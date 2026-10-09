@@ -1,0 +1,15 @@
+/* Surowe kolory, które ZOSTAJĄ: przyciemnienie overlaya (biel/czerń nie
+   niosą chromy, więc nie są kolorem marki) oraz pełny, nieprzezroczysty
+   kolor banera. Rozpoznanie washu wymaga OBU cech naraz — chromy i alfy
+   <= 45% — a każda z osobna ma prawo żyć. */
+.scrim {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.scrimSlash {
+  background: rgb(0 0 0 / 0.12);
+}
+
+.solidBanner {
+  background: oklch(78% 0.17 85);
+}

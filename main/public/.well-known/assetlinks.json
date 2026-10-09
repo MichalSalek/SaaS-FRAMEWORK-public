@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nailfolio.app",
+      "sha256_cert_fingerprints": [
+        "04:D8:9D:98:27:52:5C:6B:3E:F1:3E:A3:3D:F2:9D:39:06:A6:0A:6F:8D:9A:EF:0A:77:26:2E:D3:5B:28:CC:5E"
+      ]
+    }
+  }
+]

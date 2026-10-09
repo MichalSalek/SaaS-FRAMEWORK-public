@@ -1,0 +1,149 @@
+#!/bin/bash
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+
+echo ""
+echo "=============================="
+echo "   TYPESCRIPT CHECK SUITE     "
+echo "=============================="
+echo ""
+
+FAILED=0
+START_TIME=$(date +%s)
+
+# --- Batch 1: tsc in parallel (main + web-1) ---
+echo "  tsc: main + web-1 (parallel)..."
+
+(cd "$PROJECT_ROOT/main" && ./node_modules/.bin/tsc --noEmit > /tmp/tc_main_$$ 2>&1) &
+PID_MAIN_TSC=$!
+
+(cd "$PROJECT_ROOT/web-1" && ./node_modules/.bin/tsc --noEmit > /tmp/tc_web1_$$ 2>&1) &
+PID_WEB1_TSC=$!
+
+if wait $PID_MAIN_TSC; then
+  echo "  main tsc: OK"
+else
+  echo "  main tsc: FAILED"
+  cat /tmp/tc_main_$$ 2>/dev/null
+  FAILED=$((FAILED + 1))
+fi
+
+if wait $PID_WEB1_TSC; then
+  echo "  web-1 tsc: OK"
+else
+  echo "  web-1 tsc: FAILED"
+  cat /tmp/tc_web1_$$ 2>/dev/null
+  FAILED=$((FAILED + 1))
+fi
+
+rm -f /tmp/tc_main_$$ /tmp/tc_web1_$$
+
+echo ""
+
+# --- Batch 2: eslint in parallel (main + web-1 + shared kernel) ---
+# .shared-kernel/ = ZRODLO wspolnego kodu. Oba submoduly trzymaja swoje kopie
+# (src/READONLY-shared-kernel) w `ignores` i maja racje — kopia jest artefaktem, chmod 444,
+# a `main` robi w pre:build `eslint --fix`, wiec lint kopii wywracalby build na EACCES.
+# Przez 119 sesji nikt nie lintowal ZRODLA, wiec 17,6 tys. linii kodu wspoldzielonego przez
+# oba projekty nie mialo bramki lintera w ogole. Ten krok ja zamyka (config: eslint.config.mjs
+# w roocie, reguly = podzbior web-1 bez Next/React).
+echo "  eslint: main + web-1 + kernel (parallel)..."
+
+(cd "$PROJECT_ROOT/main" && ./node_modules/.bin/eslint --max-warnings 0 . > /tmp/el_main_$$ 2>&1) &
+PID_MAIN_ESLINT=$!
+
+(cd "$PROJECT_ROOT/web-1" && ./node_modules/.bin/eslint --max-warnings 0 . > /tmp/el_web1_$$ 2>&1) &
+PID_WEB1_ESLINT=$!
+
+# BRAK BINARKI = BLAD, NIE SKIP — ta sama lekcja co przy `scripts tsc` nizej: cicha zielen
+# nad nieuruchomiona bramka jest gorsza niz brak bramki.
+(cd "$PROJECT_ROOT" && \
+  if [ -x ./node_modules/.bin/eslint ]; then \
+    ./node_modules/.bin/eslint --max-warnings 0 . > /tmp/el_kernel_$$ 2>&1; \
+  else \
+    echo "brak node_modules/.bin/eslint w roocie (uruchom npm install w roocie)" > /tmp/el_kernel_$$; \
+    exit 1; \
+  fi) &
+PID_KERNEL_ESLINT=$!
+
+if wait $PID_MAIN_ESLINT; then
+  echo "  main eslint: OK"
+else
+  echo "  main eslint: FAILED"
+  cat /tmp/el_main_$$ 2>/dev/null
+  FAILED=$((FAILED + 1))
+fi
+
+if wait $PID_WEB1_ESLINT; then
+  echo "  web-1 eslint: OK"
+else
+  echo "  web-1 eslint: FAILED"
+  cat /tmp/el_web1_$$ 2>/dev/null
+  FAILED=$((FAILED + 1))
+fi
+
+if wait $PID_KERNEL_ESLINT; then
+  echo "  kernel eslint: OK"
+else
+  echo "  kernel eslint: FAILED"
+  cat /tmp/el_kernel_$$ 2>/dev/null
+  FAILED=$((FAILED + 1))
+fi
+
+rm -f /tmp/el_main_$$ /tmp/el_web1_$$ /tmp/el_kernel_$$
+
+echo ""
+
+# --- Batch 3: tests tsc (sequential, depends on kernel types) ---
+# Try local tests/ tsc first, fall back to web-1's binary
+echo "  tsc: tests..."
+TESTS_TSC="$PROJECT_ROOT/tests/node_modules/.bin/tsc"
+if [ ! -x "$TESTS_TSC" ]; then
+  echo "  [WARN] tests/node_modules/.bin/tsc missing — falling back to web-1's tsc (version mismatch possible)"
+  TESTS_TSC="$PROJECT_ROOT/web-1/node_modules/.bin/tsc"
+fi
+if (cd "$PROJECT_ROOT/tests" && "$TESTS_TSC" -p tsconfig.json --noEmit); then
+  echo "  tests tsc: OK"
+else
+  echo "  tests tsc: FAILED"
+  FAILED=$((FAILED + 1))
+fi
+
+# scripts/ — narzedzia budujace i propagujace SSOT (generator DTO, kernel).
+# Bez tego kroku scripts/**/*.ts nie bylo objete ZADNA bramka typow: nie lapia go
+# tsconfigi main/web-1/tests (ich include to src/** i tests/**), wiec blad typu
+# w generatorze ujawnial sie dopiero w runtime, po tym jak ktos go odpalil.
+# BRAK BINARKI = BLAD, NIE SKIP. Wczesniej ta galaz wypisywala WARN i szla dalej
+# z FAILED nietknietym, wiec `npm run typecheck` meldowal komplet zielonych bez
+# uruchomienia bramki dla scripts/ — a nieobecny tsc to najczestszy stan po swiezym
+# klonie albo po czystce node_modules, czyli dokladnie wtedy, gdy bramka jest
+# najbardziej potrzebna. Cicha zielen jest gorsza niz brak bramki.
+SCRIPTS_TSC="$PROJECT_ROOT/web-1/node_modules/.bin/tsc"
+if [ ! -x "$SCRIPTS_TSC" ]; then
+  echo "  scripts tsc: FAILED — brak web-1/node_modules/.bin/tsc (uruchom npm run system:install)"
+  FAILED=$((FAILED + 1))
+else
+  echo "  tsc: scripts..."
+  if (cd "$PROJECT_ROOT/scripts" && "$SCRIPTS_TSC" -p tsconfig.json --noEmit); then
+    echo "  scripts tsc: OK"
+  else
+    echo "  scripts tsc: FAILED"
+    FAILED=$((FAILED + 1))
+  fi
+fi
+
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+
+echo ""
+echo "-------------------------------"
+echo " TYPESCRIPT CHECK SUMMARY"
+echo "-------------------------------"
+if [ $FAILED -eq 0 ]; then
+  echo "  All checks passed (${ELAPSED}s)"
+else
+  echo "  Failed: $FAILED (${ELAPSED}s)"
+fi
+echo ""
+
+exit $FAILED

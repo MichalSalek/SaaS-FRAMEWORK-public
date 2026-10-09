@@ -1,0 +1,3 @@
+/* Blok w JEDNEJ linii: liczenie klamer per linia dawalo `opens === closes`,
+   wiec regula byla dla straznika niewidzialna — falszywa zielen. */
+.meta { color: var(--color-text-disabled); }

@@ -1,0 +1,4 @@
+.popup {
+  background: var(--color-bg-paper);
+  outline: 1px solid var(--color-border);
+}

@@ -1,0 +1,19 @@
+# Strażnicy CAŁEGO DRZEWA — skanują main/src/UI niezależnie od tego, co jest
+# w stage'u, więc uruchomienie z roota jest poprawne bez względu na to, w którym
+# repo stoi commit.
+#
+# SSOT dla DWÓCH konsumentów, którzy wcześniej trzymali własne kopie tej listy:
+#   · scripts/hooks/pre-commit   (bucket HAS_MAIN)
+#   · scripts/hooks/install-hooks (hook wstrzykiwany do submodułów)
+# Rozjazd między nimi był cichy: ratchet dopisany do jednego miejsca zostawiał
+# drugie bez ochrony, a nic tego nie pilnowało. Jedna linia = jedna nazwa
+# skryptu bez rozszerzenia; puste linie i komentarze są pomijane.
+tint-discipline
+edge-stripe-discipline
+section-discipline
+hex-policy
+disabled-text-contrast
+min-font-size
+no-sparkle
+no-split-bg
+ink-focus-ring

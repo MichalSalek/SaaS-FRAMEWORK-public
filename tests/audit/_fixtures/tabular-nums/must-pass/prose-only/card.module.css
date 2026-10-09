@@ -1,0 +1,4 @@
+/* We removed font-variant-numeric: tabular-nums here: it spaced out the date. */
+.date {
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,6 @@
+/* Krem w prymitywie WSPÓŁDZIELONYM (głos S98/A): chip renderuje się
+   kilkanaście razy na jednym ekranie z filtrami, więc „jeden krem na stronę”
+   przestaje być prawdą, zanim strona zdąży cokolwiek narysować. */
+.chip {
+  background: var(--color-bg-subtle);
+}

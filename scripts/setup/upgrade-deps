@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# scripts/setup/upgrade-deps
+
+# 1. Source Utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+header "UPGRADE DEPENDENCIES" "⬆️"
+info "Root: ${ROOT_DIR}"
+
+# 2. Upgrade root devDependencies
+if [ -f "${ROOT_DIR}/package.json" ]; then
+  step "Upgrading deps for: ${BOLD}root${RESET}"
+  (
+    cd "$ROOT_DIR"
+    if npm upgrade; then
+      success "Upgraded root"
+    else
+      error "Failed to upgrade root"
+      exit 1
+    fi
+  ) || exit 1
+fi
+
+# 3. Upgrade Loop
+for dir in "$ROOT_DIR"/*; do
+  if [ -d "$dir" ] && is_app_dir "$(basename "$dir")"; then
+    APP_NAME=$(basename "$dir")
+    step "Upgrading deps for: ${BOLD}${APP_NAME}${RESET}"
+    
+    (
+      cd "$dir"
+      if npm upgrade; then
+        success "Upgraded ${APP_NAME}"
+      else
+        error "Failed to upgrade ${APP_NAME}"
+        exit 1
+      fi
+    ) || exit 1
+  fi
+done
+
+# 4. Upgrade test dependencies
+TESTS_DIR="${ROOT_DIR}/tests"
+if [ -d "$TESTS_DIR" ] && [ -f "$TESTS_DIR/package.json" ]; then
+  step "Upgrading deps for: ${BOLD}tests${RESET}"
+  (
+    cd "$TESTS_DIR"
+    if npm upgrade; then
+      success "Upgraded tests"
+    else
+      error "Failed to upgrade tests"
+      exit 1
+    fi
+  ) || exit 1
+fi
+
+# 5. Copy Kernel
+step "Copying Shared Kernel..."
+"${SCRIPT_DIR}/../kernel/cp-kernel" || { error "Kernel Copy Failed"; exit 1; }
+
+success "All dependencies upgraded & kernel copied."
+exit 0

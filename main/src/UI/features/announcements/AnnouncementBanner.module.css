@@ -1,0 +1,149 @@
+/* ─── AnnouncementBanner ───
+ * Stacks above the AppBar/header. Each announcement is a full-width strip.
+ * Types: info (default) / warning / critical — controlled via data-type attr.
+ * Dismissable per-announcement via localStorage.
+ */
+
+/* ─── Outer wrapper ─── */
+
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: calc(var(--z-app-bar) + 1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ─── Single announcement strip ─── */
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  /* DECISION (nie usuwaj tego komentarza) — S113, 2026-09-10:
+     Odstęp poziomy jest PŁYNNY i liczony w PROCENTACH, a nie z `@media`. Ścisłe
+     sformułowanie: procent w paddingu rozwiązuje się względem inline-size BLOKU
+     ZAWIERAJĄCEGO, nie własnej szerokości elementu — dziś wychodzi na to samo tylko
+     dlatego, że pas jest pełnej szerokości rodzica. Kto doda poziomy padding rodzicowi
+     albo odbierze pasowi rozciąganie, rozjedzie te 6% po cichu. Wcześniej stało tu `@media (min-width: 768px)` z
+     `var(--space-48)` — pytanie o szerokość OKNA, gdy pas mieszka wewnątrz ramki
+     telefonu. Na desktopie ≥1280 `.layoutFrame .appShell` ma sztywne 390 px, więc
+     zapytanie i tak się łapało i pas dostawał 48 px z każdej strony: 390 − 96 = 294 px
+     na tekst. Procent tego nie umie pomylić, bo pyta o element, nie o okno.
+     Świadomie NIE container query: `container-type: inline-size` implikuje
+     `contain: layout`, czyli robi z przodka blok zawierający dla `position: fixed`
+     (szuflada, dialogi, snackbary, dolna belka) — za duży promień rażenia jak na
+     odstęp w banerze. Zmierzone wartości: 390 px → ~23 px, 768 px → ~46 px,
+     1440 px → 48 px (ścięte), czyli szeroki widok wygląda jak dotąd. */
+  padding-block: var(--space-12);
+  padding-inline: clamp(var(--space-20), 6%, var(--space-48));
+  min-height: 44px;
+  /* info (default) */
+  /* Pierscien fokusu: domyslny pas stoi na --color-primary, ktore w trybie
+     jasnym jest CIEMNA czerwienia (L 0.565), a hostuje przycisk zamkniecia.
+     Dzis ring rysuje sie przez currentColor i jest widoczny, ale gdyby ten
+     override kiedys zniknal, kontrolka spadlaby na atramentowy
+     --color-focus-ring (~3,6:1, bez zapasu). Remap zamyka to na wlasnosc.
+     UWAGA: tej powierzchni NIE widzi ink-focus-ring.sh — galaz "zloty pas"
+     wymaga `width: 100vw` w tym samym bloku, a ten pas jest pelnej szerokosci
+     przez rodzica. Rozszerzenie regexa o --color-primary dawaloby falszywki
+     na kazdym wypelnionym przycisku, wiec zamiast tego stoi tu jawny remap. */
+  --color-focus-ring: var(--color-primary-contrast);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+/* Ostrzeżenie — rola pasa ostrzegawczego */
+.item[data-type='warning'] {
+  /* Wlasny ring: bez tego wariant dziedziczy biel z bloku domyslnego, a pas
+     ostrzegawczy jest JASNY (L 0.78) — biel na nim znika. */
+  --color-focus-ring: var(--color-on-banner-warning);
+  background: var(--color-banner-warning);
+  color: var(--color-on-banner-warning);
+}
+
+/* Krytyczne — rola pasa krytycznego */
+.item[data-type='critical'] {
+  /* Pierscien fokusu: pas krytyczny to ciemna czerwien (L 0.50), a bazowy ring
+     jest w trybie jasnym atramentem — przycisk zamkniecia zostawalby bez
+     widocznego wskaznika. Ring bierze kolor tekstu tego pasa. */
+  --color-focus-ring: var(--color-on-banner-critical);
+  background: var(--color-banner-critical);
+  color: var(--color-on-banner-critical);
+}
+
+/* ─── Icon ─── */
+
+.icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+/* ─── Text content ─── */
+
+.content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.title {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.message {
+  opacity: 0.92;
+}
+
+/* ─── Dismiss button ─── */
+
+.dismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: var(--space-8);
+  padding: 0;
+  border: none;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.dismiss:hover {
+  opacity: 1;
+  background: color-mix(in oklch, var(--color-scrim) 24%, transparent);
+}
+
+.dismiss:active {
+  opacity: 0.7;
+}
+
+.dismiss:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* ─── Separator between stacked announcements ─── */
+
+.item + .item {
+  border-top: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-scrim) 20%, transparent);
+}
+
+/* ─── Reduced motion — no animations on banner itself ─── */

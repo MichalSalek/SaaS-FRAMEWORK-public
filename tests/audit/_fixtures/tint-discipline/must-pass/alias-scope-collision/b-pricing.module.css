@@ -1,0 +1,5 @@
+/* Druga strona, ta sama nazwa zmiennej, znowu złoto. Dwa źródła kolizji
+   wystarczą, żeby globalny namespace wyglądał wiarygodnie. */
+.pricingPage {
+  --eyebrow-color: var(--color-primary);
+}

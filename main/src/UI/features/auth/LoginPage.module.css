@@ -1,0 +1,395 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * LoginPage — the entry screen (also „Sprawdź skrzynkę” and the
+ * „Logujesz się jako…” gate, which reuse .wrapper / .card / .headline).
+ *
+ * DECISION (nie usuwaj tego komentarza) — owner 2026-10-08:
+ * biała karta bez ramy na papierze, w niej jedno pole i JEDNA wypełniona
+ * akcja; dostawcy pod spodem jako `outlined` tej samej wysokości. Linki
+ * pomocnicze to wiersze pod kartą, nie szare słowa. Tytuł trzyma skalę
+ * nagłówka ekranu aplikacji (ten sam idiom intro co 404 i sprawdzanie
+ * połączenia), więc na szerokim ekranie nie łamie się na trzy linie.
+ * Wejście ekranu nie jest animowane: karta po prostu jest.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* ─── Outer wrapper — full-viewport stage on paper ─── */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  min-height: 100dvh;
+  padding: var(--space-20);
+  background: var(--color-bg-main);
+}
+
+/* Above-the-card way back — aligned to the card's left edge. */
+.homeReturn {
+  width: 100%;
+  max-width: 440px;
+}
+
+.homeReturnLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 44px;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--style-radius-control);
+  transition: color var(--transition-fast);
+}
+
+.homeReturnIcon {
+  flex: none;
+  display: block;
+}
+
+.homeReturnLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .homeReturnLink:hover {
+    color: var(--color-text-primary);
+  }
+}
+
+/* ─── Card — the white box of this screen, no frame ─── */
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-24) var(--space-20);
+}
+
+/* ─── Brand header — lockup + contextual headline ─── */
+
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin-bottom: var(--space-24);
+}
+
+.brandLockup {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-8);
+}
+
+.brandMark {
+  height: 1.9em;
+  width: auto;
+}
+
+/* Contextual page title (logowanie / rejestracja) — NIE nazwa marki.
+ * Marka żyje w BrandLockupMolecule powyżej (S88). */
+.headline {
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.15;
+  letter-spacing: var(--style-heading-tracking);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* Focus target only when the previous screen unmounted under it (the sent
+   screen, the confirm gate): a heading, not a control, so no ring. */
+.headline:focus {
+  outline: none;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* ─── Context banner (chosen plan / pairing) ───
+ * A note inside the white card: paper fill, no frame. */
+.planBanner {
+  display: block;
+  margin: 0 0 var(--space-20);
+  padding: var(--space-12) var(--space-14);
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-main);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+  text-decoration: none;
+}
+
+/* Wariant KLIKALNY bannera (owner S82): tylko planBanner-jako-Link dostaje
+ * hover-cue; connectBanner (<p>, ta sama .planBanner) NIE — hover na
+ * nie-interaktywnym = floor §4. */
+.planBannerLink {
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.planBannerLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .planBannerLink:hover {
+    background: var(--color-state-hover);
+  }
+}
+
+.planBannerName {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* Komunikat po nieudanym logowaniu dostawcą (?error=…): zdanie w kolorze
+ * tekstu, ton błędu niesie ikona (bez różowej karty). */
+.authErrorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: 0 0 var(--space-20);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+}
+
+/* One line tall, so the glyph sits on the first line of a wrapping message. */
+.authErrorIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-error);
+}
+
+.authErrorIcon > svg {
+  display: block;
+}
+
+/* ─── Email form ─── */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.submitButton {
+  width: 100%;
+}
+
+/* What „Kontynuuj” does: one quiet line under the button. */
+.reassureLine {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* ─── Providers, under the form ─── */
+
+.socialSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-16);
+}
+
+.orLine {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* ─── Quick Login (DEV only) ─── */
+
+.protoLabel {
+  margin: 0 0 var(--space-12);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.quickLoginGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* A control inside the white card: paper fill, no frame (like a field). */
+.quickLoginTile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-8) var(--space-14);
+  border: 0;
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.quickLoginTile:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quickLoginTile:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .quickLoginTile:hover:not(:disabled) {
+    background: var(--color-state-hover);
+  }
+}
+
+.tileIcon {
+  flex: none;
+  display: flex;
+  color: var(--color-text-secondary);
+}
+
+.tileIcon > svg {
+  display: block;
+}
+
+.tileText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tileName {
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.tileSub {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Recovery / help rows under the card ─── */
+
+.secondaryNav {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * „Sprawdź skrzynkę”
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* The address is the one fact to check: ink, and it may break anywhere. */
+.sentEmail {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.sentActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.sentHint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.countdown {
+  display: inline-block;
+  min-width: 2ch;
+  text-align: center;
+  /* tnum-allow: digits only, counting down in place */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Counting down: the button keeps focus (aria-disabled, not disabled) but
+   must not look ready. */
+.inert {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* One reserved line under the button: sending, sent again, refusal. */
+.sentStatus {
+  margin: 0;
+  min-height: calc(var(--text-sm) * 1.5 * 2);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.sentStatus[data-tone='error'] {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+/* Inline link inside a sentence („To nie ten adres? Zmień adres”). */
+.inlineLink {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  border-radius: var(--style-radius-control);
+}
+
+.inlineLink:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.inlineLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * RESPONSIVE
+ * ───────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-40) var(--space-40) var(--space-32);
+  }
+}

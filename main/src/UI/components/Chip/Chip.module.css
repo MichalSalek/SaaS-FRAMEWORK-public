@@ -1,0 +1,149 @@
+/* ─── Chip base ─── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  border-radius: var(--style-radius-pill);
+  /* S126: ten sam krok co cichy przycisk; biały chip w białym boksie czytał
+   * się jak zwykły napis (uzasadnienie przy tokenie). */
+  background: var(--color-control-fill);
+  color: var(--color-text-primary);
+  border: var(--style-border-control) solid var(--color-control-border);
+  white-space: nowrap;
+  font-family: var(--style-control-font);
+  text-transform: var(--style-control-case);
+  letter-spacing: var(--style-control-tracking);
+  word-spacing: var(--style-control-word-spacing);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--duration-200) var(--spring-curve);
+}
+
+.chip:active {
+  transform: scale(0.95);
+}
+
+/* Interaktywny chip (role=button via ChipAtom, S33): afordancja klikalności +
+ * dostępny focus dla nawigacji klawiaturą (token mode-aware, WCAG 2.4.7). */
+.chip[role='button'] {
+  cursor: pointer;
+  position: relative;
+  min-width: 44px;
+  justify-content: center;
+}
+
+/* DECISION (nie usuwaj tego komentarza) — cel dotykowy 44px POWIĘKSZENIEM POLA,
+ * nie powiększeniem chipa:
+ * Klikalne chipy to gęste listy wyboru (UploadTagStep: 22 tagów na jednym
+ * kroku). Zmierzone wysokości: `sm` 31,6px, `md` ~41px — obie poniżej progu
+ * 44×44 (WCAG 2.5.5). Dosypanie paddingu podniosłoby chip o ~12px, czyli przy
+ * pięciu wierszach o ~60px samego kroku taggowania. Zamiast tego przezroczysty
+ * `::after` rozciąga POLE TRAFIENIA na równe 44px w pionie (`top: 50%` +
+ * `height` + translate = niezależne od wysokości chipa, więc nie trzeba
+ * przeliczać go przy zmianie fontu ani locale), a `min-width` domyka oś poziomą
+ * dla krótkich etykiet („XL", „Żel").
+ * `pointer-events` NIE wyłączamy — o to w tym elemencie chodzi. Pseudo nie
+ * przechwytuje kliknięć chipowi: jest jego częścią, więc `onClick` na chipie
+ * dostaje zdarzenie tak samo. Odstęp wierszy w `.group` musiał urosnąć do sp-14,
+ * żeby pola sąsiadujących wierszy się nie nakładały (rachunek tam). */
+.chip[role='button']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
+.chip[role='button']:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Sizes ─── */
+.sm {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.md {
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+/* ─── Label ─── */
+.label {
+  display: inline-block;
+}
+
+/* ─── Colored variant ─── */
+.colored {
+  background: var(--chip-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-text);
+}
+
+/* ─── Selected (toggle chip that is ON) ───
+ * DECISION (nie usuwaj tego komentarza) — S126, 2026-10-08:
+ * wybór = atrament odwrócony z ról (kanon „A3”), jeden wygląd w całym
+ * produkcie. Do tej sesji dwa ekrany malowały wybrany chip czerwienią marki
+ * przez własną klasę `composes: chip`, więc krok cech miał kilkanaście
+ * czerwonych pigułek obok czerwonego „Dalej” i główna akcja ginęła. */
+.selected,
+.selected.colored {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-bg-main);
+  /* Pierścień fokusu w LIGHT ma kolor atramentu, czyli na tym wypełnieniu
+   * 1:1; na negatywie rolą jest akcent-na-atramencie (S106). */
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+/* ─── Delete button ─── */
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--style-radius-pill);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.deleteButton:active {
+  opacity: 0.6;
+}
+
+/* Restored hover for desktop */
+@media (hover: hover) {
+  .deleteButton:hover {
+    opacity: 1;
+  }
+}
+
+/* ─── ChipGroup ─── */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  /* DECISION (nie usuwaj tego komentarza): odstęp WIERSZY 14px, kolumn 8px.
+   * Klikalny chip rozciąga niewidzialne pole trafienia do 44px (rachunek przy
+   * `.chip[role='button']::after`). Przy `sm` (31,6px wysokości) pole wystaje
+   * 6,2px nad i pod chipa, więc stary wspólny odstęp 8px dawał 4,4px zakładki
+   * między wierszami — dotknięcie w tym pasku trafiałoby w sąsiada z drugiego
+   * rzędu. 14px > 2 × 6,2px, czyli pola wierszy stykają się bez nachodzenia,
+   * a układ rośnie o 6px na odstęp (nie o 12px na chip, jak przy dosypaniu
+   * paddingu). Oś pozioma zostaje na 8px — pole nie rozszerza się w bok. */
+  row-gap: var(--space-14);
+  column-gap: var(--space-8);
+  align-items: center;
+}

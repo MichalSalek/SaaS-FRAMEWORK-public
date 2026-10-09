@@ -1,0 +1,25 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:preflight": "tsx preflight.ts",
+    "test:concurrency": "tsx concurrency/run-concurrency.ts",
+    "test:smoke": "tsx run-smoke-tests.ts",
+    "test:coverage": "tsx utils/coverage-checker.ts",
+    "test:context": "tsx utils/generate-context-snapshot.ts",
+    "test:full": "tsx run-smoke-tests.ts",
+    "test:all": "tsx run-smoke-tests.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit 2>/dev/null || ../web-1/node_modules/.bin/tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/pg": "^8.10.0",
+    "dotenv": "^16.0.0",
+    "imapflow": "^1.7.1",
+    "pg": "^8.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^6.0.3"
+  }
+}

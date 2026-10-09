@@ -1,0 +1,15 @@
+/* Dwa legalne zapisy: jawnie stała szerokość kolumn albo jawnie uzasadniony
+   auto. Zakazany jest tylko BRAK decyzji. */
+.comparison {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.logTable {
+  /* table-layout-auto: log admina scrolluje się poziomo (nowrap + overflow-x),
+     więc kolumny mają sizować się treścią, nie równym podziałem */
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}

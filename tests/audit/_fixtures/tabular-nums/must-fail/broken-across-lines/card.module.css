@@ -1,0 +1,5 @@
+.price {
+  font-variant-numeric:
+    lining-nums
+    tabular-nums;
+}

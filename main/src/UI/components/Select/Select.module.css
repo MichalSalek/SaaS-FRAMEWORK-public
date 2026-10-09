@@ -1,0 +1,114 @@
+/* ─── Wrapper ─── */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+}
+
+/* ─── Label ─── */
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.wrapper:focus-within .label {
+  color: var(--color-primary);
+}
+
+/* ─── Select container ─── */
+.selectContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Native select ─── */
+.select {
+  width: 100%;
+  padding: var(--style-input-pad) calc(var(--space-32) + var(--space-8))
+    var(--style-input-pad) var(--style-input-pad);
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface-input);
+  /* DECISION (nie usuwaj tego komentarza) — S116: pole tekstowe zostaje przy
+     cichej linii 1px w `--color-border`, mimo że reszta kontrolek w kierunku
+     „A3” ram nie ma. Biel pola na papierze to 1,09:1, a WCAG 1.4.11 wymaga
+     3:1 dla granicy kontrolki: bez tej linii pole nie istnieje dla oka przy
+     złym świetle. Chipy, przyciski i karty niosą się samą powierzchnią. */
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  /* DECISION (B2-F18): outline:none removes browser default ring on base selector.
+   * :focus provides border-color affordance for mouse users; :focus-visible adds
+   * a 2px primary ring for keyboard navigation (WCAG 2.4.7). */
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.select:focus {
+  border-color: var(--color-primary);
+}
+
+.select[data-empty] {
+  color: var(--color-text-muted);
+}
+
+/* The open list is the platform's: options keep full ink there. */
+.select[data-empty] option:not(:disabled) {
+  color: var(--color-text-primary);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Chevron icon ─── */
+.chevron {
+  position: absolute;
+  right: var(--space-12);
+  display: flex;
+  align-items: center;
+  color: var(--color-icon-muted);
+  pointer-events: none;
+  transition: transform var(--transition-fast);
+}
+
+/* ─── Error (the same voice as InputAtom) ─── */
+.hasError .label,
+.wrapper.hasError:focus-within .label {
+  color: var(--color-error);
+}
+
+.hasError .select,
+.hasError .select:focus {
+  border-color: var(--color-error);
+}
+
+.error {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  line-height: 1.3;
+}
+
+/* ─── Disabled ─── */
+/* Degradacja stanu idzie przez opacity, NIE przez podmianę powierzchni:
+ * kremowe tło pod wyszarzonym selectem było drugim kremem na ekranie
+ * (głos S98/A) i dublowało sygnał, który niesie już przezroczystość. */
+.isDisabled .select {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.isDisabled .label {
+  opacity: 0.5;
+}

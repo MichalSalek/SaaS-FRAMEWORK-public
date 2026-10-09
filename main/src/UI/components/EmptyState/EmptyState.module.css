@@ -1,0 +1,225 @@
+/* ============================================================
+ * EMPTY STATE — canonical "nothing here yet" surface.
+ *
+ * Two sizes, both measured off the existing family rather than invented:
+ *   page  — 5 near byte-identical page-level states (Explore, Favorites,
+ *           Gallery, ClientSessions, SalonStaff): 96px medallion, fluid title.
+ *   panel — the ~15 section/dialog/table states: 64px round medallion,
+ *           static title, smaller body.
+ *
+ * DECISION (nie usuwaj tego komentarza) — DWIE WARSTWY ZMIENNYCH, i to nie jest
+ * ozdobnik. Wariant `page` musi siedzieć na selektorze atrybutowym
+ * (`.root[data-size='page']`, specyficzność 0-2-0), a strona nadpisuje przez
+ * własną klasę (0-1-0) — więc gdyby obie warstwy pisały do TEJ SAMEJ zmiennej,
+ * wariant wygrywałby zawsze i żadne nadpisanie per strona by nie działało.
+ * Wyszło to dopiero pomiarem: SalonStaff prosił o okrągły medalion i dostawał
+ * kwadratowy z wariantu `page`.
+ *
+ * Stąd podział:
+ *   --_x            wartość WARIANTU (pisze ją tylko ten plik),
+ *   --empty-x       nadpisanie STRONY (pisze je tylko call-site),
+ *   var(--empty-x, var(--_x))  — czytane w deklaracji.
+ * Kaskada schodzi z drogi: wartość strony wygrywa, bo wariant nigdy nie pisze
+ * do `--empty-*`. Nazwy `--empty-*` zostają publicznym API komponentu.
+ *
+ * Wszystkie pokrętła deklarowane są NA `.root`, nigdy na `:root` ani na
+ * wrapperze strony. Custom properties DZIEDZICZĄ, więc `--empty-*` postawione
+ * na przodku „ustawia" je także dla instancji w środku — wtedy `var(--empty-x,
+ * var(--_x))` nie sięgnie po fallback i wariant przestanie działać. Dziś takiego
+ * przypadku nie ma (sprawdzone odczytem z żywego DOM: zero zagnieżdżeń, zero
+ * pokręteł dziedziczonych z przodka) i dlatego NIE ma tu obrony na zapas.
+ * Gdy zagnieżdżenie się pojawi, właściwą obroną jest `--empty-*: initial`
+ * na `.root` — nie przenoszenie odczytu zmiennych.
+ *
+ * Uwaga na `--empty-border`: to shorthand, więc wartość, która po podstawieniu
+ * jest niepoprawna (np. odwołanie do nieistniejącego tokenu), unieważnia CAŁĄ
+ * deklarację i element zostaje bez obramowania, cicho. To nie jest wada tego
+ * wzorca — gołe `border: var(--style-border-surface) var(--style-border-style-empty) var(--widmo)` zachowuje się tak samo —
+ * ale przy nadpisywaniu warto to wiedzieć, bo objawem jest brak ramki,
+ * a nie wartość domyślna.
+ *
+ * `--empty-surface` jest celowo NIE ujednolicone: `--color-bg-main` (#0a0a0a)
+ * i `--color-bg-paper` (#141414) to ten sam kolor w jasnym i RÓŻNE w ciemnym,
+ * więc snap przemalowałby połowę ciemnych ekranów.
+ *
+ * Floor 7×ZERO: płaska powierzchnia + pełny hairline. Zero gradientu, cienia
+ * i jednostronnej krawędzi.
+ * ============================================================ */
+
+.root {
+  /* --- wartości wariantu `panel` (domyślnego) --- */
+  --_surface: var(--color-bg-paper);
+  /* S126: rama w kolorze POWIERZCHNI (w „A3” przezroczysta), jak każdy inny
+     boks treści. Stał tu 22-procentowy tint akcentu, czyli blada różowa
+     ramka wokół każdego pustego stanu: jedyny obramowany boks na ekranie
+     i dokładnie ten „blady róż”, który owner zdjął głosem S116. */
+  --_border: var(--style-border-surface) var(--style-border-style-empty)
+    var(--color-border-surface);
+  --_pad-block: var(--space-48);
+  --_pad-block-end: var(--space-48);
+  --_pad-inline: var(--space-20);
+  --_gap: var(--space-12);
+  --_medal-size: 64px;
+  --_medal-radius: var(--style-radius-medallion);
+  --_medal-bg: var(--color-mark-bg);
+  --_medal-border: var(--style-border-surface) solid var(--color-border-surface);
+  /* Pierścień wokół medalionu — cztery ekrany rysowały go własnym
+     pseudo-elementem, każdy z innym tintem (26/30/32%) i raz do wewnątrz,
+     raz na zewnątrz. Domyślnie wyłączony; strona włącza go deklaracją ramki
+     i wybiera stronę przez `--empty-medal-ring-inset`. */
+  --_medal-ring: none;
+  --_medal-ring-inset: calc(var(--space-8) * -1);
+  --_title-size: var(--text-lg);
+  --_title-maxw: none;
+  /* Dwa ekrany (Sesje, Stylistki w Odkrywaniu) piszą tytuł pustego stanu
+     krojem odręcznym — to świadomy, cieplejszy ton dla „jeszcze nic tu nie ma".
+     Wpuszczony jako pokrętło, żeby nie wracał jako globalna klasa doklejana
+     do nagłówka z zewnątrz. */
+  --_title-font: var(--style-heading-font);
+  --_body-size: var(--text-sm);
+  --_body-maxw: 40ch;
+  --_action-minw: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--empty-gap, var(--_gap));
+  padding: var(--empty-pad-block, var(--_pad-block))
+    var(--empty-pad-inline, var(--_pad-inline))
+    var(--empty-pad-block-end, var(--_pad-block-end));
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  background: var(--empty-surface, var(--_surface));
+  border: var(--empty-border, var(--_border));
+  /* Own stacking context so a decorated illustration's pseudo-elements stay
+   * inside the card instead of climbing over neighbouring sections. */
+  position: relative;
+  isolation: isolate;
+}
+
+.root[data-size='page'] {
+  --_pad-block-end: var(--space-32);
+  --_gap: var(--space-20);
+  --_medal-size: 96px;
+  --_medal-radius: var(--style-radius-surface);
+  --_medal-border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-primary) 28%, transparent);
+  --_title-size: var(--text-fluid-lg);
+  --_title-maxw: 22ch;
+  --_body-size: var(--text-base);
+  --_body-maxw: 42ch;
+  --_action-minw: 220px;
+}
+
+.medallion {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--empty-medal-size, var(--_medal-size));
+  height: var(--empty-medal-size, var(--_medal-size));
+  border-radius: var(--empty-medal-radius, var(--_medal-radius));
+  background: var(--empty-medal-bg, var(--_medal-bg));
+  border: var(--empty-medal-border, var(--_medal-border));
+  color: var(--color-accent-fg);
+}
+
+.medallion::before {
+  content: '';
+  position: absolute;
+  inset: var(--empty-medal-ring-inset, var(--_medal-ring-inset));
+  border-radius: inherit;
+  border: var(--empty-medal-ring, var(--_medal-ring));
+  pointer-events: none;
+}
+
+/* Idle motion — the medallion is the only thing that moves on an empty
+ * screen, so both timings are slow enough to read as "waiting", not as an
+ * attention grab. Two named gestures, no third: `float` was SalonStaff's
+ * emptyFloat, `pulse` was Favorites' heartPulse. */
+@keyframes emptyMedallionFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes emptyMedallionPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.medallion[data-animate='float'] {
+  animation: emptyMedallionFloat 5s ease-in-out infinite;
+}
+
+.medallion[data-animate='pulse'] {
+  animation: emptyMedallionPulse 2.4s ease-in-out infinite;
+}
+
+.title {
+  margin: 0;
+  max-width: var(--empty-title-maxw, var(--_title-maxw));
+  font-family: var(--empty-title-font, var(--_title-font));
+  font-size: var(--empty-title-size, var(--_title-size));
+  font-weight: var(--style-heading-weight);
+  letter-spacing: var(--style-heading-tracking);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.description {
+  margin: 0;
+  max-width: var(--empty-body-maxw, var(--_body-maxw));
+  font-size: var(--empty-body-size, var(--_body-size));
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* Polish compounds are long enough to leave a ragged right edge inside a
+ * 40ch column; hyphenation is the same call the migrated pages already made. */
+.description:lang(pl) {
+  hyphens: auto;
+}
+
+/* DECISION (nie usuwaj tego komentarza): szerokość minimalną dostaje SAM
+ * przycisk, nie ten wrapper. Na wrapperze `min-width` rozciągałoby tylko pudło,
+ * a przycisk zostawałoby dosunięty do jego lewej krawędzi — czyli optycznie
+ * przesunięty względem wyśrodkowanej treści nad nim. Domyślnie `auto`: drobne
+ * CTA panelu ma zostać drobne, szeroki przycisk należy do wariantu page. */
+.action {
+  margin-top: var(--space-12);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* Odstęp, bo część stanów daje dwa wyjścia (ponów + wróć), a nie jedno. */
+  gap: var(--space-8);
+}
+
+.action > * {
+  min-width: var(--empty-action-minw, var(--_action-minw));
+}
+
+/* S108, głos 5 (desktop 1500): stan pusty sam jest zamkniętą ramą. Kolor
+   i grubość to rama powierzchni (głos S114/D), nie atrament. */
+@media (min-width: 1280px) {
+  .root,
+  .root[data-size='page'] {
+    --_surface: transparent;
+    --_border: var(--style-border-surface) solid var(--color-border-surface);
+    --_pad-block: var(--space-40);
+    --_pad-block-end: var(--space-40);
+    --_pad-inline: var(--space-40);
+  }
+}

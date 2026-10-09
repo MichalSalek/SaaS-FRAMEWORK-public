@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# scripts/setup/chmod-scripts
+
+# 1. Source Utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+# 2. Configuration
+TARGET_DIR="${SCRIPT_DIR}/.." # scripts/setup/.. -> scripts/
+DIR_MODE="0755"
+EXEC_MODE="0755"   # skrypty uruchamiane wprost: bez rozszerzenia oraz *.sh
+DATA_MODE="0644"   # reszta: *.json, *.list, *.md, *.mjs/*.cjs/*.ts (odpala je node/tsx)
+DRY_RUN=false
+
+# DECISION (nie usuwaj tego komentarza):
+# Poprzednia wersja nadawala 0755 KAZDEMU plikowi w scripts/, wiec tsconfig.json,
+# tree-guards.list i moduly node dostawaly bit wykonywalny. To nie jest kosmetyka:
+# bit exec na pliku danych sugeruje nastepnej osobie (i skryptowi szukajacemu
+# „wykonywalnych"), ze to punkt wejscia, ktorym nie jest. Nadajemy go temu, co
+# realnie odpalamy shellem.
+
+header "CHMOD SCRIPTS" "🔒"
+info "Target: ${BOLD}${TARGET_DIR}${RESET}"
+
+for arg in "$@"; do
+  if [[ "$arg" == "--dry-run" ]]; then
+    DRY_RUN=true
+    warn "DRY RUN ENABLED"
+  fi
+done
+
+# 3. Execution
+step "Setting Directory Permissions (${DIR_MODE})"
+if [ "$DRY_RUN" = true ]; then
+  info "find ${TARGET_DIR} -type d -exec chmod ${DIR_MODE} {} +"
+else
+  find "${TARGET_DIR}" -type d -exec chmod "${DIR_MODE}" '{}' +
+fi
+
+step "Setting Executable Permissions (${EXEC_MODE})"
+if [ "$DRY_RUN" = true ]; then
+  info "find ${TARGET_DIR} -type f \( ! -name '*.*' -o -name '*.sh' \) -exec chmod ${EXEC_MODE} {} +"
+else
+  find "${TARGET_DIR}" -type f \( ! -name '*.*' -o -name '*.sh' \) -exec chmod "${EXEC_MODE}" '{}' +
+fi
+
+step "Setting Data Permissions (${DATA_MODE})"
+if [ "$DRY_RUN" = true ]; then
+  info "find ${TARGET_DIR} -type f -name '*.*' ! -name '*.sh' -exec chmod ${DATA_MODE} {} +"
+else
+  find "${TARGET_DIR}" -type f -name '*.*' ! -name '*.sh' -exec chmod "${DATA_MODE}" '{}' +
+fi
+
+success "Permissions updated"
+exit 0

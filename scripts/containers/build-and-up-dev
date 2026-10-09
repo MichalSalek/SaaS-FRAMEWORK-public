@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# scripts/containers/build-and-up-dev
+
+# 1. Source Utils + SSOT par plikow compose
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/_compose.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+header "DOCKER DEV BUILD & START" "🐳"
+info "Root: ${ROOT_DIR}"
+info "Files: ${DEV_COMPOSE_LABEL}"
+
+cd "${ROOT_DIR}" || { error "Cannot enter root dir"; exit 1; }
+
+# NOTE: bylo tu `compose rm -f` — krok BEZ EFEKTU: `rm` usuwa wylacznie kontenery
+# ZATRZYMANE ("No stopped containers", rc=0 przy dzialajacym devie), a te i tak
+# odtwarza `up --force-recreate` ponizej. Usuniete, zeby log nie sugerowal
+# czyszczenia, ktorego nie ma.
+
+step "Pulling images..."
+# Ciagnie obrazy serwisow bez `build:` (postgres, adminer, caddy). Bez diagnostyki
+# `set -e` ubijalo skrypt w tym miejscu bez slowa wyjasnienia.
+dev_compose pull || { error "Pull obrazow nieudany (brak sieci? rejestr niedostepny?)"; exit 1; }
+
+step "Building images..."
+dev_compose build --pull || { error "Failed to build images"; exit 1; }
+
+step "Starting containers..."
+dev_compose up -d --force-recreate || { error "Failed to start containers"; exit 1; }
+
+# ==============================================================================
+# VERIFICATION — `up -d` konczy sie sukcesem po UTWORZENIU kontenerow, nie po ich
+# wystartowaniu. Bez tej asercji skrypt meldowal "Build DEV OK" takze wtedy, gdy
+# kontener natychmiast padal (crash-loop / zly env / zajety port).
+# ==============================================================================
+step "VERIFICATION"
+if ! assert_compose_running dev_compose main-dev web-1-dev db adminer caddy; then
+  error "Dev NIE wstal poprawnie. Diagnostyka: npm run dev:preflight  |  docker compose logs --tail 50 <serwis>"
+  exit 1
+fi
+
+success "Build DEV OK"
+exit 0

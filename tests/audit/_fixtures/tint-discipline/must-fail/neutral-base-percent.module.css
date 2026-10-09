@@ -1,0 +1,14 @@
+/* Procent stojący przy BAZIE zapisanej literałem (transparent / white /
+   black), a nie przy tokenie. Skan zbierał procenty wyłącznie przy var(--x),
+   więc złoto-reszta wychodziło jako kolor PEŁNY (100%) i przechodziło. */
+.overTransparent {
+  background: color-mix(in oklch, transparent 88%, var(--color-primary));
+}
+
+.overWhite {
+  background: color-mix(in srgb, white 90%, var(--color-primary));
+}
+
+.overBlack {
+  background: color-mix(in srgb, black 91%, var(--color-primary));
+}

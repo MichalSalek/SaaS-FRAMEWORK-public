@@ -1,0 +1,9 @@
+/* Kanoniczny „tell" AI-slopu: cienki pas akcentu przyklejony do LEWEJ
+   krawędzi karty. Zapis przez skrót `inset` z `auto` w slocie prawym. */
+.planCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-primary);
+}

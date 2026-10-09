@@ -1,0 +1,4 @@
+.inkNoRemap {
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+}

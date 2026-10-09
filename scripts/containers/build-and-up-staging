@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# scripts/containers/build-and-up-staging
+
+# 1. Source Utils + SSOT par compose + SSOT konfiguracji deployu
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/_compose.sh"
+source "${SCRIPT_DIR}/../deploy/deploy.config.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+# Staging = the prod compose + a dedicated local-DB override (docker-compose.staging.yml).
+# Both files, in order, on EVERY compose invocation — lista plikow w _compose.sh.
+
+header "DOCKER STAGING RESET" "🐳"
+info "Root: ${ROOT_DIR}"
+info "Files: ${STAGING_COMPOSE_LABEL}"
+
+cd "${ROOT_DIR}" || { error "Cannot enter root dir"; exit 1; }
+
+# ==============================================================================
+# PHASE 0: BUILD (STAGING ARTIFACTS)
+# ==============================================================================
+step "PHASE 0: BUILD (STAGING ARTIFACTS)"
+npm run build:staging || { error "Build failed"; exit 1; }
+
+# ==============================================================================
+# PHASE 1: STOP & REMOVE
+# ==============================================================================
+step "PHASE 1: STOP & REMOVE CONTAINERS"
+# NOTE: down WITHOUT --volumes — staging now carries a local DB (staging_db) whose
+# data (test accounts/content) should survive a redeploy. The web-1 entrypoint
+# runs an idempotent `db push` on every start, so persisting the volume is safe;
+# `--volumes` here would wipe the staging DB on every deploy.
+# DECISION (nie usuwaj): the reset chain `install:docker:staging:reset` (package.json)
+# uses `system:prune:all` (images + build cache, NO volumes), NOT `system:prune:full`
+# (whose `docker system prune --volumes` would delete staging_db once containers are
+# down). Same volume-preservation reason as below — do not swap it back to :full.
+staging_compose down --remove-orphans || warn "Failed to stop containers (might be already stopped)"
+
+success "Containers removed"
+
+# ==============================================================================
+# PHASE 2: BUILD
+# ==============================================================================
+# --pull keeps base images (node:24-slim, postgres:16) fresh. --no-cache (owner
+# decision 2026-06-24): force a fully fresh image build on every deploy so there is
+# zero chance a stale layer ships — that certainty is the point. Disk churn is bounded
+# by the `system:prune:all` (docker builder prune) that brackets the reset chain, and
+# the Dockerfiles only ADD prebuilt host output so the extra build time is small.
+# Volumes are NEVER pruned (see PHASE 1) so staging_db survives.
+step "PHASE 2: BUILD"
+staging_compose build --pull --no-cache || { error "Build failed"; exit 1; }
+
+success "Images built"
+
+# ==============================================================================
+# PHASE 3: START
+# ==============================================================================
+step "PHASE 3: START CONTAINERS"
+staging_compose up -d --force-recreate || { error "Start failed"; exit 1; }
+
+success "Containers started"
+
+# ==============================================================================
+# VERIFICATION — az do 2026-08-20 byl tu goly `compose ps`: wypisywal tabelke,
+# ktorej NIKT nie sprawdzal, a skrypt konczyl sie sukcesem. Wszystkie serwisy maja
+# `restart: always`, wiec kontener padajacy w petli pokazuje sie jako Restarting
+# (chwilowo nawet Up) — "staging postawiony" bylo twierdzeniem bez pomiaru.
+# Dwa poziomy: (1) kontenery faktycznie w stanie running, (2) aplikacja ODPOWIADA
+# (kontener zyje != Next wstal; entrypoint web-1 robi jeszcze `db push`).
+# ==============================================================================
+step "VERIFICATION"
+staging_compose ps
+
+# Celowo niecytowane: STAGING_EXPECTED_SERVICES to lista rozdzielona spacjami (SSOT
+# w deploy.config.sh), ktora ma sie rozwinac na osobne argumenty.
+# shellcheck disable=SC2086
+if ! assert_compose_running staging_compose ${STAGING_EXPECTED_SERVICES}; then
+  error "Diagnostyka: docker compose -f docker-compose.prod.yml -f docker-compose.staging.yml logs --tail 80 <serwis>"
+  exit 1
+fi
+
+step "HEALTH GATE"
+assert_http_ok "${STAGING_HEALTH_URL_FRONTEND}" 20 3 || { error "Front stagingu nie odpowiada."; exit 1; }
+# Backend dostaje wiecej czasu: entrypoint robi `prisma db push` na lokalnej bazie.
+assert_http_ok "${STAGING_HEALTH_URL_BACKEND}" 30 4 || { error "Backend stagingu nie odpowiada (db push? env?)."; exit 1; }
+
+header "BUILD STAGING OK" "✨"
+exit 0

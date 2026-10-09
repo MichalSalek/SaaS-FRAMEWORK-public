@@ -1,0 +1,96 @@
+/* UI/features/shared/profile/ProfileShareCard.module.css
+ * The stylist's own profile link: one sentence, the full address with a
+ * „Kopiuj” button, then „Udostępnij” and „Zobacz profil” in one row.
+ * White box on paper; the address is plain text in it (no box in a box). */
+
+.card {
+  /* Ciche przyciski w białym boksie — patrz DECISION przy `.cardStack`
+     w AccountPage.module.css. */
+  --btn-quiet-hover-bg: var(--color-mark-bg-strong);
+  background: var(--color-surface-card);
+  /* The card sits in a phone column, a 280px aside and a 900px page: its
+     rows read ITS width, never the viewport. */
+  container-type: inline-size;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.title {
+  margin: 0;
+}
+
+.body {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* --- Address + copy --- */
+
+/* The address wraps as much as it needs; the button keeps its size and moves
+   under the address as a whole only when the row cannot hold both. */
+.address {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+}
+
+.url {
+  flex: 1 1 14ch;
+  min-width: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.copy {
+  flex: none;
+}
+
+/* Two states in ONE grid cell: the cell is as wide as the wider one, so
+   „Kopiuj” -> „Skopiowano” changes no width. */
+.swap {
+  display: inline-grid;
+  justify-items: center;
+  align-items: center;
+}
+
+.swap > * {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.swap > [data-shown] {
+  visibility: visible;
+}
+
+/* The label starts right after its icon: centred in the reserved cell, the
+   shorter word („Kopiuj”) stood a word away from the glyph. */
+.swapLabel {
+  justify-items: start;
+}
+
+/* --- Actions: one row, whole buttons wrap when it is too narrow --- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.action {
+  flex: 1 1 auto;
+}
+
+/* On a wide card a button takes its own width instead of half of 900px. */
+@container (min-width: 480px) {
+  .action {
+    flex: 0 0 auto;
+  }
+}

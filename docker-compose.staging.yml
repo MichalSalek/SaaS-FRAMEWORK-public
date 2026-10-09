@@ -1,0 +1,98 @@
+# docker-compose.staging.yml — STAGING override (layer ON TOP of docker-compose.prod.yml).
+#
+# Why: the prod compose has NO database (prod/preview use Neon). Pointing staging
+# at the shared preview Neon DB was wrong on two counts: (1) no isolation — staging
+# writes pollute the preview environment; (2) schema drift — the repo carries a
+# single squashed baseline migration that lags schema.prisma (dev evolves via
+# `db push`), so it never matches the latest master the staging box builds.
+# A DEDICATED local Postgres fixes both: web-1's entrypoint runs `db push` for
+# STAGING (see docker-entrypoint.sh) to sync this DB to the exact current
+# schema.prisma, isolated, with zero cloud dependency for a LAN box.
+# Mirrors the dev compose `db` service (same image + initdb extensions).
+#
+# Usage: docker compose -f docker-compose.prod.yml -f docker-compose.staging.yml ...
+services:
+  db:
+    container_name: staging-db
+    image: postgres:16
+    restart: always
+    shm_size: 128mb
+    command: [postgres, -c, shared_preload_libraries=pg_stat_statements]
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=staging
+      - POSTGRES_PASSWORD=staging
+      # trust auth is safe ONLY because this service publishes NO host port (see the
+      # absence of a `ports:` key below — unlike dev which maps 3200:5432): the DB is
+      # reachable solely on the internal compose bridge. Do NOT add a ports: mapping
+      # and do NOT reuse this on a routable host without switching to scram-sha-256.
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    networks:
+      - main_connector_network
+    volumes:
+      - staging_db:/var/lib/postgresql/data
+      - ./docker/postgres/initdb.d:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U staging -d db"]
+      interval: 5s
+      timeout: 30s
+      retries: 15
+
+  web-1-prod:
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - HOSTNAME=0.0.0.0
+      # Pin the staging branch explicitly here (this override IS the canonical
+      # staging definition) so the entrypoint's db-push path never depends on
+      # whatever NODE_ENV_MANUAL a restored .env.production.local happens to carry.
+      # `environment` overrides `env_file` from the prod compose.
+      - NODE_ENV_MANUAL=STAGING
+      - DATABASE_URL=postgresql://staging:staging@db:5432/db?schema=public
+      # App-logs store -> the SAME local db (AppLogRecord lives alongside the app
+      # tables). Without this the app-log buffer defaults to 127.0.0.1:5432 inside
+      # the web-1 container (nothing listens there) and floods the logs with
+      # DatabaseNotReachable on every flush, masking real errors. Local + isolated.
+      - ENABLE_APP_LOGS_DB=true
+      - DATABASE_APP_LOGS_URL=postgresql://staging:staging@db:5432/db?schema=public
+    # Caddy owns the host ports now; web-1 is reachable only on the compose network.
+    ports: !reset []
+
+  main-prod:
+    # Caddy owns host :80; main-prod is reachable only on the compose network.
+    ports: !reset []
+
+  # Reverse proxy: TLS termination (Let's Encrypt via Cloudflare DNS-01 — the box is
+  # behind home NAT on a private IP, so only DNS-01 works). Serves the frontend on
+  # :443 and the backend on :3101 with ONE cert for staging.example.com, and
+  # auto-redirects :80 -> :443. Custom Caddy build carries the cloudflare DNS plugin.
+  caddy:
+    container_name: staging-caddy
+    build:
+      context: ./docker/caddy
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - main_connector_network
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3101:3101"
+    env_file:
+      - ./docker/caddy/cf.env
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - main-prod
+      - web-1-prod
+
+volumes:
+  staging_db:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local

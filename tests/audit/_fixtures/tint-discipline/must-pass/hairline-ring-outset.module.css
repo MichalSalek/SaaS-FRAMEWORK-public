@@ -1,0 +1,6 @@
+/* Obrys BEZ inset: zdjęcie wymogu `inset` nie może zamienić hairline'a
+   w naruszenie. Granica jest w rozlaniu (20px), nie w słowie kluczowym. */
+.ringed {
+  background: var(--color-bg-main);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-primary) 22%, transparent);
+}

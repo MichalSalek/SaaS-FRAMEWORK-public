@@ -1,0 +1,60 @@
+/* ─── GetAppHero — media hero „weź to na telefon" (głos S22/2 fuzja B+C).
+ * Wydzielone z GetAppPage.module.css 2026-09-09, gdy hero stał się wspólny
+ * dla /get-app i /app/home (DECISION w GetAppHero.organism.tsx). Typografia
+ * i szkielet hero żyją w components/LpHero — tu tylko kolaż i kolumna sklepów.
+ * ─── */
+
+/* C: telefon(y) + sklepy pod nimi — pionowa kolumna dowodu.
+ * text-align centruje notę "coming soon" pod przyciskami. */
+.mediaWithStores {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  text-align: center;
+}
+
+/* B: kolaż dwóch telefonów — editorial offset.
+ * Pion + lekki overlap, zero ramek-boxów wokół (gołe telefony).
+ * Szerokość MUSI przyjść z wrapperów: figura PhoneMockup bez figcaption
+ * kolabuje do zera bez wymiaru kontenera (lekcja S21). */
+.collage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.collagePrimary {
+  width: clamp(180px, 58%, 260px);
+  z-index: 1;
+}
+
+/* Drugi ekran (rozmowa) schodzi w dół i lekko nachodzi na pierwszy —
+ * z-index wynosi go NAD galerię w pasie overlapu. Ramka telefonu zajmuje 90%
+ * wrappera, więc -24px przy 390 dawało STYK ramek zamiast nachodzenia i dwie
+ * obwódki urządzeń zlewały się w grubą kreskę (sonda qa:borders, S114). */
+.collageSecondary {
+  width: clamp(140px, 46%, 200px);
+  margin-top: clamp(48px, 9vw, 88px);
+  margin-left: clamp(-48px, -10vw, -40px);
+  z-index: 2;
+}
+
+/* Scroll anchor wrapping GetAppStoreButtons (funnel CTAs in 'get-app' mode
+   scroll here instead of navigating to login). Lives inside .mediaWithStores —
+   transparent column with the parent's gap, so the fragment (buttons row +
+   "coming soon" note) keeps the exact rhythm of the voted form. */
+.storesAnchor {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  scroll-margin-top: 80px;
+  /* Store CTA stack left-aligns (owner 2026-07-18): favoured Android button on
+   * top, "coming soon" + iOS note read as left-aligned captions beneath it.
+   * text-align:left overrides the centered .mediaWithStores column for this
+   * block only (the phone collage above stays centered). */
+  text-align: left;
+}

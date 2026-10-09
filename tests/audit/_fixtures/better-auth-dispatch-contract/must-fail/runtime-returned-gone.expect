@@ -1,0 +1,2 @@
+ctx.context.returned: BRAK przypisania
+audyt CANNOT_LOGIN przestaje zapisywać nieudane logowania

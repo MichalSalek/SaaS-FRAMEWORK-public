@@ -1,0 +1,128 @@
+/* ─── Wrapper ─── */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+}
+
+/* ─── Label ─── */
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.wrapper:focus-within .label {
+  color: var(--color-primary);
+}
+
+.hasError .label {
+  color: var(--color-error);
+}
+
+/* ─── Input container (for search icon positioning) ─── */
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Shared input / textarea styles ─── */
+.input,
+.textarea {
+  width: 100%;
+  padding: var(--style-input-pad);
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface-input);
+  /* DECISION (nie usuwaj tego komentarza) — S116: pole tekstowe zostaje przy
+     cichej linii 1px w `--color-border`, mimo że reszta kontrolek w kierunku
+     „A3” ram nie ma. Biel pola na papierze to 1,09:1, a WCAG 1.4.11 wymaga
+     3:1 dla granicy kontrolki: bez tej linii pole nie istnieje dla oka przy
+     złym świetle. Chipy, przyciski i karty niosą się samą powierzchnią. */
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  /* DECISION (B2-F18): outline:none on base selector — browser default ring removed.
+   * :focus-visible below re-adds a 2px primary ring for keyboard navigation (WCAG 2.4.7).
+   * :focus adds border-color change for mouse/stylus users as secondary affordance. */
+  outline: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  /* muted (nie disabled) — placeholder aktywnego pola wymaga AA (disabled #aaa
+   * = 2.19:1 na #f8f8f8 FAIL; muted #6e6e6e = ~4.8:1 PASS, dark #909090 ~5.4:1).
+   * Disabled-token jest WCAG-exempt tylko dla disabled UI, nie dla placeholderów. */
+  color: var(--color-text-muted);
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--color-primary);
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Search icon ─── */
+.searchIcon {
+  position: absolute;
+  left: var(--style-input-pad);
+  display: flex;
+  align-items: center;
+  color: var(--color-icon-muted);
+  pointer-events: none;
+}
+
+.withSearchIcon {
+  padding-left: calc(var(--style-input-pad) + 20px + var(--space-8));
+}
+
+/* ─── Textarea ─── */
+.textarea {
+  resize: none;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* ─── Error state ─── */
+.hasError .input,
+.hasError .textarea {
+  border-color: var(--color-error);
+}
+
+.hasError .input:focus,
+.hasError .textarea:focus {
+  border-color: var(--color-error);
+}
+
+.error {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  line-height: 1.3;
+}
+
+/* ─── Disabled ─── */
+.isDisabled .input,
+.isDisabled .textarea {
+  opacity: 0.5;
+  cursor: not-allowed;
+  /* surface-hover (neutral), NIE bg-subtle: gold-tint robił z pola
+   * read-only NAJCIEPLEJSZE pole formularza — odwrócona afordancja
+   * (fresh-eyes S25, e-mail na koncie). */
+  background: var(--color-surface-hover);
+}
+
+.isDisabled .label {
+  opacity: 0.5;
+}

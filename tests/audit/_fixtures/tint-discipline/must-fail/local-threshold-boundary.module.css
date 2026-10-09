@@ -1,0 +1,14 @@
+/* Bliźniaczy próg drabiny lokalnej — ta sama granica, inna gałąź kodu
+   (localTints), i tak samo niezakotwiczona od góry. */
+.page {
+  --wash-44: color-mix(in oklch, var(--color-primary) 44%, var(--color-bg-main));
+  --wash-45: color-mix(in oklch, var(--color-primary) 45%, var(--color-bg-main));
+}
+
+.introCard {
+  background: var(--wash-44);
+}
+
+.outroCard {
+  background: var(--wash-45);
+}

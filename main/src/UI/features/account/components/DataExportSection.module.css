@@ -1,0 +1,75 @@
+/* DataExportSection.module.css — section „Dane”: the export of account data.
+ * The white box comes from `.cardStack > section` (AccountPage.module.css).
+ * One column: what it is, the one action, then the line that carries the
+ * result. The button never shares a row with the description (at 390px the
+ * text was squeezed into a 150px column beside it). */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-16);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title {
+  margin: 0;
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  max-width: 56ch;
+}
+
+.action {
+  max-width: 100%;
+}
+
+/* Always mounted: idle = what the file is, after the export = where it went.
+ * The icon sits on the FIRST line of a text that may wrap. */
+.status {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: 0;
+  min-height: 2lh;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.status[data-tone='success'] {
+  color: var(--color-text-primary);
+}
+
+.status[data-tone='warning'] {
+  color: var(--color-text-primary);
+}
+
+.statusIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.statusIcon svg {
+  display: block;
+}
+
+.status[data-tone='success'] .statusIcon {
+  color: var(--color-success);
+}
+
+.status[data-tone='warning'] .statusIcon {
+  color: var(--color-warning);
+}

@@ -1,0 +1,27 @@
+.frame {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: min(55rem, var(--illustration-native-width, 55rem));
+  --illustration-gap: clamp(32px, 4vw, 48px);
+  margin-block: var(--illustration-gap);
+  margin-inline: auto;
+  border: var(--style-border-ring) solid
+    var(--illustration-frame, var(--color-text-primary));
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-paper);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* DECISION: one rhythm around artwork; section padding already separates the
+ * final illustration from the next band. No second bottom gap at band ends. */
+.frame:last-child {
+  margin-bottom: 0;
+}

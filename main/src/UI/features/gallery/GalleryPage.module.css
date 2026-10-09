@@ -1,0 +1,351 @@
+/* UI/features/gallery/GalleryPage.module.css
+ * The stylist's own gallery: the photos are the content.
+ *
+ * Hierarchy: intro (canon <AppHero>: title + one sentence of live numbers) →
+ * ONE filter control row (GalleryFilterBar) → photo grid. Nothing animates in
+ * on entry (owner 2026-10-08: no staggered entrances), so a return from a
+ * photo lands on a still page at the remembered position.
+ *
+ * Zero: gradient / shadow / glow / blur / one-sided-border / hover-on-static.
+ */
+
+/* --- Page shell --- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  /* Compensate AppLayout content padding for full-bleed hero. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  /* Bottom clearance so in-flow content (esp. the empty-state CTA "Dodaj
+   * pierwsze zdjecie") never hides under the fixed 56px BottomTabBar NOR the
+   * floating filter-FAB (GalleryFilterSection: bottom 76px + 48px tall =
+   * reaches 124px above the viewport bottom) — clear that plus the
+   * safe-area inset and a breathing gap. */
+  padding: var(--space-20) var(--space-20)
+    calc(124px + var(--space-32) + env(safe-area-inset-bottom, 0px));
+}
+
+/* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+   ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+   a `@media (min-width: …)` mierzy VIEWPORT, nie ramę: przy 1440 siatka szła
+   w cztery kolumny (`min-width: 960px`) wewnątrz kadru 350px, czyli kafle po
+   ~78px. Reguły szerokościowe niżej pytają `@container app-view`, o progach
+   niższych o 40px od dawnych viewportowych (mierzą content-box strony), więc
+   na realnym telefonie zachowanie jest 1:1 z poprzednim.
+
+   Kontener siedzi na `.pageTrack`, NIE na `.page`: `container-type` włącza
+   layout containment, a to robi z elementu blok zawierający dla potomków
+   `position: fixed`. FAB filtrów (GalleryFilterSection, `position: fixed`)
+   jest rodzeństwem `.pageTrack` wewnątrz `.page` — gdyby kontener stał na
+   `.page`, FAB przestałby trzymać się okna i zjeżdżał ze scrollem. */
+.pageTrack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* Karta-intro żyje w kanonie <AppHero> (components/AppHero). */
+
+/* ============================================================
+ * FILTERS — one compact row in the content (GalleryFilterBar), not sticky
+ * ============================================================ */
+
+/* DECISION (nie usuwaj tego komentarza) — S115, 2026-09-15: blok filtrów NIE jest
+ * przyklejony. Trzy podpisane rzędy chipów (kolory, cechy, długości) mają ~330 px,
+ * więc przyklejone zabierały na telefonie ~40% ekranu i zdjęcia przewijały się
+ * w wąskim pasku. Filtry zostają pod ręką przez przyklejony przycisk
+ * `GalleryFilterSection .filterFab`, który otwiera pełną nakładkę.
+ *
+ * S126, 2026-10-08 (owner: „rozlazłe”): te trzy rzędy NIE stoją już nad
+ * zdjęciami wcale. Został jeden rząd „Filtry N” z aktywnymi filtrami
+ * (components/GalleryFilterBar), dalej nieprzyklejony, a pływający przycisk
+ * pokazuje się dopiero, gdy ten rząd zjedzie z ekranu (DECISION w
+ * components/GalleryFloatingFilters.organism.tsx). */
+
+/* ============================================================
+ * MASONRY GRID — variable heights via CSS columns
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * CSS columns over CSS grid (auto-flow: dense) because true masonry needs
+ * variable child heights without aspect-ratio coupling. The Pinterest-
+ * style flow happens automatically; cards fill columns top-to-bottom.
+ * break-inside: avoid keeps each card intact across column breaks.
+ * 2 cols on mobile, 3 on tablet, 4 on desktop, 5 on wide desktop, counted on
+ * the content track (container query), so the grid uses the page's width.
+ * ============================================================ */
+
+.galleryGrid {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .galleryGrid {
+    column-count: 3;
+    column-gap: var(--space-12);
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGrid {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+@container app-view (min-width: 1360px) {
+  .galleryGrid {
+    column-count: 5;
+  }
+}
+
+.galleryGridItem {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGridItem {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* Full-width layout (single column, vertical rhythm) — for the
+ * editorial / single-column reading mode. */
+/* S118 (owner): widok jednokolumnowy ma się czytać jak feed: zdjęcie na pełną
+   szerokość kadru, bez marginesu sekcji i bez karty wokół, kolejne prace jedna
+   pod drugą. Siatka dwukolumnowa zostaje kartami. */
+.galleryGridFullWidth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-24);
+  /* section-discipline-allow: widok jednokolumnowy to feed zdjęć na pełną
+     szerokość kadru (głos ownera S118), a nie sekcja strony statycznej —
+     komponent Section niesie inną semantykę i własne odstępy. */
+  /* The feed bleeds through the page gutter, including inside the DEV phone
+   * frame. Viewport units would size its photos against the desktop window. */
+  width: calc(100% + var(--space-20) * 2);
+  margin-inline: calc(var(--space-20) * -1);
+}
+
+/* S126 (owner: „wykorzystaj szerokość”): na szerokim torze „duże zdjęcia” to
+ * dwie, potem trzy kolumny dużych kadrów w marginesach strony, a nie jedna
+ * kolumna 400 px pośrodku pustego ekranu. Przełącznik widoku dalej wybiera
+ * między dużymi kadrami a gęstą siatką. */
+@container app-view (min-width: 560px) {
+  .galleryGridFullWidth {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: auto;
+    margin-inline: 0;
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGridFullWidth {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ============================================================
+ * EMPTY STATE — branded illustration + warm copy + tip pills
+ * Reads as Notion-style onboarding, not a sad icon + text.
+ * Motyw „Jeden krem" (R3): głębię niesie sama zamknięta ramka przerywana
+ * plus medalion ilustracji — fill zdjęty, blok siedzi na papierze.
+ * ============================================================ */
+
+/* Powierzchnia, rama i typografia = kanon <EmptyState size="page"> (biały
+   boks bez ramy, jak każda sekcja; S126 zdjęło lokalne tło i różową ramkę). */
+.emptyState {
+  margin-top: var(--space-12);
+}
+
+/* Inline guidance list — plain text, tonal tint, NO pill/border/icon-circle.
+ * DECISION (nie usuwaj): static tips must NOT look tappable (fake affordance).
+ * Reads as "to przeczytaj", nie "to kliknij". Each line carries a flat tonal
+ * marker (color-mix bullet, zero gradient/shadow) for editorial rhythm. */
+.emptyTips {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.emptyTip {
+  position: relative;
+  padding-left: var(--space-20);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.emptyTip::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--style-radius-pill);
+  background: color-mix(in oklch, var(--color-primary) 55%, transparent);
+}
+/* No-results variant — slim, no illustration, focused on clear-filters action. */
+/* Powierzchnia = kanon <EmptyState> bez medalionu (to krótki komunikat, nie
+   zaproszenie do pierwszej akcji). Zostają dwa przyciski obok siebie zamiast
+   jednego pod drugim. */
+.noResultsState {
+  --empty-title-size: var(--text-lg);
+  --empty-pad-block: var(--space-32);
+  --empty-pad-block-end: var(--space-32);
+}
+/* ============================================================
+ * PLAN LIMIT NOTICE — only when one place is left, or none
+ *
+ * At the limit: a white box with the one decision („Zmień plan”). One place
+ * left: a quiet line on paper. No tint, no frame: the lock icon and the
+ * button carry the meaning.
+ * ============================================================ */
+
+.limitNotice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* The text may wrap: the icon's box is exactly one line of that text tall, so
+ * the glyph sits on the FIRST line, not against the middle of the paragraph. */
+.limitNoticeIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.limitNoticeIcon svg {
+  display: block;
+}
+
+.limitNoticeText {
+  flex: 1 1 12ch;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.limitNoticeCta {
+  flex: none;
+  margin-left: auto;
+}
+
+.limitHint {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* --- Upgrade Dialog --- */
+
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog-backdrop);
+  background: color-mix(in oklch, var(--color-ink) 50%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-32);
+}
+
+.dialogPanel {
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-48);
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  text-align: center;
+}
+
+.dialogIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--style-radius-pill);
+  /* Motyw „Jeden krem" (S94): ZNAK (medalion pod glifem dialogu) zostaje
+     złoty przez token roli; ikona bierze accent-fg, bo primary na papierze
+     to 2.2:1. */
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialogCta {
+  width: 100%;
+}
+
+/* ============================================================
+ * SKELETON — varied heights to hint at masonry
+ * ============================================================ */
+
+.skeletonGrid {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .skeletonGrid {
+    column-count: 3;
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonGrid {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+.skeletonCard {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+  border-radius: var(--style-radius-surface);
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonCard {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* Varied skeleton heights via nth-child rotation — masonry feel from
+ * the loading state itself. */
+.skeletonCard:nth-child(3n + 1) {
+  aspect-ratio: 3 / 4;
+}
+.skeletonCard:nth-child(3n + 2) {
+  aspect-ratio: 1 / 1;
+}
+.skeletonCard:nth-child(3n + 3) {
+  aspect-ratio: 4 / 5;
+}

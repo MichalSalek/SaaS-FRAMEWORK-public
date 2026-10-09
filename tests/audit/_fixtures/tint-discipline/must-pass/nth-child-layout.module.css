@@ -1,0 +1,8 @@
+/* nth-child użyty do UKŁADU, bez tła — to nie zebra. */
+.tile:nth-child(even) {
+  grid-column: span 2;
+}
+
+.tile:nth-of-type(3) {
+  align-self: end;
+}

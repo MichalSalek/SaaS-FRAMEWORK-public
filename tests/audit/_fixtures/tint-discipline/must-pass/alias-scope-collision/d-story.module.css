@@ -1,0 +1,9 @@
+/* Ta sama mechanika na KREMIE. Tu alias --band faktycznie wskazuje krem
+   i niesie JEDEN pas, czyli zapis w pełni legalny (R2). */
+.storyPage {
+  --band: var(--color-bg-subtle);
+}
+
+.storyPage .heroBand {
+  background: var(--band);
+}

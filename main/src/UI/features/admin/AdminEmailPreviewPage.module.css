@@ -1,0 +1,128 @@
+/* AdminEmailPreviewPage: the picker row and the ONE box that holds the
+   subject line and the mail's frame. Select, segmented controls, pills, the
+   skeleton and the error are shared parts; nothing of them is drawn here. */
+
+/* ─── Pickers (on paper) ─── */
+
+/* The template select takes the free width; the two switches keep their own
+   and move under it whole when the row is too narrow. */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  /* Fields of one row share its height: labels start on one line, controls
+     stand on one centre line (the select is taller than a switch). */
+  align-items: stretch;
+  gap: var(--space-16) var(--space-24);
+}
+
+.templateField {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.field {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  /* Same gap as SelectAtom puts between its label and its control. */
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.fieldControl {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+/* Same voice as the label SelectAtom draws next to it. */
+.fieldLabel {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Panel: subject, then the frame ─── */
+
+.panel {
+  /* The frame ends where the mail ends (`--mail-height`, measured), up to
+     this maximum; a longer mail scrolls INSIDE its frame and the page never
+     scrolls sideways. */
+  --preview-frame-max: clamp(420px, 75svh, 760px);
+  --preview-frame-height: min(
+    var(--mail-height, var(--preview-frame-max)),
+    var(--preview-frame-max)
+  );
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+  padding: var(--space-16);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.subject {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-12);
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+.subjectLabel {
+  flex: none;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* The line box is reserved, so the subject arriving moves nothing. */
+.subjectValue {
+  flex: 1 1 12rem;
+  min-width: 0;
+  min-height: 1lh;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* Nothing rendered and the read failed: the error stands where the frame
+   would, in the frame's own height. */
+.stageState {
+  display: grid;
+  place-items: center;
+  min-height: var(--preview-frame-height);
+}
+
+.frameWrap {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  transition: max-width var(--duration-200) var(--ease-entrance);
+}
+
+/* optical: 375px is the width of the phone the mail is checked at, a device
+   measure and not a step of the spacing scale. */
+.frameWrap[data-viewport='mobile'] {
+  max-width: 375px;
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  height: var(--preview-frame-height);
+  border-radius: var(--style-radius-control);
+  /* DECISION (nie usuwaj): canvas podglądu maila jest FUNKCJONALNIE biały i
+     mode-invariant — klienci pocztowi renderują nasze maile na białym tle
+     niezależnie od motywu admina; token themowany kłamałby w dark mode.
+     Named custom-prop (wzorzec hex-policy, opcja 2). */
+  --email-canvas: #ffffff;
+  background-color: var(--email-canvas);
+  /* No line of its own: the mail's document is the only surface inside the
+     panel (its grey ground is the mail's own body, as a mail client shows it). */
+  border: 0;
+}

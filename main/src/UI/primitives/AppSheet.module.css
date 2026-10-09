@@ -1,0 +1,152 @@
+/* AppSheet — full-height side sheet (details of one record). Mobile: whole
+ * screen. Desktop: a wide panel from the chosen edge, inner corners rounded. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog-backdrop);
+  min-height: 100dvh;
+  background: var(--color-scrim-soft);
+  transition: opacity var(--duration-300) var(--ios-sheet-curve);
+}
+
+.backdrop[data-starting-style],
+.backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+/* Same local dark-mode scrim lift as AppDialog (DECISION there). */
+:root[data-mode='dark'] .backdrop {
+  background: var(--color-scrim-strong);
+}
+
+.sheet {
+  position: fixed;
+  z-index: var(--z-dialog);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  /* Mobile: both edges pinned instead of 100vw, which counts a desktop
+   * scrollbar and left a strip of the page visible at the free edge. */
+  right: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-paper);
+  color: var(--color-text-primary);
+  outline: none;
+  overscroll-behavior: contain;
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--duration-300) var(--ios-sheet-curve);
+  will-change: transform;
+}
+
+/* The panel itself receives the initial focus (see AppSheet.atom.tsx) only as
+ * the focus-trap anchor; a ring around the whole full-height sheet read as a
+ * frame, not as focus. Controls inside keep their own focus rings. */
+.sheet:focus-visible {
+  outline: none;
+}
+
+.sheet[data-side='left'][data-starting-style],
+.sheet[data-side='left'][data-ending-style] {
+  transform: translate3d(-100%, 0, 0);
+}
+
+.sheet[data-side='right'][data-starting-style],
+.sheet[data-side='right'][data-ending-style] {
+  transform: translate3d(100%, 0, 0);
+}
+
+@media (min-width: 768px) {
+  .sheet {
+    right: auto;
+    width: min(36rem, calc(100vw - var(--space-48)));
+  }
+
+  .sheet[data-side='right'] {
+    left: auto;
+    right: 0;
+  }
+
+  .sheet[data-size='wide'] {
+    width: min(52rem, calc(100vw - var(--space-48)));
+  }
+
+  .sheet[data-side='left'] {
+    border-radius: 0 var(--style-radius-surface) var(--style-radius-surface) 0;
+  }
+
+  .sheet[data-side='right'] {
+    border-radius: var(--style-radius-surface) 0 0 var(--style-radius-surface);
+  }
+}
+
+/* ---- Header ---- */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-20) var(--space-20) var(--space-16);
+  padding-top: max(var(--space-20), env(safe-area-inset-top));
+}
+
+.headingBlock {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title {
+  margin: 0;
+  outline: none;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.headerExtra {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-8)) 0 0;
+}
+
+/* ---- Body / footer ---- */
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--space-20) var(--space-24);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-16) var(--space-20);
+  padding-bottom: max(var(--space-16), env(safe-area-inset-bottom));
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}

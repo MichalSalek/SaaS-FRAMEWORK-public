@@ -1,0 +1,4 @@
+/* rem omija rodzica, ale nadal omija tez tokeny --text-*. */
+.banner {
+  font-size: 0.875rem;
+}

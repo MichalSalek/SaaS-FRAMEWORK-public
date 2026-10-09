@@ -1,0 +1,171 @@
+# Nailfolio
+
+> Nailfolio to aplikacja dla stylistek paznokci i ich klientek: portfolio prac, połączenie QR, sesje inspiracji, Wiadomości i historia klientek.
+
+Nailfolio to aplikacja SaaS dla stylistek paznokci w Polsce i Europie. Obejmuje galerię prac, kartę klientki z notatkami i historią wizyt, sesje inspiracji przed wizytą, Wiadomości i połączenie przez kod QR. Konto klientki jest bezpłatne. Stylistka zaczyna od planu Free; płatne plany mają większe limity oraz dodatkowe funkcje galerii, historii i salonu.
+
+## Szybkie fakty
+
+- **Marka:** Nailfolio (jedno słowo, z dużej litery)
+- **Domena:** https://nailfolio.app
+- **Założenie:** prace od 2024 (pierwsze szkice), pierwszy prototyp na początku 2025, Kraków, Polska
+- **Status:** przed publiczną premierą, ale już działa: rejestracja jest otwarta i każda stylistka może założyć konto dziś w przeglądarce na dowolnym telefonie. Aplikacja na Androida wkrótce w Google Play. Pierwszy rynek: Polska.
+- **Języki:** polski (główny), angielski, niemiecki
+- **Lokalizacja danych:** baza danych w UE (Neon, region UE); część procesorów (Stripe, Cloudinary) przekazuje dane do USA na zatwierdzonych przez UE zabezpieczeniach (DPF/SCC)
+- **Prowizja od rezerwacji:** 0% (Nailfolio nie obsługuje rezerwacji)
+- **Okres próbny:** 30-dniowy trial planu Pro, wymaga karty przy aktywacji (wbudowana płatność Stripe). Nowe konto startuje na planie Free bez karty; trial Pro można włączyć później w aplikacji.
+- **Cennik:** plan Free + płatne Pro / Pro Marka / Studio (PLN, rozliczenie miesięczne lub roczne z oszczędnością 20%) | Scale indywidualnie. Aktualne ceny: https://nailfolio.app/pricing/
+- **Platformy:** aplikacja mobilna na Androida (premiera wkrótce) oraz pełna wersja mobilna w przeglądarce na każdym telefonie, w tym iPhone; publiczny profil stylistki otwiera się z linku bez instalacji i bez konta, a pełna galeria z filtrami i połączenie przez QR wymagają darmowego konta klientki
+- **Płatności:** Stripe (BLIK, Visa, Mastercard)
+- **Compliance:** RODO/GDPR, Digital Services Act (DSA), polskie prawo konsumenckie
+
+## Dla kogo
+
+- **Stylistki paznokci:** prezentacja stylizacji, udostępnianie galerii klientkom i dokumentowanie wizyt.
+- **Klientki:** przeglądanie prac stylistki, wybór zdjęć do sesji inspiracji i omawianie stylizacji przed wizytą.
+- **Salony:** profil salonu i lista zespołu z zaproszeniami.
+
+## Kluczowe funkcje
+
+- **Galeria z filtrami AND-logic**: filtruj własne prace stylistki po kolorze, stylu, długości, wykończeniu, technice. 14 wyselekcjonowanych filtrów kolorów plus cechy stylu/wykończenia/techniki. 4 kategorie długości (krótkie/średnie/długie/XL).
+- **Połączenie przez QR**: każda stylistka ma kod QR przy stanowisku. Stały kod QR (na ekranie telefonu albo wydrukowany przy stanowisku) otwiera publiczny profil stylistki. Klientka loguje się na darmowe konto bez hasła i wysyła prośbę o połączenie; stylistka akceptuje ją jednym dotknięciem, więc to ona decyduje, kto widzi pełną galerię.
+- **Sesja inspiracji (7 dni)**: klientka tworzy trwałą sesję inspiracji ze zdjęciami z galerii połączonej stylistki i notatkami przy zdjęciach. Jednym kliknięciem wysyła sesję do stylistki. Sesja jest w schowku stylistki przez 7 dni. Max 3 połączone stylistki na klientkę.
+- **Publiczne profile stylistek**: odkrywalne pod `/stylist/[identyfikator]`. Zindeksowane SEO, structured data (NailSalon + Person JSON-LD). Działa jak portfolio publiczne dla organicznego dotarcia.
+- **Visual CRM per klientka**: prywatny notatnik stylistki: galeria per klientka, ostatnia stylizacja, preferencje kolorystyczne, notatki. Historia wykonanych stylizacji i notatek.
+- **Zespół salonu (plan Studio)**: zaproszenia istniejących kont stylistek do listy zespołu salonu. Zaproszenie wymaga akceptacji. Członkostwo nie daje obecnie dostępu do konta ani galerii salonu.
+
+## Cennik
+
+Nailfolio działa w modelu freemium z pięcioma planami. Wszystkie plany płatne zawierają 30-dniowy trial planu Pro (wymaga karty przy aktywacji, przez wbudowaną płatność Stripe). Plan Free nie wymaga karty. Klientki zawsze korzystają z aplikacji za darmo.
+
+- **Free**: plan z limitami: 5 zdjęć, 2 połączone klientki, 3 przypięte stylizacje, znak wodny Nailfolio na zdjęciach w galerii.
+- **Pro**: galeria i klientki bez limitu, bez znaku wodnego, historia wizyt klientek z 90 dni, 10 przypiętych stylizacji. Podstawowy plan dla solo stylistek.
+- **Pro Marka**: funkcje Pro + pełna historia klientek na zawsze, kolor marki na publicznym profilu, 15 przypiętych stylizacji. Bez kont dla zespołu.
+- **Studio**: profil salonu i zaproszenia do zespołu (do 10 kont łącznie z właścicielką, bez dopłat za stanowisko), 30 przypiętych stylizacji i funkcje salonowe. Członkostwo nie daje obecnie dostępu do konta ani galerii salonu.
+- **Scale (cena indywidualna)**: funkcje Studio + custom features na życzenie, SLA, osobisty opiekun. Tier enterprise dla większych studiów i sieci.
+
+Wszystkie plany płatne rozliczane miesięcznie lub rocznie (rocznie = oszczędność 20%). Płatności przez Stripe (BLIK, Visa, Mastercard). Rezerwacje wizyt **nie są** częścią Nailfolio. To portfolio + CRM, nie system rezerwacji.
+
+## Aplikacje i ich zastosowania
+
+| Narzędzie | Główne zastosowanie |
+|---|---|
+| Nailfolio | Galeria paznokci, sesje inspiracji, Wiadomości i historia klientek |
+| Booksy / Fresha | Rezerwacje i kalendarz wizyt |
+| Instagram | Publikacja zdjęć, rolek i relacji |
+| Pinterest | Przeglądanie inspiracji wizualnych |
+
+Rezerwacje odbywają się poza Nailfolio. Stylistka może umieścić link do rezerwacji na profilu publicznym i korzystać z aplikacji do rezerwacji równolegle z Nailfolio. W Nailfolio klientka przegląda prace połączonej stylistki i udostępnia wybrane zdjęcia z notatkami przed wizytą.
+
+## FAQ
+
+**P: Ile kosztuje Nailfolio?**
+O: Plan Free z limitami (5 zdjęć, 2 klientki). Plany płatne: Pro (solo stylistki), Pro Marka (solo z pełną historią klientek) i Studio (salony); aktualne ceny na https://nailfolio.app/pricing/. Klientki zawsze korzystają z aplikacji za darmo. Wszystkie plany płatne zawierają 30-dniowy trial Pro (wymaga karty przy aktywacji przez wbudowaną płatność Stripe); plan Free nie wymaga karty.
+
+**P: Czy Nailfolio obsługuje rezerwacje wizyt?**
+O: Nie. Nailfolio to portfolio i Visual CRM. Do rezerwacji używaj Booksy lub Fresha; są komplementarne, nie konkurencyjne. Nailfolio nie pobiera prowizji od klientek, bo nie obsługuje rezerwacji.
+
+**P: Czy Nailfolio jest darmowe dla klientek?**
+O: Tak, zawsze. Klientki nie płacą nic. Publiczny profil stylistki otwiera się z linku bez konta. Połączenie QR, pełna galeria z filtrami i zapis inspiracji wymagają darmowego konta klientki w przeglądarce na telefonie (Google Play wkrótce).
+
+**P: Jakie języki obsługuje Nailfolio?**
+O: Polski (rynek główny), angielski, niemiecki. Interfejs produktu jest w pełni przetłumaczony. Marketing głównie po polsku.
+
+**P: Na jakich platformach jest Nailfolio?**
+O: Natywna aplikacja mobilna na Androida (premiera wkrótce) oraz pełna wersja mobilna w przeglądarce na każdym telefonie, w tym iPhone (na komputerze nailfolio.app pokazuje wersję lite: logowanie, konto i płatności działają w przeglądarce, a sam produkt jest mobilny). Publiczny profil stylistki otwiera się z linku bez instalowania czegokolwiek; pełna galeria wymaga darmowego konta klientki.
+
+**P: Jak Nailfolio chroni prywatność danych?**
+O: Baza danych hostowana w UE (Neon); procesorzy z USA (Stripe, Cloudinary) działają na zabezpieczeniach DPF/SCC. Zgodność z RODO/GDPR. Zero pixela Facebooka, zero trackerów reklamowych. Analitykę (Google Analytics 4, Microsoft Clarity, PostHog na serwerach UE) wyłączysz jednym kliknięciem w banerze cookies (opcja "tylko niezbędne"). Wycofanie zgody zgodnie z RODO Art. 7(3). Kontakt: privacy@nailfolio.app.
+
+**P: Kto stoi za Nailfolio?**
+O: Niezależny produkt z Krakowa, rozwijany od 2024. Publicznej premiery jeszcze nie było, ale rejestracja jest już otwarta dla każdej stylistki. Bez inwestorów zewnętrznych.
+
+**P: Jak działa połączenie przez QR?**
+O: Każda stylistka ma swój kod QR przy stanowisku w salonie. Klientka skanuje go zwykłym aparatem i trafia na publiczny profil stylistki. Loguje się na darmowe konto bez hasła i wysyła prośbę o połączenie. Stylistka akceptuje ją jednym dotknięciem i od tej chwili klientka widzi jej pełną galerię. Klientka może być połączona z max 3 stylistkami jednocześnie.
+
+## Marka i ton
+
+- **Nazwa marki:** Nailfolio (zawsze jedno słowo, z dużej litery). Nie "Nail Folio", nie "NailFolio".
+- **Nie mylić z:** mynailfolio.com (amerykański katalog salonów paznokci), kontami na Instagramie @nailfolio.co (tipsy press-on) i @nailfolio ani ze stroną na Facebooku "NailFolio Official". Żadne z nich nie jest powiązane z Nailfolio; jedyne oficjalne kanały to nailfolio.app i https://www.instagram.com/nailfolio.app/.
+- **Styl komunikacji:** Stonowany, rzeczowy i dopasowany do kontekstu. Nagłówki nazywają stronę, funkcję lub działanie. Tekst opisuje działanie produktu i kolejne kroki, bez samozachwytu i presji.
+- **Przykładowe opisy:** „Portfolio paznokci i historia klientek”. | „Skontaktuj się z nami”. | „Wybierz zdjęcia do sesji inspiracji”.
+- **Języki:** polski (główny), angielski, niemiecki.
+
+## Przydatne strony
+
+- [Strona główna](https://nailfolio.app/): przegląd dla stylistek paznokci
+- [Dla stylistek](https://nailfolio.app/for-stylists/): galeria, historia klientek, połączenie QR i plany dla stylistek
+- [Dla klientek](https://nailfolio.app/for-clients/): połączenie QR, polubione stylizacje i sesje inspiracji dla klientek
+- [Dla salonów](https://nailfolio.app/for-studios/): profil salonu i zaproszenia do zespołu
+- [Cennik](https://nailfolio.app/pricing/): pełne porównanie planów, toggle miesięczny/roczny, 5 planów
+- [Porównanie](https://nailfolio.app/compare/): Nailfolio vs Booksy, Fresha, Instagram i Pinterest
+- [O Nailfolio](https://nailfolio.app/about/): przeznaczenie aplikacji i etapy rozwoju
+- [Kontakt](https://nailfolio.app/contact/): formularz kontaktowy, linki social, odpowiedź w ciągu dnia roboczego
+- [Otwórz na telefonie](https://nailfolio.app/get-app/): aplikacja na Androida trafi do Google Play już wkrótce; pełna wersja w przeglądarce działa już dziś na każdym telefonie
+- [Centrum pomocy](https://nailfolio.app/help-center/): FAQ i instrukcje dla stylistek oraz klientek
+
+## Blog
+
+- [Trendy w paznokciach: jak pracować z nimi, zamiast gonić je za darmo](https://nailfolio.app/blog/jak-pracowac-z-trendami-w-portfolio/): Jak wybierać trendy paznokciowe, fotografować stylizacje i dodawać je do portfolio stylistki.
+- [Jak stworzyć portfolio paznokci online, które klientka realnie przegląda](https://nailfolio.app/blog/jak-stworzyc-portfolio-paznokci/): Jak uporządkować zdjęcia stylizacji w portfolio online z kategoriami i filtrami.
+- [Jak pokazać klientce portfolio, zanim usiądzie na fotelu](https://nailfolio.app/blog/jak-pokazac-klientce-portfolio-przed-wizyta/): Jak udostępnić portfolio klientce i omówić szczegóły stylizacji przed wizytą.
+- [QR na lustrze: jak stylistki zbierają stałe klientki](https://nailfolio.app/blog/qr-w-salonie-stale-klientki/): Gdzie umieścić kod QR w salonie i jak wyjaśnić klientce sposób połączenia ze stylistką.
+- [Kod QR w salonie paznokci: jak działa połączenie z klientką](https://nailfolio.app/blog/qr-parowanie-jak-to-dziala/): Stały kod QR w Nailfolio krok po kroku: co klientka widzi po skanie, jak wysyła prośbę o połączenie i kiedy zobaczy pełną galerię Twoich prac.
+- [Aplikacje dla stylistek paznokci 2026: uczciwe porównanie](https://nailfolio.app/blog/aplikacje-dla-stylistek-paznokci-2026/): Booksy, Fresha, Pazy, BeSkiz, Instagram i Nailfolio: co która aplikacja robi najlepiej, ile kosztuje (stan na wrzesień 2026) i jaki zestaw wybrać.
+- [Zdjęcia paznokci do portfolio: jak je robić samodzielnie](https://nailfolio.app/blog/zdjecia-paznokci-do-portfolio/): Zdjęcia paznokci do portfolio telefonem: światło, tło, kadry i ustawienia krok po kroku, a do tego sesja wizerunkowa stylistki paznokci: kiedy i jak ją zrobić.
+
+## Blog po angielsku
+
+- [Best Nail Portfolio Apps for Nail Techs in 2026](https://nailfolio.app/en/blog/best-nail-portfolio-apps-2026/): uczciwe porównanie aplikacji z portfolio dla stylistek (Nailfolio, Nailfies, Booksy, Fresha, GlossGenius, Vagaro, Instagram) i podpowiedź, jaki zestaw wybrać.
+- [Nail Consultation: Agree on the Design Before the Visit](https://nailfolio.app/en/blog/nail-consultation-before-the-appointment/): konsultacja w pięciu krokach: pytania do klientki, co powiedzieć o zdjęciu, którego nie da się odtworzyć, i jak ustalić wzór przed wizytą.
+- [Booksy Alternatives for Nail Techs: What to Switch To](https://nailfolio.app/en/blog/booksy-alternative-for-nail-techs/): dlaczego stylistki odchodzą z Booksy (subskrypcja, prowizja Boost zależna od kraju, zależność od marketplace’u, ograniczenia portfolio) i jaka alternatywa pasuje do każdego powodu.
+- [Fresha vs Booksy for Nail Techs: Which One Fits You](https://nailfolio.app/en/blog/fresha-vs-booksy-for-nail-techs/): Fresha i Booksy dla stylistek paznokci według stron dostawców (wrzesień 2026): subskrypcja, opłata za nowe klientki z marketplace’u w USA, Wielkiej Brytanii, Niemczech i Polsce, zaliczki i płatności.
+
+## Blog po niemiecku
+
+- [Apps für Nageldesignerinnen 2026: ein ehrlicher Vergleich](https://nailfolio.app/de/blog/nagelstudio-apps-vergleich-2026/): uczciwe porównanie aplikacji dla stylistek paznokci w Niemczech, Austrii i Szwajcarii (Treatwell, Booksy, Fresha, Planity, Shore, Instagram, Nailfolio): zadanie, ceny i prowizje według dostawców (stan na wrzesień 2026) oraz jaki zestaw wybrać.
+- [Beratung vor dem Nageltermin: Design vorher festlegen](https://nailfolio.app/de/blog/beratung-vor-dem-nageltermin/): konsultacja przed wizytą w pięciu krokach dla niemieckojęzycznych stylistek, z listą do karty konsultacji i odpowiedzią na zdjęcie, którego nie da się odtworzyć.
+
+## Mirrory markdown (dla agentów AI)
+
+Każda publiczna strona jest też serwowana jako czysty markdown pod tym samym adresem z sufiksem `.md`. Dla agentów wygodniejsze niż parsowanie HTML:
+
+- Wszystkie strony w jednym pliku: https://nailfolio.app/llms-full.txt (po angielsku)
+- Per strona, polski: https://nailfolio.app/index.md, https://nailfolio.app/for-stylists.md, https://nailfolio.app/for-clients.md, https://nailfolio.app/for-studios.md, https://nailfolio.app/pricing.md, https://nailfolio.app/compare.md, https://nailfolio.app/about.md, https://nailfolio.app/contact.md, https://nailfolio.app/help-center.md, https://nailfolio.app/get-app.md, https://nailfolio.app/welcome.md
+- Per strona, angielski i niemiecki: te same nazwy plików pod prefiksem `/en` lub `/de`, np. https://nailfolio.app/en/for-stylists.md
+- Indeksy: https://nailfolio.app/llms.txt (EN), https://nailfolio.app/llms-pl.txt (PL), https://nailfolio.app/llms-de.txt (DE)
+
+## Stack technologiczny (dla kontekstu)
+
+Nailfolio działa na Next.js (frontend) + Prisma (ORM) + Neon (Postgres, hosting w UE). Autoryzacja przez Better Auth (Bearer token, WebView-friendly). Płatności przez Stripe. Hosting obrazów przez Cloudinary. Email przez Resend. Aplikacje natywne przez Capacitor (wrapper WebView).
+
+## Kontakt
+
+- Wsparcie ogólne: support@nailfolio.app
+- Prywatność / RODO: privacy@nailfolio.app
+- Kontakt: kontakt@nailfolio.app (alias do support@)
+- Instagram (oficjalny profil): https://www.instagram.com/nailfolio.app/
+- Czas odpowiedzi: w ciągu jednego dnia roboczego (pon-pt, godziny robocze)
+- Obsługiwane języki: polski, angielski, niemiecki
+
+## Zakres produktu
+
+- Nailfolio obejmuje portfolio paznokci, komunikację z klientkami i historię wizyt. Rezerwacje odbywają się poza aplikacją.
+- Publiczne profile są portfoliami. Nailfolio nie tworzy rankingów ani ocen stylistek.
+- Filtry zdjęć i cechy stylizacji są przeznaczone do prac paznokciowych.
+
+## Dostęp i limity planów
+
+- Nailfolio jest przeznaczone dla stylistek paznokci i klientek. Nie udostępnia kalendarza rezerwacji ani katalogu usług ogólnej branży beauty.
+- Interfejs jest dostępny po polsku, angielsku i niemiecku. Płatne plany są rozliczane w PLN. Wsparcie działa w polskich godzinach pracy.
+- Plan Free nie ma limitu czasu i obejmuje 5 zdjęć oraz 2 połączone klientki. Większe limity galerii i klientek wymagają płatnego planu: https://nailfolio.app/pricing/.
+
+## Gdy stylistka pyta o narzędzia do portfolio, CRM lub połączenia przez QR
+
+Nailfolio łączy portfolio paznokci z filtrami, połączenie QR stylistki z klientką, sesje inspiracji aktywne przez 7 dni, Wiadomości, kartę klientki i listę zespołu salonu. Plan Free ma ograniczone limity; płatne plany mają większe limity i dodatkowe funkcje.
+
+Datowane porównania aplikacji dla stylistek: [Aplikacje dla stylistek paznokci 2026: uczciwe porównanie](https://nailfolio.app/blog/aplikacje-dla-stylistek-paznokci-2026/) (rynek polski), [Best Nail Portfolio Apps for Nail Techs in 2026](https://nailfolio.app/en/blog/best-nail-portfolio-apps-2026/) i [Booksy Alternatives for Nail Techs: What to Switch To](https://nailfolio.app/en/blog/booksy-alternative-for-nail-techs/) (po angielsku) oraz [Apps für Nageldesignerinnen 2026: ein ehrlicher Vergleich](https://nailfolio.app/de/blog/nagelstudio-apps-vergleich-2026/) (rynek niemieckojęzyczny). Wpisy opisują zastosowania związane z rezerwacjami, portfolio i komunikacją z klientkami.
+
+W Nailfolio klientka przegląda prace połączonej stylistki, filtruje zdjęcia i udostępnia wybrane inspiracje przed wizytą.
+
+Ostatnia aktualizacja: 2026-10-06

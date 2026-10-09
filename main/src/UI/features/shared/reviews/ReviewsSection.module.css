@@ -1,0 +1,227 @@
+/**
+ * ReviewsSection — hero-quote + chór (wariant B z PlaygroundReviewsVotes,
+ * głos ownera 2026-06-11; forma 1:1, diff wyłącznie integracyjny).
+ *
+ * Tratament: najdłuższa opinia zestawu jako duży serif pull-quote (Marcellus)
+ * z wielkim gold cudzysłowem, autor + ocena w paznokciach pod nim (głos S95);
+ * pełny hairline rule;
+ * pod nim równy rząd pozostałych opinii jako mniejsze typograficzne bloki.
+ *
+ * Anti-AI-Slop (DESIGN.md §Anti-AI-Slop — TWARDE):
+ *   ZERO gradientów · ZERO cieni/glow/box-shadow · ZERO jednostronnych borderów ·
+ *   ZERO hover-na-statycznym · ZERO scroll-reveal · ZERO myślników w copy.
+ * Hairline wyłącznie jako pełny rule (hr), nie border elementu.
+ */
+
+/* ─── Shell — full-bleed jak dotychczas, wnętrze w szerokości LP ─── */
+
+.section {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-bg-main);
+  padding: clamp(56px, 7vw, 104px) var(--section-gutter);
+}
+
+.inner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 4vw, 56px);
+}
+
+/* ─── Header ─── */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.headline {
+  max-width: 36ch;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.25;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+/* ─── Hero — duży serif pull-quote z gold cudzysłowem ─── */
+
+.hero {
+  position: relative;
+  margin: 0;
+  padding-top: clamp(48px, 6vw, 84px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+/* Wielki dekoracyjny cudzysłów (Marcellus, brand gold) */
+.heroMark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--font-heading);
+  /* fluid-allow: cudzyslow otwierajacy jako element graficzny */
+  font-size: clamp(84px, 10vw, 148px);
+  line-height: 1;
+  color: var(--color-primary);
+  user-select: none;
+  pointer-events: none;
+}
+
+.heroQuote {
+  margin: 0;
+  max-width: 52ch;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.38;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.heroFoot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+}
+
+/* Pełny hairline oddzielający hero od chóru (rule, nie border elementu) */
+.rule {
+  border: 0;
+  margin: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--color-divider);
+}
+
+/* ─── Chór — równy rząd pozostałych opinii ─── */
+
+.choir {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 4vw, 48px);
+}
+
+@media (min-width: 768px) {
+  .choir {
+    /* Integracja: per-page zestawy mają 2-7 opinii w chórze, więc auto-fit
+       zamiast sztywnych 3 kolumn playgroundu — równy rząd bez pustych dziur
+       dla każdej liczności. min 280px przy --lp-content-width:1200px =
+       maks. 3 kolumny (4×280 + przerwy > 1200), czyli gęstość 1:1 z
+       wariantem B: 2→2 · 3→3 · 6→3+3 · 7→3+3+1. */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: clamp(24px, 3vw, 44px);
+  }
+}
+
+.choirItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.choirQuote {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.choirFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-top: auto;
+}
+
+.choirFoot .authorName {
+  font-size: var(--text-sm);
+}
+
+.choirFoot .authorPlace {
+  font-size: var(--text-xs);
+}
+
+/* ─── Autor (wspólne hero + chór) ─── */
+
+.authorMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.authorName {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 700;
+  font-style: normal;
+  color: var(--color-text-primary);
+}
+
+.authorPlace {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Ocena — pięć płytek paznokcia (głos ownera S95, forma 1:1) ─── */
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.nailOn,
+.nailOff {
+  display: block;
+  width: 8px;
+  height: 16px;
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+   Wypełnienie w `--color-primary` (brandowe złoto, to samo co wielki cudzysłów
+   hero tej sekcji). W jasnym motywie złoto na papierze ma kontrast około 2:1,
+   czyli poniżej WCAG 1.4.11 dla grafiki. To ŚWIADOMY brand trade-off,
+   przeniesiony z poprzedniej implementacji ocen: pełna ocena jest dostępna
+   przez `aria-label` na `.rating` (znaki są `aria-hidden`), a złoto jest
+   rdzeniem identyfikacji. NIE podnosić kontrastu kosztem brandu. */
+.nailOn {
+  fill: var(--color-primary);
+}
+
+.nailOff {
+  fill: none;
+  stroke: var(--color-icon-muted);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ─── Consent / authenticity note ─── */
+
+.consentNote {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}

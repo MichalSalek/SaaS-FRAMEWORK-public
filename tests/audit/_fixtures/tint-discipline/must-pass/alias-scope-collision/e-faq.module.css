@@ -1,0 +1,14 @@
+/* Inny moduł, ta sama nazwa --band, wartość neutralna. Dwa użycia, więc przy
+   globalnym rozwiązywaniu po nazwie wychodziło fałszywe „DRUGI krem
+   w module (R2)" na module, w którym kremu nie ma ani grama. */
+.faqPage {
+  --band: var(--color-surface-input);
+}
+
+.faqPage .rowA {
+  background: var(--band);
+}
+
+.faqPage .rowB {
+  background: var(--band);
+}

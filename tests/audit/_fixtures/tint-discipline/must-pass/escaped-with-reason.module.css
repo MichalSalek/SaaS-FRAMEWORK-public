@@ -1,0 +1,8 @@
+.dataTint {
+  /* tint-allow: hue pochodzi z imienia stylistki, więc tint KODUJE DANE */
+  background: color-mix(
+    in oklch,
+    var(--cover-hue, var(--color-primary)) var(--cover-mix, 18%),
+    var(--color-bg-main)
+  );
+}

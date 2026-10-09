@@ -1,0 +1,138 @@
+/* ─── PhoneMockup — reusable phone frame placeholder ─── */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10);
+}
+
+/* ─── Size variants ─── */
+/* Definite width per rozmiar (NIE max-width): bez figcaption figura nie ma
+ * żadnej innej intrinsic width i w gridzie `minmax(0, auto)` / flex
+ * shrink-to-fit kolabuje do zera (glitch hero for-studios, głos ownera S24).
+ * max-width:90% na .frame pozwala się kurczyć w wąskich kontenerach. */
+.sm .frame {
+  width: 160px;
+}
+.md .frame {
+  width: 200px;
+}
+.lg .frame {
+  width: 260px;
+}
+.xl .frame {
+  width: 320px;
+}
+/* xxl/hero — breakout-size screeny (sesja /ui S35: tryptyk większy, przełamanie
+ * kolumny --lp-content-width). Addytywne: NIE zmieniają istniejących call-sites. */
+.xxl .frame {
+  width: 420px;
+}
+.hero .frame {
+  width: 400px;
+}
+
+/* Figura wypełnia kontener (centrowanie ramki), ale wymiar gwarantuje
+ * definite width ramki powyżej — nie zależymy od szerokości rodzica.
+ * (S24: figcaption usunięty NA STAŁE głosem ownera; atrybut zostaje dla
+ * parytetu z istniejącymi selektorami stron.) */
+.wrapper[data-no-caption] {
+  width: 100%;
+}
+
+.frame {
+  max-width: 90%;
+  /* shape-allow: rysowana ramka telefonu; narożnik urządzenia, nie rola produktu */
+  border-radius: 14px;
+  /* shape-allow: drawn phone bezel; 3px chrome, not a surface/control/ring role */
+  border: 3px solid var(--color-border);
+  aspect-ratio: 9 / 19.5;
+  overflow: hidden;
+  background: var(--color-surface-input);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+/* Top notch decoration */
+.frame::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 5px;
+  background: var(--color-border);
+}
+
+/* Real screenshot fills the frame (cover); replaces the schematic placeholder. */
+.screenshotImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-10);
+  padding: var(--space-24) var(--space-12) var(--space-16);
+  width: 100%;
+  height: 100%;
+}
+
+/* Grid of placeholder tiles to simulate screen content */
+.screenGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  width: 80%;
+  flex: 1;
+  margin-top: var(--space-8);
+}
+
+/* DECISION (nie usuwaj — S18): tonal brand color-block zamiast neutralnego
+   szarego (--color-surface-hover @0.5 czytalo sie jak broken-image). Solidny
+   color-mix primary-tint + hairline = intencjonalny placeholder galerii, nie
+   brak assetu. Floor-safe (solid fill, NIE gradient). */
+.screenTile {
+  /* tint-allow: podkład placeholdera galerii — sygnalizuje „kadr tu będzie",
+     nie pustkę. Motyw „Jeden krem" (S94) celuje w tinty POWIERZCHNI TREŚCI;
+     to jest podkład medium, a biała dziura czytała się jak broken-image. */
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  aspect-ratio: 1;
+}
+.screenTile:first-child {
+  /* tint-allow: jak wyżej — mocniejszy stopień tego samego podkładu. */
+  grid-column: span 2;
+  aspect-ratio: 2 / 1;
+  background: var(--color-bg-paper);
+}
+
+/* Route pill at bottom of screen */
+.routePill {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-2) var(--space-8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+/* Mobile: definite width + max-width:100% w bazie .frame załatwiają kurczenie
+ * w wąskich kontenerach — osobny breakpoint nie jest już potrzebny. */

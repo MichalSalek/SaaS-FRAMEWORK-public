@@ -1,0 +1,35 @@
+/* AvatarCropDialog.module.css */
+
+/* Okienko kadru idzie DOMYŚLNĄ szerokością dialogu z prymitywu AppDialog
+   (pełny ekran na telefonie, wąska karta na desktopie — dokładne wartości i ich
+   progi żyją w AppDialog.module.css) — ta klasa dokłada wyłącznie rytm odstępów
+   w środku. Wcześniejszy komentarz zapowiadał tu węższą kartę
+   („przedmiotem pracy jest jeden kwadrat"), ale żadna reguła nigdy nie ustawiała
+   szerokości, więc zapowiedź była nieprawdziwa. Gdyby węższe okno było nadal
+   celem, brakującą regułą jest `width` TUTAJ, a nie zmiana w prymitywie. */
+.popup {
+  gap: var(--space-16);
+}
+
+.cropWrapper {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.reactCrop {
+  max-width: 100%;
+  /* Limit wysokości MUSI siedzieć na korzeniu ReactCrop: arkusz biblioteki daje
+   * `.ReactCrop__child-wrapper > img { max-height: inherit }` (wyższa specyficzność
+   * niż klasa modułu), więc `max-height` zadeklarowany na samym obrazku nigdy nie
+   * zadziała — ten sam powód co w CropStep.module.css. */
+  max-height: 360px;
+}
+
+.cropImage {
+  display: block;
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}

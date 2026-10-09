@@ -1,0 +1,323 @@
+/* UI/features/salon-staff/SalonStaffPage.module.css
+ * Salon team page (/app/salon/staff) and its dialogs.
+ *
+ * „Biel na papierze” (S116): the page is paper, every person is one white box
+ * (`--color-surface-card`, no frame, no shadow). A card is NOT tappable as a
+ * whole, so it has no hover and no press state; its one control is the „more”
+ * button (or one labelled outlined action on the two special cards).
+ *
+ * S126 (owner walk-through): no stat strip, no role pill, no icon strip under
+ * a divider, no entrance animation. Nothing here moves on its own.
+ */
+
+/* ─── Page shell ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-height: 100%; /* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+     ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+     a `@media (min-width: …)` mierzy VIEWPORT, nie ramę — reguły szerokościowe
+     przełączały układ w tryb „szeroki" wewnątrz kadru 390px. Dlatego siatka kart
+     pyta `@container app-view` o WŁASNĄ szerokość strony. */
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* The intro's line of live numbers: one sentence of unbreakable facts. */
+.heroMeta {
+  min-width: 0;
+}
+
+.heroFact {
+  white-space: nowrap;
+}
+
+/* The screen's action sits under the intro at its own width: a button is never
+   stretched across the page. */
+.pageAction {
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+/* ─── Plan note: the seat limit in a sentence, with the plans link ─── */
+
+.planNote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.planNoteText {
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+.planNoteText:lang(pl) {
+  hyphens: auto;
+}
+
+/* ─── Section (the leftover team of a plan without staff accounts) ─── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.sectionBody {
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.sectionBody:lang(pl) {
+  hyphens: auto;
+}
+
+/* ─── Team: one column on a phone, a grid from 720px of the page's own width ─── */
+
+.staffGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+  align-items: start;
+}
+
+@container app-view (min-width: 720px) {
+  .staffGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container app-view (min-width: 1024px) {
+  .staffGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ─── Card ─── */
+
+.staffCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* Avatar, identity, the one trailing control. Centred: with a two-line name
+   the avatar and the button stay on the middle of the text block. */
+.cardRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+  /* Same height with and without the 44px „more” button, so a card that has no
+     menu does not come out shorter than its neighbours. */
+  min-height: 44px;
+}
+
+.cardRow > :first-child {
+  flex: none;
+}
+
+.cardIdentity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* The name is never cut: it wraps (an e-mail of a pending invitation breaks
+   where it must) and the card grows. */
+.cardName {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cardMeta {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.cardNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.cardNote:lang(pl) {
+  hyphens: auto;
+}
+
+.cardAction {
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+/* ─── Permissions (hidden scaffold, StaffMemberPermissions.molecule) ─── */
+
+.permsOwner {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.permsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.permRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: 44px;
+  padding: var(--space-8) 0;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.permRow:last-child {
+  border-bottom: none;
+}
+
+.permRowText {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+/* ─── Empty / locked state ─── */
+
+/* Powierzchnia, medalion i typografia = kanon <EmptyState size="page">.
+   Zostają wyłącznie custom property — geometria oddechu tej strony (padding
+   płynny) i okrągły medalion, bo ikona osoby czyta się w kole, nie w kaflu.
+   NIE dopisuj tu padding/background/border: równa specyficzność z modułem
+   komponentu, o wyniku decydowałaby kolejność w bundlu. */
+.empty {
+  --empty-pad-block: clamp(var(--space-32), 6vw, var(--space-64));
+  --empty-pad-block-end: clamp(var(--space-32), 6vw, var(--space-64));
+  --empty-medal-radius: var(--style-radius-pill);
+  --empty-body-size: var(--text-sm);
+  overflow: hidden;
+}
+
+/* ─── Loader: the real boxes, empty ─── */
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+/* The box of the invite button it stands in for. */
+.skeletonAction {
+  width: 240px;
+  height: 44px;
+  border-radius: var(--style-radius-control);
+}
+
+/* ─── Dialogs ─── */
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding: var(--space-12) var(--space-20) var(--space-20);
+}
+
+.dialogSubmit {
+  width: 100%;
+}
+
+.dialogNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.dialogNote:lang(pl) {
+  hyphens: auto;
+}
+
+.detailSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* A label over its value: an e-mail gets the whole width of the dialog and a
+   long German label never squeezes it into a narrow column. */
+.detailList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0;
+  padding: 0;
+}
+
+.detailRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.detailLabel {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.detailValue {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}

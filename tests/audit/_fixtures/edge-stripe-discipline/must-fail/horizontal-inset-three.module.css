@@ -1,0 +1,10 @@
+/* Skrót TRZYCZŁONOWY (`inset: <top> <inline> <bottom>`) — dokładnie tak był
+   zapisany pasek akcentu na kartach ActivateRolePage i przeżył całą falę
+   motywu jako fałszywa zieleń. */
+.stepCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 var(--sp-2) auto;
+  height: 3px;
+  background: var(--color-primary);
+}

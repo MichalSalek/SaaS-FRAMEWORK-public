@@ -1,0 +1,40 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>layout-shift fixture: must pass</title>
+<!-- Same controls, built the right way: the counter is always mounted and only its
+     text changes inside a fixed-width box; the check mark sits out of flow. -->
+<style>
+  body { font: 16px system-ui; margin: 20px; }
+  header { display: flex; gap: 8px; align-items: center; }
+  header h2 { flex: 1; margin: 0; }
+  #count { display: inline-block; min-width: 9ch; padding: 4px 10px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .chips { display: flex; gap: 8px; margin-top: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 24px; }
+  .card { position: relative; display: flex; flex-direction: column; align-items: center; min-height: 64px; padding: 12px 8px; }
+  .card i { position: absolute; top: 8px; right: 8px; width: 14px; height: 14px; background: currentColor; opacity: 0; }
+  .card[aria-pressed="true"] i { opacity: 1; }
+</style>
+<section>
+  <header><h2>Cechy</h2><span id="count">0 cech</span></header>
+  <div class="chips">
+    <button aria-pressed="false" data-chip>French</button>
+    <button aria-pressed="false" data-chip>Ombre</button>
+  </div>
+</section>
+<div class="grid">
+  <button class="card" aria-pressed="false" data-card><span>Krótkie</span><i></i></button>
+  <button class="card" aria-pressed="false" data-card><span>Długie</span><i></i></button>
+</div>
+<script>
+  let n = 0;
+  for (const chip of document.querySelectorAll('[data-chip]')) {
+    chip.addEventListener('click', () => {
+      n += 1;
+      chip.setAttribute('aria-pressed', 'true');
+      document.getElementById('count').textContent = n + ' cechy';
+    });
+  }
+  for (const card of document.querySelectorAll('[data-card]')) {
+    card.addEventListener('click', () => card.setAttribute('aria-pressed', 'true'));
+  }
+</script>

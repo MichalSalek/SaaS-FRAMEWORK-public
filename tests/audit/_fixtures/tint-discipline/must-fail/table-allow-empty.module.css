@@ -1,0 +1,7 @@
+/* Pusty escape decyzji o table-layout — ta sama klasa co wyżej: marker bez
+   powodu to wyjątek nie do zweryfikowania w review. */
+.logTable {
+  /* table-layout-auto: */
+  width: 100%;
+  border-collapse: collapse;
+}

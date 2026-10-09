@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# scripts/deploy/deploy-app
+# =============================================================================
+# Deploy calej aplikacji produkcyjnej w bezpiecznej kolejnosci:
+#   1. backend web-1 -> Render
+#   2. frontend main -> hosting wspoldzielony
+#
+# Frontend rusza dopiero po potwierdzonym sukcesie deployu backendu.
+# =============================================================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/deploy.config.sh"
+
+# origin-parity-allow: orkiestrator — nie buduje niczego z drzewa, a obie skladowe
+# (deploy-backend, deploy-frontend) sprawdzaja parytet z origin same, u siebie.
+# artifact-identity-allow: ten sam powod — tozsamosc artefaktu (BUILD_ID) weryfikuja
+# skladowe u siebie; orkiestrator nie ma wlasnego artefaktu do porownania.
+header "DEPLOY APP (backend -> frontend)" "🚀"
+
+# `cmd; ec=$?` NIE dziala pod `set -e` (utils.sh): przy niezerowym kodzie powloka
+# konczy sie NA `cmd`, wiec przypisanie i caly komunikat ponizej byly martwym kodem
+# — operator nie dostawal potwierdzenia, ze frontend nie ruszyl. `|| ec=$?` jest
+# czescia listy ||, wiec errexit go nie dotyczy.
+backend_ec=0
+"${SCRIPT_DIR}/deploy-backend" || backend_ec=$?
+if [ "$backend_ec" -ne 0 ]; then
+  if [ "$backend_ec" -eq "${CONFIRM_DECLINED_EXIT_CODE:-20}" ]; then
+    warn "Deploy backendu ANULOWANY przez Ciebie — frontend NIE ruszony."
+  else
+    error "Backend deploy padł (exit ${backend_ec}) — STOP, frontend NIE ruszony."
+  fi
+  exit "$backend_ec"
+fi
+
+frontend_ec=0
+ENV_NAME=production "${SCRIPT_DIR}/deploy-frontend" || frontend_ec=$?
+if [ "$frontend_ec" -ne 0 ]; then
+  if [ "$frontend_ec" -eq "${CONFIRM_DECLINED_EXIT_CODE:-20}" ]; then
+    warn "Deploy frontendu ANULOWANY przez Ciebie — backend zostal juz wdrozony."
+  else
+    error "Frontend deploy padł (exit ${frontend_ec}) — UWAGA: backend jest juz na prodzie."
+  fi
+  exit "$frontend_ec"
+fi
+
+header "DEPLOY APP DONE" "✅"
+exit 0

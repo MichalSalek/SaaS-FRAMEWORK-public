@@ -1,0 +1,7 @@
+/* Ciemny dysk kontrolki lezacy na cudzej bitmapie: hostuje fokus, wiec
+   musi przemapowac pierscien. Bramka kontrastu tego NIE zobaczy — tlem
+   jest obraz, a nie token powierzchni. */
+.heartButton {
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+}

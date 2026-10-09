@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Kontrakt stdout i brak utils.sh — patrz DECISION w db-snapshot-dev.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+SNAPSHOT_DIR="${ROOT_DIR}/.local/db-snapshots"
+DB_CONTAINER="${DEV_DB_CONTAINER:-db}"
+
+if ! docker ps --format '{{.Names}}' | grep -qx "$DB_CONTAINER"; then
+  echo "Kontener bazy '${DB_CONTAINER}' nie dziala. Podnies dev (npm run dev) albo wskaz inny: DEV_DB_CONTAINER=<nazwa>" >&2
+  exit 1
+fi
+
+FILE_PATH="${1:-}"
+
+if [[ -z "$FILE_PATH" ]]; then
+  FILE_PATH="$(ls -1t "${SNAPSHOT_DIR}"/*.sql 2>/dev/null | head -n 1 || true)"
+fi
+
+if [[ -z "$FILE_PATH" || ! -f "$FILE_PATH" ]]; then
+  echo "Snapshot file not found: ${FILE_PATH:-<empty>}" >&2
+  exit 1
+fi
+
+# Restore NADPISUJE cala baze dev. Pytamy tylko, gdy ktos siedzi przy terminalu —
+# w potoku/CI (brak tty) skrypt musi dzialac bez interakcji.
+if [ -t 0 ] && [ -t 1 ]; then
+  printf 'Nadpisac baze w kontenerze %s zrzutem %s? [t/N] ' "$DB_CONTAINER" "$(basename "$FILE_PATH")" >&2
+  read -r answer </dev/tty || answer=""
+  case "$answer" in
+    t|T|y|Y) ;;
+    *) echo "Przerwane." >&2; exit 1 ;;
+  esac
+fi
+
+docker exec -i "$DB_CONTAINER" bash -lc 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < "$FILE_PATH"
+
+echo "$FILE_PATH"

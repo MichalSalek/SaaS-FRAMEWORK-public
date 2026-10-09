@@ -1,0 +1,570 @@
+/* ─────────────────────────────────────────────────────────────────────────
+ * AppLayout — `/app/*` shell
+ *
+ * Mobile / tablet (<1280px): fluid full-viewport shell with iOS-style header,
+ * sticky bottom tab bar, side navigation drawer, safe-area aware.
+ *
+ * Desktop (>=1280px) when `desktopAccess === 'frame'`: shell becomes a centered
+ * 390x844 iPhone-style frame with a sidebar slot for ThemeSwitcher / admin
+ * tools. Outside the frame the page background is dark.
+ *
+ * Capacitor WebView: uses dvh (not vh), env(safe-area-inset-*), no fixed body
+ * overflow, and `position: sticky` for the header (fixed has known iOS 16.4+
+ * bugs in WebView).
+ * ─────────────────────────────────────────────────────────────────────── */
+
+/* ─── Skip link (WCAG 2.4.1) ─── */
+.skipLink {
+  position: absolute;
+  top: -100%;
+  left: var(--space-12);
+  z-index: var(--z-skip-link);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-primary);
+  /* Pierscien fokusu rysuje sie POZA linkiem, czyli na ciemnym pasku aplikacji
+     za nim, a bazowy ring to w LIGHT atrament: 1,02:1 na tym pasku. Skip-link
+     jest GLOWNA afordancja klawiatury, wiec akurat on nie moze byc bramka
+     bez wskaznika. Rola --color-accent-on-ink (DECISION S106) trzyma tam
+     wysoki kontrast w obu trybach — i wobec paska, i wobec samego chipa,
+     ktory ma tlo --color-primary. Poprzednia wartosc (--color-primary) rysowala
+     ciemna czerwien na ciemnym pasku, a przy tym ring w kolorze wlasnego tla. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-primary-contrast);
+  border-radius: var(--style-radius-control);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: top var(--transition-fast);
+}
+
+.skipLink:focus-visible {
+  top: var(--space-12);
+}
+
+/* ─── Outer wrapper ─── */
+.layout {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg-main);
+  display: flex;
+  justify-content: center;
+}
+
+/* Onboarding full-screen branch (NVT O12): <main> replaced the page root as
+ * the .layout flex item — mirror .appShell's width so the funnel keeps the
+ * full column instead of flex shrink-to-fit. */
+.onboardingMain {
+  width: 100%;
+}
+
+/* ─── Inner shell ─── */
+.appShell {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--color-bg-main);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* `overflow: hidden` is fine on a *container*; never put it on body in
+   * Capacitor or scroll breaks. */
+  overflow: hidden;
+}
+
+/* Sidebar slot — hidden by default, surfaced only in frame mode.
+ * Frame-mode background is set inside the >=1280px media query so it picks
+ * up `--color-frame-sidebar-bg` (theme-aware, oklch-blended toward the
+ * dark stage). Avoids the previous white-on-dark mismatch in light mode
+ * and the near-invisible flat panel in dark mode. */
+.sidebar {
+  display: none;
+  flex-direction: column;
+  color: var(--color-text-secondary);
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding-bottom: var(--space-12);
+  border-bottom: var(--style-border-divider) solid var(--color-border-surface);
+  margin-bottom: var(--space-20);
+}
+
+.sidebarBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-cta);
+  color: var(--color-accent-text);
+  flex-shrink: 0;
+}
+
+.sidebarTitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  margin: 0;
+}
+
+.sidebarBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  color: var(--color-text-secondary);
+}
+
+.sidebarTip {
+  font-size: var(--text-xs);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  padding: var(--space-12) var(--space-12);
+  border-radius: var(--style-radius-control);
+  /* Motyw „Jeden krem" (S94/R3): wyróżnienie niesie ZAMKNIĘTA rama, nie
+     wypełnienie — 5% złota nad papierem było tintem poniżej progu.
+     Floor §3: pełna 4-bok hairline zamiast lewego stripe'a (S30). */
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.sidebarInfo {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+}
+
+/* ─── AppBar ─── */
+.appBar {
+  /* `sticky` over `fixed` — works inside the frame container in desktop mode
+   * and is more reliable in Capacitor WebView (iOS 16.4+ has fixed quirks). */
+  position: sticky;
+  top: 0;
+  z-index: var(--z-app-bar);
+  background: var(--color-nav-bg);
+  color: var(--color-nav-text);
+  padding-top: env(safe-area-inset-top);
+  transition: height var(--duration-200) var(--ease-entrance);
+  will-change: height;
+}
+
+.appBarInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--app-bar-height);
+  padding: 0 var(--space-20);
+  transition: height var(--duration-200) var(--ease-entrance);
+}
+
+/* Boki nagłówka: dwie RÓWNE kolumny (flex:1 każda) obejmujące tytuł. Dzięki
+   równości tytuł ląduje na PRAWDZIWYM środku paska, nawet gdy back-button z lewej
+   jest szerszy niż dzwoneczek z prawej (space-between by tego nie dał — głos ownera
+   2026-07-13). Prawy bok renderuje się zawsze (pusty u klientki) = balans. */
+.appBarSide {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.appBarSideRight {
+  justify-content: flex-end;
+}
+
+.appBarTitleText {
+  min-width: 0;
+  /* The same element is a <span>, or the screen's <h1> when no intro card
+     carries one: it must look identical either way. */
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.appBarTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  color: var(--color-nav-text);
+  /* Naturalna szerokość, wyśrodkowana treść — centrowanie robią równe boki. */
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-8);
+  transition:
+    font-size var(--duration-200) var(--ease-entrance),
+    opacity var(--duration-200) var(--ease-entrance);
+  /* Defensywnie: długi tytuł strony nie może wejść pod 'Wróć' (390px, S25). */
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Karta-intro (AppHero) widoczna → top-bar wygasza zdublowany tytuł
+ * (głos ownera S27/2 = B; wzorzec iOS large-title). Po przescrollowaniu
+ * karty atrybut znika i tytuł wjeżdża. Tylko opacity — back/avatar zostają. */
+/* Podczas przejścia NVT tytuł NIE animuje (snap): reset→korekta suppression
+ * dzieje się w jednym commit-tasku (nigdy nie „wygrywa" painta), ale forced
+ * reflow pomiaru hero pomiędzy recalcami restartował transition → widoczny
+ * blink 0→1→0 przez 200ms przy każdej nawigacji (probe S50b). Poza nawigacją
+ * (scroll-driven show/hide) transition zostaje. */
+:global(html[data-nav-phase]) .appBarTitle {
+  transition: none;
+}
+
+.appBar[data-hero-title-hidden] .appBarTitle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.appBar[data-compact] .appBarInner {
+  height: 40px;
+}
+
+.appBar[data-compact] .appBarTitle {
+  font-size: var(--text-base);
+}
+
+/* ─── Back button (iOS style) ─── */
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-nav-text);
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  padding: var(--space-4);
+  cursor: pointer;
+  opacity: 0.85;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--duration-100) var(--spring-snappy);
+  /* S120: okrągły cel dotykowy jak pozostałe przyciski ikonowe paska. */
+  border-radius: var(--style-radius-round);
+  /* S126: „Wróć” stoi teraz na każdej podstronie, a mierzył 34px wysokości
+     (sonda układu, cel dotyku 44px). Belka ma 56px, więc 44 mieści się bez zmiany
+     układu; widać tylko tekst i strzałkę, pole dotyku jest niewidoczne. */
+  min-height: var(--style-control-min-h);
+}
+
+.backButton:active {
+  opacity: 1;
+  transform: scale(0.95);
+}
+
+@media (hover: hover) {
+  .backButton:hover {
+    opacity: 1;
+  }
+}
+
+/* ─── Avatar trigger (top-bar identity slot) ───
+ * Takes the back button's slot on root routes (the two are mutually exclusive
+ * — back wins whenever there is history to go back to) for logged-in users.
+ * Tappable —
+ * opens the navigation drawer. Has a subtle accent ring so it reads as
+ * interactive rather than decorative. */
+.avatarTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  /* DECISION (nie usuwaj tego komentarza) — cel dotykowy 44×44 przez padding,
+   * nie przez większy awatar:
+   * Awatar ma 32px (AvatarAtom size='sm'), a to JEDYNE wejście do szuflady na
+   * każdej trasie /app — 32×32 to poniżej progu 44×44 (WCAG 2.5.5). Padding
+   * 6px robi z przycisku 44×44 (32 + 2×6), nie ruszając grafiki. Pierścień
+   * `::after` musiał zejść z `-sp-4` na `sp-2`, żeby jego średnica została
+   * ta sama 40px co dotąd: offsety absolutu liczą się od PADDING BOXA, więc
+   * po urośnięciu przycisku ujemny inset odsunąłby obwódkę na 52px.
+   * Pasek aplikacji ma 56px wysokości, a dzwoneczek stoi ~295px dalej, więc
+   * powiększone pole nie koliduje z niczym (zmierzone: awatar x=20,
+   * dzwoneczek x=315 przy 390). */
+  padding: var(--space-6);
+  cursor: pointer;
+  border-radius: var(--style-radius-pill);
+  position: relative;
+  transition: transform var(--duration-100) var(--spring-snappy);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.avatarTrigger::after {
+  content: '';
+  position: absolute;
+  /* sp-2 od padding boxa 44px = ta sama obwódka 40px co przy `-sp-4` od 32px. */
+  inset: var(--space-2);
+  border-radius: var(--style-radius-pill);
+  border: var(--style-border-control) solid
+    color-mix(in srgb, var(--color-nav-text) 45%, transparent);
+  pointer-events: none;
+  transition: border-color var(--transition-fast);
+}
+
+.avatarTrigger:hover::after,
+.avatarTrigger:focus-visible::after {
+  border-color: var(--color-accent);
+}
+
+.avatarTrigger:focus-visible {
+  /* --color-focus-ring, NIE --color-accent z fallbackiem: `--color-accent` jest
+     w palecie zdefiniowany jako alias zlota, wiec fallback NIGDY nie wchodzil
+     i ring byl zloty niezaleznie od tokenu. Na bialym pasku aplikacji dawalo to
+     1,96:1, czyli awatar (wejscie do konta) nie mial wskaznika fokusu w trybie
+     jasnym. Token istnieje dokladnie po to, zeby ring szedl za powierzchnia. */
+  outline: 2px solid var(--color-focus-ring);
+  /* Ujemny offset po urośnięciu przycisku do 44px: ring ma zostać na tej samej
+     średnicy 40px, na której leży obwódka `::after` (tak było przy 32px + 4px). */
+  outline-offset: calc(var(--space-2) * -1);
+}
+
+.avatarTrigger:active {
+  transform: scale(0.92);
+}
+
+/* ─── Content ─── */
+.content {
+  flex: 1;
+  padding: var(--space-20);
+  /* Reserve space for the sticky bottom bar + safe area inset.
+   *
+   * The gap between the last piece of content and the bar is ONE value, read
+   * by the reservation, by the phone-frame variant and by the sticky bars.
+   * It is 20px, not 12px (measured 2026-10-09): the raised middle tab stands
+   * 16px above the bar, so with 12px the last row of a list ended 3.7px
+   * under the disc at the end of the scroll. */
+  --content-end-gap: var(--space-20);
+  padding-bottom: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) +
+      var(--content-end-gap)
+  );
+  /* DECISION (nie usuwaj tego komentarza) — owner 2026-09-14, zmierzone w DOM:
+   * Chromium pinuje `position: sticky; bottom: 0` do scrollportu POMNIEJSZONEGO
+   * O PADDING tego kontenera. Rezerwa wyżej zostawiała więc każdą przyklejoną
+   * belkę akcji (onboarding „Dalej", aktywacja roli, usuwanie konta, dodawanie
+   * zdjęcia, odpowiedź w wątku) 12px nad krawędzią, a przez szparę przewijała
+   * się treść. Belka stawia `bottom: var(--sticky-flush-bottom)` i siada równo
+   * na górnej krawędzi dolnej belki nawigacji albo, bez niej, na krawędzi
+   * ekranu. Z dolną belką wystarczy zdjąć sam odstęp końca treści: belka
+   * nawigacji rośnie o safe-area razem z rezerwą, więc różnica jest stała.
+   * Belka akcji NIE liczy tej rezerwy sama. */
+  --sticky-flush-bottom: calc(var(--content-end-gap) * -1);
+  overflow-y: auto;
+  /* Capacitor: smooth momentum scrolling */
+  -webkit-overflow-scrolling: touch;
+  /* Stop pull-to-refresh / overscroll bounce from leaking out of the shell */
+  overscroll-behavior: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Stream-based screens own their scroll area. The routed wrapper must also
+ * stretch; percentage heights against its otherwise auto height collapse to
+ * the stream's content and leave the composer in the middle of the screen. */
+.contentFill {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.contentFill > [data-navigation-content-shell] {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Focused flows (onboarding / activation) suppress the bottom nav via
+ * hideBottomNav. Drop the --bottom-nav-height reservation so an in-page
+ * `position: sticky` footer (e.g. the onboarding action bar) pins to the TRUE
+ * bottom edge instead of floating ~80px above a phantom reserved strip. The
+ * safe-area inset + a small gutter stay. */
+.contentNoBottomNav {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-12));
+  /* Bez dolnej belki cała rezerwa leży pod belką akcji, a belka akcji sama
+   * dokłada safe-area do swojego paddingu, więc zdejmujemy ją w całości. */
+  --sticky-flush-bottom: calc(
+    (env(safe-area-inset-bottom, 0px) + var(--space-12)) * -1
+  );
+}
+
+/* ─── BottomTabBar overrides (kept inside the shell, themed for nav bar) ─── */
+
+.bottomBar {
+  /* Override the global `display: none` from BottomTabBar.module.css that
+   * hides the bar above 768px — AppLayout is mobile-first up to 1280px and
+   * NEEDS the bar visible the whole time. */
+  display: flex !important;
+  background: var(--color-nav-bg);
+  color: var(--color-nav-text);
+  border-top-color: color-mix(in srgb, var(--color-nav-text) 20%, transparent);
+  /* `padding-bottom: env(safe-area-inset-bottom)` ZDJĘTE — było dosłownym
+   * duplikatem deklaracji z `.tabBar`, a że oba selektory mają tę samą wagę,
+   * o wyniku decydowała kolejność arkuszy: ta kopia wygrywała i ZERO-wała
+   * padding ustawiony przez `--tab-bar-pad-bottom` w ramce telefonu (belka
+   * rosła do 70px, ale rezerwa na home indicator znikała). Padding paska ma
+   * jedno źródło — zmienną, którą czyta też jego `height`. */
+}
+
+/* Tab text colour inside the dark nav-bar context */
+.bottomBar > button {
+  color: color-mix(in srgb, var(--color-nav-text) 65%, transparent);
+}
+
+.bottomBar > button[aria-current='page'] {
+  color: var(--color-accent);
+}
+
+/* ─── Desktop phone frame (>=1280px, frame mode only) ─── */
+
+.layoutFrame {
+  /* Activate frame mode: dark background, side-by-side shell + sidebar */
+}
+
+@media (min-width: 1280px) {
+  .layoutFrame {
+    background: var(--color-frame-bg);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-32);
+    padding: var(--space-20);
+  }
+
+  .layoutFrame .appShell {
+    width: 390px;
+    min-width: 390px;
+    max-width: 390px;
+    height: 844px;
+    min-height: 844px;
+    max-height: 844px;
+    /* shape-allow: drawn iPhone-frame chrome; 44px device radius is not a --style-radius role */
+    border-radius: 44px;
+    /* `clip`, not `hidden`: in the frame the closed drawer is positioned
+     * against this box, 300px past its right edge, so a `hidden` box was a
+     * 690px-wide scroll container that a `scrollIntoView` or a text selection
+     * dragged to the edge could slide sideways (measured: scrollLeft 20, the
+     * whole app shifted and the drawer's edge showed). A clipped box cannot
+     * scroll at all. */
+    overflow: clip;
+    /* DECISION (S14): 2 spread-ring warstwy = geometria ramki telefonu (device
+     * bezel, ZERO blur — to obwódki, nie cień). Usunięto dekoracyjny 0 0 80px
+     * ambient glow (anti-slop §2 — głębia sceny niesie solid --color-frame-bg). */
+    box-shadow:
+      0 0 0 8px var(--color-frame-bezel),
+      0 0 0 10px var(--color-frame-bg);
+  }
+
+  /* Cosmetic notch */
+  .layoutFrame .appBar::before {
+    content: '';
+    display: block;
+    width: 126px;
+    height: 28px;
+    background: var(--color-frame-bg);
+    /* shape-allow: rysowana wyspa ramki telefonu, nie kontrolka produktu */
+    border-radius: 0 0 20px 20px;
+    margin: 0 auto;
+    position: relative;
+    /* 101 wygląda na warstwę globalną, ale nią NIE jest: `.appBar` ma własny
+     * z-index, więc tworzy kontekst układania i ta liczba znaczy tyle co „1"
+     * — kolejność wewnątrz paska. Zostaje jak była, żeby nie ruszać działającej
+     * geometrii ramki; gdyby ktoś ją kiedyś porównywał ze skalą --z-*, to jest
+     * odpowiedź, dlaczego jej tam nie ma. */
+    z-index: 101;
+  }
+
+  .layoutFrame .content {
+    flex: 1;
+    overflow-y: auto;
+    /* Rezerwacja bazowa liczy `--bottom-nav-height + safe-area + odstęp`, ale
+     * w ramce telefonu safe-area jest zerowa (to desktopowa przeglądarka),
+     * a belka rośnie o rysowany home indicator (sp-14). Bez tego członu
+     * ostatnie 14px treści chowałoby się pod belką. */
+    padding-bottom: calc(
+      var(--bottom-nav-height) + var(--space-14) + var(--content-end-gap)
+    );
+  }
+
+  /* Ramka bez dolnej belki: reguła wyżej ma wyższą wagę niż
+   * `.contentNoBottomNav`, więc bez tej linii flow skupiony (aktywacja roli)
+   * rezerwował w ramce miejsce na nieistniejącą belkę. */
+  .layoutFrame .contentNoBottomNav {
+    padding-bottom: var(--space-12);
+    --sticky-flush-bottom: calc(var(--space-12) * -1);
+  }
+
+  /* Inside the frame the bottom bar is positioned absolutely against the
+   * frame container, not the viewport. */
+  .layoutFrame .bottomBar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    /* shape-allow: matches the drawn 44px iPhone-frame chrome on .appShell */
+    border-radius: 0 0 44px 44px;
+    /* DECISION (nie usuwaj tego komentarza):
+     * Miejsce na rysowany „home indicator" ramki telefonu wchodzi przez
+     * `--tab-bar-pad-bottom` (zmienna paska), NIE przez samo
+     * `padding-bottom`. Border-box liczy padding w środku zadeklarowanej
+     * wysokości, więc gołe `padding-bottom: 14px` ścinało rząd treści z 55px
+     * do 41px i etykiety pięciu zakładek schodziły do 1px (zmierzone w 1440).
+     * Pasek czyta tę samą zmienną w `height` i w `padding-bottom`, więc
+     * nadpisanie jej JEDNEJ podnosi belkę zamiast ją zgniatać. */
+    --tab-bar-pad-bottom: var(--space-14);
+  }
+
+  /* Cosmetic home indicator */
+  .layoutFrame .bottomBar::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: var(--color-nav-text);
+    opacity: 0.3;
+  }
+
+  .layoutFrame .sidebar {
+    display: flex;
+    width: 300px;
+    min-width: 300px;
+    height: 844px;
+    /* Theme-aware bg + border + inset shadow — tokens.css owns the values
+     * for light/dark parity.
+     * Light: warm beige (oklch 0.94 0.012 70) + brand-tinted border
+     *        (~18% primary), establishes contrast vs the phone frame edge
+     *        that was missing in iter 1.
+     * Dark : deep charcoal blended toward the frame stage. */
+    background: var(--color-frame-sidebar-bg);
+    border: var(--style-border-surface) solid var(--color-frame-sidebar-border);
+    border-radius: var(--style-radius-surface);
+    padding: var(--space-32) var(--space-20);
+    overflow-y: auto;
+    /* Inset edge only (NIE outer drop — anti-slop §2); border + inset establish
+     * the recessed-panel read vs the frame stage. Usunięto 2 drop layers. */
+    box-shadow: var(--color-frame-sidebar-inset-shadow);
+  }
+}

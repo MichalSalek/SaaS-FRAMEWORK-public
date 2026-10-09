@@ -1,0 +1,46 @@
+/* Tile parity L/D (census S26): bg-secondary był widoczny tylko w dark
+ * (w light zlewał się z tłem strony) — paper + pełna hairline rama daje
+ * widoczny kafel w OBU trybach. Wysokość = 48px (1px rama + 1px padding
+ * + 44px opcja), równa z okrągłym FAB-em filtrów obok. */
+.toggle {
+  /* Hairline inset keeps the 44px icon hit target. The child radius below
+     subtracts this same pad so the corners stay concentric (12 - 1 - 1 = 10). */
+  --_segment-pad: 1px;
+  display: flex;
+  gap: var(--space-2);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-control);
+  padding: var(--_segment-pad);
+  width: fit-content;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: max(
+    0px,
+    calc(
+      var(--style-radius-control) - var(--_segment-pad) -
+        var(--style-border-surface)
+    )
+  );
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* Aktywna opcja = konwencja selected-chip: solidny tint primary + złoto
+ * mode-aware (accent-fg) — czytelne w light i dark, zero zależności od
+ * koloru tła strony. */
+.active {
+  background: var(--color-state-selected);
+  color: var(--color-accent-fg);
+}

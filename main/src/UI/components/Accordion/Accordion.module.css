@@ -1,0 +1,41 @@
+/* Mechanika rozwijania współdzielonego akordeonu (Style Policy §5:
+ * disclosure MUSI animować otwarcie 150-300ms; twarde display:none→block
+ * to violation). Wzorzec grid-template-rows 0fr→1fr — bez animowania
+ * height (layout-prop) i bez max-height-hacków.
+ *
+ * Skórka (padding/kolory/typografia) pozostaje per-strona przez
+ * `classNames` slots (patrz DECISION w AccordionItem.tsx) — ten plik
+ * dostarcza WYŁĄCZNIE mechanikę, wspólną dla wszystkich FAQ. */
+
+/* Nagłówek-wrapper pytania FAQ (h3, SEO+ARIA APG): zerowanie domyślnych
+ * marginesów/fontu <h3>, żeby button-trigger rządził wyglądem 1:1 jak przed
+ * dodaniem semantyki nagłówka (zero regresji wizualnej). Block, pełna
+ * szerokość — button (width:100%) wypełnia go bez zmiany layoutu. */
+.triggerHeading {
+  margin: 0;
+  font: inherit;
+}
+
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  /* visibility z opóźnieniem = po zwinięciu treść znika z tab-orderu
+     i drzewa a11y dopiero po zakończeniu animacji. */
+  visibility: hidden;
+  transition:
+    grid-template-rows 250ms var(--ease-entrance),
+    visibility 0s 250ms;
+}
+
+.panel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows 250ms var(--ease-entrance),
+    visibility 0s;
+}
+
+.panelClip {
+  overflow: hidden;
+  min-height: 0;
+}

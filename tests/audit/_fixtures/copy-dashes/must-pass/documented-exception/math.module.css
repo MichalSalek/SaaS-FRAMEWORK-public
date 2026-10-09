@@ -1,0 +1,3 @@
+.operator::after {
+  content: '·'; /* middle-dot-allow: operator mnożenia we wzorze, nie separator */
+}

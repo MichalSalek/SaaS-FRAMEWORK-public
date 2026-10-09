@@ -1,0 +1,67 @@
+/* MarketingCatchOverlay.module.css
+ *
+ * Floor 7×ZERO (flat): solidne tło (bg-main), ikona w pigułce na bg-paper +
+ * pełny hairline. Zero gradientu, zero cienia/glow, zero jednostronnych
+ * borderów, zero hover-na-statycznym. Pełnoekranowy język 1:1 z
+ * FirstPhotoCelebration (.overlay), z-index nad celebracją. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-fullscreen-overlay-above);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-main);
+  padding: var(--space-64);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  max-width: 340px;
+  text-align: center;
+  animation: marketingCatchIn 320ms var(--ease-entrance) both;
+}
+
+@keyframes marketingCatchIn {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Ikona w pigułce — solidna powierzchnia + hairline (zero cienia). */
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-bg-paper);
+  color: var(--color-accent);
+}
+
+.body {
+  /* Tekst ciągły PL → line-height >= 1.6 (floor). */
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+  margin-top: var(--space-12);
+}

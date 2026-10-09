@@ -1,0 +1,297 @@
+/* ═══════════════════════════════════════════════════════════════════════
+ * AdminReportsPage — Stripe revenue dashboard polish.
+ * Uses AdminPageLayout for editorial header band.
+ * This file styles: period control, charts grid, chart cards, KPIs.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Motion ─── */
+@keyframes barGrow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ─── Period control (title band, actions slot) ───
+   Label and control are one pair; on a narrow band the control moves under
+   the label whole instead of being squeezed. */
+
+.periodControl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.periodLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ─── Charts grid ───
+   Columns follow the grid's OWN width: admin routes also render inside a
+   390px frame on a wide desktop, where a viewport query lies. */
+
+.charts {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+
+/* Panels of one row keep their own height (a short chart is not stretched to
+   its tallest neighbour). */
+.chartsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-20);
+}
+
+@container (min-width: 768px) {
+  .chartsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1024px) {
+  .chartsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ─── Chart plot ───
+   The frame, the title row and the padding come from the shared admin panel
+   (AdminPanelMolecule); the classes below only draw what stands inside it. */
+
+.chartBarGroup {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: var(--space-8);
+  height: 160px;
+  margin-top: var(--space-12);
+}
+
+/* Bars share the panel's width: they narrow, they never leave it. */
+.chartBar {
+  flex: 1 1 0;
+  max-width: 56px;
+  border-radius: var(--style-radius-control) var(--style-radius-control) 0 0;
+  min-width: 0;
+  transform-origin: bottom;
+  animation: barGrow var(--duration-300) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Chart labels row ─── */
+
+.chartLabelsRow {
+  display: flex;
+  justify-content: space-around;
+  padding-top: var(--space-12);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  gap: var(--space-8);
+}
+
+/* One cell per bar: the label may wrap, the number is its own line and all
+   numbers of a row stand on one line (cells stretch, the number sits at the
+   bottom). */
+.chartLabelCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.chartLabelName {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-secondary);
+}
+
+.chartLabelValue {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+/* ─── A chart with no data: one sentence inside its panel ─── */
+
+.emptyState {
+  margin: 0;
+  padding: var(--space-12) 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Funnel chart ─── */
+
+.funnelBody {
+  padding-top: var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.funnelStep {
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.funnelBarTrack {
+  position: relative;
+  height: 28px;
+  /* Motyw „Jeden krem" (R2): track lejka to PODKŁAD danych — neutralny. */
+  background: var(--color-surface-input);
+  border-radius: var(--style-radius-control);
+  overflow: hidden;
+}
+
+.funnelBar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--style-radius-control);
+  background: var(--color-primary);
+  transition:
+    opacity var(--transition-fast),
+    width var(--transition-slow);
+}
+
+.funnelLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-secondary);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: var(--leading-body);
+}
+
+.funnelValue {
+  /* Wartosc lejka = dane (sans + tabular-nums). Marcellus ma tylko wage 400,
+   * wiec `font-weight: 700` obok dawal syntetyczne pogrubienie. */
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* ─── Pie chart ─── */
+
+.pieBody {
+  padding-top: var(--space-12);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-20);
+}
+
+.pieChart {
+  width: 132px;
+  height: 132px;
+  border-radius: var(--style-radius-pill);
+  flex-shrink: 0;
+  position: relative;
+  /* DECISION (nie usuwaj): inset 0 0 0 1px = pełna obwódka ringu (NIE elevacja),
+   * domyka krawędź conic pie na tle karty. Zero blur radius → floor-OK. */
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.pieChart::after {
+  content: '';
+  position: absolute;
+  inset: 28%;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-pill);
+  border: var(--style-border-surface) solid var(--color-divider);
+}
+
+.pieLegend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  flex: 1 1 9rem;
+  min-width: 0;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--text-xs);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--style-radius-pill);
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.legendValue {
+  /* Jak `.funnelValue` — liczba z legendy wykresu to dane. */
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-left: auto;
+  /* tnum-allow: right-aligned column of plain integers in the chart legend */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Loading: the box of a chart card (header lines, then the bars) ─── */
+
+.skeletonCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-height: 240px;
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.skeletonHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.skeletonBars {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  gap: var(--space-8);
+  min-height: 140px;
+}
+
+.skeletonBars > * {
+  flex: 1;
+}

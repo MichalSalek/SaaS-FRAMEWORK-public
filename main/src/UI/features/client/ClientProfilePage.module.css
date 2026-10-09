@@ -1,0 +1,207 @@
+/* UI/features/client/ClientProfilePage.module.css
+ * The client's own profile. „Biel na papierze” (S116): the page is paper,
+ * section titles sit on paper, grouped content and tappable rows sit in white
+ * boxes with no frame and no shadow. */
+
+/* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+   ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+   a `@media (min-width: …)` mierzy VIEWPORT, nie ramę, więc reguły szerokościowe
+   pytają `@container app-view` (content-box strony). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-height: 100%;
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* ─── Section: a title on paper, then its content ─── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+
+.sectionHint {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* A standalone secondary action under a list: its own width, never stretched
+   across a wide column. Full width only on a phone-sized track. */
+.sectionAction {
+  align-self: stretch;
+}
+
+@container app-view (min-width: 440px) {
+  .sectionAction {
+    align-self: flex-start;
+  }
+}
+
+/* ─── White box for grouped content ─── */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* ─── Contact card ─── */
+
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.contactFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0;
+}
+
+/* Read rows keep the height of a field label plus value, so switching to the
+   form moves the buttons as little as possible. */
+.contactValueRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.contactLabel {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.contactValue,
+.contactValueEmpty {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.contactValue {
+  color: var(--color-text-primary);
+}
+
+.contactValueEmpty {
+  color: var(--color-text-secondary);
+}
+
+.contactActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+@container app-view (min-width: 440px) {
+  .contactActions {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* ============================================================
+ * PREFERENCES — chip groups. NOT RENDERED today (DECISION next to
+ * CLIENT_PREFERENCES_ENABLED in clientProfile.config.ts); kept with the
+ * component so the section returns in one step once saving exists.
+ * ============================================================ */
+
+.chipGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.chipGroupLabel {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-top: var(--space-4);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 44px;
+  padding: var(--space-8) var(--space-14);
+  border: 0;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-surface-input);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.chip:hover {
+  background: var(--color-state-hover);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* S116 („A3”): wybór to atrament odwrócony, nie czerwień ani tint. */
+.chipActive,
+.chipActive:hover {
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+.preferencesNote {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.preferencesNote:lang(pl) {
+  hyphens: auto;
+}

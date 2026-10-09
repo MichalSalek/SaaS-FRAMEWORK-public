@@ -1,0 +1,698 @@
+/* UI/features/gallery/StyleDetailPage.module.css
+ * Style Detail — Single style taxonomy view (W2.5 iter 1).
+ *
+ * Mood: "Curator's lens on one beauty signature".
+ * Klientka klika "Boho" w filter -> ląduje tu i widzi single style
+ * jako TEMAT: portrety, motyw, kolekcja, kontekst — nie generic filter result.
+ *
+ * Hierarchy:
+ *  - Editorial hero (eyebrow + large style name + stats pills)
+ *    + decorative category-specific pattern bg (geometric/organic/pearls/strokes)
+ *  - Length filter strip (Wszystkie | Krótkie | Średnie | Długie | XL)
+ *  - Masonry gallery (CSS columns — variable heights, lyrical rhythm)
+ *  - Related styles row (Spotify "Fans also like" — same category first)
+ *  - Branded empty / error / not-found / skeleton states
+ *
+ * Anti-AI-Slop: depth via solid color-mix tonal blocks + full hairline borders.
+ * ZERO gradient/shadow/glow/blur. Spread-ring OK.
+ *
+ * Patterns inherited from W1+W2 (Dashboard, Gallery, Sessions, Photo Detail,
+ *  Explore, Favorites, Stylist Gallery, Upload, Session Detail):
+ *  - Eyebrow chip = kanon components/Eyebrow (frozen-light, bez kropki)
+ *  - color-mix(in oklch) solid tints for depth
+ *  - Spring easing on hover: cubic-bezier(0.34, 1.56, 0.64, 1)
+ *  - Stagger entrance (--stagger-index)
+ *  - Sparkle SVG mask (opacity 0.10 light / 0.14 dark)
+ *  - Dark mode parity (data-mode override)
+ *  - Masonry CSS columns (W1.2 Gallery vocabulary)
+ *  - Container queries for phone-frame mode (>=1280px)
+ */
+
+/* ─── Motion keyframes ─────────────────────────────────────── */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Skeleton pulse — solid fill + opacity breathe (zamiast gradient-shimmer). */
+@keyframes skeletonPulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: slideUp 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}
+
+/* ─── Page shell ───────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%; /* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+     ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+     a `@media (min-width: …)` mierzy VIEWPORT, nie ramę — reguły szerokościowe
+     przełączały układ w tryb „szeroki" wewnątrz kadru 390px. Progi w
+     `@container app-view` są o 40px niższe od dawnych viewportowych, bo mierzą
+     content-box strony (viewport minus 2×--space-20 wyściółki AppLayout.content),
+     więc na realnym telefonie zachowanie jest 1:1 z poprzednim. */
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* ─── EDITORIAL HERO ───────────────────────────────────────
+ * NYT Special Section feel: massive title, generous breathing room,
+ * stats pills (żywe dane), decorative category-specific pattern.
+ * Anti-AI-Slop: elevation = solid tonal color-block + full hairline.
+ * ZERO box-shadow, ZERO gradient.
+ */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  /* Motyw „Jeden krem" (R1): hero stoi na papierze — rangę niesie skala
+     tytułu, rama i wzór kategorii, nie podmalowany prostokąt. */
+  background: var(--color-bg-paper);
+  padding: var(--space-48) var(--space-20) var(--space-32);
+}
+
+/* Subtle grain overlay for tactile finish. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='nF'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23nF)'/%3E%3C/svg%3E");
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+}
+
+/* Decorative category-specific pattern layer.
+ * Lives ABOVE base wash, beneath content. Each category maps to a CSS class. */
+.heroPattern {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+}
+
+:root[data-mode='dark'] .heroPattern {
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+/* TECHNIQUE — disciplined grid (graph-paper feel).
+ * Kolor ZYJE w background-color (token/hue), SVG jest tylko maska ksztaltu
+ * (1px linie siatki) — zero funkcji gradientowych. */
+.patternTechnique {
+  background-color: color-mix(
+    in oklch,
+    var(--style-hue, var(--color-primary)) 28%,
+    transparent
+  );
+  -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cg fill='%23000'%3E%3Crect width='1' height='28'/%3E%3Crect width='28' height='1'/%3E%3C/g%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cg fill='%23000'%3E%3Crect width='1' height='28'/%3E%3Crect width='28' height='1'/%3E%3C/g%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-size: 28px 28px;
+  mask-size: 28px 28px;
+}
+
+/* FINISH — dot grid (solid dots, Anti-AI-Slop: no radial-gradient blobs). */
+.patternFinish {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='4' cy='4' r='2.2' fill='%23000' opacity='0.18'/></svg>");
+  background-size: 40px 40px;
+}
+
+/* DECORATION — scattered pearls (small dots). */
+.patternDecoration {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><circle cx='3' cy='3' r='1.4' fill='%23000' opacity='0.22'/></svg>");
+  background-size: 32px 32px;
+}
+
+/* STYLE — diagonal brush strokes (editorial italic feel).
+ * Ukosne 1px linie ~28deg jako SVG maska (kafel 32x17, linia naroznik do
+ * naroznika = bezszwowe kafelkowanie); kolor w background-color. */
+.patternStyle {
+  background-color: color-mix(
+    in oklch,
+    var(--style-hue, var(--color-primary)) 18%,
+    transparent
+  );
+  -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='17' viewBox='0 0 32 17'%3E%3Cpath d='M-4 19.1 L36 -2.1' stroke='%23000' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='17' viewBox='0 0 32 17'%3E%3Cpath d='M-4 19.1 L36 -2.1' stroke='%23000' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-size: 32px 17px;
+  mask-size: 32px 17px;
+}
+
+/* Content overlay (eyebrow + h1 + stats). */
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: 56ch;
+}
+
+/* Layout only — align-self so the chip does not stretch in the hero column. */
+.heroEyebrow {
+  align-self: flex-start;
+}
+
+.heroTitle {
+  font-family: var(--font-heading);
+  /* fluid-allow: tytul stylu — poziom miedzy 2xl a 3xl */
+  font-size: clamp(36px, 7vw, 56px);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.02;
+  letter-spacing: var(--ls-tight-25);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+  margin: 0;
+  /* Drop the baseline closer to the eyebrow for editorial slab. */
+  margin-top: var(--space-8);
+}
+
+/* Stats pills row — small chips with gold-dot + count + label. */
+.heroStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
+
+.heroStatPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-12);
+  border-radius: var(--style-radius-pill);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-text-primary);
+}
+
+.heroStatIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.heroStatNum {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ─── LENGTH FILTER STRIP ─────────────────────────────────
+ * Single-row chip filter. Active = solid pill, inactive = ghost.
+ */
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Filter header — spacing wrapper, wyglad chipa = <Eyebrow variant='chip'>.
+ * (Bez wlasnego marginesu — parent .filterSection daje gap.) */
+.filterHeader {
+  display: flex;
+}
+
+.filterChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.filterChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px var(--space-14);
+  border-radius: var(--style-radius-pill);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-10);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .filterChip:hover {
+    border-color: var(--color-border-surface);
+    color: var(--color-text-primary);
+    background: var(--color-state-hover);
+    transform: translateY(-1px);
+  }
+}
+
+/* Active chip — solid primary fill + full hairline. No gradient, no shadow.
+ * Tekst = primary-contrast (ciemny ink na złocie, jak elevated FAB
+ * BottomTabBar) — on-ink (biel) dawał ~2:1 na goldzie (census S26). */
+.filterChipActive {
+  /* focus-ring-allow: wybór w atramencie (S116), a pierścień fokusu ma
+     outline-offset 2px, więc leży na papierze obok elementu, nie na atramencie. */
+  /* S116 („A3”): wybór to atrament odwrócony z ról tekstu i tła (działa w obu
+     trybach), nie czerwień ani tint. Czerwień zostaje dla jednego CTA. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .filterChipActive:hover {
+    color: var(--color-primary-contrast);
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+  }
+}
+
+.filterChipCount {
+  margin-left: var(--space-6);
+  padding: 1px var(--space-6);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  background: var(--color-mark-bg);
+  color: color-mix(
+    in oklch,
+    var(--color-text-primary) 80%,
+    var(--color-primary)
+  );
+}
+
+.filterChipActive .filterChipCount {
+  background: color-mix(
+    in oklch,
+    var(--color-primary-contrast) 14%,
+    transparent
+  );
+  color: var(--color-primary-contrast);
+}
+
+/* ─── GALLERY SECTION ─────────────────────────────────────
+ * Masonry via CSS columns — variable photo heights = visual rhythm.
+ */
+
+.gallerySection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-8);
+}
+
+.galleryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.galleryTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.galleryCount {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: var(--text-xs);
+}
+
+/* Masonry — CSS columns (W1.2 Gallery vocabulary).
+ * 2 cols mobile, 3 cols tablet+, 4 cols at xl. */
+.masonry {
+  column-count: 2;
+  column-gap: var(--space-12);
+  /* Wrappers prevent visual breaks across columns. */
+}
+
+@container app-view (min-width: 728px) {
+  .masonry {
+    column-count: 3;
+    column-gap: var(--space-20);
+  }
+}
+
+@container app-view (min-width: 1240px) {
+  .masonry {
+    column-count: 4;
+  }
+}
+
+.masonryItem {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: var(--space-12);
+  display: block;
+}
+
+@container app-view (min-width: 728px) {
+  .masonryItem {
+    margin-bottom: var(--space-20);
+  }
+}
+
+.loadingMore {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20) 0;
+}
+
+/* ─── RELATED STYLES ROW ──────────────────────────────────
+ * Spotify "Fans also like" — horizontal scroll of style pills.
+ * Same category first, then cross-category fallback.
+ * Anti-AI-Slop: solid tonal fill + full hairline, no gradient.
+ */
+
+.relatedSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-20);
+  padding: var(--space-20) var(--space-20) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R3): sekcję „podobne" zamyka rama, nie tło. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.relatedHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.relatedTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.relatedHint {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.relatedChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Anti-AI-Slop: solid tonal fill per chip-hue, full hairline, no gradient.
+   tint-allow: --chip-hue ustawia StyleDetailPage.parts.organism ze stylu
+   powiązanego (kolor KATEGORII), więc tint niesie dane, nie ozdobę.
+   --color-primary stoi tu wyłącznie jako fallback dla braku hue —
+   bliźniaki: .cardCover (explore), .exhibitCover (galeria), .profileCover. */
+.relatedChip {
+  --chip-hue: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 9px var(--space-16) 9px 13px;
+  border-radius: var(--style-radius-pill);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-5);
+  color: var(--color-text-primary);
+  background: color-mix(in oklch, var(--chip-hue) 10%, var(--color-bg-paper));
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--chip-hue) 30%, transparent);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  /* tint-allow: hover tego samego chipa kodującego dane — patrz wyżej */
+  .relatedChip:hover {
+    transform: translateY(-2px);
+    background: color-mix(in oklch, var(--chip-hue) 16%, var(--color-bg-paper));
+    border-color: color-mix(in oklch, var(--chip-hue) 44%, transparent);
+  }
+}
+
+.relatedChipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--style-radius-pill);
+  background: var(--chip-hue);
+  flex-shrink: 0;
+}
+
+/* tint-allow: etykieta kategorii dziedziczy hue chipa, czyli te same DANE */
+.relatedChipCategory {
+  margin-left: var(--space-4);
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--style-radius-pill);
+  /* Było 0.72em NA --text-sm, czyli 10.8px — poniżej floora czcionek (owner:
+     żadna czcionka < 16px; skala tokenów ma własny floor 14px, DECISION S37
+     w tokens.css). Relatywny em omijał audit:min-font-size, bo ten skanuje px. */
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  background: color-mix(in oklch, var(--chip-hue) 12%, transparent);
+  color: color-mix(in oklch, var(--chip-hue) 70%, var(--color-text-primary));
+}
+
+/* ─── SKELETON STATES ──────────────────────────────────── */
+
+.skeletonHero {
+  position: relative;
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  background: var(--color-bg-paper);
+  overflow: hidden;
+  padding: var(--space-48) var(--space-20) var(--space-32);
+}
+
+/* Motyw „Jeden krem" (R1): wash szkieletu (inset:0) zniknął — placeholder
+   stoi na papierze, rytm ładowania niosą same pulsujące linie. */
+
+.skeletonHeroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.skeletonLine {
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonEyebrow {
+  height: 22px;
+  width: 80px;
+  border-radius: var(--style-radius-pill);
+}
+
+.skeletonTitle {
+  height: 46px;
+  width: 60%;
+}
+
+.skeletonStats {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
+
+.skeletonStatPill {
+  height: 26px;
+  width: 88px;
+  border-radius: var(--style-radius-pill);
+}
+
+.skeletonFilters {
+  display: flex;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.skeletonFilterChip {
+  height: 32px;
+  width: 96px;
+  border-radius: var(--style-radius-pill);
+}
+
+.skeletonMasonry {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-12);
+}
+
+@container app-view (min-width: 728px) {
+  .skeletonMasonry {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-20);
+  }
+}
+
+@container app-view (min-width: 1240px) {
+  .skeletonMasonry {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.skeletonCard {
+  border-radius: var(--style-radius-surface);
+  /* Variable heights for masonry feel. */
+}
+
+.skeletonCard:nth-child(3n) {
+  aspect-ratio: 3 / 4;
+}
+.skeletonCard:nth-child(3n + 1) {
+  aspect-ratio: 1 / 1;
+}
+.skeletonCard:nth-child(3n + 2) {
+  aspect-ratio: 4 / 5;
+}
+
+/* ─── EMPTY / ERROR / NOT-FOUND STATES ───────────────────
+ * Branded calls-to-action, never plain "0 results" text.
+ * Anti-AI-Slop: solid tonal fill + full hairline, no gradient/shadow.
+ */
+
+.stateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  padding: var(--space-48) var(--space-20)
+    calc(var(--space-48) + var(--space-12));
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R3): pustkę zamyka przerywana rama, nie wypełnienie. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    var(--color-border-surface);
+}
+
+.stateCardError {
+  background: color-mix(in oklch, var(--color-error) 5%, var(--color-bg-paper));
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-error) 22%, transparent);
+}
+
+/* State icon — solid tonal fill + full hairline. No gradient, no shadow. */
+.stateIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+  margin-bottom: var(--space-8);
+}
+
+.stateIconError {
+  background: color-mix(in oklch, var(--color-error) 10%, transparent);
+  color: var(--color-error);
+  border-color: color-mix(in oklch, var(--color-error) 22%, transparent);
+}
+
+.stateTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.stateHint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  max-width: 40ch;
+  margin: 0;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.stateHint:lang(pl) {
+  hyphens: auto;
+}
+
+.stateActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  justify-content: center;
+  margin-top: var(--space-8);
+}
+
+/* Blok `@container (max-width: 480px)` USUNIĘTY. Miał cofać masonry do dwóch
+ * kolumn w ramie telefonu, ale był BEZIMIENNY i żaden przodek nie deklarował
+ * `container-type`, więc nie odpalał się nigdy — a jego komentarz twierdził, że
+ * „strona jest opakowana w wąski kontener". Nie była. Odkąd progi masonry idą
+ * przez `@container app-view`, ta korekta jest zbędna: w ramie tor treści ma
+ * 350px, więc obowiązuje baza (2 kolumny). */

@@ -1,0 +1,62 @@
+/* Admin Policies: page spacing and the layout of the editor form. Panels,
+ * the list, fields, pills and buttons are shared parts with their own look. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-width: 0;
+}
+
+/* Lands below the sticky top bar when a pick in the list scrolls to it.
+   Also the container the action row measures itself against. */
+.editorAnchor {
+  container-type: inline-size;
+  min-width: 0;
+  scroll-margin-top: var(--space-80);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding-top: var(--space-8);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+}
+
+/* A narrow editor (a phone): the buttons are a deliberate stack of equal
+   width, never two on a row and a third alone. Same rule on notes and
+   policies. */
+@container (max-width: 479px) {
+  .actions {
+    flex: 1 1 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Reserved line: „Zapisano” appears without moving the buttons. */
+.saved {
+  min-width: 6ch;
+  min-height: 1lh;
+  font-weight: 600;
+  color: var(--color-success-fg);
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.listEmpty {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}

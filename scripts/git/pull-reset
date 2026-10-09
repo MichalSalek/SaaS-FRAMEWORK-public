@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# scripts/git/pull-reset
+# DESTRUKCYJNY: fetch + `reset --hard` + `clean -fd` na roocie I wszystkich
+# submodulach. Przeznaczenie: odtworzenie boxa CI/stagingu z origin/master.
+#
+# DECISION (nie usuwaj tego komentarza):
+#   Ten skrypt kasuje KAZDA niezacommitowana prace w calym drzewie, a wisi pod
+#   `npm run git:pull:reset` — jedno slowo w terminalu. Repo, ktorego naczelna
+#   zasada brzmi „nie kasuj cudzej pracy", trzymalo go bez ani jednego guardu,
+#   a pracuja tu rownolegle sesje, ktorych stanu nie widac z jednego terminala.
+#
+#   GUARD MUSI BYC NIEINTERAKTYWNY: wola go zdalny lancuch stagingu przez SSH
+#   (`deploy-docker-staging` -> `install:docker:staging:reset` -> tutaj), wiec
+#   `read`/`confirm` zabilby deploy. Dlatego kryterium jest STANEM, nie pytaniem:
+#     • sledzone modyfikacje w drzewie (M/A/D/R, staged lub nie) = PRACA -> STOP;
+#     • czyste drzewo = nie ma czego stracic -> jedziemy.
+#   Box stagingu jest odtwarzany z origin przy kazdym deployu, wiec jego drzewo
+#   jest czyste i lancuch dziala bez zmian. Maszyna z sesjami w toku ma je brudne
+#   i wlasnie o to chodzi.
+#
+#   UNTRACKED celowo NIE blokuje: `clean -fd` zdejmuje je od poczatku, a na boxie
+#   to smieci po buildach. Swiadome nadpisanie mimo pracy: GIT_RESET_FORCE=1.
+
+# 1. Source Utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+header "GIT PULL + RESET ALL" "📥"
+
+# --- GUARD: czy jest co stracic ----------------------------------------------
+step "GUARD: niezacommitowana praca w drzewie"
+
+collect_tracked_changes() {
+  local label="$1" path="$2" changes
+  # `--porcelain=v1` + odsianie '??' = wylacznie SLEDZONE zmiany (untracked
+  # zdejmuje `clean -fd` i to jest jego zadanie, patrz DECISION wyzej).
+  #
+  # `.audit-logs/` WYLACZONE swiadomie: to sledzone ARTEFAKTY, ktore przepisuje
+  # kazde uruchomienie audytow (takze na boxie), a ich utrata kosztuje jedno
+  # `npm run audit:all`. Gdyby liczyly sie jako „praca", guard bywalby czerwony
+  # bez powodu — a bramka, ktora bywa czerwona bez powodu, uczy omijania guarda.
+  changes="$(git -C "$path" status --porcelain=v1 2>/dev/null \
+    | grep -v '^??' \
+    | grep -v '\.audit-logs/' || true)"
+  if [ -n "$changes" ]; then
+    printf '%s\n' "$changes" | sed "s|^|    ${label}: |"
+  fi
+}
+
+AT_RISK="$(collect_tracked_changes "root" "$ROOT_DIR")"
+while read -r sm_path; do
+  [ -n "$sm_path" ] || continue
+  [ -e "${ROOT_DIR}/${sm_path}/.git" ] || continue
+  SM_CHANGES="$(collect_tracked_changes "$sm_path" "${ROOT_DIR}/${sm_path}")"
+  [ -n "$SM_CHANGES" ] && AT_RISK="${AT_RISK}${AT_RISK:+$'\n'}${SM_CHANGES}"
+done <<< "$(git config --file "${ROOT_DIR}/.gitmodules" --get-regexp '^submodule\..*\.path$' 2>/dev/null | awk '{print $2}')"
+
+if [ -n "$AT_RISK" ]; then
+  if [ "${GIT_RESET_FORCE:-0}" = "1" ]; then
+    warn "GIT_RESET_FORCE=1 — kasuje ponizsza prace swiadomie:"
+    printf '%s\n' "$AT_RISK" >&2
+  else
+    error "STOP: w drzewie sa niezacommitowane zmiany — reset --hard skasowalby je BEZPOWROTNIE."
+    printf '%s\n' "$AT_RISK" >&2
+    echo ""
+    error "To srodowisko rownoleglych sesji: te pliki to zwykle CUDZA praca w toku, nie Twoj balagan."
+    info  "Zrob z nimi cos swiadomie (commit pathspec wlasnych plikow) albo, jesli na pewno maja zginac:"
+    info  "  GIT_RESET_FORCE=1 npm run git:pull:reset"
+    exit 1
+  fi
+else
+  success "Drzewo czyste (root + submoduly) — nie ma czego stracic"
+fi
+
+# --- Reset -------------------------------------------------------------------
+step "Root -> origin/master"
+git -C "$ROOT_DIR" fetch --all || { error "Root fetch failed"; exit 1; }
+git -C "$ROOT_DIR" reset --hard origin/master || { error "Root reset failed"; exit 1; }
+git -C "$ROOT_DIR" clean -fd || warn "Root clean failed (non-critical)"
+
+step "Submoduly -> wskazniki roota"
+git -C "$ROOT_DIR" submodule update --init --recursive || { error "Submodule update failed"; exit 1; }
+
+step "Submoduly -> wlasne origin/master"
+git -C "$ROOT_DIR" submodule foreach --recursive \
+  "(git fetch --all && git checkout master && git reset --hard origin/master) || exit 1; git clean -fd || true"
+
+success "Git Pull + Reset Complete"
+exit 0

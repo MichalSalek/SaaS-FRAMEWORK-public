@@ -1,0 +1,11 @@
+/* Wyciszacz rozmiaru liczy JAWNY rozmiar 1–6px (linia, glif, konektor).
+   `0px` to nie element wielkości linii, tylko pudełko zwinięte do zera, które
+   rośnie paddingiem albo aspect-ratio, więc rozszerzenie zakresu w dół
+   (`[0-6]px`) zamienia każde wyzerowane pudełko w uniwersalny wyłącznik
+   strażnika. Wariant `min-width` pokrywa osobna próbka:
+   min-width-not-a-silencer. */
+.collapsedBox {
+  width: 0px;
+  padding-inline: var(--sp-4);
+  background: color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

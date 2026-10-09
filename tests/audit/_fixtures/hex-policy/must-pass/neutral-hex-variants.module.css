@@ -1,0 +1,14 @@
+/* Biel i czern w kazdej dlugosci zapisu, takze z alfa, oraz FRAGMENT url()
+   (nazwa filtra SVG), ktory kolorem nie jest. */
+.a {
+  background: url("data:image/svg+xml,%3Csvg fill='%23FFFF'%3E%3C/svg%3E");
+}
+.b {
+  background: url("data:image/svg+xml,%3Csvg fill='%23000000ff'%3E%3C/svg%3E");
+}
+.c {
+  filter: url(%23noiseFilter);
+}
+.d {
+  filter: url(%23feed);
+}

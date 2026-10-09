@@ -1,0 +1,22 @@
+-- ContentReport.reporter_id: twardy FK z kaskadą -> soft-FK.
+--
+-- DECISION (nie usuwaj tego komentarza):
+-- Kaskada oznaczała, że usunięcie konta zgłaszającego kasowało jego zgłoszenia —
+-- również te w stanie PENDING, dotyczące TREŚCI, KTÓRA ZOSTAWAŁA ŻYWA. Kolejka
+-- moderacji cicho traci zgłoszenie, a zgłoszony materiał zostaje opublikowany.
+--
+-- Ten sam model trzyma już `resolved_by_id` jako soft-FK z uzasadnieniem
+-- „append-only > integralność", a EventLog robi to samo dla audytu. Twardy FK na
+-- `reporter_id` był więc odstępstwem od własnego siostrzanego pola, bez decyzji,
+-- która by je sankcjonowała.
+--
+-- Kolumna zostaje NOT NULL: surowy identyfikator przeżywa usunięcie (jak w EventLogu),
+-- więc ślad „kto zgłosił" nie znika. Odczyt dołącza autora osobnym zapytaniem
+-- i renderuje brak, gdy konta już nie ma (DTO od początku dopuszcza `reporter: null`).
+--
+-- `lock_timeout` bo DROP CONSTRAINT bierze ACCESS EXCLUSIVE także na tabeli
+-- referowanej (`users`): bez limitu migracja czekałaby w kolejce za dowolnym długim
+-- zapytaniem, blokując po drodze cały ruch na users. Lepiej, żeby deploy padł szybko
+-- i został powtórzony, niż żeby uwiesił produkcję.
+SET lock_timeout = '5s';
+ALTER TABLE "ContentReport" DROP CONSTRAINT IF EXISTS "ContentReport_reporter_id_fkey";

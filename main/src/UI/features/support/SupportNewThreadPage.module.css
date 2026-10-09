@@ -1,0 +1,80 @@
+/* SupportNewThreadPage.module.css
+ * New support request: one white form box on paper. Category select, message,
+ * one filled action. Flat: no gradients, shadows or one-sided lines. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-height: 100%;
+  /* Full-bleed against the AppLayout padding, like the help hub. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) var(--space-32);
+  container-type: inline-size;
+  container-name: supnew;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.counter {
+  align-self: flex-end;
+  font-size: var(--text-xs);
+  line-height: 1.3;
+  color: var(--color-text-secondary);
+  /* tnum-allow: live character counter while typing; digits and a slash */
+  font-variant-numeric: tabular-nums;
+}
+
+.privacyNote {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.privacyNote a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-8);
+}
+
+/* Full width on a phone: the spinner appears inside a button whose box does
+ * not change. */
+.submit {
+  width: 100%;
+}
+
+@container supnew (min-width: 560px) {
+  .actions {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-12);
+  }
+
+  .submit {
+    width: auto;
+    min-width: 16rem;
+  }
+}

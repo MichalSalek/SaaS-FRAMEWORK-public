@@ -1,0 +1,495 @@
+/**
+ * Global CSS -- CSS foundation for the application.
+ *
+ * Cascade layer order (lowest to highest specificity):
+ *   reset < tokens < base < components < utilities
+ *
+ * Source: adapted from prototype archive (usunięty 2026-06-14, git history)
+ */
+
+/* --- Layer declaration (order matters) --- */
+@layer reset, tokens, base, components, utilities;
+
+/* --- Structural tokens + palette tokens --- */
+@import './tokens.css';
+@import './themes/palettes.css';
+/* S125 palette vote scaffolding (generated); delete with the vote. */
+
+/* --- CSS Reset --- */
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ul,
+  ol {
+    list-style: none;
+  }
+}
+
+/* --- Base styles --- */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Reserve the scrollbar gutter ALWAYS. A scroll-lock that toggles
+       `overflow:hidden` on <body> (Base UI menu/dialog, drawer) otherwise
+       removes the viewport scrollbar and shifts the whole layout sideways
+       (user 2026-06-25: the logged-in account dropdown made the LP jump as the
+       scrollbar appeared/disappeared). With a stable gutter the space is held
+       whether or not the scrollbar is painted, so opening/closing any overlay
+       is shift-free. */
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    font-family: var(--font-body, sans-serif);
+    font-weight: var(--font-weight-body, 400);
+    letter-spacing: var(--letter-spacing-body, 0);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    background-color: var(--color-bg-main);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    transition:
+      background-color var(--transition-normal),
+      color var(--transition-normal);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading, sans-serif);
+    font-weight: var(--font-weight-heading, 400);
+    letter-spacing: var(--letter-spacing-heading, 0);
+    line-height: 1.2;
+    overflow-wrap: break-word;
+  }
+
+  /* DECISION (nie usuwaj — wiring fontow, 2026-06-01, poprawiony 2026-09-02):
+   * --font-heading/--font-body deklaruje palettes.css na <html>, a next/font
+   * wstrzykuje --font-schibsted/--font-instrument/--font-marcellus/--font-caveat
+   * przez klasy. Do 09-02 te klasy
+   * siedzialy na wrapper-divie w _app, czyli POTOMKU <html>: var() w scope
+   * <html> byl pusty, wiec `body { font-family: var(--font-body) }` bylo
+   * invalid-at-computed-value-time i CALA tresc bez wlasnej deklaracji
+   * renderowala sie systemowym sans (zmierzone: stopka landingu, etykiety pol,
+   * nawigacja konta — 109 z 305 elementow z tekstem na /app/user/account).
+   * Portale do document.body (modale, dialogi, overlaye) nie widzialy tych
+   * zmiennych W OGOLE. Klasy sa teraz na <html> (_document.tsx +
+   * application/fonts.ts), wiec re-deklaracja per-scope jest zbedna —
+   * dziedziczenie z <body> obejmuje cale drzewo, portale wlacznie. */
+
+  /* --- Mobile-native feel --- */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    overscroll-behavior: none;
+    /* Owner S82: animacja scrollowania WSZĘDZIE — skok bez przejścia to
+     * antypattern. Smooth scroll dla anchor-jumpów (#kotwice) i programmatic
+     * scrollTo/scrollIntoView bez jawnego behavior. Punktowy override
+     * `behavior:'auto'` tam, gdzie instant jest POPRAWNY (scroll-restore
+     * zapisanej pozycji, route-change skok na górę nowej strony). Bezwarunkowo
+     * (brak prefers-reduced-motion w projekcie, decyzja 2026-05-28). */
+    scroll-behavior: smooth;
+  }
+
+  /* App-shell scroll-container (AppLayout `main`) — własny scroll, więc dziedziczy
+   * tę samą płynność co window-scroll na LP. */
+  main {
+    scroll-behavior: smooth;
+  }
+
+  button,
+  a,
+  [role='button'],
+  input,
+  select,
+  textarea,
+  label {
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection on UI chrome -- content areas opt back in */
+  button,
+  [role='button'],
+  nav,
+  [role='navigation'],
+  [role='tablist'] {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* --- Focus-visible: global accessibility --- */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [role='button']:focus-visible,
+  [tabindex]:focus-visible:not([tabindex='-1']) {
+    /* DECISION (S14 WCAG SC 1.4.11): --color-focus-ring (ink-in-light / gold-in-dark)
+     * gwarantuje >=3:1 do tła. Wcześniej --color-primary (gold) = 2.2:1 na bieli (FAIL). */
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--style-radius-control);
+  }
+
+  /* Ring focusu NIE-klawiaturowego wywalony GLOBALNIE (głos ownera 2026-07-13).
+   * Klik myszą albo focus PROGRAMOWY (route-change ląduje na kontenerze scroll
+   * lub nagłówku „Zaloguj się…", Chrome 125+ czyni overflow-scroll focusowalnym)
+   * malował outline na całym wewnętrznym oknie / nagłówku — wizualny szum na
+   * elementach, które NIE są kontrolką. Tłumimy TYLKO ring nie-klawiaturowy:
+   * prawdziwy Tab z klawiatury dalej łapie :focus-visible i zachowuje wskaźnik,
+   * więc WCAG 2.4.7 (keyboard focus visible) zostaje spełnione. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* The content landmark taking PROGRAMMATIC focus after a route change
+   * (NavigationTransitionController.focusAfterSettle adds tabindex=-1, focuses,
+   * drops the tabindex on blur) paints no ring either. After a redirect with no
+   * pointer input in between (/app/stylists → /app/explore, /app →
+   * /app/onboarding) Chrome counts that script focus as :focus-visible, so the
+   * rule above does not catch it and the UA outline framed the whole screen
+   * (S122). The focus itself stays: it is what moves a screen reader to the new
+   * page. The landmark is not a control and Tab never lands on it, so no
+   * keyboard indicator (WCAG 2.4.7) is lost. */
+  #main-content[tabindex='-1']:focus {
+    outline: none;
+  }
+
+  #__next {
+    min-height: 100vh;
+  }
+}
+
+/**
+ * DD3-F11: .fontAccent utility class — accent font (Caveat) for hero/decorative
+ * headings. Previously used inline in 10+ files (StylistPairing, GalleryPage,
+ * ExploreStylistsTab, FavoritesPage, etc.) without a CSS rule — browsers fell
+ * back to body font, defeating the accent-font intent. Defining here centrally
+ * keeps the class portable (no module scoping) and consistent with how
+ * --font-caveat is exposed by _app.tsx's next/font config.
+ *
+ * S110: klasa czyta teraz ROLĘ `--font-accent` z palety (decyzja ownera
+ * 2026-09-07), a nie loader wprost. Dzięki temu wymiana kroju akcentowego jest
+ * jedną linią w `palettes.css`, tak jak dla nagłówków i tekstu.
+ */
+@layer base {
+  .fontAccent {
+    font-family: var(--font-accent);
+  }
+}
+
+/* --- Animation Keyframes --- */
+@layer base {
+  /* Modern entrance: scale resolve (blur removed — Anti-AI-Slop §2 no filter:blur) */
+  @keyframes reveal-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Clip-path reveal: content uncovered from center */
+  @keyframes clip-reveal {
+    from {
+      clip-path: inset(8% 8% 8% 8%);
+      transform: scale(0.98);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+      transform: scale(1);
+    }
+  }
+
+  /* Stagger entrance for card grids (blur removed — Anti-AI-Slop §2) */
+  @keyframes card-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Scroll progress bar fill */
+  @keyframes scroll-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* --- Utility classes --- */
+@layer utilities {
+  /* Visually hidden, but kept in DOM for assistive tech (accessible name for
+   * icon-only controls, off-screen labels). Standard clip-rect pattern — no
+   * visual effects. Prefer aria-label on <button>; use .sr-only for inline
+   * text that must read to screen readers without rendering on screen. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .reveal-in {
+    animation: reveal-in var(--duration-200) var(--spring-snappy) both;
+  }
+
+  .clip-reveal {
+    animation: clip-reveal var(--duration-300) var(--spring-bounce) both;
+  }
+
+  .card-pop {
+    animation: card-pop var(--duration-200) var(--spring-snappy) both;
+    animation-delay: calc(var(--stagger-index, 0) * var(--stagger-offset));
+  }
+
+  /* Haptic press feedback */
+  .haptic-press {
+    transition: transform var(--duration-100) var(--spring-snappy);
+  }
+  .haptic-press:active {
+    transform: scale(0.97);
+  }
+
+  /* Licznik DANYCH wewnątrz serif-nagłówka (np. „Galeria · 10", „(10/10)",
+   * „MAJ 2026"): display serif (Marcellus) renderuje 0 jak literę O i 1 jak I,
+   * więc liczby danych jadą w sans (lekcja S25, census S26).
+   * Owiń SAM licznik spanem z tą klasą; nagłówek zostaje w serifie.
+   *
+   * DECISION (nie usuwaj tego komentarza): `tabular-nums` NIE jest domyślnym
+   * strojem liczb. W naszych krojach ta cecha poszerza kropkę, przecinek,
+   * dwukropek i średnik do szerokości cyfry (pomiar S126: 25 → 64 jednostki)
+   * i zwęża `%`, więc każda data, godzina, cena i adres e-mail dostaje
+   * rozstrzelone znaki („14 : 32”, „example . com”). Cecha się DZIEDZICZY.
+   * Wolno jej użyć tylko tam, gdzie tekst to same cyfry (plus litery, spacja,
+   * ukośnik) ORAZ cyfry zmieniają się w miejscu na oczach użytkownika (licznik
+   * znaków, odometr ceny) albo stoją w kolumnie liczb całkowitych. Każde
+   * użycie niesie `tnum-allow: <powód>`; strażnik `audit:tabular-nums`. */
+  .data-count {
+    font-family: var(--font-body);
+  }
+}
+
+/* --- NVT page transitions: motion overflow guard --- */
+/* Keyframes/phases live in navigation-transition.module.css (content shell);
+ * html[data-nav-*] attrs are written by NavigationTransitionController.
+ * While content translates horizontally it may momentarily overflow its
+ * scroll owner — clip BOTH owners (inner #main-content and the window/body)
+ * only during an active phase, so no permanent layout change. `clip` (unlike
+ * `hidden`) creates no scroll container, so position:sticky keeps working. */
+@layer base {
+  html[data-nav-phase] body {
+    overflow-x: clip;
+  }
+
+  html[data-nav-phase] #main-content {
+    overflow-x: clip;
+  }
+}
+
+/* ─── Sonner toasts — Apple-grade frozen glass (decyzja usera 2026-06-25) ─── */
+/* DECISION (nie usuwaj tego komentarza):
+ * Świadomy premium frosted-glass — floor §cienie/blur dopuszcza frozen glass jako
+ * wyjątek (UI-FRONTEND-RULES §2 + DESIGN.md §CSS Craft, decyzja usera). Sonner
+ * wstrzykuje swój CSS RUNTIME bezwarstwowo (poza @layer), więc te reguły TEŻ są
+ * bezwarstwowe (po @layer-blokach) i mają selektor (0,3,0) > baked-in Sonnera
+ * (0,2,0) — przebijają default bez !important. Kolory z tokenów --color-* (na
+ * <html>[data-mode]) → glass jest automatycznie light/dark correct; theme=
+ * {resolvedMode} w kontrolerze ubija jasny light-skin Sonnera. Tło półprzezroczyste
+ * (color-mix … transparent) jest WARUNKIEM blura — solidny token zasłoniłby efekt. */
+[data-sonner-toaster] {
+  --border-radius: var(--style-radius-surface);
+}
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] {
+  /* 88% krycia: ciemne, przydymione szkło z niewielkim przebiciem — mocny blur
+   * na małym przebiciu = subtelny frost (jak iOS), bez „przejmowania" gold-akcentów
+   * treści pod toastem na żółto. saturate 125% = łagodna Apple-vibrancy. */
+  background: color-mix(in oklch, var(--color-bg-elevated) 88%, transparent);
+  -webkit-backdrop-filter: blur(26px) saturate(125%);
+  backdrop-filter: blur(26px) saturate(125%);
+  /* Obrys = mode-aware --color-border (NIE on-ink: on-ink jest biały w OBU
+   * trybach → niewidoczny biały-na-białym w light). Rim-light „szkła" niesie
+   * inset highlight niżej (jasny u góry w dark). */
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-border-surface) 55%, transparent);
+  color: var(--color-text-primary);
+  /* inset 0 1px 0 = jasny rim-light u góry (krawędź szkła); outer = miękkie
+   * „unoszenie" nad treścią. Oba przez tokeny (zero raw hex). */
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, var(--color-on-ink) 24%, transparent),
+    0 10px 34px color-mix(in oklch, var(--color-ink) 34%, transparent);
+}
+[data-sonner-toaster] [data-sonner-toast] [data-title] {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+[data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: var(--color-text-secondary);
+}
+
+/* ─── CTA effect — „color-work" na łowiących CTA (S81, owner; głos = wariant C) ─── */
+/* DECISION (nie usuwaj tego komentarza):
+ * Owner (głos S81 = wariant C „gra temperaturą"): button DELIKATNIE „pracuje
+ * kolorem" — cieplejszy odcień złota wchodzi od dołu i gaśnie, chłodniejszy od
+ * góry, W MIEJSCU (zero ruchu pozycyjnego) + miękki glow. ODRZUCONE (nie wracać):
+ * przechodzący błysk/sweep = „kiczowate"; wędrujący ton (A) i oddech/halo =
+ * „trywialne". Głosowanie playground skasowane po rozstrzygnięciu.
+ *
+ * ŚWIADOMY OVERRIDE floora 7×ZERO (gradient §1 + glow/box-shadow §2) + DECISION
+ * „CTA=solid" — sankcjonowany wyjątek (DESIGN.md + ui-taste). Tło buttona solidne;
+ * kolor = warstwy ::before/::after z-index:-1 POD tekstem (isolation → kontrast
+ * labela zachowany), animacja tylko opacity; glow = box-shadow puls. Łowiący CTA
+ * = first-child; LpHero tylko z propem shimmerCta.
+ *
+ * S90 (dyrektywa ownera): to JEDYNE gałki amplitudy/tempa. Call-site stawia
+ * tylko data-cta-shimmer='on' (FinalCtaBand / StickyCtaBar / MidPageCta /
+ * LpHero.shimmerCta / heroActions). NIE kopiować keyframes per stronę.
+ * S81 → S90: satin peak 0.9→0.45, glow blur 6/24→3/12 + alpha 18/52→9/26,
+ * czas +2.5s (5→7.5 glow, 5.5→8 satin). Wariant C bez zmian. */
+[data-cta-shimmer='on'] {
+  --cta-satin-peak: 0.45;
+  --cta-satin-duration: 8s;
+  --cta-glow-duration: 7.5s;
+  --cta-glow-idle: 0 0 3px 0
+    color-mix(in oklch, var(--color-primary) 9%, transparent);
+  --cta-glow-peak: 0 0 12px 1.5px
+    color-mix(in oklch, var(--color-primary) 26%, transparent);
+  /* Bieguny temperatury. Nie sa kolorami marki (nie maja i nie beda mialy
+   * tokenu w palecie) — to punkty docelowe miksu, o ktore ociera sie zloto
+   * u dolu i u gory przycisku. Naliczone tu jako galki, zeby caly wariant C
+   * dal sie przestroic z jednego miejsca, tak jak obiecuje komentarz wyzej. */
+  --cta-anchor-warm: #7a3d08;
+  --cta-anchor-cool: white;
+}
+
+@layer base {
+  /* Temperatura: odcień wchodzi i gaśnie (::before ciepły dół / ::after chłodna góra). */
+  @keyframes cta-warm {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: var(--cta-satin-peak, 0.45);
+    }
+  }
+  @keyframes cta-glow-pulse {
+    0%,
+    100% {
+      box-shadow: var(--cta-glow-idle);
+    }
+    50% {
+      box-shadow: var(--cta-glow-peak);
+    }
+  }
+}
+
+/* Stacking context + clip + glow puls. */
+[data-cta-shimmer='on'] > a:first-child,
+[data-cta-shimmer='on'] > button:first-child {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: cta-glow-pulse var(--cta-glow-duration) ease-in-out infinite;
+}
+
+/* Dwie warstwy koloru pod tekstem — wspólny kształt. */
+[data-cta-shimmer='on'] > :first-child::before,
+[data-cta-shimmer='on'] > :first-child::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Ciepły biegun od dołu + chłodny od góry pojawiają się i gasną razem — button
+ * rozwija polaryzację temperatury barwy i wraca do płaskiego złota (wariant C 1:1). */
+[data-cta-shimmer='on'] > :first-child::before {
+  background: radial-gradient(
+    150% 150% at 50% 128%,
+    color-mix(in oklch, var(--color-primary-dark) 72%, var(--cta-anchor-warm)),
+    transparent 62%
+  );
+  animation: cta-warm var(--cta-satin-duration) ease-in-out infinite;
+}
+[data-cta-shimmer='on'] > :first-child::after {
+  background: radial-gradient(
+    150% 150% at 50% -28%,
+    color-mix(in oklch, var(--color-primary-light) 55%, var(--cta-anchor-cool)),
+    transparent 62%
+  );
+  animation: cta-warm var(--cta-satin-duration) ease-in-out infinite reverse;
+}
+
+/* ─── Skorupa telefonu jako blok zawierający nakładek (desktop, trasa produktowa) ───
+ *
+ * DECISION (nie usuwaj tego komentarza): `contain: layout` czyni skorupę
+ * telefonu (`[data-app-frame]`, ustawiane przez AppLayout w trybie ramki)
+ * BLOKIEM ZAWIERAJĄCYM dla potomków `position: fixed`. Dialogi portalują się do
+ * tej skorupy (overlayContainer.context.ts), ale sam portal nie wystarcza:
+ * bez containmentu arkusz dalej mierzyłby się do okna (1440) i centrował poza
+ * obudową telefonu, nachodząc na panel podglądu obok. To containment UKŁADU,
+ * nie malowania — obwódki ramki (box-shadow skorupy) rysują się dalej na
+ * zewnątrz, a `overflow: hidden` skorupy przycina arkusz do promienia 44px.
+ * Nie zamieniaj na `transform`/`filter` (anti-slop §2). Reguła jest globalna,
+ * bo CSS Modules nie przyjmują selektora bez klasy lokalnej, a media query
+ * dubluje warunek polityki desktop-access (ramka istnieje wyłącznie od XL),
+ * żeby chwilowy stan viewportu nigdy nie skurczył arkusza na telefonie. */
+@media (min-width: 1280px) {
+  [data-app-frame='true'] {
+    contain: layout;
+  }
+}

@@ -1,0 +1,8 @@
+/* Pusty escape ramy z atramentu. Reszta bloku jest ZGODNA z motywem, więc
+   jedynym powodem faila może być sam marker bez powodu — gdy ta gałąź
+   zniknie, komunikat zmieni się na zwykłe R8 i meta-strażnik to zobaczy. */
+.timelineDot {
+  /* ink-border-allow: */
+  background: var(--color-primary);
+  border: 2px solid var(--color-ink);
+}

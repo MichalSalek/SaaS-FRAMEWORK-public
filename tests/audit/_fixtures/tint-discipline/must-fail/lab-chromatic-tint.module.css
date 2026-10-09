@@ -1,0 +1,3 @@
+.labTint {
+  background: lab(60 40 30 / 0.12);
+}

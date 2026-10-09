@@ -1,0 +1,63 @@
+/* DashboardNote — a section title on paper and one white field (S126: no
+ * tint, no frame of its own; it is a text field like any other). */
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(var(--text-xs) * 1.4);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.field {
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-interactive);
+  cursor: text;
+}
+
+/* The ring is drawn by the FIELD box, not the bare textarea inside it: an
+   outline around the text alone would read as a frame around the words. */
+.field:focus-within {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--text-base) * 1.5 * 2);
+  padding: 0;
+  border: none;
+  /* DECISION (B2-F18): auto-expanding textarea; the .field box is its visual
+   * container and carries the focus ring (:focus-within above), so the
+   * browser's own ring on the bare text is off. */
+  outline: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  resize: none;
+  overflow: hidden;
+}
+
+.textarea::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* One quiet line under the field: who sees the notes and when they save. */
+.hint {
+  margin: var(--space-8) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}

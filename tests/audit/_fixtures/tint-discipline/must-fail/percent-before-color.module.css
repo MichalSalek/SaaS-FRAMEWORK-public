@@ -1,0 +1,5 @@
+/* Procent PRZED kolorem: CSS Color 5 nie narzuca kolejności w color-mix,
+   a skan czytający tylko to, co stoi PO var(--gold), nie miał czego dopasować. */
+.reversedOrder {
+  background: color-mix(in oklch, 12% var(--color-primary), var(--color-bg-main));
+}

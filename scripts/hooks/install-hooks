@@ -1,0 +1,155 @@
+#!/bin/bash
+# Install hooks: root (pre-commit + commit-msg + pre-push) and, in each
+# submodule, the same three: READONLY guard plus the tree-wide guards from
+# scripts/hooks/tree-guards.list, commit-msg and pre-push.
+#
+# Hooks are NOT tracked by git — run this after clone/setup.
+# Called by: npm run system:install-hooks
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+GUARD_SCRIPT="$SCRIPT_DIR/readonly-guard"
+PRECOMMIT_SCRIPT="$SCRIPT_DIR/pre-commit"
+PREPUSH_SCRIPT="$SCRIPT_DIR/pre-push"
+SUBMODULE_PRECOMMIT_SSOT="$SCRIPT_DIR/submodule-pre-commit"
+COMMITMSG_SCRIPT="$SCRIPT_DIR/commit-msg"
+
+# Instalacja nadpisuje pliki hookow, wiec musi byc GLOSNA, gdy zastaje cos
+# cudzego (husky, lefthook, recznie napisany hook). Bez tego czyjas konfiguracja
+# znika bez sladu i bez backupu, a skrypt melduje sukces.
+warn_if_foreign() {
+  local dst="$1" src="$2"
+  [ -f "$dst" ] || return 0
+  cmp -s "$dst" "$src" && return 0
+  # Kopia zdryfowana od naszego SSOT to normalny przypadek (po edycji hooka),
+  # ale hook, ktory nie pochodzi stad, zaslugowal na ostrzezenie i backup.
+  if ! head -5 "$dst" | grep -q "scripts/hooks"; then
+    cp "$dst" "${dst}.backup-$(date +%Y%m%d%H%M%S)"
+    echo "  [UWAGA] $dst nie pochodzi z scripts/hooks (husky/lefthook/wlasny?)."
+    echo "          Kopia zapasowa obok, nadpisuje wersja z repo."
+  fi
+}
+
+# core.hooksPath przekierowuje git POZA .git/hooks, wiec instalacja moglaby
+# zameldowac sukces nad plikami, ktorych git nigdy nie uruchomi.
+HOOKS_PATH_CFG="$(git -C "$PROJECT_ROOT" config --get core.hooksPath || true)"
+if [ -n "$HOOKS_PATH_CFG" ]; then
+  echo "  [UWAGA] core.hooksPath = $HOOKS_PATH_CFG"
+  echo "          git czyta hooki STAMTAD, a ten skrypt pisze do .git/hooks —"
+  echo "          instalacja bedzie bez efektu, dopoki nie zdejmiesz tej opcji."
+fi
+
+# --- Root pre-commit + commit-msg hooks ---
+ROOT_HOOKS_DIR="$PROJECT_ROOT/.git/hooks"
+
+if [ -d "$ROOT_HOOKS_DIR" ]; then
+  ROOT_PRECOMMIT="$ROOT_HOOKS_DIR/pre-commit"
+
+  warn_if_foreign "$ROOT_PRECOMMIT" "$PRECOMMIT_SCRIPT"
+  cp "$PRECOMMIT_SCRIPT" "$ROOT_PRECOMMIT"
+  chmod +x "$ROOT_PRECOMMIT"
+  echo "  root — pre-commit hook installed"
+
+  ROOT_COMMITMSG="$ROOT_HOOKS_DIR/commit-msg"
+
+  warn_if_foreign "$ROOT_COMMITMSG" "$COMMITMSG_SCRIPT"
+  cp "$COMMITMSG_SCRIPT" "$ROOT_COMMITMSG"
+  chmod +x "$ROOT_COMMITMSG"
+  echo "  root — commit-msg hook installed (no-AI-signature guard)"
+
+  # pre-push: ostatnia bramka. Bez niego zwykły `git push` (ten, którego używa
+  # się przy równoległych sesjach zamiast sweepującego git:push) omijał
+  # WSZYSTKIE audyty — łącznie z commitami robionymi z --no-verify.
+  ROOT_PREPUSH="$ROOT_HOOKS_DIR/pre-push"
+
+  warn_if_foreign "$ROOT_PREPUSH" "$PREPUSH_SCRIPT"
+  cp "$PREPUSH_SCRIPT" "$ROOT_PREPUSH"
+  chmod +x "$ROOT_PREPUSH"
+  echo "  root — pre-push hook installed (pełny run-all przed wysłaniem)"
+else
+  echo "  root/.git/hooks/ not found — skipping"
+fi
+
+# --- Submodule READONLY guard hooks ---
+SUBMODULES=("main" "web-1")
+
+for sub in "${SUBMODULES[@]}"; do
+  # `$sub/.git` bywa PLIKIEM `gitdir: …`, nie katalogiem: git od dawna absorbuje
+  # submoduly do `.git/modules/<nazwa>`. Zalozenie o katalogu sprawialo, ze na
+  # standardowym ukladzie (swiezy `clone --recursive`) instalator meldowal
+  # „submodule not initialized" i po cichu NIE instalowal ani readonly-guarda,
+  # ani zadnego straznika. `git rev-parse --git-path hooks` zna oba uklady.
+  #
+  # NAJPIERW jednak trzeba sprawdzic, ze to W OGOLE osobne repo. `git -C` na
+  # PUSTYM katalogu submodulu (klon bez --recursive albo `submodule deinit`)
+  # wspina sie w gore drzewa i oddaje hooki ROOTA — a petla nizej nadpisuje
+  # wtedy rootowy pre-commit 13-linijkowym delegatorem submodulu i melduje
+  # sukces. Efekt: kazdy commit w roocie przechodzi bez readonly-guarda i bez
+  # ani jednego straznika, przy zielonym komunikacie instalatora. Ten warunek
+  # jest jedyna rzecza, ktora dzieli „poprawna obsluge gitfile" od wylaczenia
+  # bramki calego repozytorium.
+  # Porownanie musi isc po sciezkach FIZYCZNYCH. `rev-parse --show-toplevel`
+  # rozwiazuje dowiazania, a `PROJECT_ROOT` powstaje ze zwyklego `cd`+`pwd`,
+  # wiec przy jakimkolwiek symlinku w sciezce repo (typowe: /repo -> /srv/repo)
+  # surowe porownanie odrzucaloby POPRAWNY submodul i po cichu pomijalo cztery
+  # hooki — ta sama klasa cichego oslabienia bramki, ktora ten warunek naprawia.
+  SUB_EXPECTED="$(cd -P "$PROJECT_ROOT/$sub" 2>/dev/null && pwd -P || true)"
+  SUB_TOPLEVEL="$(git -C "$PROJECT_ROOT/$sub" rev-parse --show-toplevel 2>/dev/null || true)"
+  SUB_TOPLEVEL_REAL="$(cd -P "$SUB_TOPLEVEL" 2>/dev/null && pwd -P || true)"
+  if [ -z "$SUB_EXPECTED" ] || [ "$SUB_TOPLEVEL_REAL" != "$SUB_EXPECTED" ]; then
+    echo "  $sub — nie jest zainicjalizowanym submodulem (git wskazuje ${SUB_TOPLEVEL:-brak}), pomijam"
+    continue
+  fi
+
+  HOOKS_DIR="$(git -C "$PROJECT_ROOT/$sub" rev-parse --path-format=absolute --git-path hooks 2>/dev/null || true)"
+
+  if [ ! -d "$HOOKS_DIR" ]; then
+    echo "  $sub/.git/hooks/ not found — skipping (submodule not initialized?)"
+    continue
+  fi
+
+  PRE_COMMIT="$HOOKS_DIR/pre-commit"
+
+  # Always overwrite to pick up guard script changes
+  # Hook submodulu DELEGUJE do skryptu w repo zamiast zawierac logike.
+  # Wstrzykiwanie calego ciala przez heredoc instalowalo ZAMROZONA KOPIE bez
+  # zadnej ochrony przed dryfem — i obie byly juz zdryfowane w chwili, gdy to
+  # wykryto. Trzy linijki delegacji nie maja od czego zdryfowac.
+  warn_if_foreign "$PRE_COMMIT" "$SUBMODULE_PRECOMMIT_SSOT"
+  cat > "$PRE_COMMIT" << 'HOOK_EOF'
+#!/bin/bash
+# Auto-installed by scripts/hooks/install-hooks — CIENKA DELEGACJA.
+# Cala logika: scripts/hooks/submodule-pre-commit (SSOT, pod kontrola gita).
+SSOT="$(git rev-parse --show-toplevel)/../scripts/hooks/submodule-pre-commit"
+# FAIL-LOUD, nie cisza. Ten delegator jest jedyna realnie ZAMROZONA kopia w tym
+# ukladzie, wiec brak SSOT (checkout roota sprzed tego commita, bisect,
+# samodzielny klon submodulu) oznacza commit bez readonly-guarda i bez ani
+# jednego straznika. Nie blokujemy commita, ale nie udajemy, ze bramka byla.
+if [ ! -f "$SSOT" ]; then
+  echo "  [UWAGA] brak $SSOT — commit BEZ readonly-guarda i BEZ straznikow drzewa."
+  exit 0
+fi
+exec bash "$SSOT" "$@"
+HOOK_EOF
+
+  chmod +x "$PRE_COMMIT"
+
+  # commit-msg: no-AI-signature guard (ten sam skrypt co root)
+  warn_if_foreign "$HOOKS_DIR/commit-msg" "$COMMITMSG_SCRIPT"
+  cp "$COMMITMSG_SCRIPT" "$HOOKS_DIR/commit-msg"
+  chmod +x "$HOOKS_DIR/commit-msg"
+
+  # pre-push: ten sam skrypt co root — audyty żyją w ROOCIE i skanują src/
+  # submodułów, więc push submodułu też musi przez nie przejść (hook sam
+  # wykrywa, że jest w submodule, i wchodzi piętro wyżej po run-all).
+  warn_if_foreign "$HOOKS_DIR/pre-push" "$PREPUSH_SCRIPT"
+  cp "$PREPUSH_SCRIPT" "$HOOKS_DIR/pre-push"
+  chmod +x "$HOOKS_DIR/pre-push"
+
+  echo "  $sub — hooks installed (pre-commit: guard + straznicy drzewa; commit-msg; pre-push)"
+done
+
+echo ""
+echo "Done. Root: pre-commit + commit-msg + pre-push. Submoduly: READONLY guard + straznicy drzewa + commit-msg + pre-push."

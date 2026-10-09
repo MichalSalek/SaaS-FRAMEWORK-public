@@ -1,0 +1,21 @@
+/* Trzy role, w których tint ZOSTAJE złoty — każda przez token z tokens.css.
+   Strażnik nie może ich ruszać, bo to jest właśnie wyjście, na które kieruje. */
+.markCircle {
+  background: var(--color-mark-bg);
+}
+
+.markCircleStrong {
+  background: var(--color-mark-bg-strong);
+}
+
+.markOnInk {
+  background: var(--color-mark-bg-on-ink);
+}
+
+.selectedRow {
+  background: var(--color-state-selected);
+}
+
+.hoverRow:hover {
+  background: var(--color-state-hover);
+}

@@ -1,0 +1,11 @@
+/* 0.46 to już pełnokolorowa powierzchnia akcentu, nie wash pod treścią,
+   a alfa 0 to element całkowicie przezroczysty (jego widoczny stan opisuje
+   inna reguła). Obie granice muszą być zakotwiczone, inaczej rozszerzenie
+   progu zamienia strażnika w zakaz koloru marki jako takiego. */
+.at46 {
+  background: rgba(212, 168, 64, 0.46);
+}
+
+.fullyTransparent {
+  background: rgba(212, 168, 64, 0);
+}

@@ -1,0 +1,4 @@
+.notch {
+  /* shape-allow: wycięcie ramki telefonu jest rysunkiem, nie kontrolką */
+  border-radius: 3px;
+}

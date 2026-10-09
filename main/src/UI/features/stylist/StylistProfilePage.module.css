@@ -1,0 +1,481 @@
+/* ─── StylistProfilePage ─── */
+.page {
+  padding: var(--space-20) var(--space-20);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ─── Profile Exhibit Hero ───────────────────────────────────────────
+ * Behance-tier cover band + avatar overlap + name/meta body.
+ * Mirrors StylistGalleryPage exhibitHero vocabulary (W2).
+ * Anti-AI-Slop: elevation = tonal surface (paper bg) + full hairline border,
+ * zero box-shadow.
+ */
+.profileHero {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  background: var(--color-bg-paper);
+  margin-bottom: var(--space-8);
+}
+
+/* Menu (trzy kropki) — prawy górny róg nagłówka. */
+.profileMenuWrapper {
+  position: absolute;
+  top: var(--space-12);
+  right: var(--space-12);
+  z-index: 2;
+}
+
+/* DECISION (nie usuwaj tego komentarza) — S118 (owner 2026-09-16): pas
+   „okładki” z tintem z imienia ZNIKA („wygląda jak pod Facebooka, beznadziejne”).
+   Nagłówek profilu to rząd: awatar, obok imię i nazwa studia. Nie przywracaj
+   ani coveru, ani nachodzącego awatara. */
+.profileBody {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-14);
+  padding: var(--space-20);
+}
+
+/* Avatar — overlaps the cover/body boundary.
+ * Anti-AI-Slop: border-ring (3px solid paper) = spread-ring pattern OK.
+ * Elevation = the ring contrast against the cover bg, not shadow.
+ */
+.profileAvatar {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--style-radius-round);
+  overflow: hidden;
+  background: var(--color-bg-paper);
+}
+
+.profileMeta {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.profileName {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-lg);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.15;
+  letter-spacing: var(--ls-tight-10);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.profileBusinessName {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.profileInlineMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+}
+
+.profileMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.profileMetaItem svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ─── Stats row (social proof — N4) ─── */
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--space-12);
+  padding: var(--space-20) var(--space-12);
+  /* DECISION (nie usuwaj tego komentarza):
+     Pas statystyk jest BIAŁYM boksem, nie kremowym. Krem jako „jedyny pas”
+     (motyw S94/R2) padł razem z wdrożeniem „A3 · Biel na papierze”: strona
+     jest papierem, a każda sekcja białym boksem — kremowa banda była tu
+     ostatnim blednącym tintem (owner, 2026-09-17). */
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  margin-block: var(--space-20);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.statValue {
+  /* Stat figures are DATA, not headings — rendered as <p> (Typography subtitle)
+   * to keep heading order h1→h2 clean. Liczby DANYCH jadą w sans: Marcellus
+   * (display serif) renderuje "0" jak literę "O". */
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-2xl);
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+.statLabel {
+  color: var(--color-text-secondary);
+  text-transform: lowercase;
+  letter-spacing: var(
+    --ls-wide-20
+  ); /* subtelnie: etykieta statystyki, nie kicker */
+}
+
+.statDivider {
+  width: 1px;
+  height: 32px;
+  background: var(--color-divider);
+  flex-shrink: 0;
+}
+
+/* ─── Sections ─── */
+/* S120 (owner): „poproś o połączenie są sklejone” — przycisk udostępniania
+   stoi poza rzędem akcji, więc sekcja musi sama trzymać odstęp między nimi. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+}
+
+/* Opis stylistki = biały boks („A3 · Biel na papierze”). Leżał gołym akapitem
+   na papierze między białą bandą statystyk a białą kartą telefonu. Reszta
+   sekcji (telefon, akcje, galeria) NIE dostaje boksu: telefon niesie własną
+   kartę, akcje to same przyciski, a kafle prac są już białe. */
+.bioSection {
+  padding: var(--space-20);
+  /* A section spaces itself from its neighbours with its block padding; the
+     box turned that padding into its inside, so the title of the next section
+     („Kontakt”) sat 12px under it. The margin gives the rhythm back. */
+  margin-block: var(--space-12);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.sectionTitle {
+  margin-bottom: var(--space-12);
+}
+
+/* „Udostępnij” w naturalnej szerokości: `.section` jest kolumną i rozciągała
+   przycisk od krawędzi do krawędzi (owner 2026-10-08). Cel dotyku 44px. */
+.shareAction {
+  align-self: flex-start;
+  min-height: var(--style-control-min-h);
+}
+
+/* ─── Ikona na linii swojego tekstu ───
+ * Tekst obok może się zawinąć (niemiecki na 360px), więc rząd wyrównuje do
+ * góry, a ikona stoi w uchwycie o wysokości JEDNEJ linii (1lh liczone z
+ * line-height uchwytu, tego samego co tekstu obok). Środkowanie względem
+ * całego akapitu zrzucało ikonę 13px pod pierwszą linię (sonda S126). */
+.lineIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.lineIcon svg {
+  display: block;
+}
+
+/* ─── Action row ─── */
+.actionRow {
+  display: flex;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Równe szerokości CTA w rzędzie — census S26: pille o przypadkowych
+ * szerokościach tworzyły rwany lewy blok; wspólna siatka = spokojny rytm. */
+.actionRow > * {
+  flex: 1 1 auto;
+}
+
+.actionLink {
+  text-decoration: none;
+}
+
+/* ─── "Sparowano" badge ─── */
+.pairedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-20);
+  background: var(--color-surface-hover);
+  color: var(--color-success);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+/* Stan „prośba czeka" — zdanie, nie pill 1-słowa: bez nowrap (PL/DE
+   wyjeżdżały poza 360px), radius-md zamiast pigułki (pigułka na zdaniu =
+   „kiełbasa", taste 23). */
+.pendingBadge {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-8) var(--space-20);
+  background: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+  border-radius: var(--style-radius-surface);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+/* ─── Gallery grid ─── */
+.galleryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-20);
+}
+
+@media (min-width: 480px) {
+  .galleryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.galleryMore {
+  display: block;
+  margin-top: var(--space-12);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* ─── Pairing Explainer — forward-looking value list ("co zyskujesz") ─── */
+/* DECISION (nie usuwaj): jedna lista zysków (check), NIE siatka before/after
+ * (floor §7). Tonal tint + pełny hairline 4 boki (NIE jednostronny accent). */
+.pairingExplainer {
+  padding: var(--space-32) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.pairingExplainerTitle {
+  text-align: center;
+}
+
+.valueList {
+  list-style: none;
+  padding: var(--space-20) var(--space-32);
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-12) var(--space-32);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: color-mix(
+    in oklch,
+    var(--color-success) 7%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-success) 22%, var(--color-border-surface));
+  border-radius: var(--style-radius-surface);
+}
+
+.valueList li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+
+.valueList .lineIcon {
+  color: var(--color-success);
+}
+
+@media (max-width: 479px) {
+  .valueList {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Pairing CTA Banner ─── */
+.pairingCta {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-20);
+  padding: var(--space-20) var(--space-32);
+  /* Motyw „Jeden krem" (S94/R3): banner podpowiedzi siedzi na papierze —
+     wyróżnienie niesie ZAMKNIĘTA rama, nie wypełnienie tintem. Rama jest tu
+     obowiązkowa: tint pełnił rolę GRANICY bloku, bo poza nią box nie ma
+     nic, co by go odcięło od tła ekranu. Wzorzec 1:1 z .anchorBanner
+     na /pricing. */
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  margin-block: var(--space-32);
+}
+
+/* Uchwyt o wysokości pierwszej linii tekstu obok: rozmiar i interlinia
+   Typography `body2` (--text-sm, 1.5), bez marginesu „na oko”. */
+.pairingCtaIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  /* Złoto jako IKONA niosąca znaczenie = accent-fg (primary = 2.2:1). */
+  color: var(--color-accent-fg);
+}
+
+.pairingCtaIcon svg {
+  display: block;
+}
+
+.pairingCtaText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* ─── Unpair Dialog content ─── */
+.unpairDialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-20);
+}
+
+.warningBox {
+  display: flex;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  background: var(--color-surface-hover);
+  border-radius: var(--style-radius-surface);
+  color: var(--color-text-primary);
+}
+
+/* Jak `.pairingCtaIcon`: jedna linia Typography `body2` (--text-sm, 1.5). */
+.warningIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-warning);
+}
+
+.warningIcon svg {
+  display: block;
+}
+
+/* ─── Empty state ─── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-20);
+  padding: var(--space-64) var(--space-20);
+  min-height: 60dvh;
+  text-align: center;
+}
+
+.emptyDescription {
+  color: var(--color-text-secondary);
+  max-width: 32rem;
+}
+
+.emptyLink {
+  text-decoration: none;
+}
+
+/* ─── Skeleton ─── */
+.skeletonPhoto {
+  aspect-ratio: 3 / 4;
+  height: auto !important;
+  border-radius: var(--style-radius-surface);
+}
+
+/* ─── Feedback banner (temporary toast replacement until ToastProvider is wired) ─── */
+.feedbackBanner {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--space-32) + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  padding: var(--space-12) var(--space-32);
+  /* DECISION (nie usuwaj): feedback toast używa wysokiego kontrastu (text-primary bg
+   * + paper text) + full hairline, zero box-shadow. Solid dark surface wystarcza
+   * dla toastu — jest transjentny, pojawiający się nad treścią. Hairline ring
+   * zapewnia wizualne wyodrębnienie bez glow. Anti-slop §2 compliant. */
+  /* focus-ring-allow: toast `<div role='status' aria-live='polite'>` z
+   * `pointer-events: none` w tym samym bloku — nieinteraktywny i nieosiągalny
+   * tabulatorem, nie hostuje żadnej kontrolki. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-paper);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-text-primary) 60%, transparent);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  z-index: var(--z-toast);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: feedbackFadeIn 200ms ease-out;
+}
+
+@keyframes feedbackFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* O1: dialog anulowania prośby — sekcja kontaktu (Zadzwoń / Napisz). */
+.cancelDialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.cancelContactIntro {
+  color: var(--color-text-secondary);
+}
+
+.cancelMessageCta {
+  width: 100%;
+  justify-content: center;
+}

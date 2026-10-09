@@ -1,0 +1,10 @@
+/* 8px to już kolumna, nie pasek — granica cienkości musi być zakotwiczona
+   także od góry, inaczej jej rozszerzenie zamieniłoby strażnika w zakaz
+   dowolnego elementu przy krawędzi. */
+.sidebarPanel::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 8px;
+  background: var(--color-primary);
+}

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# scripts/containers/recreate-dev
+# Odtwarza (force-recreate) kontenery deva ZAWSZE z oboma plikami compose (baza +
+# override SSL — lista plikow: scripts/containers/_compose.sh). Jedyny wspierany
+# przepis na: stale `.next` deva (klasy A/C w scripts/dev/preflight.sh), stary
+# env_file, zmiany w docker-compose*/next.config.
+# Ręczne `docker compose -f docker-compose.dev.yml up ... main-dev` (bez override'a)
+# było źródłem regresji 2026-08-18: kontener tracił env nakładany przez override
+# → HMR WebSocket blokowany → przeglądarka reloadowała stronę co ~50 s (klasa D).
+#
+# UŻYCIE:  npm run dev:recreate [-- main-dev web-1-dev caddy]   (domyślnie: main-dev)
+# `db`/`adminer` celowo poza zasięgiem (stateful/infra) — nie ryzykuj danych deva.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/_compose.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+services=("$@")
+[ ${#services[@]} -eq 0 ] && services=("main-dev")
+for s in "${services[@]}"; do
+  case "$s" in
+    main-dev|web-1-dev|caddy) ;;
+    db|adminer) error "Odmowa: '$s' nie podlega recreate (stateful/infra) — zrób to ręcznie i świadomie."; exit 1 ;;
+    *) error "Nieznany serwis deva: '$s' (dozwolone: main-dev web-1-dev caddy)"; exit 1 ;;
+  esac
+done
+
+header "DOCKER DEV RECREATE (${services[*]})" "♻️"
+info "Root: ${ROOT_DIR}"
+info "Files: ${DEV_COMPOSE_LABEL}"
+
+cd "${ROOT_DIR}" || { error "Cannot enter root dir"; exit 1; }
+
+step "Recreating: ${services[*]} (--force-recreate --no-deps)"
+dev_compose up -d --force-recreate --no-deps "${services[@]}" || { error "Recreate failed"; exit 1; }
+
+# Weryfikacja: `up -d` zwraca 0 po utworzeniu kontenera, nie po jego wystartowaniu.
+step "VERIFICATION"
+if ! assert_compose_running dev_compose "${services[@]}"; then
+  error "Recreate NIE postawil serwisu. Diagnostyka: docker compose logs --tail 50 <serwis>  |  npm run dev:preflight"
+  exit 1
+fi
+
+success "Recreate OK — env z obu plików compose, świeży layer kontenera (.next deva od zera)."
+exit 0

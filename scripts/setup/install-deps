@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# scripts/setup/install-deps
+
+# 1. Source Utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+header "INSTALL DEPENDENCIES" "📦"
+info "Root: ${ROOT_DIR}"
+
+# 2. Install root devDependencies (needed for generate-dto)
+if [ -f "${ROOT_DIR}/package.json" ]; then
+  step "Installing deps for: ${BOLD}root${RESET}"
+  (
+    cd "$ROOT_DIR"
+    if npm install; then
+      success "Installed root"
+    else
+      error "Failed to install root"
+      exit 1
+    fi
+  ) || exit 1
+fi
+
+# 3. Install Loop
+for dir in "$ROOT_DIR"/*; do
+  if [ -d "$dir" ] && is_app_dir "$(basename "$dir")"; then
+    APP_NAME=$(basename "$dir")
+    step "Installing deps for: ${BOLD}${APP_NAME}${RESET}"
+    
+    (
+      cd "$dir"
+      if npm install; then
+        success "Installed ${APP_NAME}"
+      else
+        error "Failed to install ${APP_NAME}"
+        exit 1
+      fi
+    ) || exit 1
+  fi
+done
+
+# 4. Install test dependencies (needed for smoke tests in Docker)
+TESTS_DIR="${ROOT_DIR}/tests"
+if [ -d "$TESTS_DIR" ] && [ -f "$TESTS_DIR/package.json" ]; then
+  step "Installing deps for: ${BOLD}tests${RESET}"
+  (
+    cd "$TESTS_DIR"
+    if npm install; then
+      success "Installed tests"
+    else
+      error "Failed to install tests"
+      exit 1
+    fi
+  ) || exit 1
+fi
+
+# 5. Copy Kernel
+step "Copying Shared Kernel..."
+"${SCRIPT_DIR}/../kernel/cp-kernel" || { error "Kernel Copy Failed"; exit 1; }
+
+success "All dependencies installed & kernel copied."
+exit 0
+

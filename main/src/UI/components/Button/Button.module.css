@@ -1,0 +1,307 @@
+/* ─── Button base ─── */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  border: none;
+  border-radius: var(--style-radius-control);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: var(--style-control-font);
+  font-weight: var(--style-control-weight);
+  text-transform: var(--style-control-case);
+  letter-spacing: var(--style-control-tracking);
+  word-spacing: var(--style-control-word-spacing);
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast),
+    transform var(--duration-100) var(--spring-snappy);
+  user-select: none;
+}
+
+/* ─── Haptic press: spring bounce-back on tap ─── */
+.button:active:not(.disabled) {
+  transform: scale(0.97);
+}
+
+/* ─── Error shake: horizontal wiggle for validation/rejection feedback ───
+   Reużywalny na KAŻDYM Buttonie (newsletter „Wpisz adres e-mail", walidacja
+   formularzy, odrzucenie serwera): parent podnosi prop `shake` na błędzie i
+   zeruje go w onShakeEnd (onAnimationEnd). Ruch celowy na elemencie
+   interaktywnym (nie scroll-reveal) — zgodny z floorem. */
+@keyframes buttonErrorShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-7px);
+  }
+  30% {
+    transform: translateX(6px);
+  }
+  45% {
+    transform: translateX(-5px);
+  }
+  60% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+.shake {
+  animation: buttonErrorShake 0.45s ease-in-out;
+}
+
+/* ─── Sizes ─── */
+.sm {
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  min-height: var(--style-control-min-h);
+}
+
+.md {
+  padding: var(--space-12) var(--style-control-pad-x);
+  font-size: var(--text-base);
+  min-height: var(--style-control-min-h);
+}
+
+.lg {
+  padding: var(--space-12) var(--space-32);
+  font-size: var(--text-md);
+  min-height: calc(var(--style-control-min-h) + var(--space-4));
+}
+
+/* ─── Icon-only square ─── */
+.iconOnly.sm {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+.iconOnly.md {
+  /* WCAG 2.1 AA / iOS HIG: 44px minimum tappable area for icon-only buttons */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+.iconOnly.lg {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+}
+
+/* ─── Icon element ─── */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.icon > svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* ─── Loading: the spinner never changes the width (DECISION in buttonCore) ─── */
+@keyframes buttonSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: buttonSpin 800ms linear infinite;
+}
+
+.loading {
+  position: relative;
+  cursor: progress;
+}
+
+/* No glyph to replace: the spinner lies over the label, which fades but keeps
+ * its place (and stays the accessible name). */
+.spinnerOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinnerOverlay > svg {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.label[data-faded] {
+  opacity: 0;
+}
+
+/* ─── Label ─── */
+.label {
+  display: inline-flex;
+  align-items: center;
+  transition: opacity var(--transition-fast);
+}
+
+/* ─── Variant: Primary (solid CTA color-block, anti-slop §1/§2) ─── */
+/* DECISION (anti-slop §2): no box-shadow on primary button — solid tonal
+ * surface + border gives elevation; shadows were slop residue from gradient era.
+ * filter: brightness() for press/hover feedback is intentional and kept. */
+.primary {
+  background: var(--color-cta);
+  color: var(--color-accent-text);
+}
+.primary:active:not(.disabled) {
+  filter: brightness(0.95);
+}
+
+/* Restored hover for desktop */
+@media (hover: hover) {
+  .primary:hover:not(.disabled) {
+    filter: brightness(1.06);
+  }
+}
+
+/* ─── Variant: Outlined ─── */
+/* DECISION (S25, WCAG AA): tekst i border = var(--color-accent-fg), NIE
+ * --color-primary — jasny gold #e0b341 na bieli to 2.2:1 (FAIL 4.5:1 tekstu
+ * i 3:1 obwódki UI). accent-fg jest mode-aware (light=ciemny gold 4.91:1,
+ * dark=jasny gold) — patrz DESIGN.md §Gold-as-text. */
+/* --btn-quiet-fg / --btn-quiet-border: hak dla powierzchni NEGATYWOWYCH.
+ * Warianty ciche (outlined/text/ghost) niosą się kolorem tekstu, a ich
+ * domyślne tokeny są dobrane pod JASNE tło (accent-fg to ciemny gold,
+ * text-secondary to średnia szarość) — na atramencie oba schodzą do ~2:1.
+ * Karta-negatyw ustawia hak u siebie zamiast nadpisywać prywatne klasy
+ * przycisku selektorem potomka. */
+/* S116 („A3 · Biel na papierze”): obrysowy przestaje być obrysem. Tekst
+ * w atramencie, bez ramy (hak --btn-quiet-border zostaje dla negatywów, które
+ * chcą linii). Wypełnione CTA dalej jedno.
+ * S126: domyślne wypełnienie to `--color-control-fill` (uzasadnienie przy
+ * tokenie), czyli przycisk widać na papierze I w białym boksie. Strony
+ * publiczne trzymają biel przez hak na korzeniu PublicLayout. */
+.outlined {
+  background: var(--btn-quiet-bg, var(--color-control-fill));
+  color: var(--btn-quiet-fg, var(--color-text-primary));
+  border: var(--style-border-control) solid
+    var(--btn-quiet-border, var(--color-control-border));
+}
+.outlined:active:not(.disabled) {
+  background: var(--btn-quiet-pressed-bg, var(--color-surface-pressed));
+  color: var(--btn-quiet-fg, var(--color-accent-fg-strong));
+}
+
+/* Restored hover for desktop */
+@media (hover: hover) {
+  .outlined:hover:not(.disabled) {
+    background: var(--btn-quiet-hover-bg, var(--color-surface-hover));
+    color: var(--btn-quiet-fg, var(--color-accent-fg-strong));
+  }
+}
+
+/* ─── Variant: Text ─── */
+.text {
+  background: transparent;
+  color: var(--btn-quiet-fg, var(--color-accent-fg));
+}
+.text:active:not(.disabled) {
+  background: var(--btn-quiet-pressed-bg, var(--color-surface-pressed));
+  color: var(--btn-quiet-fg, var(--color-accent-fg-strong));
+}
+
+/* Restored hover for desktop */
+@media (hover: hover) {
+  .text:hover:not(.disabled) {
+    background: var(--btn-quiet-hover-bg, var(--color-surface-hover));
+    color: var(--btn-quiet-fg, var(--color-accent-fg-strong));
+  }
+}
+
+/* ─── Variant: Ghost ─── */
+.ghost {
+  background: transparent;
+  color: var(--btn-quiet-fg, var(--color-text-secondary));
+}
+.ghost:active:not(.disabled) {
+  background: var(--btn-quiet-pressed-bg, var(--color-surface-pressed));
+}
+
+/* Restored hover for desktop */
+@media (hover: hover) {
+  .ghost:hover:not(.disabled) {
+    background: var(--btn-quiet-hover-bg, var(--color-surface-hover));
+    color: var(--btn-quiet-fg, var(--color-text-primary));
+  }
+}
+
+/* ─── Variant: Danger (akcja nieodwracalna: usuń wpis/konto) ─── */
+/* DECISION (nie usuwaj tego komentarza):
+ * Outlined error-surface (error text + error hairline, tło TRANSPARENTNE) —
+ * mode-safe afordancja destrukcji. Baza transparentna, bo #dc2626 (error light)
+ * na BIAŁYM ma tylko 4.9:1 — każdy error-tint tła spycha go PONIŻEJ 4.5:1 AA
+ * (S53 /spar: 12% tint = 4.13:1 FAIL). Na papierze/powierzchni dialogu tekst
+ * trzyma 4.9:1 (light) / ~5.7:1 (dark #f87171 na ciemnym) = AA w OBU trybach.
+ * NIE solidny red-bg+biały tekst: --color-error w dark to jasny token TEKSTU.
+ * Tint tylko na hover/active (transient, ~4.7:1 nadal OK). Kanon "Strefa
+ * krytyczna" AccountPage. Floor-safe: solid color + hairline, zero gradient/shadow. */
+.danger {
+  background: transparent;
+  color: var(--color-error);
+  border: var(--style-border-control) solid
+    color-mix(in oklch, var(--color-error) 50%, transparent);
+}
+.danger:active:not(.disabled) {
+  background: color-mix(in oklch, var(--color-error) 8%, transparent);
+}
+@media (hover: hover) {
+  .danger:hover:not(.disabled) {
+    background: color-mix(in oklch, var(--color-error) 8%, transparent);
+    border-color: var(--color-error);
+  }
+}
+
+/* ─── Focus visible ─── */
+.button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Disabled ─── */
+.disabled {
+  opacity: 0.5;
+  /* saturate: samo opacity gasiło primary w light, ale w dark złoto na
+   * ciemnym tle wciąż czytało się jak aktywne (cross-mode rozjazd stanu,
+   * fresh-eyes S25). */
+  filter: saturate(0.55);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary disabled: dociśnięty filter zamiast solidnej powierzchni z tokenów
+ * tekst/papier — PublicFooter ma inverted-ink scope (--color-bg-paper:#fff,
+ * --color-text-*:#fff), w którym powierzchnia z color-mix robiła się
+ * biała-na-białej (S26: consent-gated „Zapisz się" znikał całkowicie).
+ * brightness dociska złoto w dark (census S26: opacity+saturate samo
+ * zostawiało fill czytany jako AKTYWNY secondary), a filter degraduje
+ * COKOLWIEK przycisk dziedziczy — bezpieczne w każdym scope. */
+.primary.disabled {
+  opacity: 0.55;
+  filter: saturate(0.4) brightness(0.85);
+}
+
+/* Outlined/text disabled: bez saturate (zostawia barwę accent-fg) i z lżejszym
+ * przygaszeniem — label ma zostać odczytywalny (census S26: „Zarządzaj
+ * rozliczeniami" przy opacity .5 + saturate spadał do 2.05:1 i czytał się
+ * jako zepsuty, nie jako wyłączony). */
+.outlined.disabled,
+.text.disabled {
+  opacity: 0.65;
+  filter: none;
+}

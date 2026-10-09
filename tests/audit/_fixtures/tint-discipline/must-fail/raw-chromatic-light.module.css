@@ -1,0 +1,14 @@
+/* Druga strona tej samej granicy: jasny tint z realną chromą zostaje
+   naruszeniem. `oklch()` zapisuje chromę WPROST, więc para 0.041 / 0.04
+   przypina próg z obu stron (bliźniacza próbka must-pass: raw-chroma-floor). */
+.washLightGold {
+  background: rgba(238, 205, 140, 0.25);
+}
+
+.washNearFloor {
+  background: rgba(248, 236, 205, 0.3);
+}
+
+.washFloorAbove {
+  background: oklch(0.82 0.041 88 / 0.12);
+}

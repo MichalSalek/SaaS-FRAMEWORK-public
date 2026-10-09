@@ -1,0 +1,7 @@
+/* 6px to ostatnia grubość, którą motyw uznaje za LINIĘ (konektor, tor,
+   podkreślenie). Bez tej próbki zawężenie wyciszacza do [1-5] przechodziło
+   bez śladu i zaczynało krzyczeć na hairline'y. */
+.trackRail {
+  height: 6px;
+  background: color-mix(in oklch, var(--color-primary) 25%, transparent);
+}

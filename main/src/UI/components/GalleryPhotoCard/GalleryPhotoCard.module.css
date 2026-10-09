@@ -1,0 +1,370 @@
+/* ─── GalleryPhotoCard ─── */
+.card {
+  overflow: hidden;
+  border-radius: var(--style-radius-surface);
+  /* S116 („A3”): karta zdjęcia jest klikalna, więc stoi na bieli. */
+  background: var(--color-surface-interactive);
+  position: relative;
+  isolation: isolate;
+  /* Off-screen render skipping (perf): the browser skips layout/paint for
+   * cards outside the viewport in the own-gallery / stylist-gallery / explore
+   * lists, then renders them just-in-time on scroll. contain-intrinsic-size
+   * reserves a placeholder box so the scrollbar + layout stay stable while a
+   * card is skipped. Estimate: imageWrapper is aspect-ratio 3/4 (~240px tall
+   * at the ~180px column width on mobile) + info block (~80px) ≈ 320px.
+   * The `auto` keyword remembers each card's real size after first paint and
+   * reuses it on re-skip, so the estimate only matters before first render. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 180px auto 320px;
+  /* Depth = hairline border + tonal surface (no shadow). Border carries the
+   * card edge against the gallery grid; strengthened from 6% so the photo
+   * reads as a framed object, not a floating slab. */
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color var(--transition-normal);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+/* Hover: lift + border emphasis (transform + border-color carry the
+ * interactive affordance — no shadow). */
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px) scale(1.012);
+    border-color: var(--color-border-surface);
+  }
+  .card:hover .image {
+    transform: scale(1.04);
+  }
+}
+
+/* S118/S120 (owner): jednokolumnowy widok to feed — zdjęcie idzie na całą
+   szerokość kadru bez zaokrąglenia, ale podpis pod nim dostaje własny,
+   minimalistyczny biały boks, żeby kolory i style nie leżały na gołym papierze
+   („zbyt majtkowo”). */
+.cardFullWidth {
+  border-radius: 0;
+  background: transparent;
+  border-color: transparent;
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+   W feedzie podpis jest PRZYKLEJONY do kadru, nie jest osobnym bąbelkiem pod
+   nim: zero marginesu, szerokość zdjęcia, górne rogi ścięte (kadr i podpis to
+   jedna bryła), zaokrąglony tylko dół. Wcześniejszy odsunięty boks czytał się
+   jak druga karta i rozbijał rytm instagramowej kolumny (owner, 2026-09-17). */
+.cardFullWidth .info {
+  margin: 0;
+  padding: var(--space-16) var(--space-20) var(--space-20);
+  background: var(--color-bg-paper);
+  border-radius: 0 0 var(--style-radius-surface) var(--style-radius-surface);
+}
+
+.cardFullWidth .imageWrapper {
+  border-radius: 0;
+  /* 3:4 = proporcja kadru z kreatora (CropStep ASPECT), jak w siatce. Kwadrat
+   * docinał zatwierdzony kadr po raz drugi (2026-09-09). */
+  aspect-ratio: 3 / 4;
+}
+
+/* Haptic press */
+.card:active {
+  transform: scale(0.97);
+  transition: transform var(--duration-100) var(--spring-snappy);
+}
+
+.imageWrapper {
+  width: 100%;
+  aspect-ratio: 3 / 4; /* Portrait, nail-friendly */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: var(--style-radius-surface) var(--style-radius-surface) 0 0;
+  overflow: hidden;
+  /* tint-allow: podkład placeholdera zdjęcia — widoczny wyłącznie do czasu
+   * wczytania kadru, więc nie konkuruje z powierzchniami treści (motyw
+   * „Jeden krem" S94 celuje w tinty POWIERZCHNI, nie w podkłady medium).
+   * DECISION (nie usuwaj tego komentarza):
+   * Solid tonal fill (NOT gradient) — this is the placeholder backdrop shown
+   * only before/behind the lazy-loaded photo (object-fit:cover covers it once
+   * loaded). Functional image-placeholder per de-slop floor, kept solid. */
+  background: var(--color-bg-paper);
+}
+
+/* Keyboard focus ring for the clickable image area (role=button, tabIndex=0).
+ * Mode-aware --color-focus-ring clears 3:1 in both themes (WCAG 2.4.11). */
+/* Rozciągnięty przycisk otwierania zdjęcia — leży na całym kadrze, POD akcjami
+   (serce / pinezka / udostępnianie mają z-index 2). Pierścień fokusu przeniósł
+   się tu z `.imageWrapper` razem z rolą kontrolki: obrysowuje ten sam prostokąt
+   co wcześniej, bo przycisk wypełnia kadr co do piksela. */
+.openPhotoButton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* DECISION (S110, nie usuwaj tego komentarza): wskaznik fokusu kafelka rysuje
+   sie NA KARCIE, nie na zdjeciu. Bylo: outline atramentem przy UJEMNYM offsecie,
+   czyli wewnatrz kadru — na ciemnym zdjeciu ~1:1, kafelek bez wskaznika.
+   Pierwsza proba naprawy dawala bialy ring na zaslonie 72%: kontrast wychodzil
+   (3,18:1 na bialym kadrze), ale zaslona przykrywala prace, wiec osoba na
+   klawiaturze przestawala widziec, KTORE zdjecie zaraz otworzy. Rodzenstwo
+   (szczegol sesji, sekcja podobnych) od dawna robi to poprawnie: ring ląduje
+   na chromie obok zdjecia. `:has()` celuje wylacznie w przycisk otwarcia —
+   pin/serce/udostepnij maja wlasny wskaznik wewnatrz swojego dysku. */
+.card:has(.openPhotoButton:focus-visible) {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.openPhotoButton:focus-visible {
+  outline: none;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Image load-state resolve (former blur-up) ─── */
+/* De-slop (zero blur): the old filter:blur(8px) LQIP is replaced by an
+ * opacity resolve — the wrapper (already backed by a solid tonal
+ * placeholder, see .imageWrapper) sits slightly dimmed until the <img>
+ * mounts, then fades to full. Same transient load cue, no filter. */
+.imageResolve {
+  opacity: 0.85;
+  transition: opacity 400ms var(--ease-entrance);
+}
+
+.imageResolve:has(img) {
+  opacity: 1;
+}
+
+/* ─── Pinned Badge (top-right) ─── */
+/* S120 (owner): plakietka ma stać w pionie na środku serduszka obok (44px
+   dysk od `--space-8`), a nie równo z jego górną krawędzią. */
+.pinnedBadge {
+  position: absolute;
+  top: calc(var(--space-8) + 22px);
+  transform: translateY(-50%);
+  right: var(--space-8);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--style-radius-pill);
+  z-index: 2;
+}
+
+/* When both pinned badge and heart are present, shift badge left */
+.pinnedBadgeWithHeart {
+  right: calc(var(--space-8) + 44px + var(--space-8));
+}
+
+/* ─── Pin Toggle Button (top-right, interactive) ─── */
+/* WCAG 2.1 AA / iOS HIG: minimum 44x44 tappable area */
+.pinToggle {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-pill);
+  /* Solid dark scrim (no backdrop-blur) — guarantees >=3:1 for the white
+   * icon over arbitrary photo content (WCAG 1.4.11 non-text). */
+  /* Pierscien fokusu na nakladce zdjecia: bazowy --color-focus-ring to w trybie
+     jasnym atrament, a ten dysk jest ciemny i lezy na cudzej bitmapie, wiec ring
+     bierze biel z roli nakladki. UJEMNY offset jest tu KONIECZNY: globalna regula
+     daje +2px, czyli ring wypadalby POZA dysk, na goly kadr — bialy na bialym
+     zdjeciu to ~1:1. Wewnatrz dysku, ktory na czas fokusu ciemnieje do policzonej
+     zaslony, biel trzyma 3,18:1 niezaleznie od tresci zdjecia. */
+  --color-focus-ring: var(--color-on-photo-overlay);
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast);
+  z-index: 2;
+}
+
+.pinToggle:active {
+  transform: scale(0.9);
+}
+
+.pinToggleActive {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+/* ─── Heart Button (top-right) ─── */
+.heartButton {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-pill);
+  /* Solid dark scrim (no backdrop-blur) — raised to 0.45 so the white heart
+   * clears >=3:1 over light photo regions (WCAG 1.4.11 non-text). */
+  /* Pierscien fokusu na nakladce zdjecia: bazowy --color-focus-ring to w trybie
+     jasnym atrament, a ten dysk jest ciemny i lezy na cudzej bitmapie, wiec ring
+     bierze biel z roli nakladki. UJEMNY offset jest tu KONIECZNY: globalna regula
+     daje +2px, czyli ring wypadalby POZA dysk, na goly kadr — bialy na bialym
+     zdjeciu to ~1:1. Wewnatrz dysku, ktory na czas fokusu ciemnieje do policzonej
+     zaslony, biel trzyma 3,18:1 niezaleznie od tresci zdjecia. */
+  --color-focus-ring: var(--color-on-photo-overlay);
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
+  z-index: 2;
+}
+
+.heartButton:active {
+  transform: scale(0.95);
+}
+
+/* Stan serca jeszcze nieznany (ulubione w locie albo padły): serce nie udaje
+   potwierdzonego „nie polubione", tylko jest wygaszone i nieaktywne. */
+.heartButton:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.heartButton:disabled:active {
+  transform: none;
+}
+
+/* ─── Share Button (bottom-right) ─── */
+.shareButton {
+  position: absolute;
+  bottom: var(--space-8);
+  right: var(--space-8);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-pill);
+  /* Solid dark scrim (no backdrop-blur) — raised to 0.45 so the white share
+   * icon clears >=3:1 over light photo regions (WCAG 1.4.11 non-text). */
+  /* Pierscien fokusu na nakladce zdjecia: bazowy --color-focus-ring to w trybie
+     jasnym atrament, a ten dysk jest ciemny i lezy na cudzej bitmapie, wiec ring
+     bierze biel z roli nakladki. UJEMNY offset jest tu KONIECZNY: globalna regula
+     daje +2px, czyli ring wypadalby POZA dysk, na goly kadr — bialy na bialym
+     zdjeciu to ~1:1. Wewnatrz dysku, ktory na czas fokusu ciemnieje do policzonej
+     zaslony, biel trzyma 3,18:1 niezaleznie od tresci zdjecia. */
+  --color-focus-ring: var(--color-on-photo-overlay);
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+  z-index: 2;
+}
+
+.shareButton:active {
+  transform: scale(0.95);
+}
+
+/* ─── Card Info ─── */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12); /* Tight padding */
+}
+
+.colorDots {
+  display: flex;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+/* S118 (owner): „kolory oraz nazwy styli nie zaczynają się od jednego miejsca”.
+   Chip niesie własny padding, więc jego TEKST startował ~14px na prawo od
+   pierwszej kropki koloru. W karcie zdjęcia chipy schodzą do etykiet: bez
+   wypełnienia i bez wcięcia, tekst zaczyna się w tej samej pionowej linii. */
+.traitChips {
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-8);
+  row-gap: var(--space-4);
+}
+
+.traitChips > * {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Social Proof: Like Count ─── */
+.likeCount {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Watermark overlay for FREE plan ─── */
+.watermark {
+  position: relative;
+}
+
+.watermark::after {
+  content: 'Nailfolio';
+  position: absolute;
+  bottom: var(--space-12);
+  right: var(--space-12);
+  font-size: var(--text-xs);
+  /* DECISION (nie usuwaj tego komentarza): plamka i kolor liczone dla NAJGORSZEGO
+   * tla, czyli bialego zdjecia — jedyna powierzchnia w apce, ktorej tlo jest
+   * dowolna bitmapa uzytkowniczki, wiec kontrast musi trzymac bez zalozen o niej.
+   * Bialy tekst przy 14px potrzebuje 4.5:1 (WCAG 1.4.3; wyjatek dla logotypu
+   * TU NIE POMAGA — znak ma byc czytelny, bo po to jest). To wymaga luminancji
+   * tla <= 0.183, czyli kanalu <= 118, czyli scrimu >= 0.54 nad biala bitmapa.
+   * 0.62 daje 6.2:1 na bieli i 21:1 na czerni — z zapasem na kazde zdjecie.
+   * Poprzednie 0.85 bieli na scrimie 0.4 dawalo 2.49:1 na jasnym zdjeciu.
+   * NIE obnizac alfy scrimu ani nie przygaszac tekstu ponizej pelnej bieli.
+   * Biel jako literal (a nie token) — tak samo jak .pinToggle/.heartButton/
+   * .shareButton wyzej: overlay nad zdjeciem jest mode-invariant, nie ma
+   * wariantu dark, wiec token motywu bylby tu klamstwem. */
+  color: var(--color-on-photo-overlay);
+  /* focus-ring-allow: pseudo-element podpisu na zdjeciu — nie jest kontrolka,
+     nie ma potomkow i nigdy nie hostuje fokusu, wiec remap ringu nie mialby
+     tu czego naprawic. */
+  background: var(--color-photo-overlay-strong);
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--style-radius-control);
+  pointer-events: none;
+}
+
+/* Fokus kontrolek nad zdjeciem: dysk ciemnieje do policzonej zaslony, a bialy
+   pierscien wchodzi DO SRODKA dysku (patrz --color-photo-focus-veil). */
+.pinToggle:focus-visible,
+.heartButton:focus-visible,
+.shareButton:focus-visible {
+  background: var(--color-photo-focus-veil);
+  outline-offset: -2px;
+}

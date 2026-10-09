@@ -1,0 +1,549 @@
+/* UI/features/client-card/ClientCardPage.module.css
+ * The stylist's card of one client. „Biel na papierze” (S116): the page is
+ * paper, section titles sit on paper, grouped content (the note, each visit)
+ * and tappable rows (contact) are white boxes with no frame and no shadow.
+ * No box inside a box: a visit is its own white box, not a card in a card. */
+
+/* No width cap and no padding here: AppLayout pads the content and
+   PageColumnsMolecule owns the measure (before S126 this page added a second
+   20px gutter and its own 920px column). The container lets rules below ask
+   for the page's OWN width (the phone frame on a desktop lies to @media). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-width: 0;
+  container-type: inline-size;
+  container-name: client-card;
+}
+
+/* ─── Section: title on paper, optional quiet line, then content ─── */
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.3;
+}
+
+/* One line is reserved even while the text is short, so a status that changes
+   („Zapisywanie” → „Zaktualizowano …”) never moves what is below. */
+.sectionMeta {
+  margin: 0;
+  min-height: 1lh;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ─── Main action: add a visit ─── */
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Full width on a phone, its own width once the column is wide. */
+.composerToggle {
+  align-self: stretch;
+}
+
+@container client-card (min-width: 440px) {
+  .composerToggle {
+    align-self: flex-start;
+  }
+}
+
+.manualForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+}
+
+.input,
+.smallTextarea,
+.noteTextarea,
+.visitNote {
+  width: 100%;
+  border: 0;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  /* 16px: below it iOS zooms the page when the field takes focus. */
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+.input:focus-visible,
+.smallTextarea:focus-visible,
+.noteTextarea:focus-visible,
+.visitNote:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.input {
+  min-height: var(--style-control-min-h);
+  padding: var(--space-8) var(--space-12);
+}
+
+.smallTextarea {
+  min-height: 72px;
+  resize: none;
+  padding: var(--space-10) var(--space-12);
+  field-sizing: content;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+/* ─── Note about the client ─── */
+
+.noteCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* Grows with the text (field-sizing), so no resize grip. */
+.noteTextarea {
+  min-height: 96px;
+  resize: none;
+  padding: var(--space-12);
+  field-sizing: content;
+}
+
+/* The counter is one unbreakable piece; when the row is too narrow the delete
+   button moves under it as a whole. */
+.noteFooter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+}
+
+.noteCounter {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.noteCounterLimit {
+  color: var(--color-warning);
+}
+
+.noteSaveFailed {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-error-fg);
+}
+
+/* ─── Contact: tappable rows when a value exists ─── */
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  overflow: hidden;
+}
+
+.contactItem {
+  display: flex;
+  min-width: 0;
+}
+
+.contactItem:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.contactRow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+  min-height: 68px;
+  padding: var(--space-12) var(--space-16);
+  color: inherit;
+  text-decoration: none;
+}
+
+.contactRowLink {
+  background: var(--color-surface-interactive);
+  transition: background-color var(--transition-fast);
+}
+
+.contactRowLink:hover {
+  background: var(--color-surface-hover);
+}
+
+.contactRowLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.contactMeta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.contactLabel,
+.contactEmpty {
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.contactValue {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+  line-height: 1.4;
+}
+
+/* ─── History: one white box per visit ─── */
+
+.visitList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.visitCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* Fixed row height (the 44px control) whether the delete button is there or
+   not, so manual and session entries line up. */
+.visitHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: var(--style-control-min-h);
+}
+
+.visitHeading {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.visitDate {
+  display: block;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.visitSource {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+/* An editable field looks like one at rest (input fill), not like prose that
+   turns into a field only on focus. */
+.visitNote {
+  min-height: var(--style-control-min-h);
+  resize: none;
+  padding: var(--space-10) var(--space-12);
+  field-sizing: content;
+}
+
+.visitNote::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.addPhotoBtn,
+.loadMoreBtn {
+  align-self: flex-start;
+}
+
+.historyReach {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.fileInput {
+  display: none;
+}
+
+/* ─── Photos (session inspirations, result photos) ─── */
+
+.photoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.photoBlockTitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-8);
+}
+
+/* Never stretch three photos across a 600px card. */
+@container client-card (min-width: 560px) {
+  .photoGrid {
+    grid-template-columns: repeat(auto-fill, 112px);
+  }
+}
+
+.photoTile,
+.uploadingTile {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+}
+
+.photoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 44px tap target in the tile's corner; the visible disc is 28px. */
+.removePhoto {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 44px;
+  height: 44px;
+  padding: var(--space-6);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.removePhotoDisc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--style-radius-round);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+}
+
+.removePhotoDisc > svg {
+  display: block;
+}
+
+.removePhoto:focus-visible {
+  outline: none;
+}
+
+.removePhoto:focus-visible .removePhotoDisc {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.removePhoto:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.uploadingTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+/* ─── Empty history ─── */
+/* Powierzchnia i typografia = kanon <EmptyState>; tu tylko ciaśniejszy oddech. */
+.emptyHistory {
+  --empty-medal-size: 60px;
+  --empty-body-maxw: 34ch;
+  --empty-pad-block: var(--space-32);
+  --empty-pad-block-end: var(--space-32);
+}
+
+/* ---- Locked (premium / konwersja moment) ---- */
+.lockedWrap {
+  display: grid;
+  gap: var(--space-20);
+  /* No padding of its own: AppLayout already pads the content. */
+  width: min(100%, 560px);
+  margin: 0 auto;
+}
+
+/* To wciąż moment upsellu, nie neutralny box — ale po motywie „Jeden krem”
+ * (S94/R3) niesie go ZAMKNIĘTA rama (4 boki, z grupy .section wyżej) w mocnym
+ * złocie plus waga nagłówka, a nie wypełnienie. Fill musiał zejść, bo gdy
+ * reszta produktu stoi na papierze, kremowy box czyta się jak kolejna
+ * powierzchnia listy, a nie jak oferta. Rama jest mode-aware sama z siebie
+ * (--color-primary flipuje z trybem), więc dark-override zniknął razem z
+ * tintem. */
+.locked {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-12);
+  padding: var(--space-32) var(--space-20);
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* Przygaszony podgląd dziennika pod lockiem — pokazuje, CO odblokowuje Pro
+ * (fresh-eyes: sam opis słowny czytał się jak „access denied"). Wyblakły
+ * opacity (NIE blur — floor §), nieinteraktywny, poza drzewem a11y. */
+.lockedPreview {
+  display: grid;
+  gap: var(--space-12);
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+
+.lockedTeaserLabel {
+  margin: 0 0 var(--space-8);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+}
+
+.previewEntry {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.previewNote {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+}
+
+.previewPhotos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+}
+
+/* Kafelek w teaserze udaje ZDJĘCIE z dziennika, więc bierze dokładnie to tło,
+ * co realny .photoTile — inaczej podgląd obiecywałby złoty kadr, którego po
+ * wykupieniu planu nikt nie zobaczy. To nie jest podkład ładowanego obrazu
+ * (żaden się tu nie wczytuje), więc wyjątek `tint-allow` z GalleryPhotoCard
+ * nie ma tu zastosowania. */
+.previewPhotoTile {
+  aspect-ratio: 1;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+}
+
+/* Medalion kłódki = ZNAK (glif w kółku), nie powierzchnia — token roli. */
+.lockedIcon {
+  display: inline-grid;
+  place-items: center;
+  color: var(--color-accent-fg);
+  width: 64px;
+  height: 64px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+}
+
+.lockedTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  line-height: 1.2;
+}
+
+/* Deklaracje wspólne dawniej z `.emptyHistory p` — ten pusty stan przeszedł
+   na kanon <EmptyState>, więc reguła zbiorcza zniknęła razem z nim, a treść
+   blokady musi zachować własne. */
+.lockedBody {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+  max-width: 42ch;
+}

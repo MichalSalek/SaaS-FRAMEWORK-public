@@ -1,0 +1,635 @@
+/* UI/features/explore/components/ExploreStylistsTab.module.css
+ * Stylists Directory — Curated Artisan Browse
+ *
+ * Mood: "Curated artisan directory" — premium, hand-picked creator browse.
+ * Each stylist is a *creator with portfolio*, not a service provider with reviews.
+ *
+ * Hierarchy: karta-intro (kanon <AppHero>) → search + city pills →
+ * creator card list → branded empty state.
+ *
+ * Anti-AI-Slop (HARD): zero gradient · zero box-shadow/glow · zero one-sided borders
+ * · zero hover-on-static. Depth = solid color-mix(in oklch) tonal surfaces + full
+ * hairline borders (1px, all 4 sides). Spread-ring OK for focus-visible only.
+ *
+ * Reference anchoring (flat):
+ *  - Brand-tinted solid tonal surfaces via color-mix(in oklch, ...)
+ *  - Spring easing on interactive hover: cubic-bezier(0.34, 1.56, 0.64, 1)
+ *  - Stagger entrance animation (--stagger-index)
+ */
+
+/* ─── Motion keyframes ─────────────────────────────────────── */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes skeletonPulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: slideUp 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}
+
+/* ─── Section shell ────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+}
+
+/* ─── KARTA-INTRO — kanon <AppHero> (components/AppHero, S25/1 wariant D):
+ * tint tła, rama i typografia żyją w komponencie. Tu zostaje
+ * wyłącznie wejście .staggerIn nadawane przez className. ─── */
+
+/* ─── TOOLBAR — search + city pill row ──────────────────────── */
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.searchWrap {
+  position: relative;
+}
+
+.cityRail {
+  position: relative;
+  display: flex;
+  gap: var(--space-8);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: var(--space-4) var(--space-2);
+  /* Scroll affordance = the last pill peeking half-cut at the edge +
+   * proximity snap. (Edge-fade gradient mask removed 2026-06-12 per
+   * Anti-AI-Slop de-slop recipe — no fades, the cut itself signals scroll.) */
+  scroll-snap-type: x proximity;
+}
+
+.cityRail::-webkit-scrollbar {
+  display: none;
+}
+
+.cityPill {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 7px var(--space-14);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .cityPill:hover {
+    border-color: var(--color-border-surface);
+    color: var(--color-text-primary);
+    transform: translateY(-1px);
+  }
+}
+
+.cityPill:active {
+  transform: scale(0.96);
+}
+
+.cityPillActive {
+  /* focus-ring-allow: wybór w atramencie (S116), a pierścień fokusu ma
+     outline-offset 2px, więc leży na papierze obok elementu, nie na atramencie. */
+  /* S116 („A3”): wybór to atrament odwrócony z ról tekstu i tła (działa w obu
+     trybach), nie czerwień ani tint. Czerwień zostaje dla jednego CTA. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.cityPillIcon {
+  flex-shrink: 0;
+}
+
+/* ─── RESULT COUNT BAR — soft caption with active filter chips ─── */
+
+.resultBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.resultCount {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.resultCount strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* ─── CARD LIST — always single column ────────────────────────
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * AppLayout wymusza phone-frame container (~390px) na każdym viewporcie,
+ * więc media queries reagujące na viewport-width nie działają poprawnie
+ * (czytałyby viewport 1440px i odpalały 3-col grid w 390px slocie).
+ * Wszystkie produkcyjne widoki app/* renderują się w ramie telefonu —
+ * 1-col + bogata typografia w pełnej szerokości karty jest właściwą
+ * decyzją. Multi-col można rozważyć dopiero po rezygnacji z phone-frame.
+ */
+.cardList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-20);
+}
+
+/* ─── CREATOR CARD — cover color-block + avatar overlap + portfolio strip ─── */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-interactive);
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color var(--transition-normal);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-border-surface);
+  }
+
+  .card:hover .cardThumbStrip {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.card:active {
+  transform: scale(0.99);
+}
+
+/* Cover — solid tonal block derived from stylist name (deterministic hue offset).
+ * Anti-AI-Slop: zero gradient — depth via tonal surface step + solid gold-tint + hairline, no sparkle. */
+.cardCover {
+  position: relative;
+  aspect-ratio: 21 / 9;
+  /* --cover-mix: 18% pastel z imienia (default); branding krok 2 podbija do
+   * 100% inline (pełny kolor marki, parytet z profil/galeria S51).
+   * tint-allow: ten tint KODUJE DANE — --cover-hue ustawia StylistCard.organism
+   * (getCoverHues(displayName) albo brand_accent_color stylistki), więc jest
+   * nośnikiem tożsamości karty, nie ozdobą. --color-primary tylko jako fallback
+   * dla braku hue. Bliźniaki: StylistGalleryPage .exhibitCover,
+   * StylistProfilePage .profileCover. */
+  background: color-mix(
+    in oklch,
+    var(--cover-hue, var(--color-primary)) var(--cover-mix, 18%),
+    var(--color-bg-subtle)
+  );
+  overflow: hidden;
+}
+
+/* Solid gold-tint + hairline, no sparkle — NOT a gradient. */
+.cardCover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Cover badges row — PRO + Instagram top-right. */
+.cardCoverBadges {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  display: flex;
+  gap: var(--space-6);
+  z-index: 2;
+}
+
+.badgePro {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 3px var(--space-8);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-primary) 70%, transparent);
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+ * #c13584 = oficjalny kolor brandu Instagrama, FUNKCJONALNY na elemencie
+ * wskazującym Instagram (rozpoznawalność platformy > paleta theme). Celowo
+ * literal hex poza tokenami — nie podmieniać na var(--color-*). Dotyczy
+ * wszystkich 3 wystąpień w tym pliku (.badgeIg, .cardIgHandle:hover,
+ * .cardIgIcon). */
+.badgeIg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--style-radius-pill);
+  background: color-mix(in oklch, white 92%, var(--color-bg-paper));
+  color: #c13584;
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-border-surface) 60%, transparent);
+}
+
+:root[data-mode='dark'] .badgeIg {
+  /* Jasne tło TAKŻE w dark — magenta #c13584 (brand IG, DECISION wyżej) na
+   * ciemnym badge miał 2.19:1 (<3:1 dla znaczącej grafiki, /spar S55). Badge to
+   * mała pigułka-znacznik; jasne tło = magenta czytelny (≈4.6:1), spójne z light. */
+  background: color-mix(in oklch, white 88%, var(--color-bg-paper));
+}
+
+/* ─── Card body — avatar overlap + name + meta + sample strip ─── */
+
+.cardBody {
+  position: relative;
+  padding: var(--space-20) var(--space-20) var(--space-20);
+}
+
+.cardAvatar {
+  position: absolute;
+  top: calc(var(--space-20) * -1);
+  left: var(--space-20);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--style-radius-pill);
+  overflow: hidden;
+  border: var(--style-border-ring) solid var(--color-bg-paper);
+  background: var(--color-bg-paper);
+  z-index: 1;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-top: calc(var(--space-20) + 4px);
+  margin-bottom: var(--space-8);
+}
+
+.cardName {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+  /* Truncate gracefully to 2 lines. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardLocation {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  white-space: nowrap;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardLocationIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ─── Stat strip — photo + bookmark counts ─── */
+
+.cardStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  margin-bottom: var(--space-12);
+}
+
+.cardStat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.cardStatIcon {
+  color: color-mix(
+    in oklch,
+    var(--color-primary) 70%,
+    var(--color-text-secondary)
+  );
+  flex-shrink: 0;
+}
+
+/* ─── Sample thumbnail strip — 3 solid tonal tiles ─── */
+
+.cardThumbStrip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: 0 0 var(--space-12);
+  transform: translateY(0);
+  opacity: 0.86;
+  transition:
+    transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity var(--transition-normal);
+}
+
+/* Solid tonal tile — no gradient. Depth from tonal surface + grain texture.
+ * tint-allow: PODKŁAD PLACEHOLDERA ZDJĘCIA kodujący dane — --thumb-hue ustawia
+ * StylistCard.organism (getThumbHue(displayName, i)), DTO listy publicznej nie
+ * ma sample_photos (DECISION w StylistCard.organism.tsx), więc kafel zastępuje
+ * miniaturę. To nie drabina po indeksie: hue jest deterministyczny z imienia,
+ * ten sam dla tej samej stylistki. --color-primary tylko jako fallback. */
+.cardThumb {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--style-radius-control);
+  background: color-mix(
+    in oklch,
+    var(--thumb-hue, var(--color-primary)) 14%,
+    var(--color-bg-subtle)
+  );
+  overflow: hidden;
+  position: relative;
+}
+
+.cardThumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+.cardThumbEmpty {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    color-mix(in oklch, var(--color-border-surface) 90%, var(--color-primary));
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* ─── Card footer — CTA + IG handle ─── */
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding-top: var(--space-12);
+  border-top: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-border) 80%, transparent);
+}
+
+.cardIgHandle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .cardIgHandle:hover {
+    /* DECISION: IG brand color — patrz komentarz przy .badgeIg. */
+    color: #c13584;
+  }
+}
+
+.cardIgIcon {
+  /* DECISION: IG brand color — patrz komentarz przy .badgeIg. */
+  color: #c13584;
+  flex-shrink: 0;
+}
+
+.cardCta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 7px var(--space-14);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  /* Motyw „Jeden krem": chip-afordancja = ZNAK (token roli), etykieta złotem
+     AA — --color-primary na papierze daje 2.2:1 i przestaje być czytelne. */
+  color: var(--color-accent-fg);
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-pill);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .cardCta:hover {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    transform: translateY(-1px);
+  }
+}
+
+.cardCta:active {
+  transform: scale(0.97);
+}
+
+.cardCtaIcon {
+  flex-shrink: 0;
+}
+
+/* ─── SKELETON — solid tonal surfaces + opacity pulse ─────────
+ *
+ * 2026-06-12: the previous shimmerSweep animated background-position over a
+ * SOLID color-mix fill — a visual no-op (skeletons sat static). Replaced
+ * with the project-standard loading affordance: solid surface + opacity
+ * pulse (no gradient shimmer, per Anti-AI-Slop floor).
+ */
+
+.skeletonList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-20);
+}
+
+.skeletonCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-paper);
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  overflow: hidden;
+}
+
+/* Motyw „Jeden krem": szkielet ładowania to POWIERZCHNIA zastępcza — neutralny
+   krok tonalny (ten sam co szkielet profilu stylistki), a ruch niesie puls
+   opacity. Złota płyta udawała treść, zanim treść przyszła. */
+.skeletonCover {
+  aspect-ratio: 21 / 9;
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonBody {
+  position: relative;
+  padding: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.skeletonAvatar {
+  position: absolute;
+  top: calc(var(--space-20) * -1);
+  left: var(--space-20);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--style-radius-pill);
+  border: var(--style-border-ring) solid var(--color-bg-paper);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonLine {
+  height: 12px;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonLineLg {
+  height: 18px;
+  width: 60%;
+  margin-top: calc(var(--space-20) + 4px);
+}
+
+.skeletonLineSm {
+  height: 10px;
+  width: 40%;
+}
+
+.skeletonThumbRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.skeletonThumb {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+/* ─── EMPTY STATE — branded illustration + actionable CTA ──── */
+
+/* Powierzchnia i typografia = kanon <EmptyState>. Zostają pokrętła tego
+   ekranu: medalion 72px, tytuł krojem odręcznym (cieplejszy ton dla „nic tu
+   jeszcze nie ma") i dolny oddech pod kartą. */
+.emptyState {
+  --empty-medal-size: 72px;
+  --empty-pad-block-end: calc(var(--space-48) + var(--space-20));
+  --empty-title-size: var(--text-xl);
+  --empty-title-font: var(--font-accent);
+  --empty-body-maxw: 38ch;
+} /* ─── END-OF-LIST CAPTION + SENTINEL ───────────────────────── */
+
+.endOfList {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  padding: var(--space-20) 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.endOfList::before,
+.endOfList::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  /* Motyw „Jeden krem" (R-linia): kreska flankująca napis jest strukturalna,
+     więc neutralna — złoto na 1px i tak czytało się jak brud. */
+  background: var(--color-divider);
+}

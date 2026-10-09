@@ -1,0 +1,168 @@
+/* UserActivityPage.module.css — section „Aktywność” (account activity log).
+ *
+ * Order on the screen: last sign-in (one line on paper) → category filter
+ * (chips) → one quiet label and one white box per day → rows.
+ *
+ * Read-only content looks read-only: rows have no frame, no hover and no
+ * arrow; only a full-width divider between them. Nothing is sticky (owner:
+ * nothing floats with the scroll) and nothing animates in.
+ */
+
+.panelRoot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* ─── Summary line + end note ─── */
+
+.summary,
+.endNote {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.endNote {
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* ─── Filter ─── */
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+/* ─── Days ─── */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.dayGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.dayHeader {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.dayList {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--space-16);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+/* ─── Row: icon, title (+ repeat meta), time ─── */
+
+.eventRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.eventRow:last-child {
+  border-bottom: none;
+}
+
+/* The icon sits on the title's first line: its box is exactly one line of
+ * the title tall, the glyph is centred inside it. */
+.eventIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: calc(var(--text-base) * 1.4);
+  color: var(--color-text-secondary);
+}
+
+.eventIcon svg {
+  display: block;
+}
+
+.eventBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.eventTitle {
+  font-size: var(--text-base);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.eventMeta {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* Same line box as the title, so the time sits on the title's first line. */
+.eventTime {
+  flex: none;
+  font-size: var(--text-xs);
+  line-height: calc(var(--text-base) * 1.4);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ─── Event colour: the icon only ─── */
+
+.eventSuccess {
+  color: var(--color-success);
+}
+
+.eventError {
+  color: var(--color-error);
+}
+
+.eventWarning {
+  color: var(--color-warning);
+}
+
+.eventPrimary {
+  color: var(--color-accent-fg);
+}
+
+.eventInfo {
+  /* Rola „info" z palety, jak u rodzeństwa obok (.eventWarning, .eventPrimary).
+     Paleta trzyma info jako neutralne z rozmysłem: znaczenie niesie etykieta
+     i ikona, nie barwa (DECISION o jednym chromatycznym hue w palettes.css). */
+  color: var(--color-info-fg);
+}
+
+.eventMuted {
+  color: var(--color-text-secondary);
+}
+
+/* Nieudane odświeżenie albo nieudana kolejna strona przy już wczytanej
+ * liście: krótka informacja z ponowieniem, lista zostaje na ekranie. */
+.inlineNotice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6) var(--space-10);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}

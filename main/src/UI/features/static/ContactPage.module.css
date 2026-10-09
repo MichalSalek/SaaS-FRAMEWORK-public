@@ -1,0 +1,526 @@
+/* ─── ContactPage — Anti-AI-Slop flat pattern (MR360, S21 molecules) ─── */
+/*
+ * Depth = solid color-block (color-mix, hard seam) + tonal surface steps
+ * + full hairline borders. ZERO gradient / shadow / glow / blur /
+ * jednostronny accent-border (S21: formCardAccent + channelCard::before out).
+ * Hero / FAQ / trust-sygnały = współdzielone molecules (LpHero, FaqSection,
+ * TrustSignals) — tu żyje wyłącznie specyfika strony (split, karta formularza,
+ * karty kanałów, markery). Pattern source: PricingPage + GetAppPage.
+ */
+
+.page {
+  --section-block: clamp(56px, 6.4vw, 104px);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  --max-page-width: var(
+    --lp-content-width
+  ); /* alias lokalny → wspólny token (S20) */
+  --brand-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+/* ─── 1. Hero — kanon: molecule LpHero (components/LpHero). Typografia,
+ * gold-italic akcent i entrance żyją w LpHero.module.css; --section-gutter
+ * z .page zasila padding kanonu. ─── */
+
+/* (Markery-dividery sekcji usunięte S24 — tytuł sekcji żyje W sekcji.) */
+
+/* ─── 2. Content split: trust column + form card (fokal strony) ─── */
+/* Motyw „Jeden krem" (R2): jedyny krem tej strony to banda FAQ (Section
+ * tone='subtle' niżej), więc banda formularza wraca na papier. Kartę
+ * formularza odcina jej własna pełna rama, a w ciemnym trybie dodatkowo
+ * bg-paper o krok jaśniejszy od tła — parytet obu trybów bez nadpisania.
+ * Hairline u góry jest OBOWIĄZKOWY, nie ozdobą: to dawny tint trzymał szew
+ * między hero a tą bandą, więc po jego zdjęciu hero i sekcja zlewały się
+ * w jedną białą płaszczyznę (zmierzone DOM-probe: dwie sąsiednie sekcje,
+ * to samo tło, zero granicy). Granicę po tincie przejmuje linia. */
+.contentSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  position: relative;
+}
+
+/* Inner Section (innerClassName) — lp/centrowanie daje constrained. */
+.splitGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 72px);
+  align-items: start;
+}
+
+@media (min-width: 968px) {
+  .splitGrid {
+    /* Linear-style: narrower trust column on left, wider form on right */
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    gap: clamp(48px, 5vw, 84px);
+  }
+}
+
+/* ─── LEFT column: trust column ─── */
+.trustColumn {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2vw, 28px);
+  padding-top: clamp(4px, 1vw, 12px);
+  position: relative;
+}
+
+/* Decorative envelope SVG — asymmetric editorial accent, aria-hidden.
+ * Positioned top-right of trust column, offset to overlap the column edge slightly.
+ * Hidden on mobile (<968px split breakpoint) where column stacks vertically. */
+.decorEnvelope {
+  display: none;
+  position: absolute;
+  top: -16px;
+  right: -24px;
+  width: 140px;
+  height: 140px;
+  opacity: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 968px) {
+  .decorEnvelope {
+    display: block;
+  }
+
+  /* Dekor pojawia się dopiero tutaj, więc dopiero tutaj musi mieć własne
+     miejsce. Bez tego 140px koperta wchodziła na drugą linię nagłówka
+     (zmierzone: 116px na 94px nachodzenia na KAŻDEJ szerokości desktopu —
+     „osobiście." czytało się przez rysunek). Rezerwacja pasa po prawej
+     zawija tytuł wcześniej, zamiast przesuwać dekor na sąsiednią kolumnę. */
+  .columnTitle {
+    /* optical: rezerwacja pasa pod dekor 140px, zmierzona empirycznie (patrz komentarz wyzej) */
+    padding-right: 150px;
+  }
+}
+
+.columnTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+
+.columnLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+
+/* Trust-sygnały = molecule TrustSignals (variant grid) — statyczne karty,
+ * pełny hairline, zero hover (floor §4). Dawny pillarGrid/pillar usunięty. */
+
+/* FAQ deep-link callout — flat tonal fill + full hairline, no gradient/shadow/left-only border */
+.faqCallout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-14) var(--space-16);
+  margin-top: clamp(10px, 1.4vw, 18px);
+  padding: clamp(16px, 2vw, 22px);
+  /* Motyw „Jeden krem" (R3): callout na papierze, wyróżnienie niesie rama. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+/* Anti-AI-Slop: unified icon chip (S20) — tonal fill + full hairline, no solid primary block. */
+.faqIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--style-radius-control);
+  /* ZNAK: 36px chip pod ikoną — token roli, zostaje złoty. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+}
+
+.faqBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.faqTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.25;
+  letter-spacing: var(--ls-tight-5);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.faqText {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.faqLink {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  /* Link text on light bg → AA gold (--color-accent-fg). */
+  color: var(--color-accent-fg);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-10);
+  transition:
+    gap var(--transition-fast),
+    color var(--transition-fast);
+  align-self: start;
+  margin-top: var(--space-4);
+  padding-top: var(--space-14);
+}
+
+@media (hover: hover) {
+  .faqLink:hover {
+    /* Hover keeps AA-grade gold (gap shift signals hover); primary-dark = 2.96:1 FAIL. */
+    color: var(--color-accent-fg);
+  }
+}
+
+/* ─── RIGHT column: form card ─── */
+.formColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* Anti-AI-Slop: depth = tonal surface step (paper na tintowanej sekcji)
+ * + PEŁNY hairline border na 4 bokach, no shadow. S21: złoty top accent-bar
+ * (jednostronny border, floor 7×ZERO) usunięty — elewacja karty wynika
+ * z różnicy tonalnej surface względem .contentSection. */
+.formCard {
+  position: relative;
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  padding: clamp(24px, 3.4vw, 44px);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.2vw, 28px);
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-bottom: var(--space-4);
+}
+
+.formTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-subhead);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.formLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 50ch;
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 20px);
+}
+
+.fieldError {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  margin-top: calc(var(--space-8) * -1);
+}
+
+.submitRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-14);
+  margin-top: var(--space-4);
+  padding-top: clamp(12px, 1.6vw, 20px);
+  border-top: var(--style-border-divider) dashed var(--color-divider);
+}
+
+/* Interactive element — spring lift on hover allowed (interaction feedback),
+ * no box-shadow depth cue */
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide-10);
+  transition: transform var(--duration-100) var(--brand-spring);
+}
+
+@media (hover: hover) {
+  .submitButton:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitReassurance {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ─── Success state (post-submit) ─── */
+.successPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(14px, 1.6vw, 20px);
+  padding: clamp(12px, 1.6vw, 20px) 0;
+  animation: success-rise var(--duration-300) var(--ease-entrance) both;
+}
+
+/* Purposeful entrance przy podmianie form→success (one-shot on mount) */
+@keyframes success-rise {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.successHaloWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: var(--space-6);
+}
+
+/* Anti-AI-Slop: tonal solid ring, no radial-gradient/blur/glow */
+.successHalo {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--style-radius-pill);
+  /* ZNAK: medalion sukcesu (72px kółko pod ikoną) — token roli. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.successIcon {
+  position: relative;
+  /* Ikona niosąca znaczenie na jasnym tle → accent-fg (AA). */
+  color: var(--color-accent-fg);
+  z-index: 1;
+}
+
+.successTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.successText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 44ch;
+}
+
+/* ─── 3. Alternative channels (chip cards) ─── */
+/* Band = Section (plain); jawne bg-main zostaje (zero-diff). */
+.channelsSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+}
+
+/* Inner Section (innerClassName) — lp/centrowanie daje constrained. */
+.channelsInner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 22px);
+}
+
+.channelsTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.channelsLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 56ch;
+}
+
+.channelsLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-32);
+  margin-top: var(--space-24);
+}
+
+.channelGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-16);
+}
+
+@media (min-width: 860px) {
+  .channelsLayout {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: var(--space-48);
+  }
+}
+
+.channelsLayout .contextualIllustration {
+  margin-block: 0;
+  max-width: var(--illustration-native-width, 42rem);
+}
+
+/* Karty kanałów kontaktu → kanon NavCard (S37, icon-chip + kicker + tytuł +
+ * meta + strzałka, hover lift). Page-local .channel* usunięte. */
+
+/* ─── 4. Final CTA — współdzielony molecule FinalCtaBand
+ * (src/UI/components/FinalCtaBand/) — zero per-page stylów. ─── */
+
+/* ─── Mobile submit (form card) ─── */
+/* DECISION (nie usuwaj tego komentarza):
+   Mobile <768px: full-width inline submit (NOT position:sticky) — the
+   page-level StickyCtaBar already covers conversion-CTA stickiness and a
+   second sticky element inside the card would stack/conflict with it.
+   The submit button just needs to be visually weighty within the card. */
+@media (max-width: 767.98px) {
+  .submitRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-12);
+  }
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
+  .submitReassurance {
+    text-align: center;
+    order: 1;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * FAQ — kanon: molecule FaqSection (components/FaqSection); skórka
+ * accordionu żyje w FaqSection.module.css. Po stronie strony zostaje
+ * full-bleed band + szerokość LP + parytet skali nagłówka
+ * (.faqHeadline w spanie tytułu — wzorzec GetAppPage).
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Tytuł FAQ to <span className=.faqHeadline> przekazany jako `title` do
+ * <FaqSection> (FaqSection sam owija go semantyką nagłówka via headingId) —
+ * NIE migruje na kanon <SectionHeader>, bo to nie landmark-h2 tylko etykieta
+ * skalowa w spanie (parytet z GetAppPage). Klasa .sectionHeadline → .faqHeadline
+ * (page-local, ten sam blok typografii) = audyt eyebrow-headline-dup przechodzi,
+ * wizual 1:1 (zero zmiany koloru/skali/semantyki).
+ * ───────────────────────────────────────────────────────────────────── */
+.faqHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.06;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+/* Band = Section tone='subtle' (bg + pełna rama hairline z kanonu — S24);
+ * tu zostaje tylko rytm strony. Dawny .faqInner = constrained inner. */
+.faqSection {
+  --section-pad-block: var(--section-block);
+}
+
+/* In-content link do /about pod kolumną trust (audyt linkowania S20). */
+.aboutPrompt {
+  margin-top: var(--space-20);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+.aboutPromptLink {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.aboutPromptLink:hover {
+  /* primary-dark na papierze to 2.96:1 (FAIL) — hover idzie w atrament,
+     zgodnie z tą samą regułą co .faqLink:hover wyżej. */
+  color: var(--color-text-primary);
+}
+
+.contextualIllustration {
+  margin-top: max(
+    0px,
+    calc(var(--illustration-gap) - clamp(14px, 1.6vw, 22px))
+  );
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  height: auto;
+}

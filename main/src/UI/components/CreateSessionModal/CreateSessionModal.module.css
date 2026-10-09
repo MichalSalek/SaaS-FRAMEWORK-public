@@ -1,0 +1,70 @@
+.content {
+  min-height: 200px;
+}
+
+.stylistList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.stylistRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-12) 0;
+  background: none;
+  border: none;
+  border-radius: var(--style-radius-surface);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.stylistRow:active {
+  /* Motyw „Jeden krem" (S94/R6): press-feedback jest ULOTNY jak hover, nie
+     trwałym wybraniem — bierze własny stopień drabiny powierzchni
+     (input → hover → pressed), nie złoto. Drabina jest monotoniczna w obu
+     trybach, więc wciśnięcie zawsze czytelnie odróżnia się od najechania. */
+  background: var(--color-surface-pressed);
+}
+
+.stylistInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stylistRowDisabled {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-12) 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.activeSessionHint {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.emptyPaired {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-32) 0;
+  text-align: center;
+}
+
+.doneStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-32) 0;
+  text-align: center;
+}

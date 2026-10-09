@@ -1,0 +1,6 @@
+/* Kanoniczny pas kremu: JEDEN komponent, który ma prawo go nieść (drugi to
+   AppHero). Reszta prymitywów współdzielonych schodzi na neutralny stopień —
+   inaczej krem mnoży się przez każdy ekran, który je montuje (głos S98/A). */
+.subtle {
+  background: var(--color-bg-subtle);
+}

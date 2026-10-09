@@ -1,0 +1,8 @@
+/* Remap JEST, ale na zlej wartosci: po wymianie palety na rouge-papier
+   --color-primary to ciemna czerwien (L 0.565) i daje na atramencie 3,6:1.
+   Rola dla negatywu to --color-accent-on-ink (DECISION S106). */
+.inkRemapOnPrimary {
+  background: var(--color-ink);
+  --color-focus-ring: var(--color-primary);
+  color: var(--color-on-ink);
+}

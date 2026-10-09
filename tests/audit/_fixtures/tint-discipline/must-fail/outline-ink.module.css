@@ -1,0 +1,9 @@
+/* `outline` i `outline-color` też rysują ramę wyróżnienia (R8) i też są
+   ciemne w OBU trybach — a lista właściwości ramy nie miała dla nich próbki. */
+.focusedCard {
+  outline: 2px solid var(--color-ink);
+}
+
+.focusedRow {
+  outline-color: var(--color-ink);
+}

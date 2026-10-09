@@ -1,0 +1,45 @@
+/* ─── ShareButton ─── */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
+  border: var(--style-border-control) solid var(--color-primary);
+  /* S120: przycisk z etykietą bierze promień kontrolki, jak każdy inny
+     przycisk; pigułka zostaje chipom. */
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  /* Motyw „Jeden krem": złoto jako TEKST bierze --color-accent-fg (AA);
+     --color-primary to 2.2:1 na papierze. Rama zostaje na primary — linia
+     nie jest treścią czytaną. */
+  color: var(--color-accent-fg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--duration-200) var(--spring-curve);
+}
+
+.trigger:active {
+  transform: scale(0.96);
+  /* Motyw „Jeden krem" (S94/R6): press-feedback = ULOTNY stan → własny
+     stopień drabiny powierzchni (input → hover → pressed), nie złoto. Złoto
+     na tym przycisku niesie już rama i etykieta. */
+  background: var(--color-surface-pressed);
+}
+
+/* ─── Full-width variant ─── */
+.fullWidth {
+  width: 100%;
+  justify-content: center;
+  padding: var(--space-12) var(--space-20);
+  font-size: var(--text-base);
+}
+
+/* ─── Copied feedback ─── */
+.copied {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}

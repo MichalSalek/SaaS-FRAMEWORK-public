@@ -1,0 +1,196 @@
+/* ═══════════════════════════════════════════════════════════════════════
+ * AdminPageLayout — Shared admin page shell (header band + body)
+ * Pattern: eyebrow chip + gold dot + Marcellus serif title on a solid tonal
+ * surface with hairline border-bottom + SVG dot-tile texture (mask-feathered).
+ * Flat editorial — NO box-shadow elevation, NO gradient wash (anti-slop floor).
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Motion ─── */
+@keyframes adminSlideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: adminSlideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index, 0) * var(--stagger-offset));
+}
+
+/* ─── Page root ─── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+ * Mobile (<1024px = zakres widocznosci admin bottom-nav): dlugie listy admina
+ * chowaly sie pod fixed BottomTabBar. AdminLayout .main rezerwuje juz plaskie
+ * 56px (var(--bottom-nav-height)), ale BottomTabBar ma realną wysokość
+ * 56px + env(safe-area-inset-bottom) i .main NIE dolicza safe-area ani luzu.
+ * Dokładamy więc TYLKO brakujący delta (safe-area + oddech), NIE pełne 56px
+ * ponownie — inaczej powstałby ~56px martwy gap (double-count). Suma:
+ * 56px(.main) + safe-area + sp-4 = pełny prześwit nad nawigacją. */
+@media (max-width: 1023.98px) {
+  .page {
+    padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-32));
+  }
+}
+
+/* ─── Header band (editorial banner) ─── */
+/* DECISION (anti-slop §4): solid tonal surface + hairline border-bottom for
+ * elevation — no radial-gradient washes, no box-shadow. Złota tekstura
+ * dot-tile (.headerDecor) ZDJĘTA w motywie „Jeden krem" — powód niżej.
+ *
+ * DECISION (anti-slop §3 — jednostronny border EXEMPT, nie usuwaj):
+ * border-bottom-only NIE jest dekoracyjnym jednostronnym akcentem. Banner
+ * "wykrwawia się" poza padding contentu (negative margin na górze i bokach →
+ * margin: -sp; -sp; 0), więc jego górna i boczne krawędzie wychodzą poza
+ * kadr — JEDYNĄ widoczną krawędzią wewnątrz contentu jest dół. Dolna hairline
+ * domyka tę krawędź bleed-bannera (separacja od treści pod nim), a nie maluje
+ * ozdobny pasek z jednej strony. Floor §3 (zakaz one-sided borderów) NIE
+ * dotyczy domknięcia krawędzi elementu bleedującego poza viewport. */
+.header {
+  position: relative;
+  /* Bleed into the content padding so the band reads as a true header */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: clamp(28px, 4vw, 44px) clamp(20px, 3vw, 32px);
+  border-radius: 0 0 var(--style-radius-surface) var(--style-radius-surface);
+  /* Motyw „Jeden krem" (S94/R1+R2): banda nagłówka to POWIERZCHNIA — schodzi
+     na papier. Krem NIE może siedzieć w tym layoucie: AdminPageLayout jest
+     wspólny dla WSZYSTKICH widoków admina, a każdy z nich wydał już swój JEDEN
+     krem na nagłówek własnej tabeli (logi, crawlery, audyt) — krem tutaj
+     dawałby drugi pas na KAŻDEJ stronie admina naraz (R2). Rolę bandy niosą:
+     bleed poza padding, hairline domykający dolną krawędź i tytuł w roli --font-heading.
+     Parytet: bg-main odwraca się z trybem, więc banda czyta się tak samo
+     w bieli i w ciemności. */
+  background: var(--color-bg-main);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .header {
+    margin: calc(var(--space-32) * -1) calc(var(--space-32) * -1) 0;
+  }
+}
+
+/* Motyw „Jeden krem" (S94/R6 + Style Policy §6): złota siatka kropek
+ * (.headerDecor — data-URI SVG z fill='%23d4a840' pod maską radialną) ZDJĘTA.
+ * Powody, po kolei:
+ *  1. Po zejściu bandy nagłówka na papier był to JEDYNY złoty element tła
+ *     w całym panelu admina — złoto rozdane tłu na KAŻDEJ stronie admina
+ *     przestaje cokolwiek znaczyć i zjada headroom zarezerwowany dla CTA (R6).
+ *  2. Tekstura nie niosła znaczenia — czysta dekoracja (Style Policy §6),
+ *     a granicę bandy i tak trzyma hairline domykający dolną krawędź.
+ *  3. Forma przechodziła przez DWA strażniki naraz: `tint-discipline` skanuje
+ *     `background`/`background-color` (nie `-image`), a `hex-policy` nie widzi
+ *     hexa URL-enkodowanego jako `%23` — czyli surowy brand-hex żył w module
+ *     bez tokenu i bez alarmu. Gdyby tekstura kiedyś wracała: malowana maską
+ *     (`mask-image` SVG + `background-color: var(--color-*)`), nigdy hexem
+ *     zaszytym w data-URI, bo `currentColor` w background-image się nie
+ *     rozwiązuje.
+ * `isolation: isolate` na .header zniknęło razem z nią (kontekst układania
+ * istniał wyłącznie pod tę warstwę; wiszący kontekst to mina dla następnego
+ * tooltipa/sticky). Element `<div className={styles.headerDecor}>` w
+ * AdminPageLayout.composition.tsx został bez klasy (pusty, zero wpływu na
+ * layout) — do usunięcia przy najbliższym dotknięciu tamtego pliku. */
+
+.headerInner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-32);
+  flex-wrap: wrap;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  min-width: 0;
+  flex: 1 1 280px;
+}
+
+/* ─── Title (Marcellus serif) ─── */
+.title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* ─── Subtitle ─── */
+.subtitle {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 60ch;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* ─── Actions cluster (right) ─── */
+.headerActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-8);
+  flex-shrink: 0;
+}
+
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+@media (max-width: 640px) {
+  .headerInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* `flex: 1 1 280px` na `.headerText` to podloga SZEROKOSCI w rzedzie — ale po
+     przelaczeniu kontenera na kolumne `flex-basis` dotyczy WYSOKOSCI i te same
+     280px robia sie podloga wysokosci. Zmierzone na 390px: blok naglowka 280px
+     przy 121px tresci, czyli ~160px pustej dziury pod podtytulem, przez ktora
+     przelacznik zakresu i kafelki KPI schodza pod zgiecie — na KAZDEJ stronie
+     admina na telefonie. Powyzej 640px wysokosc rowna sie tresci co do piksela. */
+  .headerText {
+    flex-basis: auto;
+  }
+
+  .headerActions {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .actionsRow {
+    flex-wrap: wrap;
+  }
+}
+
+/* ─── Body slot ─── */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}

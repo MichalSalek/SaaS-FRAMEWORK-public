@@ -1,0 +1,5 @@
+/* Procent w notacji wykładniczej (.12e2% == 12%) — legalny CSS, którego
+   regex `\d{1,3}(\.\d+)?` nie parsował, więc udział złota wychodził „brak”. */
+.exponent {
+  background: color-mix(in oklch, var(--color-primary) .12e2%, transparent);
+}

@@ -1,0 +1,9 @@
+.legit {
+  /* tint-allow: ten wyjątek należy do TEGO bloku */
+  background: color-mix(in oklch, var(--color-primary) 10%, transparent);
+}
+/* Blok niżej NIE jest objęty wyjątkiem wyżej — okno „3 linie nad blokiem”
+   przechodziło jednak przez klamrę zamykającą i wyjątek przeciekał. */
+.leaked {
+  background: color-mix(in oklch, var(--color-primary) 10%, transparent);
+}

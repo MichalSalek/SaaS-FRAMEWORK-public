@@ -1,0 +1,161 @@
+/* ─── StylistProfileSection — formularz wizytówki publicznej (/app/profile). ───
+   Własny moduł od S126: do tej pory organizm pożyczał klasy z
+   AccountPage.module.css, choć montuje go wyłącznie ekran profilu. Dzieli go
+   z nim pole koloru marki (StylistBrandingField). */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.heading {
+  margin: 0;
+}
+
+/* DECISION (nie usuwaj tego komentarza) — owner 2026-10-08:
+   stan zapisu ma JEDNĄ linię, zamontowaną zawsze i wysoką na przycisk
+   „Ponów”. Wcześniej „Zapisywanie...” doklejało się do tytułu, a błąd
+   wskakiwał jako nowy wiersz i spychał cały formularz. */
+.saveLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-12);
+  min-height: 44px;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.saveLine[data-state='failed'] > span {
+  color: var(--color-error);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* Pole z jednolinijkową podpowiedzią. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+}
+
+.addressCta {
+  align-self: flex-start;
+  margin-top: var(--space-6);
+}
+
+/* ─── Kolor marki ─── */
+
+.branding {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.brandingLabel {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-6);
+}
+
+/* Kolor z kuratorowanej palety kernela = content-color (jak kolory lakierów),
+   podawany inline: to dane, nie design-token. 44px = cel dotykowy.
+   Wybór NIE zmienia pudełka: rama ma stałą grubość, a pierścień wyboru to
+   `outline` (poza układem), więc sąsiednie próbki nie drgają. */
+.swatch {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-round);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Wybrana próbka: pierścień atramentu z odstępem papieru (kanon „wybrane =
+   atrament”; sama próbka zostaje w swoim kolorze, bo kolor JEST treścią). */
+.swatch[data-selected] {
+  /* shape-allow: pierścień wyboru próbki koloru, nie rama powierzchni */
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 2px;
+}
+
+.swatch:focus-visible,
+.swatchDefault:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 4px;
+}
+
+.swatchDefault {
+  flex: none;
+  min-height: 44px;
+  padding: 0 var(--space-20);
+  border: 0;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* Wybrane = odwrócony atrament. Waga pisma się NIE zmienia (pogrubienie
+   poszerzało pigułkę i przesuwało próbki obok). */
+.swatchDefault[data-selected] {
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+/* Pierścień fokusu wybranej pigułki rysuje się W atramencie, tam gdzie
+   przemapowany kolor ma kontrast (na białym boksie by go nie miał). */
+.swatchDefault[data-selected]:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Stan zablokowany planem: zdanie i jedna akcja. */
+.locked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  margin-top: var(--space-6);
+}

@@ -1,0 +1,148 @@
+/* AppSelect — styled select with keyboard nav and portal positioning */
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  min-width: 10rem;
+  min-height: 2.5rem;
+  padding: var(--space-8) var(--space-12);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-interactive);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  /* DECISION (B2-F18): outline:none on base selector suppresses the default browser
+   * ring for mouse/touch users. Keyboard focus ring is handled by :focus-visible below
+   * with a 2px primary-color ring — meets WCAG 2.1 SC 2.4.7 (Focus Visible). */
+  outline: none;
+  user-select: none;
+  transition: border-color var(--transition-fast);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -1px;
+}
+
+.trigger[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Icon ---- */
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+/* ---- Positioner + Popup ---- */
+
+.positioner {
+  /* DECISION (B2-F18): Positioner is a non-visual portal anchor (Base UI pattern).
+   * Same rationale as AppTooltip — no visible affordance, focus goes to trigger. */
+  outline: none;
+  z-index: var(--z-select);
+}
+
+.popup {
+  background: var(--color-surface-interactive);
+  border-radius: var(--style-radius-surface);
+  /* Zamknięta rama niesie elewację (NIE cień, anti-slop §2); S108: rama
+   * powierzchni z tokenu, nie outline (outline nie jest ramą). */
+  /* DECISION (nie usuwaj tego komentarza) — S126, 2026-10-09: rama warstwy
+   * PŁYWAJĄCEJ bierze kolor linii dzielącej, nie `--color-border-surface`.
+   * Ten token jest od S116 przezroczysty (powierzchnie na papierze nie mają
+   * ram), więc biała warstwa otwarta nad białą listą (menu wiersza na
+   * „Twoje klientki”) nie miała żadnej krawędzi i czytała się jak dziura
+   * w liście. Warstwa nad treścią musi mieć krawędź na KAŻDYM podłożu. */
+  border: var(--style-border-surface) solid var(--color-divider);
+  overflow: hidden;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.popup[data-starting-style],
+.popup[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* ---- List ---- */
+
+.list {
+  padding: var(--space-4) 0;
+  /* DECISION (nie usuwaj tego komentarza):
+     Ten fallback ZOSTAJE. `--available-height` nie jest tokenem projektowym, tylko
+     API komponentu ustawianym w runtime przez Base UI (wysokość dostępna dla popupu), więc nie ma
+     dla niego „definicji centralnej" — wartość po przecinku jest stanem
+     domyślnym, gdy zmienna nie przyjdzie. Kasowanie takich fallbacków
+     (fala F0.3 planu S105 mówi o WIDMACH tokenów) zepsułoby stan pusty. */
+  max-height: var(--available-height, 20rem);
+  overflow-y: auto;
+}
+
+/* ---- Item ---- */
+
+.item {
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  gap: var(--space-8);
+  align-items: center;
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  cursor: default;
+  /* DECISION (B2-F18): List items in a managed listbox use data-highlighted
+   * (Base UI) for keyboard selection — no separate browser focus ring needed.
+   * The listbox root manages roving tabindex; individual items are not directly
+   * focusable via Tab. outline: none prevents spurious ring on programmatic focus. */
+  outline: none;
+  user-select: none;
+}
+
+.item[data-highlighted] {
+  background: var(--color-surface-hover);
+}
+
+.item[data-disabled] {
+  opacity: 0.4;
+}
+
+/* ---- Item indicator / text ---- */
+
+.itemIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Scroll arrows ---- */
+
+.scrollArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+  cursor: default;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+@media (hover: hover) {
+  .trigger:hover {
+    border-color: var(--color-icon-muted);
+  }
+}

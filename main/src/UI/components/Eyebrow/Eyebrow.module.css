@@ -1,0 +1,65 @@
+/* ─── Eyebrow base (plain) ───
+ * Both variants read the `--style-kicker-*` roles (tokens.css). S108, owner
+ * vote 4 „Zdanie bezszeryfowe”: sentence case, body face, --text-sm, 500,
+ * no tracking, no rule. Nothing typographic is hardcoded here anymore. */
+/* --eyebrow-color: opcjonalny hook recoloru kickera (dziedziczony z wrappera,
+ * np. SectionHeader/LpHero); pominięty = kanon (plain text-secondary, chip
+ * accent-fg). Kreska chip::before idzie za currentColor automatycznie. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin: 0;
+  font-family: var(--style-kicker-font);
+  font-size: var(--style-kicker-size);
+  font-weight: var(--style-kicker-weight);
+  line-height: 1.4;
+  letter-spacing: var(--style-kicker-tracking);
+  text-transform: var(--style-kicker-case);
+  color: var(--eyebrow-color, var(--color-text-secondary));
+}
+
+/* ─── Label ─── */
+.text {
+  display: inline-block;
+}
+
+/* ─── Variant: chip — caps + underline hairline (rule POD capsem) ───
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * chip = kicker magazynowy. Ewolucja: frozen-light box (S23) → wiodąca 28px
+ * kreska + caps (głos S28/1=C) → S82 (głos ownera = wariant D): kreska
+ * PRZENIESIONA POD caps jako pełnej-szerokości hairline (underline-rule).
+ * Powód: leading-kreska „trąciła AI" (czytała się jak wiodący myślnik-
+ * ozdobnik); underline pod tekstem to editorial rule spójny z „linie
+ * wyznaczają granice" (taste 29), nie tell. Pudełko dalej wykluczone (S23).
+ *   - flex-column + align-items:flex-start: caps w wierszu 1, hairline w 2.
+ *   - `background: currentColor` na hairline = override koloru tekstu
+ *     (.inkEyebrow on-ink, .eyebrowInk light-on-ink, .accentEyebrow,
+ *     status .eyebrowError) automatycznie recoloruje linię — zero hardcode
+ *     per-scope (lekcja S26b: degraduj przez dziedziczenie).
+ *   - `width: fit-content` = twardy fix flex-stretch (był rozciągany do 28ch);
+ *     `::after width:100%` = hairline pełnej szerokości tekstu (nie viewportu).
+ *   - max-width 40ch + wrap: długie frazy SEO h1 zawijają, hairline pod nimi.
+ * Headroom kontrastu (zasada ownera) zachowany: kicker dalej cichszy od CTA.
+ * S108 (głos 4): kreska = `--style-eyebrow-rule` = 0, więc ::after ma dziś
+ * wysokość 0; deklaracja zostaje, bo token jest jedynym miejscem decyzji.
+ */
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+  width: fit-content;
+  max-width: 40ch;
+  font-weight: var(--style-kicker-weight);
+  letter-spacing: var(--style-kicker-tracking);
+  color: var(--eyebrow-color, var(--color-accent-fg));
+  line-height: 1.2;
+}
+.chip::after {
+  content: '';
+  width: 100%;
+  height: var(--style-eyebrow-rule);
+  background: currentColor;
+}

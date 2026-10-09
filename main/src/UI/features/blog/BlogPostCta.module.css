@@ -1,0 +1,40 @@
+/* Domknięcie wpisu. Blok czytelnie oddzielony od treści jedną linią u góry —
+   bez cienia i bez ramki dookoła, żeby nie udawał reklamy wklejonej w tekst. */
+.cta {
+  margin-top: var(--space-40);
+  padding-top: var(--space-32);
+  border-top: var(--style-border-divider) solid var(--color-border);
+  text-align: center;
+}
+
+.title {
+  margin-top: var(--space-12);
+}
+
+.lede {
+  margin: var(--space-12) auto 0;
+  max-width: 52ch;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(var(--space-16), 2vw, var(--space-24));
+  margin-top: var(--space-24);
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 44px;
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

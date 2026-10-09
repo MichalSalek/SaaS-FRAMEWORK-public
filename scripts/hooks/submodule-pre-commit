@@ -1,0 +1,115 @@
+#!/bin/bash
+# submodule-pre-commit — SSOT logiki hooka pre-commit dla main/ i web-1/.
+#
+# DLACZEGO OSOBNY PLIK, A NIE HEREDOC W INSTALATORZE:
+#   Poprzednia wersja wstrzykiwała całe ciało hooka przez `cat > … << 'HOOK_EOF'`,
+#   czyli instalowała ZAMROŻONĄ KOPIĘ. Root pre-commit i pre-push mają przed tym
+#   ochronę (porównują się z wersją w repo i delegują `exec`), hook submodułu
+#   nie miał żadnej — i był już zdryfowany w obu submodułach w chwili, gdy to
+#   wykryto. Dopóki różnica siedziała w komentarzach, nic się nie działo; gdyby
+#   zdryfował blok fail-loud albo parsowanie listy strażników, byłby po prostu
+#   martwy i nikt by tego nie zobaczył. Teraz `.git/hooks/pre-commit` submodułu
+#   to trzy linijki delegacji, a cała logika żyje TUTAJ, pod kontrolą gita.
+#
+# CO ROBI: READONLY guard + strażnicy CAŁEGO DRZEWA z scripts/hooks/tree-guards.list.
+#   Klasyfikacja plików ze stage'a zostaje w hooku ROOTA — ścieżki w submodule są
+#   względne wobec submodułu i nie pasują do jego wzorców.
+#
+# ZASIĘG: wszyscy strażnicy z listy skanują `main/src/UI`, więc commit z `web-1/`
+#   przechodzi przez nie, ale nad WŁASNYMI plikami nie ma tu pokrycia — backend
+#   gatuje dopiero pre-push (pełny run-all). Strażnika backendu dopisz do
+#   tree-guards.list, nie do drugiej kopii listy.
+
+SUB_ROOT="$(git rev-parse --show-toplevel)"
+
+GUARD="$SUB_ROOT/../scripts/hooks/readonly-guard"
+if [ -f "$GUARD" ]; then
+  bash "$GUARD" || exit 1
+fi
+
+# Semantyka flagi TA SAMA co w root pre-commit i pre-push (`= "1"`), żeby
+# SKIP_PRECOMMIT_AUDITS=0 nie wyciszało jednej bramki, a drugiej nie.
+[ "${SKIP_PRECOMMIT_AUDITS:-}" = "1" ] && exit 0
+
+PROJECT_ROOT="$(cd "$SUB_ROOT/.." && pwd)"
+GUARDS_LIST="$PROJECT_ROOT/scripts/hooks/tree-guards.list"
+
+# FAIL-LOUD, nie fail-open: gdy submoduł jest checkoutowany bez roota, hook nie
+# ma czego uruchomić — i kończył się po cichu zerem, czyli commit przechodził
+# BEZ ani jednego strażnika i bez śladu. Nie blokujemy commita (samodzielny
+# checkout submodułu to legalny scenariusz), ale mówimy głośno.
+# BRAK ROOTA nad submodulem to legalny scenariusz (samodzielny checkout): nie
+# blokujemy, ale mowimy glosno.
+if [ ! -d "$PROJECT_ROOT/tests/audit" ]; then
+  echo "  [UWAGA] nie znalazłem pakietu strażników nad submodułem"
+  echo "          ($PROJECT_ROOT) — commit przechodzi BEZ strażników drzewa."
+  exit 0
+fi
+
+# ROOT JEST, ale listy nie ma — to co innego: ktos skasowal SSOT. Ten hook jest
+# JEDYNYM konsumentem listy, ktory realnie widzi commity nad `main/src`, bo `main`
+# to submodul i te sciezki nigdy nie trafiaja do indeksu roota (`git add` na nich
+# konczy sie `fatal: Pathspec is in submodule`). Rootowa blokada dotyczy wiec
+# przypadku, ktory prawie nie zachodzi; ta dotyczy tego, ktory zachodzi zawsze.
+if [ ! -f "$GUARDS_LIST" ]; then
+  echo ""
+  echo "  COMMIT BLOCKED: brak $GUARDS_LIST — strażnicy drzewa nie mają skąd się wziąć."
+  echo "                  Razem z listą znikają wszystkie ratchety motywu i a11y."
+  exit 1
+fi
+
+# `|| [ -n "$g" ]`: ostatnia linia pliku BEZ końcowego znaku nowej linii nie
+# byłaby w ogóle przeczytana, więc ratchet dopisany na końcu listy po cichu
+# by nie chodził. Ta sama pułapka wypadła wcześniej w mechanizmie `.expect`
+# meta-strażnika.
+guards=""
+while IFS= read -r g || [ -n "$g" ]; do
+  g="${g%%#*}"
+  g="$(echo "$g" | tr -d '[:space:]')"
+  [ -z "$g" ] && continue
+  # Nazwa idzie prosto do `bash "$AUDIT_DIR/$g.sh"`, więc musi być NAZWĄ, a nie
+  # ścieżką: bez tej walidacji wpis z `../` uruchamiał kod spoza tests/audit.
+  case "$g" in
+    *[!a-z0-9-]*)
+      echo "  [UWAGA] pomijam wpis '$g' z tree-guards.list — dozwolone tylko [a-z0-9-]"
+      continue ;;
+  esac
+  guards="$guards $g"
+done < "$GUARDS_LIST"
+
+# Lista ZLOZONA Z SAMYCH KOMENTARZY jest cichsza niz jej brak: `[ -f ]` przechodzi,
+# petla `for` po pustym stringu nie iteruje ani razu i nie pada ZADEN komunikat.
+if [ -z "$(echo "$guards" | tr -d '[:space:]')" ]; then
+  echo ""
+  echo "  COMMIT BLOCKED: $GUARDS_LIST nie zawiera ANI JEDNEGO wpisu."
+  exit 1
+fi
+
+for a in $guards; do
+  script="$PROJECT_ROOT/tests/audit/$a.sh"
+  # Literówka w liście nie może być cicha: root pre-commit wywala się na niej
+  # głośno, a tu `continue` udawał, że strażnik po prostu przeszedł.
+  if [ ! -f "$script" ]; then
+    echo ""
+    echo "  COMMIT BLOCKED: tree-guards.list wymienia '$a', a tests/audit/$a.sh nie istnieje."
+    echo "    Popraw listę albo dodaj skrypt."
+    exit 1
+  fi
+  log="$(mktemp)"
+  # Git eksportuje do hookow submodulu `GIT_DIR` wskazujacy na `.git/modules/<sub>`
+  # — ABSOLUTNIE, wiec samo `cd` do roota go nie zdejmuje. Audyty rozwiazuja root
+  # przez `git rev-parse --show-toplevel`, wiec z odziedziczonym `GIT_DIR` widza
+  # SUBMODUL zamiast roota i wywalaja sie z komunikatem „brak katalogu main/src/UI"
+  # zamiast mierzyc cokolwiek. Objaw nie wystepuje przy `.git` bedacym KATALOGIEM
+  # (git wtedy `GIT_DIR` nie ustawia), czyli w tym checkoucie — ale wystepuje
+  # u kazdego, kto sklonuje repo od zera albo zrobi `absorbgitdirs`, a wiec
+  # dokladnie w ukladzie, pod ktory `install-hooks` zostal zahartowany.
+  if ! (cd "$PROJECT_ROOT" && env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE bash "$script" > "$log" 2>&1); then
+    echo ""
+    echo "  COMMIT BLOCKED: audyt '$a' nie przeszedł."
+    grep -E "FAILED|Failed|:[0-9]+:" "$log" | head -20 | sed 's/^/    /'
+    echo "    Pełny log: $log"
+    exit 1
+  fi
+  rm -f "$log"
+done

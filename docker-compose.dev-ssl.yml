@@ -1,0 +1,33 @@
+# docker-compose.dev-ssl.yml — DEV override: LE HTTPS via Caddy on a real subdomain
+# (dev/api.dev.example.com), so the native dev wrapper needs NO mkcert
+# CA on test devices. Layers ON TOP of docker-compose.dev.yml and adds ONLY the `caddy`
+# service (upstreams main-dev/web-1-dev stay plain HTTP — mkcert/--experimental-https
+# removed 2026-06-25). main-dev env (ALLOWED_DEV_ORIGINS incl. the subdomain) lives in
+# the BASE file on purpose — a recreate with the base file alone must never lose it.
+# Usage: docker compose -f docker-compose.dev.yml -f docker-compose.dev-ssl.yml up -d
+#        (npm run dev / npm run dev:recreate always pass BOTH files)
+services:
+  caddy:
+    container_name: dev-caddy
+    build:
+      context: ./docker/caddy-dev
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - main_connector_network
+    ports:
+      - "443:443"
+      - "80:80"
+    env_file:
+      - ./docker/caddy-dev/cf.env
+    volumes:
+      - ./docker/caddy-dev/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_dev_data:/data
+      - caddy_dev_config:/config
+    depends_on:
+      - main-dev
+      - web-1-dev
+
+volumes:
+  caddy_dev_data:
+  caddy_dev_config:

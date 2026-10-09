@@ -1,0 +1,17 @@
+/* R7: tint kodujący STAN niesie znaczenie — poza zakresem motywu.
+   Czystka „wszystkiego, co ma color-mix” byłaby błędem, nie wykonaniem. */
+.error {
+  background: color-mix(in oklch, var(--color-error) 12%, transparent);
+}
+
+.warning {
+  background: color-mix(in oklch, var(--color-warning) 12%, transparent);
+}
+
+.success {
+  background: color-mix(in oklch, var(--color-success) 16%, transparent);
+}
+
+.info {
+  background: color-mix(in oklch, var(--color-info) 12%, transparent);
+}

@@ -1,0 +1,4 @@
+/* 0.85em na rodzicu --text-sm = 12,75px. Skan px byl na to slepy (S98). */
+.cookieName {
+  font-size: 0.85em;
+}

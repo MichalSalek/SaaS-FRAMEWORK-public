@@ -1,0 +1,88 @@
+/* UI/features/shared/SharedPage.module.css
+ * The stylist's list of inspiration sessions from her clients.
+ *
+ * Order: AppHero (title + live counts) -> open sessions -> archive by month
+ * (second column from 720px of the page's own width, through PageColumns).
+ * White on paper: the sessions of a section (or of a month) are the cells of
+ * one white list; every session is one tappable row with a single trailing
+ * disc. The only filled control is the empty state's action. The row is
+ * SessionRowMolecule (./sessions), shared with the client's list
+ * (features/sessions/ClientSessionsPage): this file holds no row styles.
+ */
+
+/* ============================================================
+ * PAGE SHELL
+ * ============================================================ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  /* Compensate AppLayout content padding for the full-bleed canvas. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) calc(var(--space-32) + 80px);
+}
+
+/* ============================================================
+ * SECTIONS
+ * ============================================================ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+ * ARCHIVE — finished sessions grouped by month
+ *
+ * The month header is a solid paper strip that sticks while its month
+ * scrolls: no blur, no rule under it. The count is one unbreakable piece
+ * that moves under the label when the row is too narrow.
+ * ============================================================ */
+
+.month {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.monthHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-12);
+  padding: var(--space-8) 0;
+  background: var(--color-bg-main);
+}
+
+.monthLabel {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.monthCount {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}

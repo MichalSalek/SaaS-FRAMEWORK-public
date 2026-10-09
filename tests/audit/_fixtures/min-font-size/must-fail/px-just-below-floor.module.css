@@ -1,0 +1,6 @@
+/* 15px to ostatni rozmiar POD floorem — i akurat ten, który wygląda
+   niewinnie (--text-sm = 15px istnieje w skali, ale jako TOKEN, nie raw px).
+   Bez tej próbki obniżenie floora do 14px przechodziło bez śladu. */
+.meta {
+  font-size: 15px;
+}

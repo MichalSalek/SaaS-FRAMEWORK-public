@@ -1,0 +1,95 @@
+/* StepIndicator — where you are in a linear process. Read-only by design:
+ * no hover, no pointer cursor, no pressed state anywhere in this file.
+ *
+ * Geometry comes from private knobs (`--_*`). The compact values are the
+ * defaults; ONE selector at the bottom rewrites them for the inline layout,
+ * so the two layouts cannot drift apart rule by rule. */
+
+.root {
+  --_direction: column;
+  --_align: stretch;
+  --_gap: var(--space-6);
+  --_bar-width: 100%;
+  --_caption-order: 0;
+  --_caption-justify: space-between;
+  --_counter-order: 0;
+  --_flex: 0 0 auto;
+
+  display: flex;
+  flex: var(--_flex);
+  flex-direction: var(--_direction);
+  align-items: var(--_align);
+  gap: var(--_gap);
+  min-width: 0;
+  font-family: var(--font-body);
+  color: var(--color-text-secondary);
+}
+
+.bar {
+  display: flex;
+  flex: none;
+  gap: var(--space-4);
+  width: var(--_bar-width);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.segment {
+  position: relative;
+  flex: 1 1 0;
+  height: var(--space-4);
+  border-radius: var(--style-radius-pill);
+  background-color: var(--color-track);
+  transition: background-color var(--transition-normal);
+}
+
+.segment[data-state='reached'] {
+  background-color: var(--color-text-primary);
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+  justify-content: var(--_caption-justify);
+  gap: var(--space-8);
+  order: var(--_caption-order);
+  min-width: 0;
+  height: var(--space-20);
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: var(--space-20);
+  white-space: nowrap;
+}
+
+/* The counter is one unbreakable piece and always survives; a step name too
+ * long for the row gives way (no flow has one today, in any language). */
+.captionName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.captionCounter {
+  flex: none;
+  order: var(--_counter-order);
+  font-weight: 400;
+}
+
+/* ── inline layout: one row next to a visible page title ───
+ * No auto margin here: the title row spreads its two children apart, so the
+ * indicator sits at the row's end, and when the row is too narrow and wraps
+ * it starts under the title instead of hanging on the right alone. */
+
+.root[data-layout='inline'] {
+  --_direction: row;
+  --_align: center;
+  --_gap: var(--space-12);
+  --_bar-width: 200px;
+  --_caption-order: -1;
+  --_caption-justify: flex-end;
+  --_counter-order: -1;
+  --_flex: 0 1 auto;
+}

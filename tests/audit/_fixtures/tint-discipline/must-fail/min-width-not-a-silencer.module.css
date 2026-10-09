@@ -1,0 +1,8 @@
+/* Wyciszacz rozmiaru liczy WYŁĄCZNIE height/width. `min-width` i `min-height`
+   opisują ograniczenie, nie narysowany rozmiar — element z min-width: 2px
+   potrafi być pełną powierzchnią i tint pod nim zostaje tintem. */
+.railHandle {
+  min-width: 2px;
+  padding: var(--sp-3);
+  background: color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Kiedys porownywalismy BUILD_ID z polem build_id z health-checka, ale to wypadlo
+# z kodu i zostala tylko ta wzmianka w prozie — assert_artifact_served tez tu nie ma.
+curl -fsS "https://example.test/api/health-check" | grep -q '"status":"APP_OK"' || exit 1

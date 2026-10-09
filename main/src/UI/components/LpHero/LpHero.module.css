@@ -1,0 +1,151 @@
+/* ─── LpHero — kanoniczny hero stron statycznych (LP) ───
+ * JEDYNY wzorzec hero LP (był skopiowany na 8 stronach z dryfem).
+ * Typografia 1:1 z kanonu ForStylistsPage .heroHeadline; lede i akcent
+ * wyrównane do konsensusu źródeł (pricing/get-app). Zmiana tutaj = zmiana
+ * wszędzie. Floor: zero gradientów / cieni; entrance = one-shot on mount
+ * (precedens hero-rise źródeł), NIE scroll-reveal. */
+
+/* Full-bleed sekcja (wzorzec FinalCtaBand); --section-gutter jest definiowany
+ * per-page na .page — fallback trzyma wartość kanonu, gdy strona go nie da. */
+/* Pokrętła publiczne (DESIGN.md §Style Policy pkt 13): gospodarz nadpisuje
+ * ZMIENNĄ, nie deklarację. `.hero[data-has-media]` ma specyficzność 0-2-0, więc
+ * klasa strony (0-1-0) nigdy by nie wygrała z min-height — a o kolejności
+ * w bundlu decyduje import, nie intencja. Wartości kanonu żyją w fallbackach.
+ * Konsument spoza LP (np. hero w kolumnie /app/home) zeruje bleed i wysokość
+ * jednym zestawem zmiennych. */
+.hero {
+  width: var(--lp-hero-width, 100vw);
+  margin-left: var(--lp-hero-bleed, calc(50% - 50vw));
+  background: var(--color-bg-main);
+  padding: var(--lp-hero-pad-top, clamp(72px, 10vw, 144px))
+    var(--lp-hero-pad-inline, var(--section-gutter, clamp(20px, 5vw, 56px)))
+    var(--lp-hero-pad-bottom, clamp(52px, 7vw, 112px));
+  display: flex;
+  align-items: center;
+}
+
+/* min-height tylko gdy jest media — text-only hero (wzorzec pricing)
+ * nie nadyma się do 72vh. */
+.hero[data-has-media] {
+  min-height: var(--lp-hero-min-height, clamp(480px, 72vh, 840px));
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
+  animation: lp-hero-rise var(--duration-300) var(--ease-entrance) both;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(18px, 2.4vw, 30px);
+  min-width: 0;
+}
+
+/* Media (PhoneMockup / kolaż / foto) — na mobile <768 schodzi POD tekst
+ * (jedna kolumna, DOM order content→media); strona może ukryć przez
+ * className, jeśli chce text-only mobile (wzorzec for-stylists). */
+.media {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Asymetryczny split: tekst 7fr / media 5fr — tylko gdy media istnieje. */
+@media (min-width: 768px) {
+  .hero[data-has-media] .inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    gap: clamp(28px, 4vw, 64px);
+  }
+}
+
+/* Celowe wejście (one-shot on mount) — pewny slide-up bloku hero. */
+@keyframes lp-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Kanon: heroHeadline z ForStylistsPage 1:1. */
+.headline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* Pokrętło publiczne (jak --lp-hero-* wyżej): skala płynna liczy się od
+   * SZEROKOŚCI OKNA, więc ten sam hero w wąskiej kolumnie (np. web-home w
+   * /app, 940px obok raila) dostaje rozmiar policzony dla całego 1440 i łamie
+   * się na pięć linii. Gospodarz podmienia STOPIEŃ skali, nie deklarację. */
+  font-size: var(--lp-hero-headline-size, var(--text-fluid-3xl));
+  line-height: 1;
+  letter-spacing: var(--ls-tight-25);
+  color: var(--color-text-primary);
+  margin: 0;
+  /* Drugie pokrętło publiczne — MIARA, osobno od stopnia skali. 16ch jest
+   * zapisane W EMACH nagłówka, więc skaluje się RAZEM z fontem: zejście stopień
+   * niżej zwęża blok w tej samej proporcji i nie odzyskuje ani jednej linii.
+   * Na pełnej szerokości LP (kolumna szersza niż 16ch) miara jest ograniczeniem
+   * typograficznym i zostaje; gospodarz w wąskiej kolumnie (web-home /app/home:
+   * 440px tekstu) podmienia ją na `none`, bo tam miarę wyznacza już siatka. */
+  max-width: var(--lp-hero-headline-measure, 16ch);
+  text-wrap: balance;
+  hyphens: none;
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+ * Kanon akcentu hero = GOLD ITALIC: var(--color-accent-fg) (AA na jasnym
+ * tle — --color-primary gold to 2.2:1 na białym, FAIL; dark token sam jasny)
+ * + font-style italic + serif --font-heading w wadze 400. Dryf na stronach
+ * (compare: fiolet, contact: bez italic) był BŁĘDEM kopiowania, nie decyzją.
+ * Strona chcąca świadomie innej roli koloru (np. for-stylists ink-violet)
+ * nadpisuje przez className — kanonu nie zmieniamy. */
+.headlineAccent {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-style: italic;
+  letter-spacing: var(--ls-wide-5);
+  color: var(--color-accent-fg);
+}
+
+/* Lede — konsensus źródeł (pricing/get-app): 16-19px, miara 56ch. */
+.lede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 56ch;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  flex-wrap: wrap;
+  margin-top: clamp(8px, 1vw, 16px);
+}
+
+/* Reassurance pod akcjami — bazowa typografia caption-level; wnętrze
+ * (listy proof/trust z ikonami) styluje strona. */
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(6px, 1vw, 12px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}

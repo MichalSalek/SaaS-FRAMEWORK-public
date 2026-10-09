@@ -1,0 +1,3 @@
+:root[data-mode='dark'] .band {
+  background: var(--color-ink);
+}

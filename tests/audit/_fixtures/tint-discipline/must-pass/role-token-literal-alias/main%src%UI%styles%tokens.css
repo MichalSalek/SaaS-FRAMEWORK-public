@@ -1,0 +1,8 @@
+/* Rola „znak na atramencie" bywa PEŁNYM złotem: na ciemnej powierzchni badge
+   nie potrzebuje przygaszenia, więc token roli jest tu DOSŁOWNYM aliasem
+   złota. Bez listy tokenów roli wpadłby do zbioru złota i strażnik zaczął by
+   krzyczeć na wyjście, do którego sam kieruje. */
+:root {
+  --color-primary: #c8a24a;
+  --color-mark-bg-on-ink: var(--color-primary);
+}

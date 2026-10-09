@@ -1,0 +1,38 @@
+/* ─── Skórka przycisków sklepów (GetAppStoreButtons.molecule.tsx).
+ * Wydzielone z GetAppPage.module.css 2026-09-09 — molekuła jeździ dziś na
+ * trzech powierzchniach (/get-app, /welcome, /app/home), więc jej style nie
+ * mogą mieszkać w module jednej strony. ─── */
+
+.storeButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+/* A plain informational line (store glyph + sentence), never a control: no
+ * surface, no frame, no padding. The sentence may wrap, so the glyph's box is
+ * exactly one line tall and sits on the FIRST line. */
+.storeNote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-align: left;
+  text-wrap: pretty;
+}
+
+.noteIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.noteIcon > svg {
+  display: block;
+}

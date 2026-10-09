@@ -1,0 +1,99 @@
+/* UI/features/admin/AdminUsersPage.module.css
+ * Page shell, the bulk actions bar, plan badges and the detail grid of the
+ * user dialog. The list, its filters and its pager are shared primitives
+ * (DataTable, FilterBar, Pagination).
+ */
+
+/* ─── Page shell ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+}
+
+.bulkBarDisabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.bulkSpacer {
+  flex: 1 1 auto;
+}
+
+.bulkConfirmIcon {
+  color: var(--color-warning);
+  flex-shrink: 0;
+}
+
+.bulkConfirmText {
+  flex: 1 1 auto;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+/* ─── Plan badges ─── */
+/* DECISION (nie usuwaj tego komentarza) — zastępuje mapowanie z S25
+ * („rosnąca ranga planu = rosnąca siła koloru": muted → gold → amber →
+ * violet → text-primary).
+ * Motyw „Jeden krem" (S94/R6): plan konta to DANE i ma prawo być zakodowany,
+ * ale nie PIĘCIOMA washami tła stojącymi obok siebie w jednej kolumnie tabeli.
+ * Kolor rozdany każdemu wierszowi przestaje cokolwiek znaczyć i zjada
+ * headroom kontrastu zarezerwowany dla CTA — a przy okazji wciągał do palety
+ * charcoal-gold obcy fiolet (--color-secondary-fg), odrzucony w głosowaniu S94
+ * (wariant F). Jeden neutralny badge (--color-surface-input + pełny hairline
+ * ring) niesie wszystkie plany; nośnikiem danych jest ETYKIETA (badge dosłownie
+ * pisze nazwę planu — kolor był redundantnym drugim kodowaniem tej samej
+ * informacji), a jedyne rozróżnienie wizualne robi TYPOGRAFIA: płatne plany
+ * mają wagę, Free zostaje przy wadze tekstu. Tinty STATUSU niżej zostają —
+ * kodują stan, nie powierzchnię (R7). */
+
+.planBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--space-10);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--ls-wide-20);
+  white-space: nowrap;
+  background: var(--color-surface-input);
+  color: var(--color-text-primary);
+  /* Hairline ringiem inset (nie border): nie rusza metryki pigułki, a domyka
+     powierzchnię badge'a z czterech stron — zero cienia, zero glow. */
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+/* Free = jedyny plan bez opłaty: waga tekstu zamiast wagi nagłówka. Kolor
+   zostaje pełny (R5 — danych nie wyszarzamy). */
+.planFree {
+  font-weight: var(--font-weight-body);
+}
+
+.planPro,
+.planProPlus,
+.planStudio,
+.planScale {
+  font-weight: 700;
+}
+
+/* ─── Bulk actions bar ───
+   Stands inside the table's own box, above the header row (DataTable
+   `selection.bar`), so it brings no box of its own. */
+
+.bulkBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  transition: opacity var(--transition-fast);
+}
+
+.bulkCount {
+  font-weight: 700;
+  white-space: nowrap;
+}

@@ -1,0 +1,5 @@
+/* Hex zakodowany URL-owo w data-URI: omija także hex-policy, bo w pliku nie ma
+   znaku „#”. Tak przeżyła złota siatka kropek w layoucie admina. */
+.dotGrid {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle r='1' fill='%23d4a840'/%3E%3C/svg%3E");
+}

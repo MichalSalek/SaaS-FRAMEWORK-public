@@ -1,0 +1,101 @@
+/* ─── Wrapper ─── */
+.wrapper {
+  display: inline-flex;
+}
+
+/* ─── Label (clickable area) ─── */
+.label {
+  /* Anchors the hidden native input below. Unanchored, the input's containing
+   * block is some far ancestor: inside a scroller (the admin permission matrix,
+   * 186 rows of checkboxes in a 590px frame) every input still counted towards
+   * the DOCUMENT's scroll area, which grew to 16 703 px and, on a phone, zoomed
+   * the whole page out to 663 px (measured S126). */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ─── Hidden native input ─── */
+.nativeInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ─── Track ─── */
+.track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: var(--style-radius-round);
+  background: var(--color-border);
+  transition: background var(--transition-normal);
+}
+
+.trackChecked {
+  background: var(--color-primary);
+}
+
+/* ─── Thumb ─── */
+.thumb {
+  position: absolute;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--style-radius-round);
+  background: var(--color-surface-card);
+  /* Hairline edge defines thumb on the track (NIE cień — anti-slop §2). */
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  transition: transform var(--duration-200) var(--spring-curve);
+}
+
+.thumbChecked {
+  transform: translateX(20px);
+}
+
+/* ─── Active press ─── */
+.label:active .thumb {
+  transform: scale(0.92);
+}
+
+.label:active .thumbChecked {
+  transform: translateX(20px) scale(0.92);
+}
+
+/* ─── Focus ring ─── */
+/* Non-:has() fallback: `.track` wystepuje PO `.nativeInput` w DOM, wiec kombinator
+ * sibling dziala (inaczej niz w Checkbox, gdzie box poprzedza input). `outline`
+ * zapewnia tez widoczny focus w forced-colors/WHCM, gdzie box-shadow jest pomijany. */
+.nativeInput:focus-visible ~ .track {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.label:has(.nativeInput:focus-visible) .track {
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+}
+
+/* ─── Label text ─── */
+.text {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+/* ─── Disabled ─── */
+.isDisabled .label {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

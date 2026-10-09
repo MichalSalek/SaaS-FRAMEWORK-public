@@ -1,0 +1,11 @@
+/* WŁASNA drabina kremu modułu: procent i token złota siedzą w deklaracji
+   zmiennej, a `background` widzi już tylko nazwę. To ta gałąź, która doniosła
+   cztery kremowe bandy na /for-clients, i przez cały czas nie miała próbki —
+   wyłączenie jej przechodziło przez meta-strażnika bez śladu. */
+.page {
+  --wash-1: color-mix(in oklch, var(--color-primary) 8%, var(--color-bg-main));
+}
+
+.introCard {
+  background: var(--wash-1);
+}

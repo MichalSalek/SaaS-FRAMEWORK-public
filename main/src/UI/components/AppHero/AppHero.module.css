@@ -1,0 +1,162 @@
+/* AppHero — kanoniczna karta-intro ekranu app (S25 → S97).
+ * Zamknięty prostokąt: KREM systemowy + neutralna hairline rama.
+ * Anatomia z hero galerii (de-slop S25); zero sparkle/gwiazdek (owner
+ * 2026-08-18).
+ *
+ * DECISION (nie usuwaj tego komentarza) — głos ownera S97, wariant B
+ * („krem jako pas ekranu"):
+ * Motyw „Jeden krem" (S94) zdjął wypełnienia z powierzchni całego produktu,
+ * ale AppHero to zagłosowany kanon (S25/1D) i najczęściej powtórzona
+ * powierzchnia aplikacji, więc kolizja poszła pod głos, nie pod decyzję
+ * agenta. Owner wybrał B: karta ZOSTAJE wypełniona, ale kremem systemowym
+ * (--color-bg-subtle) zamiast złota, z neutralnym hairlinem.
+ * Konsekwencje, o których trzeba wiedzieć:
+ *  - AppHero JEST tym jednym kremowym pasem ekranu aplikacji (R2). Ekran,
+ *    który go montuje, nie dokłada drugiej kremowej bandy.
+ *  - Złoto zostaje wyłącznie na akcencie tytułu i w CTA (R6 headroom).
+ *  - Brak osobnego wariantu dark: --color-bg-subtle jest mode-aware, więc
+ *    dawny override (6% → 9% złota) zniknął razem ze złotem.
+ * Odrzucone w tym samym głosie: DZIŚ (złoty tint), A (papier plus zamknięta
+ * rama), C (bez karty, tytuł wprost na papierze). */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  margin: 0;
+  /* DECISION (nie usuwaj tego komentarza) — owner 2026-10-08 („rozlazłe”,
+   * decyzja: nagłówek ten sam, ale niższy):
+   * 32px nad i pod tytułem pochodziło z czasów, gdy AppHero był wypełnioną
+   * KARTĄ i potrzebował wewnętrznego oddechu. Od S116 to goły tytuł na
+   * papierze, więc ten padding sumował się z marginesem strony do około
+   * 52px pustki nad tytułem i tyle samo pod nim (pierwsza treść dopiero
+   * 230px od góry przy 390px). Odstęp trzyma teraz margines strony i jej
+   * `gap`; tu zostaje tylko optyczna korekta. */
+  padding: var(--space-4) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  /* S116 („A3 · Biel na papierze”, owner 2026-09-15) nadpisuje głos S97 wyżej:
+     nagłówek ekranu to informacja, więc stoi wprost na papierze, bez karty
+     i ramy. Biel należy do tego, co się klika. Odstęp z boków znika razem
+     z kartą, żeby tytuł trzymał linię treści. */
+  background: transparent;
+  border: var(--style-border-surface) solid transparent;
+  padding-inline: 0;
+  overflow: hidden;
+  /* Body + opcjonalny aside (avatar tożsamości) w jednym rzędzie. */
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+}
+
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.aside {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+}
+
+.eyebrowRow {
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--space-12);
+}
+
+.title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--style-heading-font);
+  /* DECISION: świadomy fluid clamp tytułu hero (jedyny H1 ekranu). */
+  font-size: var(--text-fluid-xl);
+  font-weight: var(--style-heading-weight);
+  line-height: 1.15;
+  letter-spacing: var(--style-heading-tracking);
+  text-transform: var(--style-heading-case);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+  margin: 0;
+}
+
+/* Gold-as-text: accent-fg (mode-aware AA), NIE --color-primary (2.2:1 FAIL). */
+.titleAccent {
+  color: var(--color-accent-fg);
+}
+
+.subtitle {
+  position: relative;
+  z-index: 1;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: var(--space-8) 0 0;
+  max-width: 42ch;
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+/* Meta-rząd żywych danych: sans; cyfry tabelaryczne TYLKO na samych liczbach.
+ *
+ * DECISION (nie usuwaj tego komentarza) — pomiar S126, 2026-10-08:
+ * `font-variant-numeric: tabular-nums` na całym rzędzie rozsuwało
+ * interpunkcję. W Schibsted Grotesk cecha `tnum` obejmuje też kropkę
+ * i przecinek, więc „example.com” renderowało się jako „example . com”,
+ * a zdanie kończyło się „ustawieniach .” (ten sam napis: 177px bez cechy,
+ * 202px z nią). Liczniki stoją w `<strong>` i tylko one dostają cechę. */
+.meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  /* Człony dzieli przecinek dopisany w CSS (patrz ::after niżej) i odstęp
+   * jednej spacji; pionowy odstęp działa tylko po złamaniu na drugą linię.
+   * Spacja tego tekstu (15px, 400) ma 4,0px (zmierzone 2026-10-09); przy 6px
+   * przerwa po przecinku czytała się jak podwójna („13 stylizacji,  3
+   * stylistki”). */
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Każdy człon meta = nierozrywalna jednostka (liczba+etykieta, ikona+status):
+ * łamanie zachodzi MIĘDZY członami (flex-wrap), nigdy wewnątrz (S25: ikona
+ * statusu parowania lądowała na osobnej linii nad tekstem). */
+.meta > span {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  white-space: nowrap;
+}
+
+/* Jawny wyjątek (s34): człon dłuższy niż cała linia (e-mail) był ucinany przez
+ * overflow:hidden. `data-breakable` pozwala mu łamać się w dowolnym miejscu, ale
+ * dopiero gdy sam nie mieści się w linii: flex-wrap nadal przenosi go w całości,
+ * bo decyzja o łamaniu linii liczy się z jego pełnej szerokości. */
+.meta > span[data-breakable] {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Przecinek między członami meta, dopisany w CSS, więc żaden call-site nie
+ * wkleja interpunkcji ręcznie.
+ *
+ * DECISION (nie usuwaj tego komentarza) — owner 2026-10-08: kropka środkowa
+ * „·” jako interpunkcja jest zakazana w całym produkcie (tak jak myślniki).
+ * Do S126 stała tu między członami („12 prac · 3 przypięte”). Przecinek stoi
+ * PO członie (nie przed następnym), więc po złamaniu linia nie zaczyna się od
+ * znaku. Ujemny margines zjada odstęp flex między tekstem a przecinkiem. */
+.meta > span:not(:last-child)::after {
+  content: ',';
+  margin-left: calc(-1 * var(--space-4));
+}
+
+.meta strong {
+  font-weight: 700;
+  color: var(--color-accent-fg);
+}

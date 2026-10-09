@@ -1,0 +1,97 @@
+/* Admin Colours & Traits: page spacing, the loading shape of the lists and
+ * the two form dialogs. Rows, lists, tabs, buttons and fields are shared
+ * primitives and carry their own look. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+/* Hug the two labels. Geometry lives on SegmentedControl. */
+.tabs {
+  align-self: flex-start;
+  width: max-content;
+  max-width: 100%;
+}
+
+/* Short rows keep a readable width: on a wide page the row menu stood 900px
+   away from the name it belongs to. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  width: 100%;
+  max-width: 720px;
+  min-width: 0;
+}
+
+/* ─── Loading: the box and rows of the list that replaces it ─── */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: var(--space-8) var(--space-16);
+}
+
+.skeletonRow:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* ─── Form dialogs ─── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* The system picker stands on the code field's control line (the field's
+   label is above it), so the pair reads as one value. */
+.colorField {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+
+.colorPicker {
+  flex: none;
+  box-sizing: border-box;
+  width: 48px;
+  height: 48px;
+  /* Label line of the field beside it (text-sm at its line height) plus the
+     field's own gap: the swatch then starts where the code input starts. */
+  margin-top: calc(1lh + var(--space-8));
+  padding: var(--space-2);
+  font-size: var(--text-sm);
+  background: var(--color-surface-input);
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  cursor: pointer;
+}
+
+.colorPicker:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.colorPicker:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.formError {
+  margin: var(--space-12) 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-error-fg);
+}

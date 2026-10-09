@@ -1,0 +1,104 @@
+/* ─── TrustSignals — kanon trust-pilli (zamiast per-page .trustList ×7) ───
+ * Itemy są STATYCZNE (nieinteraktywne): zero hover, zero transition
+ * (floor §4 — hover tylko na interaktywnych). */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--trust-fg, var(--color-text-secondary));
+  letter-spacing: var(--ls-wide-10);
+}
+
+/* Ikona dekoracyjna — gold tint (kanon `.trustList li svg`; dekoracja-fill,
+ * nie tekst, więc --color-primary jest tu legalny). */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  justify-content: center;
+  line-height: inherit;
+}
+
+.text {
+  min-width: 0;
+}
+
+/* ─── Wariant: pills — inline chip row, człony rozdziela odstęp ─── */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-24);
+}
+
+.pills .item {
+  opacity: 0.85;
+}
+
+/* DECISION (nie usuwaj tego komentarza) — owner 2026-10-08: kropka środkowa
+ * jako separator jest zakazana w całym produkcie (tak jak myślniki). Do S126
+ * rysował ją tu pseudoelement między członami. Każdy człon zaczyna się własną
+ * ikoną, więc granicę wyznacza ikona i szerszy odstęp kolumn, bez znaku
+ * interpunkcyjnego (strażnik: audit:copy-dashes). */
+
+/* ─── Wariant: chips — obrzeżone pigułki (kanon about/for-clients) ───
+ * Statyczne <li> → ZERO hover/transition (floor §4); radius-full legalny:
+ * to prawdziwe pigułki (GLOBAL 23). Dodane S24 — wcześniej about i
+ * for-clients kopiowały tę formę per-page (about z hoverem = violation). */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-10) var(--space-12);
+}
+
+.chips .item {
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-14);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  letter-spacing: var(--ls-wide-5);
+}
+
+/* ─── Wariant: grid — równa siatka statycznych kart, pełny hairline ─── */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+}
+
+@media (min-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  }
+}
+
+/* Tonal surface step + PEŁNY hairline border (elewacja bez cienia). */
+.grid .item {
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-bg-elevated);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  line-height: var(--leading-body);
+}
+
+.grid .icon {
+  /* Optyczne wyrównanie ikony do pierwszej linii tekstu. */
+  height: 1lh;
+  margin-top: 0;
+}

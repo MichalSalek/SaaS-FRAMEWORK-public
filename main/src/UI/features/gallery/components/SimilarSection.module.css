@@ -1,0 +1,99 @@
+/* ============================================================
+ * SimilarSection — „Podobne stylizacje”: a row of thumbnails that lead
+ * to other works of the same stylist. One heading (S126: the kicker
+ * above it named the same thing twice), no frames, no entry animation.
+ * ============================================================ */
+
+/* Motyw „Jeden krem" (R6): separator sekcji jest linią strukturalną —
+   neutralny divider. Sekcję nazywa nagłówek, nie kreska. */
+.separator {
+  height: var(--style-border-divider);
+  background: var(--color-divider);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.scrollRow {
+  display: flex;
+  gap: var(--space-12);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  /* Scroll affordance = peek (staloszerokie 140px thumby — kolejny kafel
+   * naturalnie przyciety na krawedzi) + snap proximity (nie mandatory,
+   * zeby czesciowy kafel mogl zostac widoczny). Zero edge-fade mask. */
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: var(--space-8) 0 var(--space-12);
+}
+
+.scrollRow::-webkit-scrollbar {
+  display: none;
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  scroll-snap-align: start;
+  display: block;
+  background: var(--color-surface-input);
+  transition: transform var(--duration-200) var(--spring-curve);
+}
+
+.thumb:hover {
+  transform: translateY(-3px);
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+.thumb:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+.thumbImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-300) var(--ease-entrance);
+}
+
+.thumb:hover .thumbImage {
+  transform: scale(1.04);
+}
+
+/* Sekcja żyje wyłącznie w PhotoDetailPage, której `.page` deklaruje kontener
+   `app-view`. Na desktopie trasa produktowa renderuje się w ramie 390px, a
+   `@media` mierzy VIEWPORT: przy 1440 kafle rosły do 168px w torze 350px, więc
+   pasek mieścił dwa zamiast trzech. Próg o 40px niższy od dawnego = ten sam
+   moment przełamania na realnym telefonie. */
+@container app-view (min-width: 728px) {
+  .thumb {
+    width: 168px;
+    height: 168px;
+  }
+}

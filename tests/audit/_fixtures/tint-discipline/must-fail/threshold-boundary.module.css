@@ -1,0 +1,10 @@
+/* Próg 45% nie był zakotwiczony od GÓRY: mutacja przesuwająca go w dół
+   przeżywała, bo wszystkie próbki siedziały głęboko pod progiem (8–14%).
+   44 i 45 to ostatnie dwa udziały, które motyw uznaje za wash. */
+.at44 {
+  background: color-mix(in oklch, var(--color-primary) 44%, var(--color-bg-main));
+}
+
+.at45 {
+  background: color-mix(in oklch, var(--color-primary) 45%, var(--color-bg-main));
+}

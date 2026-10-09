@@ -1,0 +1,10 @@
+/* Relative color: ani color-mix, ani procentu przy tokenie — udział niesie
+   ALFA, więc skan liczący wyłącznie mieszaniny widział pełne złoto (100%)
+   i próg nigdy nie strzelał. Renderowo to ten sam wash. */
+.viaRgbFrom {
+  background: rgb(from var(--color-primary) r g b / 0.08);
+}
+
+.viaOklchFrom {
+  background: oklch(from var(--color-primary) l c h / 8%);
+}

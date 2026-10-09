@@ -1,0 +1,171 @@
+/* AppMenu — dropdown menu with keyboard nav and nested submenu support */
+
+.positioner {
+  z-index: var(--z-menu);
+  /* DECISION (B2-F18): Positioner is a non-visual portal anchor (Base UI pattern).
+   * Same rationale as AppTooltip — no visible affordance, focus goes to menu items. */
+  outline: none;
+}
+
+.popup {
+  min-width: 10rem;
+  padding: var(--space-4) 0;
+  border-radius: var(--style-radius-surface);
+  /* S116: warstwa pływająca stoi nad papierem strony, więc bierze biel
+     powierzchni klikalnej — inaczej nie ma krawędzi wobec treści pod nią. */
+  background: var(--color-surface-interactive);
+  color: var(--color-text-primary);
+  /* Zamknięta rama niesie elewację (NIE cień, anti-slop §2); S108: rama
+   * powierzchni z tokenu, nie outline (outline nie jest ramą). */
+  /* DECISION (nie usuwaj tego komentarza) — S126, 2026-10-09: rama warstwy
+   * PŁYWAJĄCEJ bierze kolor linii dzielącej, nie `--color-border-surface`.
+   * Ten token jest od S116 przezroczysty (powierzchnie na papierze nie mają
+   * ram), więc biała warstwa otwarta nad białą listą (menu wiersza na
+   * „Twoje klientki”) nie miała żadnej krawędzi i czytała się jak dziura
+   * w liście. Warstwa nad treścią musi mieć krawędź na KAŻDYM podłożu. */
+  border: var(--style-border-surface) solid var(--color-divider);
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.popup[data-starting-style],
+.popup[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* ---- Item ---- */
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  /* 44px: a menu item is a tap target like any other (S126; it was ~36px and
+   * three features raised it locally). */
+  min-height: 44px;
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  cursor: pointer;
+  /* DECISION (B2-F18): outline:none on base selector suppresses browser default ring.
+   * :focus-visible below provides keyboard ring (2px primary). WCAG 2.4.7 satisfied. */
+  outline: none;
+  user-select: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: start;
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.item[data-highlighted] {
+  background: var(--color-surface-hover);
+}
+
+.item[data-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Danger is carried by the colour of the label and its icon, not by a tinted
+ * surface. */
+.item[data-tone='danger'] {
+  color: var(--color-error-fg);
+}
+
+/* ---- „More” trigger: a row's single trailing control, 44px target ---- */
+
+.moreTrigger {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--style-radius-round);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.moreTrigger > svg {
+  display: block;
+}
+
+.moreTrigger:active,
+.moreTrigger[data-popup-open] {
+  background-color: var(--color-surface-pressed);
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover) {
+  .moreTrigger:hover:not(:disabled) {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+.moreTrigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.moreTrigger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Submenu trigger item ---- */
+
+.triggerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  min-height: 44px;
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  cursor: pointer;
+  /* DECISION (B2-F18): Same as .item — :focus-visible override handles keyboard ring. */
+  outline: none;
+  user-select: none;
+  width: 100%;
+}
+
+.triggerItem:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.triggerItem[data-highlighted] {
+  background: var(--color-surface-hover);
+}
+
+.submenuChevron {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-secondary);
+  margin-inline-start: auto;
+}
+
+/* ---- Separator ---- */
+
+.separator {
+  height: 1px;
+  margin: var(--space-4) var(--space-12);
+  background: var(--color-border);
+  border: none;
+}

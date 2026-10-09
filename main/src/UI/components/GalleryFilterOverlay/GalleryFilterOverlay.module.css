@@ -1,0 +1,403 @@
+/* ─── Overlay Container ─── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-bottom-sheet);
+  background: var(--color-bg-main);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(100%);
+  transition:
+    opacity 250ms var(--ios-sheet-curve),
+    transform 250ms var(--ios-sheet-curve);
+  pointer-events: none;
+}
+
+.overlayVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.overlay::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: var(--style-radius-control);
+  background: var(--color-divider);
+  margin: var(--space-12) auto var(--space-8);
+  flex-shrink: 0;
+}
+
+/* ─── Header ─── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  /* DECISION (nie usuwaj): border-bottom is a functional sticky app-bar
+   * divider (standard top-bar lip separating header from scrollable body),
+   * not a decorative accent stripe. Full-width separator, floor-OK. */
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  flex-shrink: 0;
+  min-height: var(--app-bar-height);
+}
+
+.headerTitle {
+  flex: 1;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+}
+
+.headerBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-6);
+  border-radius: var(--style-radius-pill);
+  /* A count of what is SELECTED: selection is inverted ink in this product
+     (S116), the accent stays with the one filled action in the footer. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  /* Inverted ink: the default ring colour has no contrast on it. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  font-family: var(--font-body);
+  margin-left: var(--space-8);
+}
+
+.headerClose {
+  flex: none;
+  /* The 44px target reaches into the header's padding, so the glyph's edge
+     stands on the content's right edge. */
+  margin-inline-end: calc(var(--space-8) * -1);
+}
+
+/* ─── Scrollable Body ─── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Stopka jest elementem flex POD przewijaną treścią, nie `fixed` nad nią,
+   * więc treść nie potrzebuje rezerwy na jej wysokość (dawne +80px). */
+  padding: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+/* ─── Search ─── */
+.searchWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ─── Section ─── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* WCAG 2.1 AA: fieldset+legend semantic group wrapper. Strip browser defaults. */
+.filterGroup {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+/* DECISION (nie usuwaj tego komentarza) — S126, 2026-10-09: tytuł sekcji
+ * filtra jest NEUTRALNY i jeden dla wszystkich czterech sekcji (cechy, kolory,
+ * długość, tryb dopasowania). Wcześniej trzy z nich były malinowymi etykietami
+ * dwóch różnych krojów: akcent na ekranie niosły tytuły, a nie akcja. Akcent
+ * należy do „Pokaż pasujące” w stopce. */
+.sectionTitle {
+  display: block;
+  padding: 0;
+  margin: 0 0 var(--space-12);
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+/* ─── Traits: Category Group ─── */
+.traitCategory {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-bottom: var(--space-12);
+}
+
+.categoryLabel {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  color: var(--color-text-secondary);
+  padding: var(--space-8) 0;
+}
+
+/* ─── Traits: List ─── */
+.traitList {
+  display: flex;
+  flex-direction: column;
+}
+
+.traitListItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-8);
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  border-radius: var(--style-radius-control);
+  transition: background var(--transition-fast);
+  min-height: 44px;
+}
+
+/* `:not(:disabled)` nie jest kosmetyka: Chromium dopina `:active` takze do
+   przyciskow natywnie wylaczonych, wiec bez tego zawezenia wylaczony wiersz
+   dawal pod palcem feedback wcisniecia — ta sama falszywa afordancja, ktora
+   zdjal `cursor: default`, tyle ze silniejsza, bo reaguje na dotyk. Swatch
+   dostal komplet od razu (`.swatch:disabled:active`), ten wiersz polowe. */
+.traitListItem:not(:disabled):active {
+  /* Motyw „Jeden krem" (S94/R6): press-feedback = ULOTNY stan → własny
+     stopień drabiny powierzchni (input → hover → pressed), nie złoto. Złoto
+     na tej liście koduje WYBRANIE (.traitListItemSelected), więc dotknięcie
+     każdego wiersza nie może go podrabiać. */
+  background: var(--color-surface-pressed);
+}
+
+.traitListItemSelected {
+  font-weight: 600;
+}
+
+.traitCheckbox {
+  width: 20px;
+  height: 20px;
+  /* Half the control radius, like CheckboxAtom: the full 12px on a 20px box
+     drew a circle, and a circle in a list reads „pick one” (a radio) while
+     these traits are a multiple choice (qa click-through, S126). */
+  border-radius: calc(var(--style-radius-control) / 2);
+  border: var(--style-border-control) solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* S116: a choice is ink, not raspberry (raspberry = the CTA and the arrow);
+   the same recipe as CheckboxAtom `.checked`. */
+.traitCheckboxActive {
+  /* focus-ring-allow: the mark is a drawn indicator inside the row button;
+     the focus ring belongs to the row and lies on paper around it. */
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+   Wygaszenie oznacza opcje NIEDOSTEPNA w biezacych wynikach, a od glosu ownera
+   (S98) taka opcja jest REALNIE nieaktywna: `disabled` + brak handlera, nie
+   tylko przygaszona wizualnie. Powod byl podwojny. Po pierwsze semantyka
+   klamala: element wygladal na wylaczony, a programowo byl aktywny, wiec
+   czytnik ekranu mowil co innego niz oczy. Po drugie sam kontrast: etykiety
+   schodzily do 2,61:1 w light. (Wczesniejsza wersja tego komentarza twierdzila,
+   ze podniesienie krycia „nic nie ratuje, bo nawet 0,7 daje 3,54:1" — to
+   nieprawda: 3,54 to wartosc dla 0,5, a 0,7 daje 7,23:1 i prog by przeszedl.
+   Argument stoi wiec na SEMANTYCE, nie na kontrascie.) WCAG 1.4.3 jawnie zwalnia tekst bedacy
+   czescia NIEAKTYWNEJ kontrolki, wiec wygaszenie moze zostac takie, jakie
+   jest — ale tylko dlatego, ze kontrolka jest teraz naprawde wylaczona. */
+.traitDimmed {
+  opacity: 0.4;
+}
+
+/* Kursor musi isc za semantyka. Odkad niedostepne opcje sa REALNIE wylaczone
+   (`disabled` + zerowy handler), lapka nad nimi jest juz tylko falszywa
+   afordancja: obiecuje klikniecie, ktorego nie bedzie. */
+.traitListItem:disabled,
+.lengthChip:disabled {
+  cursor: default;
+}
+
+/* ─── Length Chips ─── */
+.lengthChips {
+  display: flex;
+  /* Zawijanie, nie przewijanie: chipy maja stala szerokosc (nie kurcza sie),
+     wiec przy 320px CSS rzad wychodzil poza panel i "XL" dotykal krawedzi
+     ekranu. Zmierzone w Chromium na /app/gallery: scrollWidth 298 przy
+     clientWidth 265. Powyzej ~353px mieszcza sie w jednej linii. */
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+/* Reset tla i ramy NIE jest tu kosmetyka. To `<button>` uzyty jako chip, a
+   globalny reset daje przyciskom tylko `font: inherit`, wiec nieprzykryte
+   domyslne tlo przegladarki (`buttonface`) dawalo #efefef w light i SREDNIA
+   SZAROSC #6b6b6b w dark, do tego fasete 3D `border-style: outset`. Ta sama
+   klasa co w PairingPage: w kodzie nie widac jej wcale, bo deklaracji po
+   prostu NIE MA. Zmierzone w przegladarce na /app/gallery. */
+.lengthChip {
+  /* Kontrolka wygląda jak kontrolka (S126): bez wypełnienia „Krótkie Średnie
+     Długie XL” czytały się jak zwykły tekst. Ten sam krok co ChipAtom. */
+  background: var(--color-control-fill);
+  border: var(--style-border-control) solid var(--color-control-border);
+  /* Rama bez oddechu i bez zaokraglenia wygladalaby gorzej niz szare
+     wypelnienie UA, ktore ja wczesniej maskowalo: tekst dotykalby ramy,
+     a rog byl ostry posrod okraglych swatchy i pigulkowych CTA tego samego
+     overlaya. Reset musi domknac ksztalt, nie tylko zdjac domyslke. */
+  padding: 0 var(--space-12);
+  border-radius: var(--style-radius-pill);
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lengthChipSelected {
+  cursor: pointer;
+  /* Wybór = odwrócony atrament (S116), jak zaznaczone pola cech wyżej. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  /* Inverted ink: the default ring colour has no contrast on it. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  /* `border-style` tez, nie tylko `border-color`: bez tego wybrany chip
+     zostawal ze zlota faseta `outset` z domyslnego stylu przycisku. */
+  border: var(--style-border-control) solid var(--color-text-primary);
+  padding: 0 var(--space-12);
+  border-radius: var(--style-radius-pill);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ─── Match Mode: Radio Buttons ─── */
+.matchModeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+  /* DECISION (nie usuwaj): border-top is a full-width section divider between
+   * the filter body and the match-mode block (acts as an <hr>), not a
+   * decorative one-sided accent stripe. Floor-OK. */
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.radioOption {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: var(--space-12);
+  row-gap: var(--space-2);
+  cursor: pointer;
+  padding: var(--space-12);
+  border-radius: var(--style-radius-surface);
+  transition: background var(--transition-fast);
+}
+
+.radioOption:active {
+  background: var(--color-surface-pressed);
+}
+
+.radioInput {
+  grid-row: 1 / span 2;
+  /* optical: optyczne wyrownanie kontrolki (radio 18x18, kropka 10x10) do linii tekstu */
+  margin-top: 3px;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.radioLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.radioDescription {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* ─── Footer ─── */
+.footer {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  background: var(--color-bg-main);
+  /* DECISION (nie usuwaj): border-top is the functional divider for this
+   * sticky action footer (separates it from the scrollable body). The
+   * decorative elevation box-shadow was removed — the hairline carries it. */
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.footerClearButton {
+  flex: 1;
+}
+
+.footerApplyButton {
+  flex: 2;
+}
+
+.footerDisabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ─── Filter Warning (0 results) ─── */
+.filterWarning {
+  width: 100%;
+  text-align: center;
+  padding: var(--space-8) var(--space-20);
+  color: var(--color-warning);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* ─── No results in search ─── */
+.noSearchResults {
+  text-align: center;
+  padding: var(--space-20) 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}

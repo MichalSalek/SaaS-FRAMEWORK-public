@@ -1,0 +1,6 @@
+/* Neutralna biel/czern w data-URI zostaje legalna: to koniecznosc techniczna,
+   bo SVG w URL nie widzi kaskady CSS. */
+.chevron {
+  background: url("data:image/svg+xml,%3Csvg stroke='%23ffffff'%3E%3C/svg%3E");
+  mask: url("data:image/svg+xml,%3Csvg fill='%23000'%3E%3C/svg%3E");
+}

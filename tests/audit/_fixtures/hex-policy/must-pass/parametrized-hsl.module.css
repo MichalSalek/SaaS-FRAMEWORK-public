@@ -1,0 +1,4 @@
+/* Parametryzowany hsl — przepis na kolor z danych, nie literal. */
+.confetti {
+  background: hsl(var(--hue), 80%, 60%);
+}

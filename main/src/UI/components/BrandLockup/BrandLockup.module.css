@@ -1,0 +1,32 @@
+/* Lockup = sygnet + wordmark w JEDNYM rzędzie, jak navbar.
+ * Font-size lockupu steruje wysokością sygnetu (`height: 1.9em`). */
+
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  /* The wordmark keeps its identity independently of the reading font role.
+   * DECISION (nie usuwaj tego komentarza): Marcellus ships one weight (400,
+   * application/fonts.ts). Any heavier value is browser faux-bold, which smears
+   * the serifs; the wordmark stays at its real weight and synthesis is off. */
+  font-family: var(--font-marcellus), serif;
+  font-weight: 400;
+  font-synthesis: none;
+  /* font-size dziedziczy z rodzica (navbar compact, rail) — lockup nie
+   * twardzi skali, żeby compact-bar mógł zejść do --text-base. */
+  letter-spacing: var(--ls-tight-10);
+  line-height: 1;
+  color: inherit;
+}
+
+.mark {
+  height: 1.9em;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.wordmark {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}

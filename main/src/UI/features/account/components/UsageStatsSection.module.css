@@ -1,0 +1,38 @@
+/* UI/features/account/components/UsageStatsSection.module.css
+ * Usage numbers of the account: a header and the shared StatTile band.
+ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* Icon and title share one centre line. */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.headerIcon {
+  display: block;
+  flex: none;
+  color: var(--color-accent-fg);
+}
+
+.heading {
+  margin: 0;
+}
+
+/* „12 / 50” is one piece: the number never parts from its limit. */
+.value {
+  white-space: nowrap;
+}
+
+.limit {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,516 @@
+#!/usr/bin/env bash
+# scripts/git/push
+
+# 1. Source Utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+# ── Tryb pracy: świadomy wybór zakresu, nie domyślne zamiatanie ──────────────
+# DECISION (nie usuwaj tego komentarza) — GOŁE WYWOŁANIE NIE PUSHUJE:
+# ten skrypt robił `git add -A` w każdym repo, a pracuje tu równolegle kilka sesji
+# agentów w JEDNYM drzewie roboczym. Skutkiem było ciche zamiatanie cudzej pracy w toku
+# do własnego commita — na tyle regularne, że połowa skilli w tym repo miała własną
+# notkę „NIE używaj git:push". Narzędzie, którego dokumentacja odradza używanie
+# narzędzia, jest zepsute. Zamiast kolejnego ostrzeżenia w prozie: zakres jest teraz
+# ARGUMENTEM, a brak argumentu drukuje pomoc i kończy się kodem != 0 (nigdy 0 — inaczej
+# wrapper albo kolejna sesja uzna, że push się udał, i praca zostanie na dysku).
+MODE=""
+SKIP_AUDITS=0
+ONLY_PATHS=()
+
+show_help() {
+  cat <<'POMOC'
+git:push — commit i push roota razem z submodułami (main, web-1).
+
+  Musisz wybrać ZAKRES. Nie ma zachowania domyślnego, bo w tym repo pracuje
+  równolegle kilka sesji w jednym drzewie i „zgarnij wszystko" bywa cudzą pracą.
+
+TRYBY (wymagany dokładnie jeden)
+
+  --all
+      Zgarnia wszystko, co brudne w każdym repo (dawne zachowanie `git add -A`).
+      Używaj, gdy pracujesz sam i wiesz, że całe drzewo jest twoje.
+
+  --only <ścieżka> [<ścieżka>...]
+      Stage'uje WYŁĄCZNIE podane ścieżki. Reszta brudnych plików zostaje
+      nietknięta. Ścieżki podajesz względem roota repo, katalogi działają.
+      Repo, w które nie trafia żadna ścieżka, jest w całości pomijane —
+      bez checkoutu, bez commita, bez pusha.
+
+OPCJE
+
+  --skip-audits   Pomija kernel-propagation, typecheck, testy i audyty.
+                  To nie jest tryb — nadal musisz podać --all albo --only.
+
+  -h, --help      Ten tekst.
+
+PRZYKŁADY
+
+  # pracujesz sam, całe drzewo twoje:
+  npm run git:push -- --all
+
+  # równoległa sesja dłubie w AGENTS.md, ty ruszałeś tylko UI i dokumentację:
+  npm run git:push -- --only main/src/UI docs/
+
+  # pojedynczy plik:
+  npm run git:push -- --only web-1/src/domain/email/trial-email.resolver.ts
+
+GDY NIE WIESZ, CO JEST TWOJE
+
+  `git status --short` w roocie, main/ i web-1/. Cudze pliki zostaw w spokoju —
+  w tym środowisku 99% nieoczekiwanych zmian to czyjaś praca, nie twój bałagan.
+POMOC
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --all)
+      [ -n "$MODE" ] && { echo "BŁĄD: --all i --only wykluczają się."; exit 2; }
+      MODE="all"; shift ;;
+    --only)
+      [ -n "$MODE" ] && { echo "BŁĄD: --all i --only wykluczają się."; exit 2; }
+      MODE="only"; shift
+      while [ $# -gt 0 ] && [[ "$1" != --* ]]; do ONLY_PATHS+=("$1"); shift; done
+      [ ${#ONLY_PATHS[@]} -eq 0 ] && { echo "BŁĄD: --only wymaga co najmniej jednej ścieżki."; echo; show_help; exit 2; }
+      ;;
+    --skip-audits) SKIP_AUDITS=1; shift ;;
+    -h|--help) show_help; exit 0 ;;
+    *)
+      echo "BŁĄD: nieznany argument: $1"; echo; show_help; exit 2 ;;
+  esac
+done
+
+if [ -z "$MODE" ]; then
+  show_help
+  echo ""
+  echo "PRZERWANE: nie podano zakresu. Wybierz --all albo --only <ścieżka>."
+  exit 2
+fi
+
+# DECISION (nie usuwaj tego komentarza) — LITERÓWKA MA BYĆ GŁOŚNA I WCZESNA:
+# ścieżka z `--only`, która nie istnieje, przechodziła przez `git diff --quiet` jako
+# „brak zmian" i cały tryb kończył się sukcesem, nie wypchnąwszy niczego z tego repo.
+# Cichy no-op jest tu najgorszym możliwym wynikiem: skrypt melduje „Complete", a praca
+# zostaje na dysku — czyli dokładnie ta klasa, dla której gołe wywołanie w ogóle
+# przestało pushować. Sprawdzamy PRZED audytami i przed jakimkolwiek commitem, żeby
+# przerwanie nie zostawiło połowy submodułów wypchniętych.
+if [ "$MODE" = "only" ]; then
+  BRAKUJACE=()
+  for _p in ${ONLY_PATHS[@]+"${ONLY_PATHS[@]}"}; do
+    _clean="${_p#./}"; _clean="${_clean%/}"
+    [ -e "$ROOT_DIR/$_clean" ] && continue
+    # plik może nie istnieć na dysku, ale być śledzony (skasowany świadomie)
+    if git -C "$ROOT_DIR" ls-files --error-unmatch -- "$_clean" >/dev/null 2>&1; then continue; fi
+    _sub="${_clean%%/*}"
+    if [ "$_sub" != "$_clean" ] && [ -d "$ROOT_DIR/$_sub" ] \
+       && git -C "$ROOT_DIR/$_sub" ls-files --error-unmatch -- "${_clean#"$_sub"/}" >/dev/null 2>&1; then continue; fi
+    BRAKUJACE+=("$_p")
+  done
+  if [ ${#BRAKUJACE[@]} -gt 0 ]; then
+    echo "BŁĄD: te ścieżki z --only nie istnieją ani w drzewie, ani w gicie:"
+    for _p in "${BRAKUJACE[@]}"; do echo "    $_p"; done
+    echo ""
+    echo "Ścieżki podaje się WZGLĘDEM ROOTA repo (np. main/src/UI, nie src/UI)."
+    echo "Przerywam przed audytami — nic nie zostało scommitowane ani wypchnięte."
+    exit 2
+  fi
+fi
+
+header "GIT PUSH ALL" "📤"
+
+# --- Helper: generate smart commit message from staged changes ---
+generate_commit_msg() {
+  local dir="$1"
+  local name="$2"
+  shift 2
+  # Tryb --only woła to PRZED commitem, gdy nic nie jest jeszcze zastage'owane
+  # (`commit --only` bierze prosto z drzewa roboczego), więc `--cached` byłby pusty
+  # i każdy commit dostawałby message „update <repo>". Z podanymi ścieżkami liczymy
+  # różnicę wobec HEAD ograniczoną do nich; bez ścieżek — jak dawniej, z indeksu.
+  # UWAGA na kolejność: opcje (`--stat`, `--name-only`) MUSZĄ stać PRZED `--`,
+  # inaczej git potraktuje je jako kolejną ścieżkę i wypluje pełny diff zamiast listy
+  # plików — message commita robił się wtedy z linii „diff --git a/... b/...".
+  local -a diff_rev diff_paths
+  if [ $# -gt 0 ]; then
+    diff_rev=(HEAD); diff_paths=(-- "$@")
+  else
+    diff_rev=(--cached); diff_paths=()
+  fi
+
+  local stat
+  stat=$(cd "$dir" && git diff --stat --no-color "${diff_rev[@]}" ${diff_paths[@]+"${diff_paths[@]}"} 2>/dev/null | tail -1)
+
+  if [ -z "$stat" ]; then
+    echo "update $name"
+    return
+  fi
+
+  # Extract file count and summary
+  local files_changed
+  files_changed=$(cd "$dir" && git diff --name-only "${diff_rev[@]}" ${diff_paths[@]+"${diff_paths[@]}"} 2>/dev/null | head -5)
+
+  # Build descriptive message from changed paths
+  local areas=()
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    # Get meaningful directory or filename
+    local area
+    area=$(echo "$f" | sed 's|src/||' | cut -d/ -f1-2 | head -1)
+    # Deduplicate
+    local found=false
+    for a in "${areas[@]}"; do
+      if [ "$a" = "$area" ]; then found=true; break; fi
+    done
+    $found || areas+=("$area")
+  done <<< "$files_changed"
+
+  local total
+  total=$(cd "$dir" && git diff --name-only "${diff_rev[@]}" ${diff_paths[@]+"${diff_paths[@]}"} 2>/dev/null | wc -l)
+
+  if [ ${#areas[@]} -eq 0 ]; then
+    echo "update $name"
+  elif [ ${#areas[@]} -le 3 ]; then
+    local joined
+    joined=$(IFS=', '; echo "${areas[*]}")
+    echo "$name: ${total} files (${joined})"
+  else
+    echo "$name: ${total} files (${areas[0]}, ${areas[1]} +$((${#areas[@]}-2)) more)"
+  fi
+}
+
+# --- Lista submodułów (app-dirs) — potrzebna do mapowania ścieżek z --only ---
+APP_DIRS=()
+for _d in "$ROOT_DIR"/*; do
+  [ -d "$_d" ] && is_app_dir "$(basename "$_d")" && APP_DIRS+=("$(basename "$_d")")
+done
+
+# --- Helper: ścieżki z --only należące do danego repo, przeliczone na jego korzeń ---
+# $1 = prefiks repo względem roota ("main", "web-1") albo pusty łańcuch dla roota.
+# Wypisuje po jednej ścieżce w linii. BRAK WYJŚCIA = to repo jest poza zakresem.
+paths_for_repo() {
+  local prefix="$1" p a belongs
+  for p in ${ONLY_PATHS[@]+"${ONLY_PATHS[@]}"}; do
+    p="${p#./}"; p="${p%/}"
+    if [ -n "$prefix" ]; then
+      if [ "$p" = "$prefix" ]; then echo "."
+      elif [[ "$p" == "$prefix"/* ]]; then echo "${p#"$prefix"/}"
+      fi
+    else
+      belongs=false
+      for a in ${APP_DIRS[@]+"${APP_DIRS[@]}"}; do
+        if [ "$p" = "$a" ] || [[ "$p" == "$a"/* ]]; then belongs=true; break; fi
+      done
+      $belongs || echo "$p"
+    fi
+  done
+}
+
+# --- Helper: ostrzeżenie o podejrzanych plikach (bez stage'owania) ---
+warn_suspicious() {
+  local dir="$1" suspicious
+  suspicious=$(cd "$dir" && git status --porcelain 2>/dev/null | grep -E '\.(env|key|pem|secret|credentials)' | head -5) || true
+
+  if [ -n "$suspicious" ]; then
+    warn "Suspicious unstaged files detected in $(basename "$dir"):"
+    echo "$suspicious" | while read -r line; do
+      echo "     $line"
+    done
+    warn "Verify .gitignore covers sensitive files"
+  fi
+}
+
+# --- Helper: stage całego drzewa (tryb --all) ---
+safe_git_add() {
+  local dir="$1"
+  warn_suspicious "$dir"
+  (cd "$dir" && git add -A)
+}
+
+# 1.5. Run Typechecks + Audits BEFORE pushing anything (unless --skip-audits)
+# Pętla parsowania argumentów wyżej zjada wszystkie parametry (`shift`), więc `$1` jest
+# tu ZAWSZE puste — stary warunek `[[ "${1:-}" != "--skip-audits" ]]` po dodaniu trybów
+# przestałby honorować tę flagę i cicho uruchamiał pełny pakiet mimo jej podania.
+if [ "$SKIP_AUDITS" -eq 0 ]; then
+  # Propagate the shared kernel FIRST — closes the "false-green" window where a
+  # dev edited .shared-kernel/ source but forgot `npm run system:kernel`, leaving
+  # the READONLY copies in main/web-1 stale so typecheck/audits ran against the OLD
+  # kernel. Propagating here guarantees the checks — and the about-to-be-committed
+  # copies — reflect current source. (FWE Wave G)
+  step "Propagating shared kernel before checks..."
+  (
+    cd "$ROOT_DIR"
+    npm run system:kernel
+  ) || {
+    error "❌ PUSH BLOCKED: Shared-kernel propagation failed!"
+    echo ""
+    echo "Fix the kernel source/propagation and re-run the push"
+    exit 1
+  }
+  success "✅ Shared kernel propagated"
+
+  step "Running typechecks before audits..."
+  (
+    cd "$ROOT_DIR"
+    npm run typecheck
+  ) || {
+    error "❌ PUSH BLOCKED: Typechecks failed!"
+    echo ""
+    echo "Fix issues and re-run typechecks before pushing"
+    echo "Or use 'npm run git:push -- --skip-audits' to bypass (not recommended)"
+    exit 1
+  }
+  success "✅ Typechecks passed"
+
+  # Vitest MUSI stać tu, a nie tylko w pre-push: bez tego kroku 2308 testów nie
+  # stało w ŻADNEJ lokalnej bramce — chodziły dopiero w CI i przy deployu (S102).
+  # Obie suity zamykają się w ~6 s.
+  #
+  # SPROSTOWANIE (2026-09-04, zweryfikowane w kodzie): poprzednia wersja tego
+  # komentarza twierdziła, że `git:push` ustawia SKIP_PRECOMMIT_AUDITS=1, więc hook
+  # pre-push wychodzi zerem i jego bramki są w tej ścieżce pominięte. To NIEPRAWDA.
+  # Ta zmienna jest prefiksem WYŁĄCZNIE przy `git commit` (niżej w tym pliku), a
+  # prefiks `VAR=1 polecenie` żyje tylko przez to jedno polecenie — do późniejszego
+  # `git push` już nie dociera. W praktyce więc KAŻDY `npm run git:push` przepuszcza
+  # pełny pakiet DWA RAZY: raz jawnie tutaj, a potem jeszcze raz w hooku pre-push
+  # każdego pushowanego repo (razem z tsc i Vitestem).
+  #
+  # To nie jest wyłącznie marnotrawstwo i dlatego NIE „naprawiamy" tego po cichu:
+  # drugi przebieg ogląda drzewo PO `git add -A` i commicie, czyli inny stan niż
+  # pierwszy. Dokładnie stąd bierze się obserwacja, że `audit:all` bywa zielony,
+  # a chwilę później ten sam pakiet w hooku czerwony. Czy zostawić podwójną bramkę
+  # (wolniej, ale łapie też to, co dołożył `add -A`), czy realnie wyeksportować
+  # SKIP_PRECOMMIT_AUDITS na czas pusha (szybciej, ale ostatnia instancja przestaje
+  # patrzeć na stan po commicie) — to decyzja ownera, nie zmiana przy okazji.
+  step "Running unit tests before audits..."
+  for ws in main web-1; do
+    [ -d "$ROOT_DIR/$ws/node_modules" ] || { warn "⚠️  $ws bez node_modules — pomijam testy"; continue; }
+    (
+      cd "$ROOT_DIR/$ws"
+      npx --no-install vitest run --reporter=dot
+    ) || {
+      error "❌ PUSH BLOCKED: Unit tests failed in ${ws}!"
+      echo ""
+      echo "Fix the failing tests and re-run, or inspect with 'cd ${ws} && npm run test:unit'"
+      exit 1
+    }
+  done
+  success "✅ Unit tests passed"
+
+  # DECISION (nie usuwaj tego komentarza) — BRAMKA LANCUCHA DOSTAW MUSI STAC TUTAJ,
+  # BO NA TEJ SCIEZCE NIE MA JEJ NIGDZIE INDZIEJ (2026-09-16):
+  # `npm audit` byl zaimplementowany WYLACZNIE w `scripts/hooks/pre-commit`, a `git:push`
+  # wola kazdy commit z `SKIP_PRECOMMIT_AUDITS=1` — hook wychodzi wtedy w PIERWSZEJ linii,
+  # czyli przed bramka podatnosci. Komentarz przy tym skipie mowil „audits already ran in
+  # git:push", co bylo prawda dla pakietu audytow, tsc, ESLinta i testow — ale NIE dla
+  # `npm audit`, ktorego push nie odtwarzal. Efekt: kontrola lancucha dostaw formalnie
+  # istniala, a w normalnym przeplywie pracy nie odpalala sie ANI RAZU. Zmierzone: bezposredni
+  # `git commit` blokowal sie na HIGH w web-1 (mysql2 przez prisme), a `npm run git:push`
+  # przepuszczal ten sam stan bez slowa.
+  # Skip w pre-commit ZOSTAJE — on realnie odejmuje potrojna prace (push robi do trzech
+  # commitow, a pakiet audytow i tak leci raz, nizej). Brakujaca bramke dokladamy tu, RAZ.
+  # Swiadomie NIE jest zalezna od trybu (`--all` vs `--only`): podatna zaleznosc jest cecha
+  # DRZEWA, a nie tego, ktore sciezki akurat stageujesz — `--only` na jednym pliku pushuje
+  # dokladnie ten sam `package-lock.json`, co `--all`.
+  # Wzorzec 1:1 z krokiem Vitest wyzej, ktory powstal z dokladnie tego samego powodu.
+  step "Running supply-chain audit (npm audit) before push..."
+  SUPPLY_CHAIN_FAILED=""
+  for ws in "$ROOT_DIR" "$ROOT_DIR/main" "$ROOT_DIR/web-1" "$ROOT_DIR/tests"; do
+    [ -d "$ws/node_modules" ] || continue
+    # DECISION (nie usuwaj tego komentarza) — BEZ `--omit=dev`, SWIADOMIE:
+    # pierwsza wersja tej bramki miala `--omit=dev` i byla SLEPA na podatnosc, dla ktorej
+    # w ogole powstala: `prisma` jest w web-1 devDependency, wiec `mysql2` (HIGH, kradziez
+    # hasla przy downgrade auth-plugina) chowal sie przed skanem — teeth-test z cofnietym
+    # mysql2 do 3.15.3 przechodzil na zielono. Zaleznosc deweloperska nie jest „mniej grozna":
+    # narzedzia builda i testow chodza na maszynie z kluczami i z dostepem do repo.
+    if ! (cd "$ws" && npm audit --audit-level=high >/tmp/npm_audit_push_$$ 2>&1); then
+      error "❌ PUSH BLOCKED: podatnosci HIGH/CRITICAL w $(basename "$ws")"
+      cat /tmp/npm_audit_push_$$ 2>/dev/null | head -30
+      SUPPLY_CHAIN_FAILED=1
+    fi
+  done
+  rm -f /tmp/npm_audit_push_$$
+  if [ -n "$SUPPLY_CHAIN_FAILED" ]; then
+    echo ""
+    echo "Napraw (np. 'npm audit fix' albo 'overrides' na zalatana wersje) i ponow."
+    echo "UWAGA: 'npm audit fix --force' potrafi COFNAC wersje glowna (zmierzone:"
+    echo "proponowal prisma 7 -> 6) — sprawdz, co robi, zanim to odpalisz."
+    exit 1
+  fi
+  success "✅ Supply-chain audit passed (zero HIGH/CRITICAL)"
+
+  step "Running audits before push..."
+  (
+    cd "$ROOT_DIR"
+    npm run audit:all
+  ) || {
+    error "❌ PUSH BLOCKED: Audits failed!"
+    echo ""
+    echo "Fix issues and run 'npm run audit:all' to verify"
+    echo "Or use 'npm run git:push -- --skip-audits' to bypass (not recommended)"
+    exit 1
+  }
+  success "✅ Audits passed"
+else
+  # NOTE: --skip-audits also skips the shared-kernel propagation above. If you
+  # edited .shared-kernel/ source, run `npm run system:kernel` manually first,
+  # else stale READONLY copies get committed.
+  warn "⚠️  Skipping audits AND kernel propagation (--skip-audits flag)"
+fi
+
+# 2. App Loop (main, web-1)
+#
+# DECISION (nie usuwaj tego komentarza) — TRYB --only NIE DOTYKA REPO POZA ZAKRESEM:
+# submoduł, w który nie trafia żadna ścieżka, jest pomijany w CAŁOŚCI — bez `checkout
+# master`, bez commita i bez pusha. Trzy powody, każdy zmierzony: (1) `git add --
+# <pathspec>` na ścieżce nieistniejącej w tym repo kończy się kodem 128, a `utils.sh`
+# włącza `errexit`, więc literówka wywracała cały przebieg PO tym, jak pierwszy submoduł
+# został już wypchnięty — zostawiając wskaźnik roota bez commita; (2) samo `git push` w
+# nieruszanym repo publikuje lokalne commity RÓWNOLEGŁEJ sesji, której nikt o to nie
+# prosił; (3) `git checkout master` w cudzym repo w toku to ostatnia rzecz, jakiej chcesz.
+SUBMODULE_SHAS="$(mktemp)"
+trap 'rm -f "$SUBMODULE_SHAS"' EXIT
+
+for dir in "$ROOT_DIR"/*; do
+  if [ -d "$dir" ] && is_app_dir "$(basename "$dir")"; then
+    APP_NAME=$(basename "$dir")
+
+    REPO_PATHS=()
+    if [ "$MODE" = "only" ]; then
+      while IFS= read -r line; do [ -n "$line" ] && REPO_PATHS+=("$line"); done < <(paths_for_repo "$APP_NAME")
+      if [ ${#REPO_PATHS[@]} -eq 0 ]; then
+        info "Pomijam ${APP_NAME} — żadna ze ścieżek --only tu nie trafia"
+        continue
+      fi
+    fi
+
+    step "Pushing: ${BOLD}${APP_NAME}${RESET}"
+
+    (
+      cd "$dir"
+      info "Checkout master, Add, Commit, Push..."
+      # ABORT, nie warn: po nieudanym checkoucie leciał `git add -A` + commit + push
+      # NA BIEŻĄCYM branchu (detached HEAD, konflikt) — praca lądowała nie tam, gdzie
+      # trzeba, a skrypt meldował „Pushed".
+      git checkout master || { error "Checkout master failed w ${APP_NAME} — przerywam (inaczej commit poszedłby na inny branch)"; exit 1; }
+
+      if git status --porcelain | grep -qE "\.next/"; then
+        error "Refusing to commit .next build artifacts. Ensure .next/ is gitignored and removed from index (git rm -r --cached .next)."
+        exit 1
+      fi
+
+      if [ "$MODE" = "all" ]; then
+        safe_git_add "$dir"
+        COMMIT_MSG=$(generate_commit_msg "$dir" "$APP_NAME")
+        # `|| warn "Nothing to commit"` maskowało KAŻDY błąd commita — także odrzucenie
+        # przez hooki (commit-msg guard) — po czym push „udawał się" bez tej pracy.
+        # Pusty index to jedyny przypadek, w którym wolno iść dalej.
+        if git diff --cached --quiet; then
+          warn "Nothing to commit (${APP_NAME})"
+        else
+          SKIP_PRECOMMIT_AUDITS=1 git commit -m "$COMMIT_MSG" \
+            || { error "Commit w ${APP_NAME} ODRZUCONY (hook? pusty message?) — przerywam, żeby push nie zameldował sukcesu bez tej pracy"; exit 1; }
+        fi
+      else
+        warn_suspicious "$dir"
+        # DECISION (nie usuwaj tego komentarza) — `commit --only`, NIE `add` + `commit`:
+        # `git add -- <ścieżki>` tylko DOKŁADA do wspólnego indeksu, więc pliki, które
+        # zdążyła zastage'ować równoległa sesja, zostają w nim i wjeżdżają do mojego
+        # commita — czyli dokładnie ta kontaminacja, przed którą ten tryb ma chronić.
+        # `commit --only -- <ścieżki>` bierze stan z DRZEWA ROBOCZEGO wyłącznie dla
+        # wskazanych ścieżek i pomija resztę indeksu, a przy okazji jest atomowy pod
+        # blokadą `.git` (brak okna między `add` a `commit`, w które wciska się cudzy commit).
+        # DECISION (nie usuwaj tego komentarza) — NOWE PLIKI w zakresie: `commit --only`
+        # widzi wyłącznie ścieżki znane gitowi. Nieśledzony plik w śledzonym katalogu
+        # wypadał z commita PO CICHU (2026-09-14: import CSS bez samego pliku, repo
+        # po klonie się nie budowało), a katalog w całości nowy kończył się błędem
+        # „pathspec did not match". `add --intent-to-add` rejestruje w indeksie tylko
+        # PUSTE wpisy nowych plików z MOICH ścieżek, więc nie wciąga cudzego stage'u,
+        # a `commit --only` bierze ich treść z drzewa roboczego jak dla reszty.
+        git add --intent-to-add -- "${REPO_PATHS[@]}" \
+          || { error "Nie udało się zarejestrować nowych plików w ${APP_NAME} — przerywam"; exit 1; }
+        if git diff --quiet HEAD -- "${REPO_PATHS[@]}"; then
+          warn "Nothing to commit (${APP_NAME}) — wskazane ścieżki bez zmian"
+        else
+          COMMIT_MSG=$(generate_commit_msg "$dir" "$APP_NAME" "${REPO_PATHS[@]}")
+          SKIP_PRECOMMIT_AUDITS=1 git commit --only -m "$COMMIT_MSG" -- "${REPO_PATHS[@]}" \
+            || { error "Commit w ${APP_NAME} ODRZUCONY (hook? pusty message?) — przerywam, żeby push nie zameldował sukcesu bez tej pracy"; exit 1; }
+        fi
+      fi
+
+      git push || { error "Push failed for ${APP_NAME}"; exit 1; }
+      # SHA, który REALNIE poszedł na zdalne — root przypnie dokładnie ten, a nie to,
+      # co akurat będzie w HEAD submodułu, gdy dojdziemy do commita roota.
+      echo "${APP_NAME} $(git rev-parse HEAD)" >> "$SUBMODULE_SHAS"
+    ) || exit 1
+
+    success "Pushed ${APP_NAME}"
+  fi
+done
+
+# 3. Root Push
+step "Pushing Root & Subrepos"
+(
+  cd "$ROOT_DIR"
+  info "Committing root changes..."
+
+  if [ "$MODE" = "all" ]; then
+    safe_git_add "$ROOT_DIR"
+    ROOT_MSG=$(generate_commit_msg "$ROOT_DIR" "root")
+    if git diff --cached --quiet; then
+      warn "Nothing to commit (root)"
+    else
+      SKIP_PRECOMMIT_AUDITS=1 git commit -m "$ROOT_MSG" \
+        || { error "Commit roota ODRZUCONY (hook? pusty message?) — przerywam"; exit 1; }
+    fi
+    git push || { error "Root push failed"; exit 1; }
+  else
+    warn_suspicious "$ROOT_DIR"
+
+    ROOT_PATHS=()
+    while IFS= read -r line; do [ -n "$line" ] && ROOT_PATHS+=("$line"); done < <(paths_for_repo "")
+
+    # DECISION (nie usuwaj tego komentarza) — WSKAŹNIK SUBMODUŁU PRZYPINAMY PO SHA,
+    # KTÓRY REALNIE POSZEDŁ NA ZDALNE, i tylko dla submodułów wypchniętych w TYM
+    # przebiegu. Naiwne `git add -- main web-1` bierze to, co akurat jest w HEAD
+    # submodułu — a jeśli równoległa sesja scommitowała tam coś po drodze (i jeszcze
+    # nie wypchnęła), root zacząłby wskazywać SHA nieistniejący na zdalnym. To jest
+    # dokładnie klasa osieroconego wskaźnika, którą to repo ma już w historii.
+    # `update-index --cacheinfo 160000,<sha>,<ścieżka>` zapisuje gitlink wprost,
+    # bez czytania bieżącego stanu katalogu submodułu.
+    PINNED=0
+    if [ -s "$SUBMODULE_SHAS" ]; then
+      while read -r sub_name sub_sha; do
+        [ -z "$sub_name" ] && continue
+        git update-index --cacheinfo "160000,${sub_sha},${sub_name}" \
+          || { error "Nie udało się przypiąć wskaźnika ${sub_name} — przerywam, żeby root nie wskazał złego SHA"; exit 1; }
+        info "Wskaźnik ${sub_name} przypięty na ${sub_sha:0:8}"
+        PINNED=$((PINNED + 1))
+      done < "$SUBMODULE_SHAS"
+    fi
+
+    if [ ${#ROOT_PATHS[@]} -eq 0 ] && [ "$PINNED" -eq 0 ]; then
+      warn "Root poza zakresem --only i żaden submoduł nie ruszył — pomijam root"
+    else
+      # Ścieżki roota (jeśli są) + już przypięte gitlinki. `commit --only` z pathspec
+      # gitlinków zabrałoby stan z katalogu roboczego zamiast przypiętego SHA, więc
+      # tutaj commitujemy z INDEKSU — a index zawiera dokładnie to, co sami wpisaliśmy.
+      if [ ${#ROOT_PATHS[@]} -gt 0 ]; then
+        git add -- "${ROOT_PATHS[@]}" \
+          || { error "Nie udało się zastage'ować ścieżek roota — przerywam"; exit 1; }
+      fi
+      ROOT_MSG=$(generate_commit_msg "$ROOT_DIR" "root")
+      if git diff --cached --quiet; then
+        warn "Nothing to commit (root)"
+      else
+        SKIP_PRECOMMIT_AUDITS=1 git commit -m "$ROOT_MSG" \
+          || { error "Commit roota ODRZUCONY (hook? pusty message?) — przerywam"; exit 1; }
+      fi
+      git push || { error "Root push failed"; exit 1; }
+    fi
+  fi
+) || exit 1
+
+success "Git Push All Complete 🚀"
+exit 0

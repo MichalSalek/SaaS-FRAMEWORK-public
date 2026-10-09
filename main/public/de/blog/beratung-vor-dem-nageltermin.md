@@ -1,0 +1,95 @@
+# Beratung vor dem Nageltermin: Design vorher festlegen
+
+> Beratung im Nageldesign in fünf Schritten: welche Fragen Sie stellen, was in den Beratungsbogen gehört und wie das Design schon vor dem Termin feststeht.
+
+HTML-Version dieser Seite: https://nailfolio.app/de/blog/beratung-vor-dem-nageltermin/ | Veröffentlichungsdatum: 2026-09-23 | Kategorie: Anleitungen
+
+Die Kundin setzt sich, entsperrt ihr Handy und zeigt Ihnen ein Foto von Pinterest: lange Mandelnägel mit handgemalten Blüten. Ihre eigenen Nägel sind kurz und eckig, sie tippt den ganzen Tag am Laptop, und für den Termin ist eine Stunde eingeplant. Sie halten den Farbring in der einen Hand und scrollen mit der anderen durch Ihre Fotogalerie, auf der Suche nach etwas Ähnlichem. Bevor die erste Feile angesetzt ist, läuft der Termin schon hinterher.
+
+Eine gute **Beratung im Nageldesign** verhindert genau diese Szene, und das meiste davon lässt sich vor den Termin legen. Hier ist ein Ablauf in fünf Schritten, der mit einem Beratungsbogen aus Papier genauso funktioniert wie mit einer Notiz-App oder einem eigenen Tool.
+
+## Warum die Designwahl am Tisch so lange dauert
+
+Drei Dinge ziehen das Gespräch in die Länge:
+
+1. **Die Inspiration stammt aus fremden Arbeiten.** Pinterest und Instagram zeigen Nägel auf anderen Nagelbetten, in anderen Längen und mit anderen Techniken. Das Foto weckt eine Erwartung, die Sie danach mühsam zurechtrücken.
+2. **Niemand hat aufgeschrieben, was vereinbart war.** Das letzte Gespräch steckt irgendwo in Instagram-Nachrichten, in WhatsApp und in Ihrem Gedächtnis.
+3. **Die Entscheidung fällt erst auf dem Stuhl.** Jede Minute Scrollen fehlt dem Service selbst oder der nächsten Kundin.
+
+## Kundenberatung im Nagelstudio in fünf Schritten
+
+### 1. Zeigen Sie Ihre echten Arbeiten, sortiert wie Kundinnen denken
+
+Kundinnen denken nicht in Kalenderdaten. Sie denken in Farbe, Länge und Stil: „etwas Nude, aber kurz“, „eine French für die Hochzeit“. Die Fotogalerie im Handy und das Instagram-Raster sortieren nach Datum, also liegt das passende Design oft weit unten.
+
+Ordnen Sie Ihre besten Arbeiten so, dass man sie nach **Farbe, Länge und Stil** eingrenzen kann. Fotografieren Sie sie immer im gleichen Licht, damit die Farbe auf dem Bild der Farbe auf der Hand entspricht. Schon ein paar Alben mit Namen wie „kurz Nude“, „lang French“ und „Chrome“ sind ein großer Schritt weg vom Durcheinander in der Galerie.
+
+### 2. Lassen Sie die Kundin vor dem Termin wählen
+
+Schicken Sie Ihr Portfolio ein bis zwei Tage vor dem Termin und bitten Sie die Kundin, zwei oder drei Designs daraus auszusuchen, mit einem kurzen Satz zu jedem: „diese Farbe, aber kürzer“, „die Form gefällt mir, der Glitzer nicht“. So wird aus loser Nageldesign-Inspiration vor dem Termin eine klare Richtung, und Sie kennen sie, bevor die Kundin zur Tür hereinkommt.
+
+Bei Neukundinnen lohnt es sich, im selben Schritt den **Beratungsbogen** mitzuschicken. In vielen Studios heißt er auch Anamnesebogen und wird beim ersten Besuch ohnehin ausgefüllt. Zu Hause hat die Kundin Zeit dafür, und am Tisch bleiben Ihnen diese Minuten.
+
+### 3. Stellen Sie die Fragen, die das Ergebnis verändern
+
+Diese Fragen vor dem Nageltermin gehören in jede Erstberatung, bei Stammkundinnen reicht eine Auffrischung einmal im Jahr. Formuliert sind sie so, wie Sie sie der Kundin stellen:
+
+- Welche Länge und Form tragen Sie im Alltag, und was wünschen Sie sich diesmal?
+- Was machen Sie täglich mit den Händen: viel tippen, Sport, kleine Kinder, Kochen, Arbeit mit Wasser?
+- Hatten Sie schon einmal eine Reaktion auf Nagelprodukte, etwa Rötung oder Juckreiz?
+- Wie lange soll das Design bis zum nächsten Termin halten?
+- Wie wird es entfernt: hier bei mir, oder wechseln Sie die Technik?
+- Wie viel Zeit und welches Budget planen Sie für diesen Termin ein?
+- Welche Farben tragen Sie am liebsten, und welche nie?
+- Was hat Ihnen an der letzten Modellage nicht gefallen, hier oder woanders?
+- Gibt es einen Anlass, zu dem die Nägel perfekt aussehen sollen?
+
+Zur Frage nach Reaktionen ein Satz Hintergrund: Viele Gele und Acrylsysteme enthalten **Acrylate wie HEMA**, und manche Menschen reagieren darauf, zum Beispiel mit Rötung, Juckreiz oder Schwellung rund um den Nagel. Ob es sich um eine Allergie handelt, klärt eine Hautärztin. Ihre Aufgabe ist, nachzufragen und die Antwort im Beratungsbogen festzuhalten.
+
+![French-Maniküre mit grünen Spitzen auf grünem Satin](/img/lp/portfolio/nail-42-medium-sage-micro-french.webp)
+
+### 4. Sagen Sie klar, was auf ihren Nägeln möglich ist
+
+Diesen Schritt lassen viele aus, weil er sich unangenehm anfühlt. Werden Sie konkret: was Länge und Form ihrer Nägel hergeben, wie lange eine Technik dauert und was bei ihrem Alltag nicht hält. Zeigen Sie danach die nächstliegende Variante **aus Ihren eigenen Arbeiten**, damit die Kundin ein echtes Ergebnis sieht statt eines Versprechens.
+
+### 5. Halten Sie fest, was vereinbart und was gemacht wurde
+
+Fotografieren Sie nach dem Termin das fertige Design und notieren Sie eine Zeile dazu: Farbe, Produkt, Form und was die Kundin nebenbei erwähnt hat. Beim nächsten Besuch beginnt die Beratung an dieser Stelle und nicht bei null, und die Kundin merkt, dass Sie sich an sie erinnern.
+
+## Wenn die Kundin ein Pinterest-Foto mitbringt
+
+Ein kurzer Leitfaden hilft, denn das Ziel ist, ihre Begeisterung zu behalten und auf etwas Machbares zu lenken. Zum Beispiel so:
+
+„Die Farbe ist wunderschön, und die Blüten gefallen mir auch. Auf Ihrer Nagellänge wirkt die lange Mandelform allerdings nicht wie auf dem Foto. Schauen Sie mal, das hier habe ich auf kurzen Nägeln gemacht, mit fast derselben Farbe. Wir können das machen, oder wir bleiben bei Ihrer Länge und gehen einen Ton heller. Was gefällt Ihnen besser?“
+
+Der Leitfaden nennt, was ihr gefällt, erklärt die Grenze in einem Satz und bietet zwei konkrete Möglichkeiten aus Ihren Arbeiten. Meist ist das Scrollen damit beendet, und die Kundin entscheidet zwischen zwei Dingen, die Sie wirklich liefern können.
+
+## Werkzeuge, die helfen
+
+Für den Anfang reichen ein Beratungsbogen aus Papier und eine Notiz-App im Handy. Wenn Sie die Schritte oben an einem Ort haben möchten, passt [Nailfolio](/de/for-stylists) genau an drei Stellen:
+
+- **Schritt 1:** Jedes Design in Ihrer Galerie hat eine Farbe, einen Stil und eine Länge. Die Kundin filtert Ihre Arbeiten nach allen drei gleichzeitig und sieht nur, was zu ihrer Vorstellung passt.
+- **Schritt 2:** Ein dauerhafter QR-Code an Ihrem Arbeitsplatz öffnet Ihr öffentliches Profil. Die Kundin meldet sich ohne Passwort an und sendet eine Verbindungsanfrage, Sie nehmen sie mit einem Tippen an. Vor dem Termin schickt sie Ihnen eine **Inspirationssitzung** mit ihrer Auswahl und einer Notiz zu jedem Foto; nach dem Senden bleibt sie 7 Tage verfügbar.
+- **Schritt 5:** Details klären Sie in den Nachrichten, und die Kundinnenkarte hält fest, was sie gewählt hat, was Sie vereinbart haben und wann sie zuletzt da war.
+
+Nailfolio bucht keine Termine, Ihr Buchungstool oder Terminkalender bleibt also, wo er ist. Welche Buchungs-Apps sich dafür eignen und was sie kosten, lesen Sie im [ehrlichen Vergleich der Apps für Nageldesignerinnen](/de/blog/nagelstudio-apps-vergleich-2026/).
+
+## Häufige Fragen
+
+### Wie lange dauert eine Beratung?
+
+Bei einer Neukundin ist das Ziel, das Design zu klären, bevor sie sich setzt. Der Teil am Tisch besteht dann aus einem Blick auf ihre Nägel und der Bestätigung der Wahl, also aus wenigen Minuten. Hat die Kundin ihre Auswahl und den Beratungsbogen vorher geschickt, reicht das in der Regel.
+
+### Was gehört in einen Beratungsbogen?
+
+Name und Kontakt, Länge und Form der Nägel, Allergien und frühere Reaktionen auf Produkte, Tätigkeiten im Alltag, die die Haltbarkeit beeinflussen, Lieblingsfarben und Farben, die sie nie trägt. Dazu das gewählte Design mit Notizen und nach dem Termin eine Zeile dazu, was Sie gemacht und welche Produkte Sie verwendet haben.
+
+### Soll ich die Beratung berechnen?
+
+Das entscheiden Sie. Manche Nageldesignerinnen rechnen die Beratung in den Preis des Termins ein, weil sie zu guter Arbeit dazugehört. Andere berechnen lange Beratungen oder eigene Designtermine, aus denen keine Buchung wird. Wie auch immer Sie es handhaben: Sagen Sie es der Kundin vorher.
+
+### Wie verhindere ich, dass die Kundin sich am Tisch umentscheidet?
+
+Halten Sie das Design vor dem Termin schriftlich fest und greifen Sie es auf, sobald sie sitzt: „Wir hatten Rosé-Chrome auf kurzen Mandelnägeln besprochen, passt das noch?“ Eine Änderung ist dann eine bewusste Entscheidung und keine neue Runde Scrollen.
+
+Wenn Ihre Kundinnen mit einem Design aus Ihren eigenen Arbeiten zum Termin kommen sollen, [starten Sie kostenlos](/de/for-stylists): Der Free-Plan steht sofort bereit, ohne Karte. Wenn Ihre Galerie wächst, testen Sie Pro 30 Tage gratis.

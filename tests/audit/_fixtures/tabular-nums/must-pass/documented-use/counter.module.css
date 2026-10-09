@@ -1,0 +1,4 @@
+.counter {
+  /* tnum-allow: live character counter while typing; digits and a slash */
+  font-variant-numeric: tabular-nums;
+}

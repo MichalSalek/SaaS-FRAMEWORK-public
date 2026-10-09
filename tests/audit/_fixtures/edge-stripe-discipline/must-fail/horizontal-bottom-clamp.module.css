@@ -1,0 +1,10 @@
+/* Wysokość z clamp() i pasek przy DOLNEJ krawędzi — dokładnie tak były
+   zapisane paski „printed edge" (clamp(3px, 0.5vw, 5px)), więc obie gałęzie
+   muszą mieć własną próbkę. */
+.statusCard::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(3px, 0.5vw, 5px);
+  background: var(--color-primary);
+}

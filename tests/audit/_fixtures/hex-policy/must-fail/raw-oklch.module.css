@@ -1,0 +1,5 @@
+/* Surowy literal oklch poza systemem tokenow — do S109 ten straznik
+   pilnowal wylacznie zapisu #hex i takiego koloru NIE WIDZIAL. */
+.rawOklchFill {
+  background: oklch(78% 0.17 85);
+}

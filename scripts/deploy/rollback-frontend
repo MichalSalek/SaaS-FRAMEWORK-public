@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+# scripts/deploy/rollback-frontend
+
+# 1. Source Utils + SSOT config
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/deploy.config.sh"
+source "${SCRIPT_DIR}/_pm2-remote.sh"
+source "${SCRIPT_DIR}/_static-gate.sh"
+source "${SCRIPT_DIR}/_artifact-gate.sh"
+
+# 2. Argument Parsing (ENV_NAME override vs Release ID)
+CONFIRM_YES=false
+ARGS=()
+
+for a in "$@"; do
+  case "$a" in
+    -y|--yes) CONFIRM_YES=true ;;
+    *) ARGS+=("$a") ;;
+  esac
+done
+set -- "${ARGS[@]}"
+
+# If ENV_NAME is not set, try to take it from the first argument if it's not a number
+if [[ -z "${ENV_NAME:-}" ]] && [[ $# -ge 1 ]] && [[ ! "$1" =~ ^[0-9]+$ ]]; then
+  ENV_NAME="$1"
+  shift
+fi
+
+# 3. Validation + rozwiazanie celu z config (SSOT: DOMAIN, PORT, SSH)
+check_required_vars "ENV_NAME"
+resolve_frontend_target "$ENV_NAME" || exit 1
+
+SSH_USER="${DEPLOY_SSH_USER}"
+SSH_HOST="${DEPLOY_SSH_HOST}"
+SSH_CONN="${SSH_USER}@${SSH_HOST}"
+
+# 4. Banner
+header "ROLLBACK FRONTEND" "⏪"
+info "Environment: ${BOLD}${ENV_NAME}${RESET}"
+info "Domain:      ${BOLD}${DOMAIN}${RESET}"
+info "Host:        ${BOLD}${SSH_CONN}${RESET}"
+echo ""
+
+# ==============================================================================
+# PHASE 1: FETCH RELEASES
+# ==============================================================================
+step "PHASE 1: FETCH RELEASES"
+
+info "Connecting to remote..."
+mapfile -t RELEASES < <(ssh -o BatchMode=yes "${SSH_CONN}" "ls -1t ${DEPLOY_REMOTE_BASE}/${DOMAIN}/releases 2>/dev/null | grep -v 'tmp.' || true")
+
+if [ "${#RELEASES[@]}" -eq 0 ]; then
+  error "No releases found in ${DEPLOY_REMOTE_BASE}/${DOMAIN}/releases"
+  exit 3
+fi
+
+# ==============================================================================
+# PHASE 2: SELECTION
+# ==============================================================================
+step "PHASE 2: SELECT RELEASE"
+
+SELECTED=""
+
+# If ID/Tag passed as argument
+if [ $# -ge 1 ]; then
+  ARG="$1"
+  if [[ "$ARG" =~ ^[0-9]+$ ]]; then
+    ID="$ARG"
+    if [ "$ID" -ge 1 ] && [ "$ID" -le "${#RELEASES[@]}" ]; then
+      SELECTED="${RELEASES[$((ID-1))]}"
+    fi
+  else
+    SELECTED="$ARG"
+  fi
+else
+  echo -e "${CYAN}Available releases:${RESET}"
+  I=1
+  for R in "${RELEASES[@]}"; do
+    echo -e "  ${BOLD}${I})${RESET} ${R}"
+    ((I++))
+  done
+  echo ""
+  
+  read -rp "$(echo -e "${YELLOW}Choose release to rollback to (1-${#RELEASES[@]}): ${RESET}")" CHOICE
+  if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -ge 1 ] && [ "$CHOICE" -le "${#RELEASES[@]}" ]; then
+    SELECTED="${RELEASES[$((CHOICE-1))]}"
+  fi
+fi
+
+if [ -z "${SELECTED}" ]; then 
+  error "Invalid selection or release not found."
+  exit 4
+fi
+
+# Anty-injection (spar #6): SELECTED MUSI byc realnym release z listy — trafia do remote shell przez SSH.
+FOUND=0
+for R in "${RELEASES[@]}"; do [ "$R" = "${SELECTED}" ] && { FOUND=1; break; }; done
+if [ "$FOUND" != "1" ]; then
+  error "Release '${SELECTED}' nie istnieje w releases/ — odrzucony (ochrona przed remote-injection)."
+  exit 4
+fi
+
+info "Selected Target: ${BOLD}${SELECTED}${RESET}"
+
+if [ "${CONFIRM_YES}" = false ]; then
+  confirm "Are you sure you want to rollback to ${SELECTED}?"
+fi
+
+# ==============================================================================
+# PHASE 3: ROLLBACK
+# ==============================================================================
+step "PHASE 3: EXECUTE ROLLBACK"
+
+PM2_COMMANDS=$(pm2_remote_block "frontend-${DOMAIN}" "${PORT}" "${DOMAIN}" "${DEPLOY_NODE_INTERPRETER}")
+
+ssh "${SSH_CONN}" "
+  set -e
+  export PATH=\$HOME/bin:\$HOME/.npm-global/bin:\$PATH
+
+  DOMAIN_ROOT=\"${DEPLOY_REMOTE_BASE}/${DOMAIN}\"
+  cd \$HOME/\${DOMAIN_ROOT}
+
+  if [ ! -d \"releases/${SELECTED}\" ]; then
+    echo \"Error: Release directory not found: releases/${SELECTED}\" >&2
+    exit 5
+  fi
+
+  # Atomic switch
+  rm -f current.old
+  if [ -L current ]; then
+    mv current current.old
+  elif [ -d current ]; then
+    mv current current.bak_rollback_\$(date +%s)
+  fi
+
+  ln -s releases/${SELECTED} current
+
+  cd \$HOME/\${DOMAIN_ROOT}/current
+${PM2_COMMANDS}
+" || { error "Remote rollback failed"; exit 6; }
+
+# ==============================================================================
+# PHASE 4: HEALTH GATE (rollback tez moze wstac z bledem: EPERM/port/brak server.js)
+# ==============================================================================
+step "PHASE 4: HEALTH GATE"
+HEALTH_URL="https://${DOMAIN}/"
+# Petla sondujaca = wspolna `assert_http_ok` z utils.sh (te same 15 prob co 3 s).
+if ! assert_http_ok "${HEALTH_URL}" 15 3; then
+  error "HEALTH GATE FAIL po rollbacku: ${HEALTH_URL} != 200 (rollback wstal z bledem)."
+  error "Diagnostyka: ssh ${SSH_CONN} \"pm2 logs frontend-${DOMAIN} --lines 30 --nostream\""
+  exit 10
+fi
+
+# Statyki: rollback wraca do release'u, ktory mogl byc zbudowany feralnym skryptem
+# (zagniezdzone public/public) — samo "HTML wstal" nie znaczy, ze strona dziala.
+if ! assert_static_served "${DOMAIN}"; then
+  error "Rollback WYKONANY (symlink przepiety, HTML 200), ale public/ nie serwuje — TEN release tez ma wade."
+  error "Wybierz inny release: npm run rollback:frontend:${ENV_NAME}  (lista pokaze pozostale)"
+  exit 11
+fi
+
+# Tozsamosc artefaktu: rollback bez przeladowanego pm2 zostawia STARY proces na porcie,
+# a "HTML 200" wyglada wtedy identycznie jak sukces. Oczekiwany BUILD_ID czytamy z
+# release'u, na ktory wlasnie przepielismy symlink (SELECTED jest zwalidowany wyzej
+# wzgledem listy releases — do zdalnego shella nie trafia nic spoza niej).
+TARGET_BUILD_ID="$(ssh -o BatchMode=yes "${SSH_CONN}" "cat ${DEPLOY_REMOTE_BASE}/${DOMAIN}/releases/${SELECTED}/.next/BUILD_ID 2>/dev/null" 2>/dev/null || true)"
+if ! assert_artifact_served "${SSH_CONN}" "${PORT}" "${DOMAIN}" "${TARGET_BUILD_ID:-unknown}"; then
+  error "Rollback WYKONANY, ale serwowany jest INNY artefakt niz release ${SELECTED} — pm2 nie przeladowal sie."
+  error "Diagnostyka: ssh ${SSH_CONN} \"pm2 logs frontend-${DOMAIN} --lines 30 --nostream\""
+  exit 14
+fi
+
+success "Rollback to ${BOLD}${SELECTED}${RESET} successful! 🚀"
+exit 0

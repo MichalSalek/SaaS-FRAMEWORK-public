@@ -1,0 +1,159 @@
+/* ─── TrustStatsSection — kanon home (głos S21 „2C"), wizual 1:1 ───
+ * Eyebrow + body na jasnym tle banda, ink-karta liczb (StatsBand ink-card),
+ * badges z kropkami-separatorami. Karta STATYCZNA — zero hover (floor §4). */
+
+.section {
+  /* Dense beat — kompresja sygnalizuje „twarde fakty" (kanon home). */
+  --section-pad-block: clamp(44px, 5.5vw, 80px);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 40px);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.5vw, 18px);
+}
+
+.headKicker {
+  margin: 0;
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  letter-spacing: var(--ls-tight-5);
+  color: var(--color-text-primary);
+  max-width: 60ch;
+  text-wrap: pretty;
+  margin: 0;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-24);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.badges li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: var(--ls-wide-10);
+  opacity: 0.85;
+}
+
+/* DECISION (nie usuwaj tego komentarza) — owner 2026-10-08: kropka środkowa
+ * jako separator jest zakazana w całym produkcie. Do S126 stała tu między
+ * badge'ami jako pseudoelement. Każdy badge ma własną ikonę, więc granicę
+ * wyznacza ikona i szerszy odstęp kolumn (strażnik: audit:copy-dashes). */
+
+.badges li svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.benefitExamples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: var(--space-16);
+}
+.useCase {
+  padding: var(--space-24);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-text-primary) 24%, var(--color-bg-main));
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+}
+.useCase h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-heading);
+  margin: 0 0 var(--space-12);
+  color: var(--color-text-primary);
+}
+.useCase p {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.examplesSection {
+  /* tint-allow: Owner 2026-10-08 requested a contrasting solid burgundy
+     negative between LP bands. This is an ink surface, not a cream wash. */
+  background: color-mix(in oklch, var(--color-ink) 80%, var(--color-primary));
+  color: var(--color-on-ink);
+}
+
+.headLayout {
+  display: grid;
+  align-items: center;
+  gap: var(--space-32);
+}
+
+.headKicker {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-3xl);
+  line-height: 1.08;
+  letter-spacing: var(--letter-spacing-heading);
+  max-width: 20ch;
+}
+
+.examplesSection .body,
+.examplesSection .badges li {
+  color: var(--color-on-ink);
+}
+
+.examplesSection .badges li svg {
+  color: var(--color-accent-on-ink);
+}
+
+.exampleIllustration {
+  --illustration-frame: var(--color-on-ink);
+  margin-block: 0;
+}
+
+.examplesSection .useCase {
+  background: var(--color-bg-paper);
+  padding: var(--space-32);
+}
+
+.exampleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-48);
+  height: var(--space-48);
+  margin-bottom: var(--space-24);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  color: var(--color-accent-fg);
+}
+
+.exampleIcon svg {
+  width: var(--space-24);
+  height: var(--space-24);
+}
+
+@media (min-width: 1024px) {
+  .headLayout {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: var(--space-48);
+  }
+}

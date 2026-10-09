@@ -1,0 +1,10 @@
+/* Drabina lokalna zbudowana na SUROWEJ funkcji koloru, nie na color-mix:
+   gałąź `rawColorTint` w rozpoznawaniu zmiennych modułu nie miała ani jednej
+   próbki, więc jej wyłączenie przechodziło bez śladu. */
+.page {
+  --wash-raw: rgba(212, 168, 64, 0.12);
+}
+
+.introCard {
+  background: var(--wash-raw);
+}

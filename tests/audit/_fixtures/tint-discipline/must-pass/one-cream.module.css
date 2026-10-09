@@ -1,0 +1,8 @@
+/* Jeden pas kremu na stronę — legalny. */
+.benefitsBand {
+  background: var(--color-bg-subtle);
+}
+
+.rest {
+  background: var(--color-bg-main);
+}

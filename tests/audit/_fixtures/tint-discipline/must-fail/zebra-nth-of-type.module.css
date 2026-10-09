@@ -1,0 +1,9 @@
+/* Zebra zapisana przez nth-of-type / nth-last-child — skan łapał tylko
+   nth-child, więc alternacja przechodziła pod innym zapisem tego samego. */
+.row:nth-of-type(even) {
+  background: var(--color-surface-input);
+}
+
+.cell:nth-last-child(2n) {
+  background: var(--color-surface-hover);
+}

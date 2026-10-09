@@ -1,0 +1,11 @@
+/* tint-allow: jeden pas kremu rozcięty hairlinem — oba panele MUSZĄ mieć ten
+   sam tint, żeby szczelina 1px czytała się jako linia, a nie jako prześwit. */
+@media (min-width: 768px) {
+  .splitLeft {
+    background: color-mix(in oklch, var(--color-primary) 7%, var(--color-bg-main));
+  }
+
+  .splitRight {
+    background: color-mix(in oklch, var(--color-primary) 7%, var(--color-bg-main));
+  }
+}

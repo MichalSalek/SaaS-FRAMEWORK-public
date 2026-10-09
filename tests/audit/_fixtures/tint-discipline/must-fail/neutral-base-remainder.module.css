@@ -1,0 +1,7 @@
+/* Złoto jako reszta mieszania z tokenem NEUTRALNYM spoza szóstki
+   color-(bg|surface|paper|elevated|ink|on-ink). Test bazy pytał o tę szóstkę,
+   więc --color-border uchodził za „drugi akcent” i cała deklaracja wychodziła
+   ze skanu jako mieszanina akcentów, choć maluje 8% złota. */
+.viaBorderToken {
+  background: color-mix(in oklch, var(--color-border) 92%, var(--color-primary));
+}

@@ -1,0 +1,5 @@
+/* --color-accent i --color-cta to w palettes.css DOSŁOWNE aliasy
+   --color-primary (var(--color-primary)), więc tint przez nie to ten sam tint. */
+.viaAccent {
+  background: color-mix(in oklch, var(--color-accent) 14%, transparent);
+}

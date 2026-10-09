@@ -1,0 +1,235 @@
+#!/bin/bash
+# Pre-push hook — SSOT tracked in scripts/hooks/
+# Installed by: npm run system:install-hooks
+#
+# LUKA, KTÓRĄ ZAMYKA (S98):
+#   Cała bramka jakości tego repo wisiała na dwóch rzeczach — pre-commit
+#   (podzbiór audytów dobrany do plików w commicie) i `npm run git:push`
+#   (pełny run-all). Zwykły `git push origin master`, czyli dokładnie to, czego
+#   używa się przy równoległych sesjach zamiast sweepującego git:push, NIE
+#   uruchamiał ANI JEDNEGO audytu. Do tego commity robione z --no-verify
+#   (legalne, gdy hook zamiata cudze pliki) nie miały już żadnej bramki
+#   za sobą. Ten hook jest ostatnią linią: pełny run-all przed wysłaniem.
+#
+# KOSZT: audyty ~17 s (lecą równolegle w run-all) + tsc ~3 s, ESLint na
+#   pushowanym diffie (sekundy) i Vitest ~6 s na workspace — patrz sekcja
+#   „Bramki poza audytami" niżej. Rząd wielkości dla pojedynczego submodułu: ~30 s.
+#
+# CO TA BRAMKA REALNIE SPRAWDZA: audyty skanują WORKING TREE, nie commity, które
+#   właśnie lecą na zdalne. W repo z równoległymi sesjami znaczy to, że cudza
+#   praca w toku potrafi zablokować Twój czysty push. To świadomy kompromis:
+#   audyt pushowanego drzewa wymagałby checkoutu do osobnego katalogu, a w tym
+#   projekcie worktree i stash są zakazane. Gdy bramka zatrzyma Cię na pliku,
+#   którego nie tknąłeś: NIE sięgaj po --no-verify, tylko uruchom `npm run
+#   audit:all` jeszcze raz. Znikający-w-trakcie-skanu plik (zapis atomowy innej
+#   sesji) daje przelotny czerwony wynik, który przy powtórce nie wraca.
+#
+# DELEGACJA DO SSOT: .git/hooks/pre-push to KOPIA (install-hooks robi cp).
+#   Gdy kopia zdryfuje od pliku w repo, exec-ujemy wersję z repo — inaczej
+#   egzekwowana jest zamrożona kopia sprzed zmian (klasa błędu znaleziona
+#   w pre-commit: hook nie uruchamiał ratchetów dodanych po instalacji).
+#
+# SKIP: SKIP_PRECOMMIT_AUDITS=1 — tę samą zmienną ustawia `npm run git:push`,
+#   który audyty odpalił już sam. Bez własnej flagi: jedna zmienna = jedna
+#   decyzja („audyty w tym przebiegu już były"), zero rozjazdu nazw.
+#
+# SUBMODUŁY: main/ i web-1/ mają własne .git, ale audyty żyją w ROOCIE i to
+#   one skanują ich src/. Hook jest ten sam; root wykrywamy po strukturze.
+
+set -u
+
+# ── Delegacja do SSOT — MUSI BYĆ PIERWSZA ─────────────────────────────────
+# .git/hooks/pre-push to KOPIA (install-hooks robi `cp`). Wszystko, co stoi
+# PRZED delegacją, wykonuje się z ZAMROŻONEJ kopii, więc każda przyszła zmiana
+# w tych blokach jest martwa do ręcznego `npm run system:install-hooks` — a to
+# jest dokładnie ta klasa dryfu, dla której delegację w ogóle dodano (root
+# pre-commit ma ją z tego powodu na samej górze). `exec` DZIEDZICZY stdin,
+# więc lista refów od gita dociera do wersji z repo nietknięta; dlatego
+# parsowanie stdin musi być PO delegacji, nie przed.
+TOPLEVEL="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+
+# Submoduł (main/ | web-1/) → audyty leżą piętro wyżej.
+PROJECT_ROOT="$TOPLEVEL"
+if [ ! -d "$TOPLEVEL/tests/audit" ] && [ -d "$TOPLEVEL/../tests/audit" ]; then
+  PROJECT_ROOT="$(cd "$TOPLEVEL/.." && pwd)"
+fi
+
+SSOT="$PROJECT_ROOT/scripts/hooks/pre-push"
+if [ -f "$SSOT" ] && ! cmp -s "$SSOT" "$0"; then
+  echo "  pre-push: hook zdryfował od repo — uruchamiam wersję z repo"
+  exec bash "$SSOT" "$@"
+fi
+
+# ── Refy, których push niczego w kodzie nie zmienia ────────────────────────
+# Git podaje na stdin wiersze `<local ref> <local sha> <remote ref> <remote sha>`;
+# lokalne sha z samych zer oznacza „skasuj ten ref". Gdy WSZYSTKIE wiersze są
+# takie, wychodzimy zerem. Push nowej gałęzi ma zerowe sha po stronie REMOTE,
+# nie lokalnej, więc nadal przechodzi przez audyty (i dobrze: to pierwszy raz,
+# kiedy ten kod opuszcza maszynę). TAGI świadomie NIE są zwolnione: tag potrafi
+# wskazywać commit, którego na zdalnym jeszcze nie ma, więc byłaby to furtka.
+# Brak stdin (ręczne uruchomienie hooka) = pełny pakiet.
+only_deletions=1
+saw_ref=0
+# Zakres do lintu: bierzemy go z TYCH SAMYCH refów, które i tak parsujemy.
+# `PUSH_RANGE` opisuje wyłącznie commity, które właśnie opuszczają maszynę —
+# uzasadnienie przy bramce ESLinta niżej.
+PUSH_RANGE=""
+# `[ ! -t 0 ]`: przy ręcznym uruchomieniu hooka stdin jest terminalem i `read`
+# zawiesiłby skrypt w oczekiwaniu na wpisanie refów.
+if [ ! -t 0 ]; then
+  while read -r _local_ref local_sha _remote_ref remote_sha; do
+    [ -z "${local_sha:-}" ] && continue
+    saw_ref=1
+    case "$local_sha" in
+      *[!0]*) only_deletions=0 ;;
+    esac
+    # Nowa gałąź ma zdalne sha z samych zer — nie ma wtedy sensownej bazy do
+    # porównania, więc zostawiamy zakres pusty i lint leci po całym drzewie.
+    case "${remote_sha:-}" in
+      ""|*[!0]*) [ -n "${remote_sha:-}" ] && PUSH_RANGE="${remote_sha}..${local_sha}" ;;
+    esac
+  done
+fi
+if [ "$saw_ref" = "1" ] && [ "$only_deletions" = "1" ]; then
+  echo "  pre-push: same usunięcia refów, nic do zaudytowania"
+  exit 0
+fi
+
+if [ "${SKIP_PRECOMMIT_AUDITS:-}" = "1" ]; then
+  echo "  pre-push: audyty już przeszły w tym przebiegu — pomijam"
+  exit 0
+fi
+
+RUN_ALL="$PROJECT_ROOT/tests/audit/run-all.sh"
+# FAIL-LOUD, nie fail-open. Wcześniej stało tu `|| exit 0`, czyli zniknięcie albo
+# przemianowanie run-all.sh przepuszczało push W CISZY — a to jest bramka
+# OSTATNIEJ instancji, jedyna stojąca za commitami robionymi z --no-verify.
+# Bramka, która po cichu znika, jest gorsza niż jej brak: brak widać, ciszę nie.
+if [ ! -f "$RUN_ALL" ]; then
+  echo ""
+  echo "  PUSH BLOCKED: nie znalazłem pakietu audytów."
+  echo "    Szukałem: $RUN_ALL"
+  echo "    To bramka ostatniej instancji, więc jej brak nie jest cichy."
+  echo "    Napraw instalację (npm run system:install-hooks) albo pushuj"
+  echo "    świadomie z SKIP_PRECOMMIT_AUDITS=1, jeśli wiesz, co robisz."
+  echo ""
+  exit 1
+fi
+
+# ── Bramki poza audytami: tsc, ESLint na pushowanym diffie, Vitest ─────────
+# LUKA, KTÓRĄ ZAMYKAJĄ (S102): ten hook był JEDYNĄ bramką gołego `git push`,
+# a odpalał wyłącznie audyty. Skutek zmierzony: dwa błędy ESLinta
+# (`strict-boolean-expressions` w HeroCountPill, prettier w StylistExhibitHero)
+# weszły na master właśnie tędy, przy czystym `tsc`. Osobno: 2308 testów Vitest
+# nie stało w ŻADNEJ lokalnej bramce — chodziły dopiero w CI i przy deployu,
+# czyli dowiadywałeś się o czerwonej suicie po fakcie.
+#
+# DLACZEGO LINT NA DIFFIE, A NIE NA DRZEWIE: nagłówek tego pliku tłumaczy, że
+# audyty skanują working tree, więc cudza praca w toku potrafi zablokować czysty
+# push. Powielanie tego na ESLincie byłoby gorsze (lint jest znacznie bardziej
+# czuły niż audyty), a przy 62 s na pełnym przebiegu jeszcze i drogie. Diff
+# pushowanych commitów opisuje dokładnie to, za co odpowiadasz TY w tym pushu:
+# jest celny i kosztuje sekundy. Bez zakresu (nowa gałąź, ręczne odpalenie)
+# lintujemy całość — lepiej raz zapłacić minutę niż przepuścić pierwszy push.
+#
+# Vitest leci w całości: testy nie mapują się na zmienione pliki (zmiana w
+# resolverze wywraca test handlera), a obie suity zamykają się w ~6 s każda.
+# `run_gate_in` uruchamia bramkę w KATALOGU workspace'u i z wyczyszczonym
+# środowiskiem gita (GIT_DIR odziedziczone po pushu z submodułu kieruje
+# narzędzia na `.git/modules/<sub>` — ta sama pułapka, którą niżej neutralizuje
+# wywołanie run-all). Argumenty idą tablicą, NIE przez `bash -c "... $FILES"`:
+# wieloliniowa lista nazw wstawiona do stringa rozpada się na osobne polecenia
+# powłoki i druga nazwa pliku wykonuje się jak komenda („Permission denied"
+# zamiast wyniku lintu — złapane teeth-testem tego hooka).
+run_gate_in() {
+  local dir="$1" label="$2"; shift 2
+  if ! ( cd "$dir" && env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE "$@" ) > "/tmp/prepush_gate_$$" 2>&1; then
+    echo ""
+    echo "  PUSH BLOCKED: $label"
+    echo ""
+    tail -30 "/tmp/prepush_gate_$$" | sed 's/^/    /'
+    echo ""
+    rm -f "/tmp/prepush_gate_$$"
+    exit 1
+  fi
+  rm -f "/tmp/prepush_gate_$$"
+}
+
+# Które workspace'y mają w tym pushu jakikolwiek kod do sprawdzenia. Push
+# z submodułu dotyczy tylko jego; push z roota bumpuje wskaźniki obu, więc
+# sprawdzamy oba (kod submodułu jest wtedy tym, co realnie pojedzie na prod).
+SUB="$(basename "$TOPLEVEL")"
+if [ "$TOPLEVEL" != "$PROJECT_ROOT" ] && { [ "$SUB" = "main" ] || [ "$SUB" = "web-1" ]; }; then
+  WORKSPACES="$SUB"
+else
+  WORKSPACES="main web-1"
+fi
+
+for ws in $WORKSPACES; do
+  WS_DIR="$PROJECT_ROOT/$ws"
+  [ -d "$WS_DIR/node_modules" ] || {
+    echo "  pre-push: $ws bez node_modules — pomijam tsc/lint/testy tego workspace'u"
+    continue
+  }
+
+  echo "  pre-push: $ws — typecheck..."
+  run_gate_in "$WS_DIR" "tsc nie przeszedł w $ws." npx --no-install tsc --noEmit
+
+  # ESLint tylko na plikach, które ten push wnosi do tego workspace'u.
+  # Push Z ROOTA świadomie NIE lintuje: bumpuje wskaźniki submodułów, a te
+  # commity musiały wcześniej pojechać własnym pushem (inaczej zdalne odrzuci
+  # referencję do nieistniejącego obiektu) — czyli ich pliki już przez lint
+  # przeszły. Lintowanie ich drugi raz kosztowałoby ~62 s za zero informacji.
+  LINT_ARR=()
+  if [ -n "$PUSH_RANGE" ] && [ "$TOPLEVEL" != "$PROJECT_ROOT" ]; then
+    while IFS= read -r f; do
+      # Plik skasowany w późniejszym commicie zakresu nadal siedzi w liście nazw.
+      [ -n "$f" ] && [ -f "$TOPLEVEL/$f" ] && LINT_ARR+=("$f")
+    done <<< "$(git diff --name-only --diff-filter=ACMR "$PUSH_RANGE" -- '*.ts' '*.tsx' 2>/dev/null || true)"
+  fi
+
+  if [ "${#LINT_ARR[@]}" -gt 0 ]; then
+    echo "  pre-push: $ws — ESLint (${#LINT_ARR[@]} plików z tego pusha)..."
+    run_gate_in "$WS_DIR" "ESLint odrzucił pliki z tego pusha ($ws)." \
+      npx --no-install eslint --max-warnings 0 --no-warn-ignored "${LINT_ARR[@]}"
+  elif [ -z "$PUSH_RANGE" ]; then
+    echo "  pre-push: $ws — ESLint (brak zakresu, całość)..."
+    run_gate_in "$WS_DIR" "ESLint nie przeszedł w $ws." npx --no-install eslint --max-warnings 0 .
+  fi
+
+  echo "  pre-push: $ws — Vitest..."
+  run_gate_in "$WS_DIR" "Testy jednostkowe nie przeszły w $ws." npx --no-install vitest run --reporter=dot
+done
+
+echo "  pre-push: pełny pakiet audytów (run-all)..."
+
+# CWD, NIE tylko ścieżka do run-all: audyty adresują pliki względem katalogu
+# bieżącego (`./main/src`, `./.shared-kernel`). Push z submodułu (main/ | web-1/)
+# zostawiał CWD w submodule, więc duża część audytów zgłaszała „plik nie istnieje",
+# a bramka blokowała czysty commit i uczyła obchodzenia jej flagą. Wykryty
+# PROJECT_ROOT musi więc stać się katalogiem roboczym, a nie samym prefiksem.
+# cd DOPIERO TU, po delegacji do SSOT wyżej: `exec` nie zmienia CWD, więc
+# przeniesienie tej linii wyżej odpaliłoby wersję z repo już w kontekście roota.
+cd "$PROJECT_ROOT" || exit 1
+
+# `GIT_DIR` odziedziczone po pushu z submodulu wskazuje `.git/modules/<sub>`, wiec
+# audyty rozwiazuja root NA SUBMODUL: zmierzone w swiezym klonie — z 101 audytow
+# 47 czerwonych, a 54 ZIELONE nad nieistniejacym drzewem
+# („No main/src — nothing to scan", „Scanning 0 CSS module(s) ✓"). Bramka
+# ostatniej instancji stawala sie wtedy pomiarem nad pustka, a rada z naglowka
+# („nie siegaj po --no-verify, uruchom audyt jeszcze raz") nie mogla pomoc,
+# bo powtorka dawala to samo. Czyscimy srodowisko, zamiast tylko `cd`.
+if ! env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE bash "$RUN_ALL" > /tmp/prepush_audit_$$ 2>&1; then
+  echo ""
+  echo "  PUSH BLOCKED: pakiet audytów nie przeszedł."
+  echo ""
+  grep -E "❌|FAILED|Failed" /tmp/prepush_audit_$$ | head -20 | sed 's/^/    /'
+  echo ""
+  echo "    Pełny log: /tmp/prepush_audit_$$"
+  echo "    Szczegóły: npm run audit:all"
+  exit 1
+fi
+
+rm -f /tmp/prepush_audit_$$
+echo "  pre-push: audyty przeszły"
+exit 0

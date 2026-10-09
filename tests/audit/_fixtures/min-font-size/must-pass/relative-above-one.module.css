@@ -1,0 +1,13 @@
+/* Swiadome POWIEKSZENIA relatywne (dropcap 4.2em w BlogPostPage) sa legalne —
+   regula tnie wylacznie zapisy < 1. */
+.dropcap::first-letter {
+  font-size: 4.2em;
+}
+
+.hero {
+  font-size: 1.5rem;
+}
+
+.full {
+  font-size: 100%;
+}

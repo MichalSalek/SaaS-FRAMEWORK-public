@@ -1,0 +1,5 @@
+/* Kwota po trialu w małej nocie: waga, nie rozmiar ani kolor. Nota dziedziczy
+   krój, rozmiar i kolor z klasy powierzchni (także negatyw kart na atramencie). */
+.amount {
+  font-weight: 700;
+}

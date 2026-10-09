@@ -1,0 +1,22 @@
+/* Zestaw właściwości POWIERZCHNI: każde usunięcie z listy przeżywało mutację,
+   bo wszystkie próbki malowały przez goły `background`. background-color
+   i background-image to ten sam wash, a fill/stroke to jego wersja w SVG. */
+.panel {
+  background-color: color-mix(in oklch, var(--color-primary) 12%, transparent);
+}
+
+.dotField {
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--color-primary) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 12px 12px;
+}
+
+.chartArea {
+  fill: color-mix(in oklch, var(--color-primary) 16%, transparent);
+}
+
+.chartLine {
+  stroke: color-mix(in oklch, var(--color-primary) 18%, transparent);
+}

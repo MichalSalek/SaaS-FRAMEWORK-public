@@ -1,0 +1,5 @@
+/* Nazwany lokalny token jest dozwolonym zapisem koloru funkcjonalnego. */
+.page {
+  --brand-ig: #c13584;
+  --note-main: oklch(0.86 0.15 95);
+}

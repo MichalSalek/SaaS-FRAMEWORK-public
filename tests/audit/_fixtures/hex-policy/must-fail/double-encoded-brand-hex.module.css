@@ -1,0 +1,5 @@
+/* Podwojnie zakodowany `#` (%2523): jedno dodatkowe kodowanie wystarczalo,
+   zeby przemycic kolor marki obok bramki. */
+.icon {
+  background: url("data:image/svg+xml,%3Csvg fill='%2523d9a441'%3E%3C/svg%3E");
+}

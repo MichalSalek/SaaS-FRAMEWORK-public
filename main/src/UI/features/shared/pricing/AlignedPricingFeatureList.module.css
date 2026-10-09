@@ -1,0 +1,15 @@
+.featureList {
+  display: grid;
+  grid-template-rows: repeat(
+    var(--pricing-feature-row-count),
+    minmax(var(--pricing-feature-row-min, var(--space-40)), 1fr)
+  );
+  align-content: stretch;
+}
+
+.featureItem {
+  min-width: 0;
+  min-height: var(--pricing-feature-row-min, var(--space-40));
+  display: flex;
+  align-items: center;
+}

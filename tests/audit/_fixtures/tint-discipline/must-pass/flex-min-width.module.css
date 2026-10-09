@@ -1,0 +1,7 @@
+/* `min-width: 0` bez tintu — najczęstsza deklaracja flexboxa w repo.
+   Odebranie jej mocy wyciszania nie może zamienić jej w naruszenie. */
+.truncatingCell {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--color-bg-main);
+}

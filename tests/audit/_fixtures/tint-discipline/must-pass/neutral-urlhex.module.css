@@ -1,0 +1,7 @@
+/* Hex URL-owy NEUTRALNY: biel w SVG w tle to konieczność strukturalna (SVG
+   nie czyta zmiennych CSS ani currentColor), nie ucieczka z systemu tokenów.
+   Skan hexa URL-owego musi pytać o chromę, nie o sam zapis. */
+.grid::after {
+  content: '';
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='2' height='2' fill='%23ffffff'/%3E%3C/svg%3E");
+}

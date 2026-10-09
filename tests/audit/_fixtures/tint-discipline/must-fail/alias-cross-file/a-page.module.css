@@ -1,0 +1,9 @@
+/* Alias zdefiniowany w INNYCH plikach niż użyty. Rozwiązywanie aliasów było
+   globalne wyłącznie dla palety, a poza nią per-plik — więc wystarczyło
+   rozdzielić deklarację i użycie na dwa moduły, żeby tint zniknął ze skanu.
+   Łańcuch jest rozpięty na TRZY pliki i odwrócony względem sortowania:
+   użycie tutaj, ogniwo pośrednie w m-, źródło złota w z-. Jeden przebieg
+   rozwiązywania zatrzymuje się na ogniwie pośrednim. */
+.washed {
+  background: color-mix(in oklch, var(--page-wash) 12%, transparent);
+}

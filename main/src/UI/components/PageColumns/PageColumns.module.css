@@ -1,0 +1,47 @@
+/* PageColumns — two columns from 720px of the scaffold's OWN width. */
+
+.frame {
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-20);
+  align-items: start;
+}
+
+.main,
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-width: 0;
+}
+
+/* One column: the aside may lead (a QR to show comes before the list). */
+.columns[data-narrow-first='aside'] .aside {
+  order: -1;
+}
+
+@container (min-width: 720px) {
+  .columns[data-narrow-first='aside'] .aside {
+    order: 0;
+  }
+
+  .columns[data-aside='regular'] {
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+    gap: var(--space-24);
+  }
+
+  .columns[data-aside='wide'] {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+    gap: var(--space-24);
+  }
+
+  /* One column on a wide page: keep a readable measure instead of 900px rows. */
+  .columns[data-aside='none'] {
+    grid-template-columns: minmax(0, 720px);
+  }
+}

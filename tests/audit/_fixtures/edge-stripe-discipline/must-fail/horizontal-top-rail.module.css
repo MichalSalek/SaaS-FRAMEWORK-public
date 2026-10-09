@@ -1,0 +1,9 @@
+/* Oś POZIOMA: ta sama figura obrócona o 90°, przyklejona do górnej krawędzi
+   („printed edge" na kartach login / 404 / 500). */
+.noticeCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--color-primary);
+}

@@ -1,0 +1,830 @@
+{
+  "/apple-touch-icon.png": {
+    "width": 180,
+    "height": 180
+  },
+  "/icon-192.png": {
+    "width": 192,
+    "height": 192
+  },
+  "/icon-512.png": {
+    "width": 512,
+    "height": 512
+  },
+  "/icon-maskable-512.png": {
+    "width": 512,
+    "height": 512
+  },
+  "/img/demo/glamour/manicure-01.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-02.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/hero/hero-nail-09-dark-editorial.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-13-short-pastel.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-40-xl-pastel.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-div-interaction-03.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/manicure-01.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-03.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/beauty-nails-home-cta-01.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/hero/hero-nail-12-pearl-chrome-portrait.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-20-medium-geometric.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-44-short-cherry-red.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-div-station-05.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/manicure-03.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-05.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-06.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-04.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/hero/hero-nail-10-bridal-floral.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-14-short-glitter.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-41-medium-baby-boomer.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-div-phone-04.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/manicure-06.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-07.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-08.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/beauty-nails-portrait-03.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/hero/hero-nail-13-autumn-wine-salon.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-21-medium-red.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-45-long-champagne-chrome.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-div-threequarter-02.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/portfolio/manicure-08.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-09.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/demo/glamour/manicure-10.webp": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/img/lp/app/de/appClientCard.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appClientCardVisits.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appClientFavorites.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appClientHome.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appClientPairing.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appClientProfile.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appClientSessionDetail.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appClientSessions.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appDashboard.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appGalleryFeed.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appInboxSession.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appInboxSessionScrolled.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appMessages.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appPairingRequests.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appPhotoChrome.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appPhotoRed.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appPublicProfile.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appSalonStaff.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appThread.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/de/appUpload.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientCard.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientCardVisits.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientFavorites.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientHome.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientPairing.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientProfile.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientSessionDetail.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appClientSessions.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appDashboard.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appGalleryFeed.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appInboxSession.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appInboxSessionScrolled.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appMessages.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appPairingRequests.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appPhotoChrome.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appPhotoRed.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appPublicProfile.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appSalonStaff.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appThread.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/en/appUpload.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientCard.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientCardVisits.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientFavorites.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientHome.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientPairing.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientProfile.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientSessionDetail.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appClientSessions.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appDashboard.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appGalleryFeed.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appInboxSession.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appInboxSessionScrolled.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appMessages.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appPairingRequests.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appPhotoChrome.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appPhotoRed.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appPublicProfile.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appSalonStaff.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appThread.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/app/pl/appUpload.webp": {
+    "width": 780,
+    "height": 1690
+  },
+  "/img/lp/beauty-div-01-window-light.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/beauty-div-02-two-hands.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/beauty-div-04-hands-jewelry.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/hero/hero-nail-06-ink-violet.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-09-short-nude.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-33-xl-dark-editorial.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-53-jelly-oil-droplet.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/beauty-nails-clients-cta-02.webp": {
+    "width": 1023,
+    "height": 1537
+  },
+  "/img/lp/beauty-nails-clients-cta-03-hands.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/beauty-nails-home-cta-03-red-silk.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/hero/hero-div-02-low-angle.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-01.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-24-medium-floral.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-47-medium-aura-blush.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/salon-moment-qr-04.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/contextual/contact.webp": {
+    "width": 1448,
+    "height": 1086
+  },
+  "/img/lp/contextual/contact.svg": {
+    "width": 1448,
+    "height": 1086
+  },
+  "/img/lp/contextual/for-clients.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/contextual/for-clients.svg": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/contextual/for-stylists.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/contextual/for-stylists.svg": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/contextual/get-app.webp": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/contextual/get-app.svg": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/contextual/home.webp": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/contextual/home.svg": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/contextual/pricing.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/contextual/pricing.svg": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/decor/decor-nail-01-line-art.webp": {
+    "width": 1100,
+    "height": 1100
+  },
+  "/img/lp/decor/decor-nail-02-swatch-corners.webp": {
+    "width": 1100,
+    "height": 733
+  },
+  "/img/lp/decor/static-app-download.svg": {
+    "width": 160,
+    "height": 128
+  },
+  "/img/lp/decor/static-contact-envelope.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/decor/static-help-thread.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/decor/static-location-pin.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/decor/static-pricing-plans.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/decor/static-privacy-shield.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/editorial/editorial-nail-03-chrome-salon-tools.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/editorial-nail-01-salon-black-cherry.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/editorial-nail-02-detail-floral-tools.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/editorial-nail-04-client-lamp-moment.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/static-get-app-phone-04.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/static-help-desk-03.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/static-pricing-polish-shelf-02.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/static-privacy-closed-book-05.webp": {
+    "width": 1400,
+    "height": 788
+  },
+  "/img/lp/editorial/static-client-phone-cafe-06.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/editorial/static-salon-entrance-01.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/empty/empty-explore.svg": {
+    "width": 160,
+    "height": 128
+  },
+  "/img/lp/empty/empty-favorites.svg": {
+    "width": 160,
+    "height": 128
+  },
+  "/img/lp/empty/empty-gallery.svg": {
+    "width": 160,
+    "height": 128
+  },
+  "/img/lp/empty/empty-pairing.svg": {
+    "width": 160,
+    "height": 128
+  },
+  "/img/lp/hero/hero-div-03-wide-forearm.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/hero/hero-nail-14-bridal-milky-white.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/hero/hero-nail-05-floral.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-07.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-32-long-minimal-line.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-51-medium-3d-gel-droplets.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/hero/hero-nail-16-velvet-cat-eye.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/hero/hero-nail-17-glazed-knit.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/hero/hero-nail-01-nude.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-03.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-26-long-ombre.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/portfolio/nail-48-short-classic-french.webp": {
+    "width": 1024,
+    "height": 1536
+  },
+  "/img/lp/hero/hero-nail-18-cherry-bottle.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/hero/hero-nail-19-molten-french.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/hero/hero-nail-04-ombre.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-06.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-30-long-floral.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-50-long-black-cherry.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/hero/hero-nail-20-application.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/mockups/phone-nail-01-empty-screen.webp": {
+    "width": 1120,
+    "height": 1400
+  },
+  "/img/lp/mockups/phone-nail-03-table-overlay.webp": {
+    "width": 1120,
+    "height": 1400
+  },
+  "/img/lp/mockups/phone-nail-02-overlay-screen.webp": {
+    "width": 1120,
+    "height": 1400
+  },
+  "/img/lp/portfolio/nail-08.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-42-medium-sage-micro-french.webp": {
+    "width": 1122,
+    "height": 1402
+  },
+  "/img/lp/hero/hero-div-01-side-profile.webp": {
+    "width": 1122,
+    "height": 1402
+  },
+  "/img/lp/hero/hero-nail-15-dark-chocolate.webp": {
+    "width": 1122,
+    "height": 1402
+  },
+  "/img/lp/portfolio/nail-22-medium-wedding.webp": {
+    "width": 1122,
+    "height": 1402
+  },
+  "/img/lp/portfolio/nail-46-medium-tortoiseshell.webp": {
+    "width": 1122,
+    "height": 1402
+  },
+  "/img/lp/portfolio/nail-wide-band.webp": {
+    "width": 1122,
+    "height": 1402
+  },
+  "/img/lp/portfolio/nail-52-champagne-chrome-silk.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-discover-01.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/hero/hero-nail-03-geometric.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-05.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-27-long-french.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-49-medium-marble-accent.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-discover-02.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/beauty-div-03-led-stilllife.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/hero/hero-nail-11-salon-clean-girl.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-17-medium-ombre.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-43-medium-cat-eye-rose-gold.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-div-pov-01.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/portfolio/nail-discover-03.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/img/lp/process/client-before-visit.webp": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/process/client-before-visit.svg": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/process/client-connection.webp": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/process/client-connection.svg": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/process/stylist-portfolio.webp": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/process/stylist-portfolio.svg": {
+    "width": 1774,
+    "height": 887
+  },
+  "/img/lp/steps/step-01-upload.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/steps/step-02-qr.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/steps/step-03-filter.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/img/lp/steps/step-div-01-hand-phone.svg": {
+    "width": 120,
+    "height": 120
+  },
+  "/logo-full.png": {
+    "width": 1114,
+    "height": 315
+  },
+  "/logo.png": {
+    "width": 512,
+    "height": 512
+  },
+  "/og-default-de.png": {
+    "width": 1200,
+    "height": 630
+  },
+  "/og-default-en.png": {
+    "width": 1200,
+    "height": 630
+  },
+  "/og-default.png": {
+    "width": 1200,
+    "height": 630
+  },
+  "/img/lp/editorial/salon-team-swatch.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/portfolio/nail-cobalt-glass.webp": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/img/lp/decor/nail-outline.svg": {
+    "width": 160,
+    "height": 128
+  },
+  "/img/lp/decor/phone-gallery-outline.svg": {
+    "width": 160,
+    "height": 128
+  },
+  "/img/lp/decor/woman-phone-outline.svg": {
+    "width": 160,
+    "height": 128
+  }
+}

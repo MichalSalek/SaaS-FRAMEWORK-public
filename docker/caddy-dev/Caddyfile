@@ -1,0 +1,25 @@
+{
+	email contact@michalsalek.com
+}
+
+# Dev frontend — https://dev.example.com (LE via Cloudflare DNS-01).
+# Upstream main-dev serves plain HTTP; Caddy terminates TLS at the edge (LE), so test
+# devices need NO local CA. (mkcert / --experimental-https removed 2026-06-25 — legacy:
+# secure-context for Stripe crypto.subtle now comes from this LE subdomain, not the upstream.)
+dev.example.com {
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+		resolvers 1.1.1.1 8.8.8.8
+	}
+	reverse_proxy main-dev:3000
+}
+
+# Dev backend — https://api.dev.example.com (separate subdomain, no port).
+# Upstream web-1-dev serves plain HTTP; Caddy terminates TLS (LE).
+api.dev.example.com {
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+		resolvers 1.1.1.1 8.8.8.8
+	}
+	reverse_proxy web-1-dev:3000
+}

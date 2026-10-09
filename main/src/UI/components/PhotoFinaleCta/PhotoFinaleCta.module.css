@@ -1,0 +1,244 @@
+/* PhotoFinaleCta — home ink finale (Wariant C), shared photo-grid.
+ *
+ * Two variable layers (EmptyState pattern):
+ *   --_x                 private default (this file only)
+ *   --photo-finale-x     public hook (call-site className / style)
+ *   var(--photo-finale-x, var(--_x))
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Root is width:100%, not 100vw. Home and ForClients .page already break
+ * out to the viewport. Nested width:100vw; margin-left:calc(50% - 50vw)
+ * shifts the band by the scrollbar gutter (~15px) and clips the side
+ * frames. Fill the parent; the parent owns the bleed.
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Desktop tracks 0.82fr / 1fr (~45% / ~55% at 1500). Photo is a grid
+ * track, not an absolute panel. Mobile areas are always text then photo.
+ * Both side rails stay; they are a symmetric frame, not a one-sided
+ * accent stripe.
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Foreground accent on ink uses --color-accent-on-ink (S106). Light-mode
+ * --color-primary is dark red (3.6:1 on ink). Do not put that on type.
+ */
+
+.section {
+  --_image-share: 0.82fr;
+  --_text-share: 1fr;
+  --_image-object-position: center;
+  --_pad-block: clamp(72px, 9vw, 148px);
+  --_pad-inline: var(--section-gutter, clamp(20px, 5vw, 56px));
+  --_headline-size: var(--text-fluid-3xl);
+  --_photo-min-block: clamp(420px, 48vw, 680px);
+  --_edge-inline: clamp(7px, 0.7vw, 12px);
+  --_inner-max: min(640px, calc(var(--lp-content-width) / 2));
+  --_gap: clamp(20px, 2.5vw, 36px);
+  --_action-gap: clamp(16px, 2vw, 28px);
+  --_action-gap-tight: clamp(8px, 1vw, 16px);
+  --color-focus-ring: var(--color-accent-on-ink);
+
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-top: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 18%, transparent);
+  display: grid;
+  grid-template-columns:
+    minmax(0, var(--photo-finale-image-share, var(--_image-share)))
+    minmax(0, var(--photo-finale-text-share, var(--_text-share)));
+  grid-template-areas: 'photo text';
+  align-items: stretch;
+}
+
+.section[data-image-side='right'] {
+  grid-template-columns:
+    minmax(0, var(--photo-finale-text-share, var(--_text-share)))
+    minmax(0, var(--photo-finale-image-share, var(--_image-share)));
+  grid-template-areas: 'text photo';
+}
+
+/* Home dot tile — solid SVG, not a radial gradient. Kept for parity. */
+.pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'><circle cx='2' cy='2' r='1.4' fill='%23ffffff' opacity='0.07'/></svg>");
+  background-size: 44px 44px;
+  background-position: 0 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Symmetric ink-frame rails (both sides). Not a one-sided accent stripe. */
+.edgeLeft,
+.edgeRight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--_edge-inline);
+  background: var(--color-accent-on-ink);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.edgeLeft {
+  left: 0;
+}
+
+.edgeRight {
+  right: 0;
+}
+
+.photoFrame {
+  /* focus-ring-allow: decorative image only; inherits the section ink ring */
+  grid-area: photo;
+  position: relative;
+  z-index: 1;
+  min-height: var(--photo-finale-photo-min-block, var(--_photo-min-block));
+  overflow: hidden;
+  background: var(--color-ink);
+}
+
+.photo {
+  object-fit: cover;
+  object-position: var(
+    --photo-finale-image-object-position,
+    var(--_image-object-position)
+  );
+}
+
+.inner {
+  grid-area: text;
+  max-width: var(--_inner-max);
+  margin: 0;
+  padding: var(--photo-finale-pad-block, var(--_pad-block))
+    var(--photo-finale-pad-inline, var(--_pad-inline));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--_gap);
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 859px) {
+  .section,
+  .section[data-image-side='right'] {
+    --_pad-block: clamp(56px, 12vw, 96px);
+    --_inner-max: none;
+    --_photo-min-block: 0px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'text'
+      'photo';
+  }
+
+  .photoFrame {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+.headline {
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+  font-size: var(--photo-finale-headline-size, var(--_headline-size));
+  line-height: 1;
+  letter-spacing: var(--ls-tight-25);
+  color: var(--color-on-ink);
+  margin: 0;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+
+.headlineAccent {
+  font-family: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: var(--color-accent-on-ink);
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+  margin: 0;
+  max-width: 56ch;
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--_action-gap);
+  margin-top: var(--_action-gap-tight);
+}
+
+.actions button {
+  background: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+  border-color: var(--color-primary) !important;
+  font-weight: 700;
+  transition: transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .actions button:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-on-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 50%, transparent);
+  padding: var(--space-6) 0 var(--space-4);
+  transition:
+    gap var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .actions a:hover {
+    gap: var(--space-12);
+    border-bottom-color: var(--color-on-ink);
+  }
+}
+
+.footnote {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide-20);
+  color: color-mix(in oklch, var(--color-on-ink) 92%, transparent);
+  margin: var(--space-4) 0 0;
+}
+
+/* Keep the entire approved photograph at an honest 2x pixel density.
+ * The frame sits within the ink column instead of enlarging a crop. */
+.photoFrame[data-native-photo='true'] {
+  width: 100%;
+  max-width: var(--photo-native-retina-width);
+  align-self: center;
+  justify-self: center;
+  min-height: 0;
+  aspect-ratio: var(--photo-native-aspect);
+}
+
+.photoFrame[data-native-photo='true'] .photo {
+  object-fit: contain;
+}

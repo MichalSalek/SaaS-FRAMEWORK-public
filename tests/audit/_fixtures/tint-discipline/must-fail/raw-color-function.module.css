@@ -1,0 +1,10 @@
+/* `color()` renderuje ten sam wash co `rgb()`, a nie było jej na liście
+   funkcji koloru, choć sąsiedni skan relative color już ją znał. Zapis
+   z pominiętą pozycją w liście to najtańsze obejście, jakie istnieje. */
+.washSrgb {
+  background: color(srgb 0.88 0.7 0.25 / 0.12);
+}
+
+.washP3 {
+  background: color(display-p3 0.86 0.68 0.26 / 12%);
+}

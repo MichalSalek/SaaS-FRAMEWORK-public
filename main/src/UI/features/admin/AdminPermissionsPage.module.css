@@ -1,0 +1,230 @@
+/* AdminPermissionsPage: the filters are the shared FilterBar, the marks the
+   shared CheckboxAtom, the lock a StatusPill. This file holds the matrix (the
+   one genuine two-axis table of the admin, DECISION in
+   components/AdminPermissionsMatrix.organism.tsx) and the header's save row. */
+
+/* Filters and the matrix belong together: a tighter gap than between the
+   page's sections. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* ─── The matrix's own scroller ───
+   Both axes scroll INSIDE this frame, so the page never scrolls sideways and
+   the role header stays in view down all the rows. `container-type` lets the
+   permission column size itself from the frame, not from the viewport (admin
+   routes also render inside a 390px frame on a wide desktop). */
+.matrixWrapper {
+  container-type: inline-size;
+  overflow: auto;
+  max-height: 70dvh;
+  min-width: 0;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.matrix {
+  /* table-layout auto: the first column holds full permission names, the rest
+     are narrow role columns; an equal split would cut the names. */
+  table-layout: auto;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+/* Sticky cells must be opaque (rows scroll under them) and take the frame's
+   own surface, not the page's paper (dark-mode parity). */
+.matrix th {
+  background: var(--color-surface-card);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  font-weight: inherit;
+}
+
+.matrix thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: var(--space-12);
+  vertical-align: bottom;
+  text-align: center;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* The permission column: sticky on the left, 40% of the frame on a phone and
+   never wider than a name needs on a desktop. Names wrap, nothing is cut. */
+.matrix thead th:first-child,
+.matrix tbody th {
+  position: sticky;
+  left: 0;
+  width: clamp(132px, 40cqi, 360px);
+  min-width: clamp(132px, 40cqi, 360px);
+  max-width: clamp(132px, 40cqi, 360px);
+  padding: var(--space-12) var(--space-16);
+  text-align: left;
+}
+
+.matrix thead th:first-child {
+  z-index: 3;
+}
+
+.matrix tbody th {
+  z-index: 1;
+  vertical-align: middle;
+}
+
+.matrix tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+
+/* A role column is as wide as a 44px mark and a short role name need. */
+.matrix thead th.roleCol,
+.matrix td {
+  padding-inline: var(--space-8);
+}
+
+.roleCol {
+  min-width: 88px;
+}
+
+/* Said once above the grid when every role is locked. */
+.matrixNote {
+  margin: 0;
+  padding-inline: var(--space-4);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.roleHeading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.roleLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.roleKey {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* A mark sits in the middle of its cell; the cell is a 44px target (the
+   CheckboxAtom's own label is 44px tall). */
+.matrix td {
+  padding-block: 0;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* ─── Permission name, description, category ─── */
+
+.permissionName,
+.permissionDescription,
+.permissionCategory {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+/* A machine name: breaks anywhere rather than being cut. */
+.permissionName {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.permissionDescription {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.permissionCategory {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Skeleton rows: a name and four marks, the grid's own rhythm ─── */
+
+.skeletonRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(4, 44px);
+  align-items: center;
+  justify-items: center;
+  gap: var(--space-12);
+  min-height: 56px;
+  padding: 0 var(--space-16);
+}
+
+.skeletonRow > :first-child {
+  justify-self: start;
+}
+
+.skeletonRow:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* ─── Header: counts, then the save with its one status line ─── */
+
+.heroCluster {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-8);
+}
+
+.headerSave {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-8) var(--space-12);
+}
+
+/* One piece: it moves under the button whole, never breaks inside. */
+.saveHint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* The header stacks under the title on a narrow page: start-aligned there. */
+@media (max-width: 1023px) {
+  .heroCluster {
+    align-items: flex-start;
+  }
+
+  .headerSave {
+    justify-content: flex-start;
+  }
+}
+
+/* ─── A failed save, inside the confirmation ─── */
+
+.dialogError {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-error-fg);
+}

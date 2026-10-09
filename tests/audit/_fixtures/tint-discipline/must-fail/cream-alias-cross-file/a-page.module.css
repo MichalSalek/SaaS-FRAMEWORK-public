@@ -1,0 +1,9 @@
+/* Ten sam chwyt na KREMIE: alias mieszka w cudzym pliku, więc limit „jeden
+   pas kremu na stronę" przestawał obowiązywać w całości. Tu są dwa pasy. */
+.heroBand {
+  background: var(--band);
+}
+
+.footerBand {
+  background: var(--band);
+}

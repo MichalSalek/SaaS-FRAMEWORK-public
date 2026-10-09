@@ -1,0 +1,314 @@
+/* ─── Banner (fixed bottom, mobile-first) ─── */
+.banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-dialog);
+  padding: var(--space-8) var(--space-12);
+  /* DECISION (anti-slop §2, nie usuwaj): solid fill + pelny top-divider daja
+     oddzielenie od contentu, NIE blur/cien. Usunieto backdrop-filter blur(8px)
+     + box-shadow --shadow-lg. */
+  background: var(--color-bg-elevated);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  animation: slide-up 250ms ease-out;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+/* Rozwinięty panel kategorii nie mieści się w 40vh (455px treści w oknie 336px
+   na 390×844), więc przycisk zapisu lądował pod krawędzią i trzeba było go
+   doscrollować, żeby w ogóle wyrazić zgodę. Zwinięty banner ma być mały,
+   rozwinięty ma być WIDOCZNY w całości: user właśnie świadomie poprosił o
+   szczegóły. */
+.banner:has(.innerExpanded) {
+  max-height: 85vh;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ─── Inner wrapper (max-width on desktop) ─── */
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Kolumna treści (nagłówek + opis + kategorie). Na desktopie staje się lewą
+   połową poziomego pasa, na mobile zwykłym stosem. */
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* ─── Header ─── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.headingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.heading {
+  margin: 0;
+}
+
+/* ─── „Dostosuj" w wierszu nagłówka (widok zwinięty) ───
+ * Tekstowa akcja drugorzędna: rozwija panel kategorii, nie wyraża zgody, więc
+ * nie konkuruje wizualnie z dwoma CTA niżej. Trzyma się nagłówka, bo stamtąd
+ * odzyskuje cały wiersz przycisku w rzędzie akcji. Wysokość 32px > WCAG 2.5.8
+ * minimum 24px (44px zarezerwowane dla realnych CTA zgody/odmowy). */
+.customizeBtn {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 0 var(--space-8);
+  border: none;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: var(--color-accent-fg);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.customizeBtn:active {
+  background: var(--color-surface-pressed);
+}
+
+@media (hover: hover) {
+  .customizeBtn:hover {
+    color: var(--color-primary-dark);
+    background: var(--color-surface-hover);
+  }
+}
+
+/* ─── Close button (expanded view) ─── */
+/* DECISION (B2-F14): 44×44px meets WCAG 2.5.8 / Apple HIG touch-target minimum. */
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.closeBtn:active {
+  background: var(--color-surface-pressed);
+}
+
+@media (hover: hover) {
+  .closeBtn:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+/* ─── Description ─── */
+.description {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Czytelny link „cookies" w opisie bannera — gold-ink wariant (WCAG 1.4.3).
+ * Było: --color-primary (jasny gold #e0b341) = 1.96:1 na bieli (FAIL).
+ * --color-accent-fg = #8a6d18 (4.91:1) — kanon dla MAŁEGO gold-tekstu/linków
+ * na jasnym tle (palettes.css §S14). Jasny gold zostaje do FILLów/ikon. */
+.link {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--color-primary-dark);
+}
+
+/* ─── Category toggles (expanded view) ─── */
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.alwaysOn {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+ * Opis kategorii NIE jest wcinany pod etykietę przełącznika. Stało tu
+ * `margin-left: 56px` z intencją takiego wyrównania, ale reguła była martwa:
+ * `.typography` z modułu Typography ma równą specyficzność i wygrywała
+ * kolejnością w bundlu CSS Modules (computed marginLeft = 0px, zweryfikowane
+ * DOM-probem). Pełna szerokość jest zresztą tym, czego chcemy: na 390px
+ * wcięcie 56px kosztowałoby dodatkową linię tekstu w każdej kategorii.
+ * Gdyby wcięcie kiedyś wróciło, musi iść przez custom property, nie przez
+ * gołą deklarację tej samej własności. */
+.categoryDesc {
+  color: var(--color-text-secondary);
+}
+
+/* ─── Actions (button row) ─── */
+/* Mobile: dwie równe kolumny. Zwinięty banner ma dokładnie dwa CTA (odmowa +
+   zgoda), bo „Dostosuj" przeniósł się do wiersza nagłówka. */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+}
+
+.actionBtn {
+  width: 100%;
+}
+
+/* ─── Compact mobile card (<480) ─── */
+/* Zasada StickyCtaBar: element przyklejony = zamknięta karta z buforem,
+   zajmuje minimum viewportu. Pełny hairline border (4 strony) + radius-md
+   zamiast krawędziowego paska — banner schodzi z ~45% do ~30% ekranu 390px.
+   Touch targets: oba CTA zgody/odmowy trzymają 44px; tylko tekstowy
+   „Dostosuj" jest niższy (36px — wciąż > WCAG 2.5.8 minimum 24px). */
+@media (max-width: 479px) {
+  .banner {
+    left: var(--space-8);
+    right: var(--space-8);
+    bottom: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    border: var(--style-border-surface) solid var(--color-divider);
+    border-radius: var(--style-radius-surface);
+  }
+
+  .inner {
+    gap: var(--space-8);
+  }
+
+  .headingRow .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .headingRow .heading {
+    font-size: var(--text-base);
+  }
+
+  .actions {
+    gap: var(--space-4);
+  }
+
+  .actions .actionBtn {
+    padding: var(--space-8) var(--space-12);
+    font-size: var(--text-sm);
+  }
+}
+
+/* ─── Desktop: JEDEN POZIOMY PAS ───
+ * Zwinięty banner to nie karta z trzema wierszami, tylko pasek: treść po
+ * lewej, akcje po prawej, wszystko w jednej linii bazowej. Rozwinięty wraca do
+ * kolumny, bo panel kategorii wymaga pełnej szerokości. */
+@media (min-width: 768px) {
+  .banner {
+    padding: var(--space-12) var(--space-20);
+    max-height: none;
+  }
+
+  .inner {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-20);
+  }
+
+  /* Poziomy pas ma nadmiar szerokości, więc space-between wyrzuciłby „Dostosuj"
+     na środek pustki, oderwane i od tytułu, i od akcji. Trzymamy je przy
+     nagłówku, do którego należy. Rozwinięty panel wraca do rozpychania, bo tam
+     po prawej siedzi przycisk zamknięcia. */
+  .inner:not(.innerExpanded) .header {
+    justify-content: flex-start;
+  }
+
+  .innerExpanded {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-12);
+  }
+
+  /* Kolumna treści: nagłówek + opis jeden pod drugim, akcje obok, nie pod. */
+  .textCol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+    flex: 1;
+  }
+
+  .innerExpanded .textCol {
+    gap: var(--space-12);
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+
+  .actionBtn {
+    width: auto;
+    min-width: 160px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    max-width: 1100px;
+  }
+}

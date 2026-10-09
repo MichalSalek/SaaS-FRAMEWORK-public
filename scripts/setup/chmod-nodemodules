@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# scripts/setup/chmod-nodemodules
+# Naprawia dostep do node_modules w main/ i web-1/, gdy katalog zostal utworzony
+# przez INNEGO uzytkownika (typowo root z kontenera dev) i host nie moze go zapisac.
+# Wolany przez `npm run system:permissions` (razem z chmod-scripts).
+#
+# Kolejnosc dzialan na aplikacje: brak katalogu -> instalacja; zly wlasciciel ->
+# `sudo chown` na Ciebie; nadal nie da sie zapisac -> usuniecie i reinstalacja.
+#
+# DECISION (nie usuwaj tego komentarza):
+#   1. Tryb to `u+rwX,go-w`, NIE `0777`. Poprzednia wersja nadawala node_modules
+#      prawa zapisu KAZDEMU uzytkownikowi maszyny — a w node_modules/.bin leza
+#      binarki, ktore odpala potem `npm run` (lokalny wektor podmiany). Wielka
+#      litera X w `u+rwX` nadaje bit wykonywalny katalogom i plikom, ktore juz go
+#      maja, wiec `.bin/*` dziala, a zwykle pliki nie staja sie wykonywalne.
+#   2. `sudo chown` zostaje (to CEL skryptu: oddac Ci wlasnosc), ale `sudo rm -rf`
+#      wymaga jawnego `ALLOW_SUDO_RM=1`. Kasowanie cudzych plikow z podniesionymi
+#      prawami to nie jest czynnosc, ktora ma sie wydarzyc mimochodem.
+#   3. Sciezka do usuniecia jest asertowana (`*/node_modules` + istnieje) — pusta
+#      zmienna w `rm -rf` to klasyczna katastrofa, a tu bieglaby z sudo.
+#   4. SKUTEK UBOCZNY REINSTALACJI (zweryfikowany na zywo 2026-08-21): node_modules
+#      jest bind-mountowany do kontenerow dev, wiec usuniecie go WYWALA kontener
+#      (`web-1-dev` wyszedl z kodem 1 w chwili `rm -rf`). To nie jest awaria skryptu,
+#      tylko cena sciezki reinstalacyjnej — dlatego uprzedzamy PRZED, a nie po.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+NODE_MODULES_MODE="u+rwX,go-w"
+
+header "FIX NODE_MODULES PERMISSIONS" "🔧"
+info "Root: ${ROOT_DIR}"
+info "Tryb: ${BOLD}${NODE_MODULES_MODE}${RESET} (wlasciciel pisze, reszta nie)"
+
+FAILED=0
+
+install_deps() {
+  local dir="$1"
+  if [ -f "${dir}/package-lock.json" ]; then
+    (cd "$dir" && npm ci --silent)
+  else
+    (cd "$dir" && npm install --silent)
+  fi
+}
+
+# Usuniecie node_modules z asercja ksztaltu sciezki (patrz DECISION #3).
+remove_node_modules() {
+  local nm_dir="$1"
+  case "$nm_dir" in
+    */node_modules) ;;
+    *) error "ODMOWA usuniecia '${nm_dir}' — sciezka nie konczy sie na /node_modules."; return 1 ;;
+  esac
+  [ -d "$nm_dir" ] || { error "ODMOWA usuniecia '${nm_dir}' — katalog nie istnieje."; return 1; }
+
+  if rm -rf "$nm_dir" 2>/dev/null; then
+    return 0
+  fi
+  if [ "${ALLOW_SUDO_RM:-0}" != "1" ]; then
+    error "Nie moge usunac ${nm_dir} bez podniesionych praw."
+    info  "Swiadomie: ALLOW_SUDO_RM=1 npm run system:permissions"
+    return 1
+  fi
+  warn "ALLOW_SUDO_RM=1 — usuwam ${nm_dir} przez sudo."
+  sudo rm -rf "$nm_dir"
+}
+
+for app in main web-1; do
+  app_dir="${ROOT_DIR}/${app}"
+  nm_dir="${app_dir}/node_modules"
+
+  step "${app}"
+
+  if [ ! -d "$app_dir" ]; then
+    warn "pomijam — brak katalogu ${app_dir}"
+    continue
+  fi
+
+  if [ ! -d "$nm_dir" ]; then
+    info "brak node_modules — instaluje zaleznosci"
+    if install_deps "$app_dir"; then
+      success "${app}: zainstalowane"
+    else
+      error "${app}: instalacja nieudana"
+      FAILED=$((FAILED + 1))
+    fi
+    continue
+  fi
+
+  owner_uid="$(stat -c '%u' "$nm_dir" 2>/dev/null || stat -f '%u' "$nm_dir" 2>/dev/null || echo "-1")"
+  current_uid="$(id -u)"
+
+  if [ "$owner_uid" != "$current_uid" ]; then
+    warn "node_modules nalezy do uid=${owner_uid} (Ty: ${current_uid}) — probuje chown"
+    if command -v sudo >/dev/null 2>&1 && sudo chown -R "$(id -u):$(id -g)" "$nm_dir"; then
+      success "${app}: wlasnosc przejeta"
+    else
+      warn "${app}: chown nieudany — sprobuje reinstalacji"
+    fi
+  fi
+
+  if chmod -R "$NODE_MODULES_MODE" "$nm_dir" 2>/dev/null; then
+    success "${app}: uprawnienia naprawione"
+    continue
+  fi
+
+  warn "${app}: chmod nieudany — usuwam i instaluje od nowa"
+  warn "${app}: kontener dev montuje ten katalog i PADNIE — potem: npm run dev:recreate -- ${app}-dev"
+  if remove_node_modules "$nm_dir" && install_deps "$app_dir"; then
+    success "${app}: przeinstalowane"
+  else
+    error "${app}: naprawa nieudana"
+    FAILED=$((FAILED + 1))
+  fi
+done
+
+echo ""
+if [ "$FAILED" -eq 0 ]; then
+  header "NODE_MODULES OK" "✅"
+  exit 0
+fi
+error "Nieudane aplikacje: ${FAILED}"
+exit 5

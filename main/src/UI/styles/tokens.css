@@ -1,0 +1,575 @@
+/**
+ * Structural tokens -- shared across ALL themes.
+ * These do NOT change when switching themes.
+ * Theme-specific tokens (colors, fonts) are set via palettes.css on <html>.
+ *
+ * Source: zaadaptowane z prototype archive (usunięty 2026-06-14, git history)
+ */
+
+@layer tokens {
+  :root {
+    /* ===== Spacing Scale — SSOT odstępów =====
+     * DECISION (S99, nie usuwaj tego komentarza):
+     *
+     * Nazwy są PX-BASED (`--space-24` = 24px), nie porządkowe. Powód jest
+     * praktyczny, nie kosmetyczny: skala porządkowa `--sp-0..9` nie dawała się
+     * rozszerzyć. Census 174 modułów pokazał, że NAJCZĘSTSZA wartość odstępu w
+     * całym produkcie (6px, 221 wystąpień) nie miała tokenu, bo siedzi między
+     * `--sp-0` (4px) a `--sp-1` (8px) — a wstawienie jej tam wymagałoby
+     * przenumerowania 2412 istniejących użyć, czyli zmiany ZNACZENIA każdego z
+     * nich. Brakowało też 16, 24, 40 i 56 px, więc ~1550 odstępów było
+     * wpisanych surowo: nie z niedbalstwa, tylko dlatego, że skala nie miała
+     * czego zaoferować. Px-based nazwa rozszerza się w dowolnym miejscu i
+     * czyta się bez zaglądania do tego pliku.
+     *
+     * KSZTAŁT SKALI: granulacja rzednie wraz z odstępem, bo tak działa
+     * percepcja — 2px różnicy widać przy 8px, nie widać przy 80px.
+     *   2..16   co 2px   (odstępy wewnątrz kontrolek, ikona-tekst, chipy)
+     *   20..48  co 4px   (odstępy między elementami, padding kart)
+     *   56..96  co 8px   (odstępy między blokami)
+     *   112,128 co 16px  (rytm sekcji)
+     *
+     * CZEGO TU CELOWO NIE MA: 3, 5, 7, 9, 11, 18, 22 px. To nie są stopnie
+     * skali, tylko optyczne korekty pojedynczych miejsc (wyrównanie glifu,
+     * offset hairline'u). Wpuszczenie ich zrobiłoby ze skali mapowanie każdej
+     * liczby, a `--space-5` znaczyłoby tyle co „trochę więcej niż 4".
+     * Zostają surowe, z komentarzem `optical:` — strażnik `audit:spacing-tokens`
+     * tego wymaga i tylko na to pozwala. */
+    --space-2: 2px;
+    --space-4: 4px;
+    --space-6: 6px;
+    --space-8: 8px;
+    --space-10: 10px;
+    --space-12: 12px;
+    --space-14: 14px;
+    --space-16: 16px;
+    --space-20: 20px;
+    --space-24: 24px;
+    --space-28: 28px;
+    --space-32: 32px;
+    --space-36: 36px;
+    --space-40: 40px;
+    --space-44: 44px;
+    --space-48: 48px;
+    --space-56: 56px;
+    --space-64: 64px;
+    --space-72: 72px;
+    --space-80: 80px;
+    --space-88: 88px;
+    --space-96: 96px;
+    --space-112: 112px;
+    --space-128: 128px;
+
+    /* Stara skala porządkowa `--sp-0..9` została w całości zmigrowana na
+     * powyższą (2424 użycia, alias w alias, więc zero zmian wyliczonych
+     * wartości) i USUNIĘTA. Dwa równoległe zestawy nazw na tę samą rzecz to
+     * dwa źródła prawdy; jedno z nich zawsze zaczyna dryfować.
+     * Strażnik `audit:spacing-tokens` odrzuca powrót `--sp-*`. */
+
+    /* ===== Shape language — SSOT kształtu (S105 → S108) =====
+     * DECISION (nie usuwaj tego komentarza):
+     * Prymitywy (Button, Input, Select, Card, Chip, StatusPill, Eyebrow,
+     * Avatar, Typography, AppHero, EmptyState) i od S108 także moduły stron
+     * NIE wpisują promienia, grubości linii ani typografii etykiety wprost —
+     * czytają te tokeny (stara skala --radius-* nie istnieje od S109). Wartości
+     * = głosy ownera z 2026-09-06: kierunek
+     * „Siatka studia” (głos 2: kwadratowe moduły, zamknięte ramy 2px, ciasno
+     * złożone etykiety bez kapitalików) i kicker „Zdanie bezszeryfowe”
+     * (głos 4). Sygnatura kierunku: jedno wypełnione CTA na ekran, reszta
+     * akcji obrysem (Button `outlined`). Kolor NIE jest częścią tej warstwy
+     * (paleta = palettes.css). Strażnik: `audit:shape-tokens`. */
+    /* DECISION (nie usuwaj tego komentarza) — głos ownera S116 (2026-09-15),
+     * „A3 · Biel na papierze” WSZĘDZIE (aplikacja i strony statyczne). Owner:
+     * „zbyt kwadratowo”, „zbyt majtkowo”, rama 2 px „za ciężka w odbiorze”.
+     * Kwadrat z S108 odchodzi: pole i przycisk 14 px, powierzchnia 20 px,
+     * chip pigułką, awatar i medalion kołem. Reguła kierunku: informacja
+     * leży wprost na papierze bez karty i bez ramy, białą powierzchnię
+     * (`--color-surface-interactive`) dostaje tylko to, co się klika, a
+     * klikalny wiersz lub karta niesie czerwoną strzałkę w kółku
+     * (`AffordanceDiscAtom`). Okaz głosu: git 774a603, playground S116. */
+    /* S118: 20px na dużych kartach (rekord galerii) czytało się jak zabawka,
+     * owner: „za duży”. 14/12 trzyma miękkość bez pęcznienia narożnika. */
+    --style-radius-control: 12px;
+    --style-radius-surface: 14px;
+    --style-radius-pill: 999px;
+    --style-radius-avatar: 50%;
+    --style-radius-medallion: 50%;
+    /* Koło geometryczne, nie „pigułka”: kciuk i tor przełącznika, kropka
+     * koloru, kropka nieprzeczytanych. 50% na kwadracie = koło, na 44×24 =
+     * stadion. Jedyny wyjątek od kwadratu w tym kierunku. */
+    --style-radius-round: 50%;
+    /* DECISION (nie usuwaj tego komentarza) — głos ownera S114 (2026-09-14),
+     * wariant D „Mocne tylko kontrolki": jednolite ramy 2px na kartach i na
+     * polach „wyglądały jak wersja dla ludzi disabled". Waga zostaje tam,
+     * w co się klika (pole, przycisk obrysowy, chip): 2px w pełnym kolorze
+     * ramy. Powierzchnia (karta, panel, kafel, wiersz listy) dostaje 1px
+     * w kolorze linii dzielącej (`--color-border-surface` w palecie).
+     * Powierzchnie stykające się krawędzią NIE rysują dwóch ram obok siebie:
+     * lista kart to jedna rama plus linie dzielące, inaczej 1px + 1px robi
+     * z powrotem linię 2px. */
+    /* S116: 2 px → 1 px. Pola, chipy i przycisk obrysowy nie mają już ramy
+     * (kolor `--color-control-border` jest przezroczysty, niosą je biel i
+     * promień). Szerokość zostaje dla kontrolek, którym krawędź jest
+     * funkcją: pusty checkbox, tor przełącznika, przycisk niszczący. */
+    --style-border-control: 1px;
+    --style-border-surface: 1px;
+    /* Linia dzieląca (border-top/bottom wiersza, szczelina siatki) zostaje
+     * włoskowa: okaz kierunku dzielił wiersze listy szczeliną 1px, nie ramą. */
+    --style-border-divider: 1px;
+    /* Pierścień papieru wokół nakładających się znaków (stos awatarów, medalion
+     * na zdjęciu): odstęp geometryczny w kolorze tła, nie rama. */
+    --style-border-ring: 3px;
+    --style-border-style-empty: solid;
+    --style-control-weight: 600;
+    --style-control-case: none;
+    --style-control-tracking: var(--ls-tight-10);
+    /* DECISION (nie usuwaj tego komentarza) — zmierzone 2026-10-09: nasz krój
+     * zwęża spację, gdy rośnie grubość. Przy 400 spacja ma 0,267em, przy 500
+     * i 600 już 0,21em, więc półgruba etykieta 14px ma odstęp 2,9px i na
+     * ekranie 1x czyta się jak sklejona (czytelniczka bez kontekstu:
+     * „Nowasesja”). 0,06em oddaje etykiecie i kontrolce odstęp zwykłego
+     * tekstu. Wartość stoi obok trackingu roli i idzie wszędzie tam, gdzie
+     * rola: `word-spacing: var(--style-*-word-spacing)` zaraz pod
+     * `letter-spacing: var(--style-*-tracking)`. Nagłówki (20px i więcej) mają
+     * spację powyżej 4px i jej nie potrzebują. */
+    --style-control-word-spacing: 0.06em;
+    --style-control-font: var(--font-body);
+    /* Etykiety (StatusPill, nagłówki tabel, mikroetykiety): bez kapitalików,
+     * bez rozstrzelenia. */
+    --style-label-case: none;
+    --style-label-weight: 600;
+    --style-label-tracking: var(--ls-tight-10);
+    --style-label-word-spacing: 0.06em;
+    --style-label-font: var(--font-body);
+    --style-label-size: var(--text-xs);
+    /* Kicker / Eyebrow (głos 4): zdanie tym samym bezszeryfem co treść.
+     * Osobna grupa, żeby zmiana kickera nie przestrajała każdej etykiety. */
+    --style-kicker-font: var(--font-body);
+    --style-kicker-size: var(--text-sm);
+    --style-kicker-weight: 500;
+    --style-kicker-case: none;
+    --style-kicker-tracking: 0;
+    --style-eyebrow-rule: 0;
+    --style-heading-font: var(--font-heading);
+    --style-heading-weight: var(--font-weight-heading);
+    --style-heading-tracking: var(--letter-spacing-heading);
+    --style-heading-case: none;
+    --style-control-pad-x: var(--space-16);
+    --style-control-min-h: 44px;
+    --style-input-pad: var(--space-12);
+    /* One inset and one gap for every segmented track. A control-shaped
+       child radius is the track radius minus this inset minus the track
+       border, so the corners stay concentric. The track never wraps. */
+    --style-segmented-inset: var(--space-6);
+    --style-segmented-gap: var(--space-2);
+
+    /* --- Shadows — NEUTRALIZED to `none` (Anti-AI-Slop §2: zero cieni/glow) ---
+     * DECISION (nie usuwaj — S14 floor de-slop): cała skala = `none`. Głębia
+     * budujemy tonal surface steps + pełnym hairline borderem 1px, NIE cieniem.
+     * Tokeny zostają jako safety-net: każde istniejące/przyszłe
+     * `box-shadow: var(--shadow-*)` renderuje brak cienia zamiast slopu.
+     * Floating surfaces (dialog/drawer/sheet/card.elevated) dostały hairline
+     * border w tym samym przebiegu (inaczej traciłyby definicję krawędzi). */
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+
+    /* --- Transitions --- */
+    /* Ruch ma DWIE warstwy i to jest celowe, nie dwa zestawy nazw na to samo.
+     *
+     * Nizej `--duration-N` = same liczby, nazwa niesie wartosc w ms (ta sama
+     * zasada co `--space-24` i `--ls-wide-40`). Tutaj `--transition-*` = role:
+     * czas ZLOZONY z krzywa, do skrotu `transition: color var(--transition-fast)`.
+     * Liczby maja jedno zrodlo — role sie do niego odwoluja, wiec nie da sie ich
+     * juz rozjechac.
+     *
+     * Do S100 bylo inaczej: dwa niezalezne zestawy, kazdy z wlasna liczba i
+     * wlasnym przymiotnikiem, ktore mowily rzeczy sprzeczne. `--transition-normal`
+     * to bylo 200ms i `--duration-fast` to tez bylo 200ms — ten sam czas raz
+     * „normalny", raz „szybki". Przy takim nazewnictwie nie da sie wybrac tokenu
+     * po nazwie, wiec autor pisal surowa liczbe i mial racje.
+     *
+     * UWAGA na pulapke zlozenia: `--transition-*` NIESIE JUZ krzywa, wiec
+     * `transition: transform var(--transition-normal) var(--ease-entrance)` to
+     * DWIE funkcje czasu w jednej deklaracji — CSS odrzuca ja w calosci i
+     * przejscie nie dziala wcale. Trzy takie martwe deklaracje siedzialy w
+     * repo do S100. Masz wlasna krzywa? Bierz goly `--duration-N`. */
+    --transition-fast: var(--duration-120) ease;
+    --transition-normal: var(--duration-200) ease;
+    --transition-slow: var(--duration-350) ease;
+
+    /* --- Animation Curves --- */
+    --spring-curve: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ios-sheet-curve: cubic-bezier(0.32, 0.72, 0, 1);
+    --ease-entrance: cubic-bezier(0, 0, 0.2, 1); /* ease-out — entrances */
+    --page-transition-duration: 250ms;
+    --enter-duration: 200ms;
+    --stagger-delay: 50ms;
+
+    /* --- Spring Physics (CSS linear() easing) --- */
+    --spring-bounce: linear(
+      0,
+      0.009,
+      0.035 2.1%,
+      0.141,
+      0.281 6.7%,
+      0.723 12.9%,
+      0.938 16.7%,
+      1.017,
+      1.077,
+      1.121,
+      1.149 24.3%,
+      1.159,
+      1.163,
+      1.161,
+      1.154 29.9%,
+      1.129 32.8%,
+      1.051 39.6%,
+      1.017 43.1%,
+      0.991,
+      0.977 51%,
+      0.974 53.8%,
+      0.975 57.1%,
+      0.997 69.8%,
+      1.003 76.9%,
+      1
+    );
+    --spring-snappy: linear(
+      0,
+      0.063 1.2%,
+      0.236 3.5%,
+      0.823 11.4%,
+      1.003 15.3%,
+      1.073 18.5%,
+      1.096 20.4%,
+      1.104 22.5%,
+      1.096 25%,
+      1.048 31.5%,
+      1.018 37.2%,
+      0.994 44.8%,
+      0.986 53.4%,
+      1
+    );
+    /* Czasy ruchu — nazwa niesie wartosc w ms. */
+    --duration-100: 100ms;
+    --duration-120: 120ms;
+    --duration-200: 200ms;
+    --duration-300: 300ms;
+    --duration-350: 350ms;
+    /* Offset kaskady wejscia zostaje nazwa ROLOWA: to nie jest czas trwania,
+     * tylko odstep miedzy startami sasiadow, czyli decyzja projektowa. */
+    --stagger-offset: 60ms;
+
+    /* --- Z-Index Scale --- */
+    --z-fab: 50;
+    --z-app-bar: 100;
+    --z-bottom-nav: 100;
+    --z-navigation-drawer-backdrop: 150;
+    --z-navigation-drawer: 151;
+    --z-bottom-sheet-backdrop: 200;
+    --z-bottom-sheet: 201;
+    --z-theme-switcher: 200;
+    /* Toast/snackbar renderowany przez aplikacje (feedbackBanner profilu
+     * stylistki). Sonner ma wlasny stos poza ta skala. Do S100 z tej warstwy
+     * korzystaly TEZ trzy skip-linki, ktore przez to siedzialy pod szuflada,
+     * dialogiem i tooltipem — czyli pod wszystkim, co skip-link ma przykryc.
+     * Dla nich jest --z-skip-link nizej; tutaj zostaly same toasty. */
+    --z-toast: 300;
+    --z-drawer-backdrop: 900;
+    --z-drawer: 901;
+    --z-dialog-backdrop: 1000;
+    --z-dialog: 1001;
+    --z-select: 1100;
+    --z-menu: 1100;
+    --z-tooltip: 1200;
+    /* Warstwy dopisane S99 — istniały w modułach jako surowe liczby, więc
+     * skala nie mówiła o nich prawdy, a o kolejności decydował przypadek.
+     * Wartości zostawione TAKIE, JAKIE BYŁY: to porządkowanie nazw, nie
+     * przestrajanie stosu.
+     *
+     * UWAGA na dwie zastane kolizje — są tu WIDOCZNE zamiast rozsiane po
+     * modułach, ale nadal nierozstrzygnięte, bo żadna nie ma zgłoszonego buga:
+     *   --z-sticky-bar        == --z-app-bar == --z-bottom-nav (wszystkie 100)
+     *   --z-fullscreen-overlay == to samo 100
+     * Przy równym z-index wygrywa kolejność w drzewie, nie intencja. Jeśli
+     * kiedykolwiek pasek CTA albo banner impersonacji schowa się pod app-barem,
+     * to jest tego przyczyna i wtedy trzeba rozsunąć te warstwy świadomie. */
+    --z-sticky-bar: 100;
+    --z-fullscreen-overlay: 100;
+    --z-fullscreen-overlay-above: 101;
+    /* FAB galerii siedzi wyżej niż generyczny --z-fab (50). Wartość zastana i
+     * nieudokumentowana; jeśli powód zniknie, zejdź na --z-fab. */
+    --z-gallery-fab: 90;
+    /* Skip link (WCAG 2.4.1) musi przykryć WSZYSTKO, łącznie z tooltipem. */
+    --z-skip-link: 9999;
+
+    /* --- Tooltip (inverted surface) --- */
+    --color-tooltip-bg: #1f2937;
+    --color-tooltip-text: #f9fafb;
+
+    /* --- Layout --- */
+    --app-bar-height: 57px;
+    --bottom-nav-height: 56px;
+    --max-content-width: 1727px;
+    /* LP/strony statyczne: editorial container, celowo węższy niż app
+     * --max-content-width. Ujednolica lewą/prawą krawędź KAŻDEJ sekcji
+     * public (Style Policy §4) — wcześniej mieszanka 1727 / lokalnych
+     * 1200 (--max-page-width) / 1180 / 760 dawała widoczny chaos osi. */
+    --lp-content-width: 1200px;
+
+    /* --- Account web shell (AccountWebLayout, desktop >=1280) ---
+     * Desktop chrome for the account routes (login/onboarding excluded):
+     * dark left nav-rail + centered content column. Analog do AdminLayout
+     * (rail 240 + content max), ale węższy content bo konto = formularze/karty,
+     * nie gęste tabele admina (1400). */
+    --account-rail-width: 248px;
+    --account-content-max: 940px;
+
+    /* --- Motyw „Jeden krem" (głos S94, owner 2026-08-19): tinty ROLOWE ---
+     * DECISION (nie usuwaj tego komentarza):
+     * Motyw mówi: powierzchnia jest papierem albo pełnym negatywem, a jeden
+     * krem (--color-bg-subtle) wyodrębnia JEDEN pas na stronę. Zostają
+     * dokładnie trzy role, w których tint niesie ZNACZENIE — i każda dostaje
+     * tu swój token, zamiast rozsypanego color-mix po 66 modułach:
+     *   --color-mark-bg        ZNAK: glif albo inicjał w kółku/kwadracie,
+     *                          medalion, avatar-fallback, licznik. To element
+     *                          wielkości glifu, nie tło treści — zostaje złoty.
+     *   --color-mark-bg-strong ten sam znak w wariancie wyróżnionym.
+     *   --color-state-selected TRWAŁY stan wybrania (zakładka, wiersz, pozycja
+     *                          listy, segment). Stan zasługuje na akcent (R7).
+     *   --color-state-hover    ULOTNY hover = NEUTRALNY tonal step, NIE złoto.
+     *                          R6: kontrast zostaje dla CTA; złoto rozdane
+     *                          każdemu wierszowi przestaje cokolwiek znaczyć.
+     *                          Półprzezroczysty (nie --color-surface-hover),
+     *                          bo musi komponować się nad papierem I nad kremem.
+     * Mode-aware bez duplikatu: wartości wyprowadzone z --color-primary i
+     * --color-text-primary, które palettes.css przestawia per tryb. Zmiana
+     * procentu TUTAJ przestraja cały produkt — o to chodzi. */
+    /* S116 (głos „A3”): bladoróżowe tinty z czerwieni odchodzą („zbyt
+     * majtkowo”). Znak i trwały wybór to neutralny, półprzezroczysty krok
+     * atramentu, więc czyta się i na papierze, i na bieli klikalnej karty.
+     * Czerwień zostaje dla CTA, strzałki klikalności i glifu znaku. */
+    --color-mark-bg: color-mix(
+      in oklch,
+      var(--color-text-primary) 7%,
+      transparent
+    );
+    --color-mark-bg-strong: color-mix(
+      in oklch,
+      var(--color-text-primary) 12%,
+      transparent
+    );
+    --color-state-selected: color-mix(
+      in oklch,
+      var(--color-text-primary) 9%,
+      transparent
+    );
+    --color-state-hover: color-mix(
+      in oklch,
+      var(--color-text-primary) 6%,
+      transparent
+    );
+    /* WYPEŁNIENIE CICHEJ KONTROLKI (S126, 2026-10-08).
+     * DECISION (nie usuwaj tego komentarza):
+     * Od głosu S118 każda sekcja treści stoi w BIAŁYM boksie, a cicha kontrolka
+     * (przycisk drugiego planu, chip, karta wyboru) była biała z definicji
+     * („biel = klikalne”, S116). Biel na bieli znika: owner zgłosił „Zmień
+     * zdjęcie to button, a wygląda jak tekst” i „Wybierz plan… nie wiadomo, czy
+     * to w ogóle jest klikalne”, a census S126 znalazł tę samą wadę na koncie,
+     * płatnościach, strefie krytycznej i pulpicie. S122 łatało to per boks
+     * zmienną `--btn-quiet-bg` (osiem miejsc na około 160 użyć), więc każdy
+     * nowy boks zaczynał zepsuty.
+     * Ten token jest PÓŁPRZEZROCZYSTYM krokiem atramentu, więc komponuje się
+     * i nad papierem, i nad białym boksem bez wiedzy o tym, na czym stoi.
+     * Kontrolka przestaje zależeć od kontekstu, a biel zostaje dla klikalnych
+     * wierszy i kart leżących na papierze (`--color-surface-interactive`). */
+    --color-control-fill: color-mix(
+      in oklch,
+      var(--color-text-primary) 7%,
+      transparent
+    );
+    /* ZNAK NA NEGATYWIE (S98/B): --color-mark-bg jest PÓŁPRZEZROCZYSTY, więc
+     * nad atramentem daje ciemny brąz zamiast złotego znaku, a glif w
+     * --color-accent-fg (ciemny gold pod jasne tła) schodzi na nim do ~2:1.
+     * Karta „polecana" jest od tego głosu pełnym negatywem na trzech
+     * powierzchniach (cennik, for-studios, onboarding + pay), więc znak na
+     * atramencie dostaje własny token roli zamiast trzech lokalnych
+     * color-mixów. Mode-invariant, bo ink jest mode-invariant. */
+    --color-mark-bg-on-ink: color-mix(
+      in oklch,
+      var(--color-primary) 24%,
+      var(--color-ink)
+    );
+
+    /* --- Desktop phone frame (structural, not themed) ---
+     * Used by AppLayout (>=1280px) to render the iPhone-style frame
+     * + sidebar slot around the app shell. The frame bg stays deep
+     * neutral both modes (it represents the "outside the phone" area —
+     * a stage, not a UI surface). Sidebar bg is theme-aware via
+     * `--color-frame-sidebar-bg`, blended toward the frame bg so it
+     * reads as integrated with the stage rather than a floating panel. */
+    --color-frame-bg: #1a1a1a;
+    --color-frame-bezel: #333333;
+    /* Light-mode default: warm beige with more saturation than iter 1.
+     * Dark mode overrides via `:root[data-mode='dark']` below — separate
+     * value to keep visual parity with the deep stage. */
+    --color-frame-sidebar-bg: oklch(0.94 0.012 70);
+    --color-frame-sidebar-border: color-mix(
+      in oklch,
+      var(--color-primary) 18%,
+      var(--color-border)
+    );
+    /* DECISION (nie usuwaj — floor de-slop S29): zero-blur inner hairline
+     * (inset 0 0 0 1px = obwódka, nie cień). Wcześniej `inset 4px 0 8px`
+     * (8px blur) = miękki cień łamiący floor §2 — niespójny z bezel-rodzeństwem
+     * (.layoutFrame, S14: "ZERO blur, to obwódki nie cień"). Recessed-panel read
+     * niesie border + tonal bg + ten inner hairline. */
+    --color-frame-sidebar-inset-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--color-primary) 14%, transparent);
+
+    /* --- Typography Scale (rem-based, root 16px) ---
+     * DECISION (nie usuwaj tego komentarza):
+     * Floor 14px na CAŁEJ skali (owner S37: „globalna podłoga czcionek",
+     * czytelność > gęstość; żaden token < 14px). xs=14px (floor), sm=15px
+     * (zachowany krok skali nad floorem). Wcześniej xs=10px / sm=13px łamały
+     * floor (widoczne m.in. w panelu admina). Strażnik: audit:min-font-size. */
+    --text-xs: 0.875rem;
+    --text-sm: 0.9375rem;
+    --text-base: 1rem;
+    --text-md: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 2rem;
+    --text-4xl: 2.5rem;
+
+    /* --- Typography Scale — FLUID (clamp) ---
+     * DECISION (S99, nie usuwaj tego komentarza):
+     *
+     * Skala powyżej jest STAŁA (jeden rozmiar na wszystkich szerokościach) i
+     * zostaje dla UI-chrome. Ta jest PŁYNNA i rządzi treścią, która ma rosnąć
+     * razem z ekranem: nagłówkami stron statycznych, ledami, numerałami.
+     *
+     * Powstała, bo census znalazł **219 deklaracji `font-size: clamp()` w 124
+     * RÓŻNYCH zapisach** — w tym czterdzieści jeden wariantów jednego stopnia
+     * (nagłówek sekcji: 24→36, 24→38, 26→36, 24→34, 28→36…). Nikt świadomie nie
+     * wybierał 3.4vw zamiast 3.6vw dla dwóch sąsiednich sekcji; to jest dryf,
+     * który widać dopiero wtedy, gdy dwa takie nagłówki staną obok siebie.
+     *
+     * Wartości to DOMINANTY klastrów, nie średnie: każdy stopień jest zapisem,
+     * który w tym repo już wygrał liczebnie, więc przejście na niego przesuwa
+     * najmniej pikseli. Element, który od najbliższego stopnia odstaje o więcej
+     * niż 12%, zostaje przy swoim — tam rozmiar jest decyzją, nie przypadkiem. */
+    --text-fluid-xs: clamp(14px, 1.05vw, 16px);
+    --text-fluid-sm: clamp(15px, 1.15vw, 17px);
+    --text-fluid-md: clamp(16px, 1.4vw, 20px);
+    --text-fluid-lg: clamp(20px, 2vw, 26px);
+    --text-fluid-xl: clamp(24px, 3vw, 36px);
+    --text-fluid-2xl: clamp(30px, 4.4vw, 48px);
+    --text-fluid-3xl: clamp(40px, 6vw, 72px);
+    --text-fluid-display: clamp(48px, 7vw, 96px);
+
+    /* Aliasy ROLOWE — poziomy, które w tym repo istnieją naprawdę, a nie są
+     * stopniem ośmiostopniowej skali.
+     * DECISION (S104, nie usuwaj tego komentarza):
+     *
+     * Po S99 w modułach zostały 33 własne `clamp()`. Policzone: KAŻDY odstaje
+     * od najbliższego stopnia o co najmniej 13%, więc wciśnięcie ich w skalę
+     * byłoby zmianą składu, nie porządkiem. Ale dwa z tych „wyjątków" to wcale
+     * nie wyjątki, tylko klastry o IDENTYCZNYCH krańcach, różniące się wyłącznie
+     * współczynnikiem vw (2.2 / 2.4 / 2.6 / 2.8 — nikt tego nie wybierał):
+     *   22→30 w ośmiu miejscach  = podnagłówek, tytuł bloku, lede karty
+     *   18→22 w trzech miejscach = tytuł panelu / karty
+     * Dostają nazwę zamiast liczby — tak samo jak `--ls-eyebrow` w skali
+     * trackingu, gdzie wartość jest decyzją projektową, a nie stopniem.
+     * Krańce zostają dokładnie te, co dominanta klastra, więc na skrajnych
+     * szerokościach skład się nie rusza; ujednolica się tylko środek. */
+    --text-fluid-subhead: clamp(22px, 2.5vw, 30px);
+    --text-fluid-panel-title: clamp(18px, 1.8vw, 22px);
+
+    /* --- Monospace (klucze configów, metryki, ID) ---
+     * S25: token istniał tylko jako widmo var(--font-mono, fallback) w 15
+     * plikach admin/app — definicja centralna, fallbacki per-plik zbędne. */
+    --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+    /* --- Interlinia treści (głos 3, S108) ---
+     * Instrument Sans czyta się przy 1.65; `global.css body` i moduły czytają
+     * tę rolę zamiast literału 1.6 (kodemod S108). Nagłówki mają własne,
+     * ciaśniejsze interlinie i tej roli nie dotykają. */
+    --leading-body: 1.65;
+
+    /* ===== Letter-spacing — SSOT trackingu =====
+     * DECISION (S99, nie usuwaj tego komentarza):
+     *
+     * Były tu dokładnie dwa tokeny, a census znalazł 466 surowych wartości
+     * `letter-spacing` w 106 modułach. Skutek był taki, że ten sam nagłówek
+     * dostawał -0.01em na jednej stronie i -0.012em na drugiej: różnica
+     * niewidoczna w kodzie, widoczna w składzie, gdy oba warianty stoją obok
+     * siebie.
+     *
+     * Nazwa niesie WARTOŚĆ w setnych `em` (`--ls-tight-12` = -0.012em),
+     * tak samo jak w skali odstępów. Semantyczna nazwa („heading", „caps")
+     * kusi, ale przy czternastu stopniach robi się arbitralna: nikt nie
+     * odgadnie, czy `--ls-caps` jest ciaśniejszy od `--ls-tracked`.
+     *
+     * Kierunek jest funkcją rozmiaru: duży tekst zacieśniamy (`tight`),
+     * mały rozstrzeliwujemy (`wide`). Wartości odpowiadają JEDEN DO JEDNEGO
+     * temu, co już było w kodzie — to porządkowanie, nie przestrajanie składu. */
+    /* Dwa najciaśniejsze stopnie dołożone S99, gdy zaokrąglaliśmy ogon luźnych
+     * wartości: skala kończyła się na -0.02em, a produkt ma typografię
+     * wyświetlaniową do 120px (liczniki, figury benefitów, hero). Przy takich
+     * rozmiarach -0.02em jest po prostu za luźne i litery się rozjeżdżają, więc
+     * osiem miejsc trzymało własne -0.024 / -0.025 / -0.03 / -0.04. To ta sama
+     * historia co z odstępami: brakowało stopnia, nie dyscypliny. */
+    --ls-tight-40: -0.04em;
+    --ls-tight-25: -0.025em;
+    --ls-tight-20: -0.02em;
+    --ls-tight-15: -0.015em;
+    --ls-tight-12: -0.012em;
+    --ls-tight-10: -0.01em;
+    --ls-tight-5: -0.005em;
+    --ls-wide-5: 0.005em;
+    --ls-wide-10: 0.01em;
+    --ls-wide-20: 0.02em;
+    --ls-wide-40: 0.04em;
+    --ls-wide-60: 0.06em;
+    --ls-wide-80: 0.08em;
+    --ls-wide-100: 0.1em;
+    --ls-wide-120: 0.12em;
+    --ls-wide-140: 0.14em;
+
+    /* Nazwy ROLOWE — aliasy na powyższe. Zostają, bo niosą intencję w
+     * miejscach, gdzie tracking JEST decyzją projektową, nie liczbą:
+     * eyebrow = tracked editorial label (chip + dot), kanon wspólny dla APP +
+     * LP + admin (cross-view eyebrow unification, 2026-05-30). Wzorcowa
+     * implementacja: NotFoundPage / ServerErrorPage `.eyebrowChip`. */
+    --ls-eyebrow: var(--ls-wide-140);
+    --ls-micro-label: var(--ls-wide-60);
+  }
+
+  /* --- Dark mode overrides ---
+   * When color-scheme is dark, shadows need higher opacity to be visible
+   * against dark backgrounds. Tooltip inverts for contrast. */
+  :root[data-mode='dark'] {
+    --color-tooltip-bg: #e5e7eb;
+    --color-tooltip-text: #111827;
+    /* Shadows neutralized to `none` (see light block DECISION). */
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    /* Dark sidebar — deep charcoal blended toward the frame stage, so
+     * the panel reads as a recessed surface rather than a floating tile. */
+    --color-frame-sidebar-bg: color-mix(
+      in oklch,
+      var(--color-bg-elevated) 86%,
+      var(--color-frame-bg)
+    );
+    /* zero-blur inner hairline (floor de-slop S29 — patrz light blok) */
+    --color-frame-sidebar-inset-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--color-primary) 16%, transparent);
+  }
+}

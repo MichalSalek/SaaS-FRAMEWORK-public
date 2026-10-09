@@ -1,0 +1,106 @@
+/* ─── ColorSwatch — clickable color circle + label ─── */
+
+.swatch {
+  display: flex;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+  flex-direction: column;
+  /* The dot and its name start at the cell's left edge (S126): centred on its
+     own name, each dot stood at a different x and the grid had no columns. */
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-8) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--style-radius-surface);
+  transition: transform var(--duration-100) var(--spring-snappy);
+}
+
+.swatch:active {
+  transform: scale(0.93);
+}
+
+/* Wylaczony swatch nie udaje klikalnego: kursor idzie za semantyka `disabled`,
+   inaczej wygaszenie mowi "niedostepne", a lapka "sprobuj". */
+.swatch:disabled {
+  cursor: default;
+}
+
+.swatch:disabled:active {
+  transform: none;
+}
+
+/* Selected ring on the dot */
+.selected > span:first-child {
+  border-color: var(--color-text-primary);
+  box-shadow:
+    0 0 0 2px var(--color-bg-main),
+    0 0 0 4px var(--color-text-primary);
+}
+
+/* DECISION (nie usuwaj tego komentarza) — owner 2026-10-08, S126:
+   a colour name is NEVER cut. It used to be capped at 60px with an ellipsis,
+   so on a phone the picker read „Czerw…”, „Pomara…”, „Niebies…” (measured in
+   the label font, selected weight: Pomarańczowe 106px, Turkusowe 80, Niebieskie
+   75, Czerwone 72). The grid below sizes its cells so those names fit on one
+   line; a name longer than its cell (the taxonomy is the admin's to extend)
+   wraps inside it in two even halves, hyphenated where the browser can.
+   The selected name changes COLOUR only: a heavier weight is 4px wider, which
+   was enough to wrap „Pomarańczowe” at the moment of the tap. */
+.label {
+  max-width: 100%;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: start;
+  text-wrap: balance;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.selected .label {
+  color: var(--color-text-primary);
+}
+
+/* ─── Inline variant (for summary / compact lists) ─── */
+
+.inline {
+  min-width: 0;
+  min-height: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0;
+  cursor: default;
+}
+
+.inline:active {
+  transform: none;
+}
+
+.inline .label {
+  max-width: none;
+  color: var(--color-text-primary);
+  font-weight: 400;
+}
+
+/* ─── Grid container ─── */
+
+/* As many cells as fit the grid's OWN width (never a viewport query: the same
+   grid sits in a page card, a filter sheet and a dialog). A cell is at least
+   104px, which holds the longest seeded name (102px) on one line at any
+   column count. A consumer narrower than three such cells lowers the public
+   knob `--color-swatch-cell` on its own class (the upload card does).
+   No column gap: a cell has no surface of its own, and the swatch brings its
+   own block padding, so the row gap stays small. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--color-swatch-cell, 104px), 1fr)
+  );
+  gap: var(--space-4) 0;
+  justify-items: start;
+}

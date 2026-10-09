@@ -1,0 +1,10 @@
+/* Tabela z JAWNĄ decyzją o table-layout, zagnieżdżona w @media. Skan liczy
+   tylko bloki LIŚCIE — bez tego ciało @media (z którego parser deklaracji
+   wyławia samo `border-collapse`) raportowałoby tabelę bez decyzji, choć
+   decyzja stoi linijkę wyżej. */
+@media (min-width: 768px) {
+  .comparison {
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+}

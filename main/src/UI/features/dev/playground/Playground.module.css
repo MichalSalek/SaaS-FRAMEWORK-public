@@ -1,0 +1,259 @@
+/* /dev/playground — owner-vote workshop, dev and staging only, noindex. */
+
+.page {
+  min-height: 100dvh;
+  padding: var(--space-32) var(--space-24) var(--space-48);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+}
+
+.header,
+.vote,
+.summary,
+.details {
+  max-width: 1600px;
+  margin: 0 auto var(--space-32);
+}
+
+.header {
+  max-width: 72ch;
+  margin-left: max(0px, calc((100% - 1600px) / 2));
+}
+
+.kicker {
+  margin: 0 0 var(--space-12);
+  font-family: var(--style-kicker-font);
+  font-size: var(--style-kicker-size);
+  font-weight: var(--style-kicker-weight);
+  letter-spacing: var(--style-kicker-tracking);
+  text-transform: var(--style-kicker-case);
+  color: var(--color-accent-fg);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.1;
+}
+
+.lede,
+.voteHeader p,
+.candidateHead p,
+.summary p {
+  margin: var(--space-12) 0 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.voteHeader {
+  max-width: 72ch;
+  margin-bottom: var(--space-20);
+}
+
+.voteHeader h2,
+.summary h2 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+}
+
+.voteHeader .question {
+  color: var(--color-text-primary);
+}
+
+.prerequisite {
+  font-size: var(--text-sm);
+}
+
+.login {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+  font-size: var(--text-base);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  margin-bottom: var(--space-16);
+}
+
+.frames {
+  display: flex;
+  gap: var(--space-24);
+  align-items: start;
+  overflow-x: auto;
+  padding: var(--space-16) 0;
+}
+
+.frames[data-wide='true'] {
+  flex-direction: column;
+  overflow-x: visible;
+}
+
+.candidate {
+  flex: 1 0 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.candidateHead {
+  max-width: 44ch;
+  min-height: 7.5em;
+}
+
+.candidateHead h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+}
+
+.frameBox {
+  position: relative;
+  overflow: hidden;
+  margin-top: var(--space-12);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+}
+
+.frame {
+  display: block;
+  border: 0;
+  transform-origin: top left;
+}
+
+.frameStatus {
+  position: absolute;
+  inset: var(--space-16) auto auto var(--space-16);
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.candidateActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+}
+
+.link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-base);
+}
+
+.status {
+  margin: var(--space-8) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.summary textarea {
+  width: 100%;
+  max-width: 72ch;
+  margin-top: var(--space-12);
+  padding: var(--space-12);
+  font: inherit;
+  font-size: var(--text-base);
+  border: var(--style-border-control) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-interactive);
+  color: var(--color-text-primary);
+}
+
+.details summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: var(--text-base);
+}
+
+/* --- palette vote (S125) --- */
+
+.paletteList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-bottom: var(--space-16);
+}
+
+.paletteOption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 44px;
+  padding: var(--space-8);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--color-text-primary);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-control) solid transparent;
+  border-radius: var(--style-radius-control);
+  cursor: pointer;
+}
+
+.paletteOption[aria-checked='true'] {
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.paletteOption[data-chosen='true'] .paletteName::after {
+  content: ', wybór';
+  color: var(--color-accent-fg);
+}
+
+.paletteOption[aria-checked='true'][data-chosen='true'] .paletteName::after {
+  color: var(--color-accent-on-ink);
+}
+
+.swatchStrip {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.swatchMode {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg-main);
+  border-radius: var(--style-radius-control);
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--style-radius-control);
+}
+
+.paletteName {
+  font-weight: 500;
+}
+
+.paletteMeta {
+  font-size: var(--text-sm);
+}
+
+.surfaceSlot {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.frames[data-wide='true'] .surfaceSlot {
+  width: 100%;
+}
+
+.candidate[data-column='true'] {
+  flex: 0 0 480px;
+}

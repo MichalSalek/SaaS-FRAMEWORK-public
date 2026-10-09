@@ -1,0 +1,177 @@
+/*
+ * SalonInvitationsPage — invitee screen (/app/salon/invitations).
+ *
+ * A waiting invitation is grouped content with two answers, so it stands in a
+ * white box (S116 „A3, Biel na papierze”: `--color-surface-card`, no frame,
+ * no shadow). What is left after the answer is information: one line on paper
+ * in the slot the card occupied.
+ *
+ * Anti-AI-Slop: zero gradient / shadow / glow / single-sided accent bar, no
+ * middle dot between facts.
+ */
+
+@keyframes noticeIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  width: 100%;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  min-width: 0;
+}
+
+.cardHead > :first-child {
+  flex: none;
+}
+
+.identity {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+  letter-spacing: var(--style-heading-tracking);
+  font-size: var(--text-lg);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cardSubtitle {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cardMeta {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.consent {
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+}
+
+/* An icon next to text that may wrap: a box exactly one line tall, so the
+   glyph sits on the FIRST line instead of the middle of the paragraph. */
+.lineIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-accent-fg);
+}
+
+.lineIcon > svg {
+  display: block;
+}
+
+.lineIcon.lineIconMuted {
+  color: var(--color-text-secondary);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  color: var(--color-error-fg);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  animation: noticeIn var(--duration-200) var(--ease-entrance);
+}
+
+.error .lineIcon {
+  color: inherit;
+}
+
+.errorText {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Inline confirmation in the slot the answered card occupied. */
+.noticeRow {
+  padding: var(--space-12) var(--space-20);
+}
+
+.notice {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  animation: noticeIn var(--duration-300) var(--ease-entrance);
+}
+
+.skeletonLines {
+  flex: 1;
+  display: grid;
+  gap: var(--space-8);
+}
+
+/* The box of the answer button it stands in for. */
+.skeletonAction {
+  width: 200px;
+  height: 44px;
+  border-radius: var(--style-radius-control);
+}

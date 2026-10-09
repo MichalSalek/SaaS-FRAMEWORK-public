@@ -1,0 +1,6 @@
+/* Granica alfy nie była zakotwiczona z żadnej strony: wszystkie próbki
+   surowego koloru siedziały na 0.10–0.12, więc mutacja `> 0.45` → `>= 0.45`
+   przeżywała. 0.45 to OSTATNIA alfa, którą motyw uznaje za wash. */
+.at45 {
+  background: rgba(212, 168, 64, 0.45);
+}

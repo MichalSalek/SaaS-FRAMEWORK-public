@@ -1,0 +1,2 @@
+/* split-bg-allow: pasek postepu, nie band sekcji */
+.bar::before { content: ''; position: absolute; inset: 0 0 0 auto; width: 38%; background: var(--color-surface); }

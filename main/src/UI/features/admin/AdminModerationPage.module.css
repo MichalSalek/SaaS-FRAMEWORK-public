@@ -1,0 +1,325 @@
+/* AdminModerationPage — the moderation queue. The filter bar, the pager, the
+   status pill, the buttons, the note field and the confirm dialog are shared
+   parts; this file lays out the report card (a card with a picture). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+
+/* ─── Status and count: one row ─── */
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-16);
+}
+
+.filterSummary {
+  min-height: 1lh;
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ─── Reports list ─── */
+
+/* The card switches layout on the list's OWN width: admin routes also render
+   inside a 390px frame on a wide desktop, where a viewport query lies. */
+.reportsList {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* ─── Report card ─── */
+
+.reportCard {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-12);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-interactive);
+}
+
+/* The header is the native toggle: ONE compact row (picture, what and who,
+   status with the caret), the same at every width. */
+.reportCardToggle {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: var(--space-12);
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--style-radius-control);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reportCardToggle:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Thumbnail ─── */
+
+.thumbnailWrap {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--style-radius-control);
+  overflow: hidden;
+  /* Podkład pod miniaturą (widoczny do czasu wczytania zdjęcia) = neutralna
+     powierzchnia. */
+  background: var(--color-surface-input);
+}
+
+.thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* `--color-text-muted`, nie `-disabled`: to informacja o BRAKU miniatury, nie
+   kontrolka nieaktywna (zmierzone 2,19:1 w jasnym na tokenie disabled). */
+.thumbnailPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-text-muted);
+}
+
+/* ─── Header facts ─── */
+
+.reportInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* DECISION (nie usuwaj tego komentarza): BEZ text-transform:capitalize — reason
+ * label przychodzi z i18n z poprawnym case'em ("Spam lub reklama"); capitalize
+ * łamał polską ortografię ("Spam Lub Reklama" — spójnik "lub" z wielkiej). */
+.reportReason {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* The flag sits on the FIRST line of a reason that wraps. */
+.reasonIcon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-warning);
+}
+
+.reasonIcon > svg {
+  display: block;
+}
+
+.reportDescription {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Who and when: two pieces with a gap; the date moves down whole. */
+.reportMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-12);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.reportStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* Narrow list (a phone): the status pill moves UNDER the facts and only the
+   caret stays beside them. On one line with the pill the title column was
+   about 100px and „Niewłaściwa” broke inside the word (measured S126 at 390). */
+@container (max-width: 479.98px) {
+  .reportStatus {
+    display: contents;
+  }
+
+  .reportStatus > :first-child {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .caret {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  .thumbnailWrap {
+    grid-row: 1 / span 2;
+  }
+}
+
+/* The one affordance of the toggle. */
+.caret {
+  display: flex;
+  flex: none;
+  color: var(--color-text-secondary);
+  transition: transform var(--duration-200) var(--ease-entrance);
+}
+
+.caret[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+.caret > svg {
+  display: block;
+}
+
+/* ─── Details (inside the shared disclosure panel) ─── */
+
+.detailPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding-top: var(--space-16);
+}
+
+.detailImage {
+  display: block;
+  width: min(100%, 320px);
+  height: auto;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12) var(--space-24);
+  margin: 0;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.factLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.factValue,
+.factId {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* An identifier: copied, not read. */
+.factId {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Decision ─── */
+
+.actionPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding-top: var(--space-16);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.actionNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.ownerStrikes {
+  align-self: flex-start;
+}
+
+/* Narrow card: one decision per line, full width (the column stretches them). */
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Always in the layout: a failure shows up without moving the buttons. */
+.actionError {
+  min-height: 1lh;
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-error);
+}
+
+/* ─── From 768px of the list's own width ─── */
+
+@container (min-width: 768px) {
+  .reportCard {
+    padding: var(--space-12) var(--space-16);
+  }
+
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .actionButtons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media (hover: hover) {
+  .reportCardToggle:hover .caret {
+    color: var(--color-text-primary);
+  }
+}

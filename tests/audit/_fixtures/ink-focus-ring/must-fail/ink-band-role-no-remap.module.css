@@ -1,0 +1,8 @@
+/* Pas fioletowy przez ROLĘ palety (nie przez lokalny alias) bez remapu ringu.
+   Ta próbka pilnuje, żeby promocja wartości z modułu do palettes.css nie
+   oślepiła strażnika: gałąź "ciemny pas przez alias" rozwiązuje jeden skok
+   w tym samym pliku i po przeniesieniu wartości przestałaby ten pas widzieć. */
+.violetBandNoRemap {
+  background: var(--color-ink-band);
+  color: var(--color-on-ink-band);
+}

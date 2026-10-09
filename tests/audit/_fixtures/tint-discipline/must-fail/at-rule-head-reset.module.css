@@ -1,0 +1,8 @@
+/* Instrukcja najwyższego poziomu zakończona średnikiem. Bez resetu „główki"
+   na średniku selektor kolejnego bloku sklejał się z nią w jeden ciąg, więc
+   etykieta naruszenia przestawała wskazywać regułę, której dotyczy. */
+@layer base, components;
+
+.tinted {
+  background: color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

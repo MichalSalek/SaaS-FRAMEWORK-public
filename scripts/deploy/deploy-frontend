@@ -1,0 +1,352 @@
+#!/usr/bin/env bash
+# scripts/deploy/deploy-frontend
+# =============================================================================
+# Deploy front `main` -> hosting wspoldzielony: build standalone LOKALNIE -> tar -> scp
+# -> atomowy symlink current -> pm2 (delete+start na zarezerwowanym porcie)
+# -> health-gate. Konfiguracja (domena/port/ssh) z deploy.config.sh (SSOT).
+# Wywolanie: ENV_NAME=production scripts/deploy/deploy-frontend
+# =============================================================================
+
+# 1. Source utils + SSOT config
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/deploy.config.sh"
+source "${SCRIPT_DIR}/_pm2-remote.sh"
+source "${SCRIPT_DIR}/_static-gate.sh"
+source "${SCRIPT_DIR}/_artifact-gate.sh"
+
+# 2. Walidacja + rozwiazanie celu z ENV_NAME (DOMAIN, PORT z config)
+check_required_vars "ENV_NAME"
+resolve_frontend_target "$ENV_NAME" || exit 1
+
+PROJECT_NAME="${FRONTEND_PROJECT}"
+SSH_USER="${DEPLOY_SSH_USER}"
+SSH_HOST="${DEPLOY_SSH_HOST}"
+SSH_CONN="${SSH_USER}@${SSH_HOST}"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"   # z polozenia skryptu, nie z CWD
+PROJECT_DIR="${ROOT_DIR}/${PROJECT_NAME}"
+TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
+ARCHIVE_NAME="${PROJECT_NAME}_${ENV_NAME}_${TIMESTAMP}.tar.gz"
+
+# 3. Banner
+header "DEPLOY FRONTEND" "🚀"
+info "Environment: ${BOLD}${ENV_NAME}${RESET}"
+info "Domain:      ${BOLD}${DOMAIN}${RESET}"
+info "Port:        ${BOLD}${PORT}${RESET} (zarezerwowany na hostingu — patrz deploy.config.sh)"
+info "Host:        ${BOLD}${SSH_CONN}${RESET}"
+echo ""
+
+if [[ ! -d "${PROJECT_DIR}" ]]; then
+  error "Project directory not found: ${PROJECT_DIR}"
+  exit 2
+fi
+
+# --- Guard: branch + parytet z origin + dirty (artefakt powstaje z WORKING TREE) ---
+# Standalone budowany jest z biezacego drzewa `main`, spakowany i wyslany na
+# hosting wspoldzielony — czyli dokladnie ta sama klasa ryzyka co deploy backendu, ktory te
+# guardy ma od S85/S88. Bez nich produkcja frontu mogla pojsc z feature-brancha,
+# z niezacommitowanych zmian albo ze starszego kodu niz origin (cofajac to, co
+# juz jest wdrozone przez kogos innego).
+step "GUARD: branch / parytet z origin / dirty (${PROJECT_NAME})"
+FRONT_BRANCH="$(git -C "${PROJECT_DIR}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+if [ "$FRONT_BRANCH" != "master" ]; then
+  if [ "$ENV_NAME" = "production" ]; then
+    error "Deploy produkcji wymaga brancha 'master' (${PROJECT_NAME} jest na '${FRONT_BRANCH}')."
+    error "Standalone budowany jest z working tree — z innego brancha na PROD trafi kod spoza master."
+    exit 12
+  fi
+  warn "${PROJECT_NAME} jest na branchu '${FRONT_BRANCH}' (nie master) — artefakt powstanie z niego."
+fi
+
+read -r FRONT_BEHIND FRONT_AHEAD <<< "$(git_parity_counts "${PROJECT_DIR}")"
+if [ "${FRONT_BEHIND:-0}" -gt 0 ]; then
+  # Twardy STOP tylko dla produkcji. Na preview dopuszczamy inny branch (wyzej), a
+  # kazdy feature-branch jest z definicji "behind origin/master" — blokada zamknelaby
+  # jedyne sensowne zastosowanie preview: pokazanie brancha przed mergem.
+  if [ "$ENV_NAME" = "production" ]; then
+    error "${PROJECT_NAME} jest ${FRONT_BEHIND} commit(ow) ZA origin/master."
+    error "Deploy zbudowalby PROD ze starszego kodu i COFNAL zmiany, ktore sa juz na origin."
+    error "Zrob: (cd ${PROJECT_NAME} && git pull --ff-only)  i powtorz deploy."
+    exit 13
+  fi
+  warn "${PROJECT_NAME} jest ${FRONT_BEHIND} commit(ow) ZA origin/master (preview — dopuszczalne)."
+fi
+if [ "${FRONT_AHEAD:-0}" -gt 0 ]; then
+  warn "${PROJECT_NAME}: ${FRONT_AHEAD} commit(ow) NIEwypushowanych — trafia na PROD, ale nie ma ich na origin."
+  confirm "Wdrozyc kod, ktorego nie ma na origin/master?"
+fi
+
+# Generowany js-client Prismy wykluczony (to nie kod feature'owy) — parytet z web-1.
+DIRTY_FRONT="$(git -C "${PROJECT_DIR}" status --porcelain -- src next.config.ts next.config.mjs package.json package-lock.json tsconfig.json public 2>/dev/null | grep -vE 'src/prisma/js-client/' || true)"
+if [ -n "$DIRTY_FRONT" ]; then
+  warn "Niezacommitowane/untracked zmiany w ${PROJECT_NAME} — WBUDUJA sie w standalone i wdroza na PROD:"
+  echo "$DIRTY_FRONT" | sed 's/^/    /' >&2
+  confirm "Te niezacommitowane zmiany zostana wbudowane i wdrozone na prod. Kontynuowac?"
+fi
+success "Guard OK (branch=${FRONT_BRANCH}, behind=${FRONT_BEHIND:-0}, ahead=${FRONT_AHEAD:-0})"
+
+# ==============================================================================
+# PHASE 0: PRE-FLIGHT GATE (typecheck + testy jednostkowe)
+# Build sam w sobie NIE odpala testow (pre:build = lint only) — deploy z HEAD
+# z czerwonymi testami przechodzil po cichu.
+# ==============================================================================
+step "PHASE 0: PRE-FLIGHT GATE"
+# `|| exit` NA SUBSHELLU jest OBOWIĄZKOWE: `exit 3` w środku kończy tylko subshell,
+# a skrypt nie ma `set -e` — bez tego bramka pre-flight była ŚLEPA i czerwony
+# typecheck/test leciał na produkcję (dokładnie to, czemu miała zapobiegać).
+(
+  cd "${PROJECT_DIR}"
+  info "typecheck..."
+  npm run --silent typecheck || { error "PRE-FLIGHT FAIL: typecheck"; exit 3; }
+  info "test:unit (vitest)..."
+  npm run --silent test:unit || { error "PRE-FLIGHT FAIL: testy jednostkowe — nie deployuje czerwonego HEAD"; exit 3; }
+) || exit 3
+success "Pre-flight OK (typecheck + unit)"
+
+# ==============================================================================
+# PHASE 1: BUILD
+# ==============================================================================
+step "PHASE 1: BUILD"
+
+info "Building project: ${BOLD}${PROJECT_NAME}${RESET}"
+(
+  cd "${PROJECT_DIR}"
+  # ENSURE sharp-wasm32: hosting produkcyjny nie obsluguje natywnych binarek, natywny sharp (linux-x64) sie tam nie
+  # laduje -> sharp odpala fallback WASM. npm nie utrzymuje wariantu wasm32 obok
+  # natywnych (kazdy `npm install` go usuwa, bo cpu-mismatch), wiec dogrywamy go
+  # tuz przed buildem (--no-save: lock i package.json nietkniete). Wersja SPRZEZONA
+  # z zainstalowanym sharp (ABI musi sie zgadzac — mismatch dawal TypeError w
+  # utility.js). Do standalone kopiuje go outputFileTracingIncludes (next.config).
+  SHARP_VER="$(node -p "require('sharp/package.json').version" 2>/dev/null || true)"
+  if [ -n "${SHARP_VER}" ] && ! ls node_modules/@img/sharp-wasm32/lib/*.node.wasm >/dev/null 2>&1; then
+    info "Dogrywam @img/sharp-wasm32@${SHARP_VER} (fallback WASM)..."
+    npm install --no-save --force "@img/sharp-wasm32@${SHARP_VER}" >/dev/null 2>&1 || { error "Instalacja @img/sharp-wasm32@${SHARP_VER} FAIL"; exit 4; }
+  fi
+  npm run "build:${ENV_NAME}" || { error "Build failed"; exit 4; }
+) || exit 4   # patrz PHASE 0: bez tego nieudany build leciał dalej i wysyłał POPRZEDNI standalone
+
+STANDALONE_DIR="${PROJECT_DIR}/.next/standalone"
+if [[ ! -d "${STANDALONE_DIR}" ]]; then
+  error "Standalone build not found! Check next.config.mjs (output:'standalone')."
+  exit 5
+fi
+
+# Standalone output nests under project name due to outputFileTracingRoot
+APP_DIR="${STANDALONE_DIR}/${PROJECT_NAME}"
+if [[ ! -d "${APP_DIR}" ]]; then
+  error "Nested app dir not found: ${APP_DIR}"
+  exit 5
+fi
+
+# GUARD sharp-wasm32: bez binarki WASM w standalone Next na hostingu serwuje
+# /_next/image jako PASS-THROUGH oryginalu (cicha regresja perf — potwierdzona
+# na prod 2026-07-08). Hard-abort zamiast deployu z martwym optimizerem.
+if ! ls "${STANDALONE_DIR}"/*/node_modules/@img/sharp-wasm32/lib/*.node.wasm >/dev/null 2>&1 \
+   && ! ls "${STANDALONE_DIR}"/node_modules/@img/sharp-wasm32/lib/*.node.wasm >/dev/null 2>&1; then
+  error "Brak BINARKI @img/sharp-wasm32 (lib/*.node.wasm) w standalone — /_next/image bedzie pass-through na hostingu."
+  error "Fix: ensure-step wyzej powinien byl ja doinstalowac; sprawdz outputFileTracingIncludes ('*') w next.config.mjs."
+  exit 5
+fi
+success "sharp-wasm32 obecny w standalone (image optimizer bedzie zywy na hostingu)"
+
+# Tozsamosc WYSYLANEGO artefaktu — PHASE 4 sprawdzi, ze pm2 serwuje DOKLADNIE ten
+# build (HTML 200 potrafi pochodzic z poprzedniego release'u: nieprzepiety symlink,
+# nieprzeladowany proces). Czytamy z APP_DIR, bo to ten katalog leci na serwer.
+FRONT_BUILD_ID="$(cat "${APP_DIR}/.next/BUILD_ID" 2>/dev/null || echo unknown)"
+success "Build OK (BUILD_ID ${FRONT_BUILD_ID})"
+
+# ==============================================================================
+# PHASE 2: BUNDLE
+# ==============================================================================
+step "PHASE 2: PREPARE BUNDLE"
+
+# DECISION (nie usuwaj tego komentarza): KAŻDE kopiowanie do standalone idzie przez
+# `mkdir -p` + `cp -Rp <src>/.` — NIGDY `cp -r <src> <dst>`. Standalone (next 16.x)
+# traceuje coraz więcej: .next/static, public, tests i .shared-kernel JUŻ ISTNIEJĄ w
+# APP_DIR po buildzie, więc `cp -r src dst` wkłada katalog DO katalogu
+# (.next/static/static, tests/tests). Na public kosztowało to dobę 404 na wszystkich
+# statykach (incydent 2026-08-02/03); na .next/static kosztowałoby 404 na CAŁYM JS/CSS.
+# Strażnicy: PHASE 4 sprawdza / oraz /robots.txt i /.well-known/assetlinks.json.
+info "Copying static assets..."
+mkdir -p "${APP_DIR}/.next/static"
+cp -Rp "${PROJECT_DIR}/.next/static/." "${APP_DIR}/.next/static/"
+# DECISION (nie usuwaj tego komentarza): kopiujemy ZAWARTOSC public/ (public/.),
+# NIE katalog. Standalone build (od next 16.2.12) traceuje public/logo.png, wiec
+# APP_DIR/public JUZ ISTNIEJE — stary `cp -r public public` zagniezdzal wtedy
+# public/public i WSZYSTKIE statyki (robots.txt, manifest, ikony, assetlinks,
+# llms) dawaly 404 na prodzie (incydent 2026-08-02/03). Strażnik: PHASE 4
+# sprawdza tez /robots.txt.
+mkdir -p "${APP_DIR}/public"
+cp -Rp "${PROJECT_DIR}/public/." "${APP_DIR}/public/"
+
+info "Copying tests and shared-kernel for smoke tests..."
+mkdir -p "${APP_DIR}/tests" "${APP_DIR}/.shared-kernel"
+cp -Rp "${ROOT_DIR}/tests/." "${APP_DIR}/tests/"
+cp -Rp "${ROOT_DIR}/.shared-kernel/." "${APP_DIR}/.shared-kernel/"
+
+info "Configuring entry point (server.js -> app.js)..."
+(
+  cd "${APP_DIR}"
+  ln -sf server.js app.js
+  mkdir -p public/_next
+  ln -sf ../.next/static public/_next/static
+
+  info "Compressing archive: ${BOLD}${ARCHIVE_NAME}${RESET}"
+  tar -czf "${PROJECT_DIR}/${ARCHIVE_NAME}" .
+)
+
+success "Bundle prepared"
+
+# ==============================================================================
+# PHASE 3: UPLOAD & DEPLOY
+# ==============================================================================
+step "PHASE 3: UPLOAD & DEPLOY"
+
+REMOTE_ROOT="${DEPLOY_REMOTE_BASE}/${DOMAIN}"
+RELEASES_DIR="${REMOTE_ROOT}/releases"
+RELEASE_PATH="${RELEASES_DIR}/${TIMESTAMP}"
+
+info "Creating remote directory: ${RELEASE_PATH}"
+ssh "${SSH_CONN}" "mkdir -p ${RELEASE_PATH}"
+
+info "Uploading archive..."
+scp "${PROJECT_DIR}/${ARCHIVE_NAME}" "${SSH_CONN}:${RELEASE_PATH}/" || { error "Upload failed"; exit 8; }
+
+info "Extracting and activating (pm2 delete+start na NOWY release, port ${PORT})..."
+
+# Remote PM2 block (delete+start z cwd=current — gwarantuje nowy release + wlasciwy port)
+PM2_COMMANDS=$(pm2_remote_block "frontend-${DOMAIN}" "${PORT}" "${DOMAIN}" "${DEPLOY_NODE_INTERPRETER}")
+
+ssh "${SSH_CONN}" "
+  set -e
+  export PATH=\$HOME/bin:\$HOME/.npm-global/bin:\$PATH
+
+  cd ${RELEASE_PATH}
+  tar -xzf ${ARCHIVE_NAME}
+  rm ${ARCHIVE_NAME}
+
+  # TRWALY cache optymalizatora obrazow: kazdy release startowal z pustym
+  # .next/cache/images, a sharp-wasm32 na CPU hostingu wspoldzielonego enkoduje warianty
+  # (AVIF/WebP) bardzo wolno — zimny cache po deployu = wolne LCP pierwszych
+  # userow. Cache w shared/ + symlink w release = warianty przezywaja deploy.
+  mkdir -p \$HOME/${REMOTE_ROOT}/shared/next-image-cache
+  mkdir -p \$HOME/${RELEASE_PATH}/.next/cache
+  rm -rf \$HOME/${RELEASE_PATH}/.next/cache/images
+  ln -sfn \$HOME/${REMOTE_ROOT}/shared/next-image-cache \$HOME/${RELEASE_PATH}/.next/cache/images
+
+  # Atomic switch
+  cd \$HOME/${REMOTE_ROOT}
+  rm -f current.old
+  if [ -L current ]; then
+    mv current current.old
+  elif [ -d current ]; then
+    mv current current.bak_${TIMESTAMP}
+  fi
+
+  ln -s releases/${TIMESTAMP} current
+
+  cd \$HOME/${REMOTE_ROOT}/current
+${PM2_COMMANDS}
+" || { error "Remote deployment failed"; exit 9; }
+
+# Cleanup local archive
+rm -f "${PROJECT_DIR}/${ARCHIVE_NAME}"
+
+# ==============================================================================
+# PHASE 4: HEALTH GATE (zlapalby incydent 502/EPERM — nie konczymy „OK" na zepsutym deployu)
+# ==============================================================================
+step "PHASE 4: HEALTH GATE"
+
+HEALTH_URL="https://${DOMAIN}/"
+
+# Petla sondujaca = wspolna `assert_http_ok` z utils.sh (te same 15 prob co 3 s).
+# Byla tu trzecia kopia tego samego kodu — staging dolozylby czwarta.
+if ! assert_http_ok "${HEALTH_URL}" 15 3; then
+  error "HEALTH GATE FAIL: ${HEALTH_URL} nie zwrocil 200 — deploy prawdopodobnie zepsuty (port? pm2 errored?)."
+  error "Diagnostyka: ssh ${SSH_CONN} \"pm2 logs frontend-${DOMAIN} --lines 30 --nostream\""
+  error "ROLLBACK:    npm run rollback:frontend:${ENV_NAME}"
+  exit 10
+fi
+
+# Strażnik statykow public/ (incydent 2026-08-02/03: zagniezdzone public/public
+# -> HTML 200, ale robots/manifest/ikony 404; health na "/" tego nie widzial).
+if ! assert_static_served "${DOMAIN}"; then
+  error "ROLLBACK:    npm run rollback:frontend:${ENV_NAME}"
+  exit 11
+fi
+
+# Strażnik TOZSAMOSCI artefaktu: 200 + zywe statyki potrafi oddac ROWNIEZ poprzedni
+# release. Dopiero zgodnosc BUILD_ID dowodzi, ze prod serwuje to, co wlasnie wyslalismy.
+if ! assert_artifact_served "${SSH_CONN}" "${PORT}" "${DOMAIN}" "${FRONT_BUILD_ID}"; then
+  error "Diagnostyka: ssh ${SSH_CONN} \"pm2 logs frontend-${DOMAIN} --lines 30 --nostream\""
+  error "ROLLBACK:    npm run rollback:frontend:${ENV_NAME}"
+  exit 14
+fi
+
+# ==============================================================================
+# PHASE 4b: RELEASES PRUNE (kazdy release niesie pelne node_modules — bez prune
+# quota shared hostingu rosnie w nieskonczonosc). Zostawiamy 3 najnowsze
+# (biezacy + 2 do rollbacku); sort po nazwie = po timestampie.
+# ==============================================================================
+info "Pruning old releases (keep 3)..."
+ssh "${SSH_CONN}" "cd ${DEPLOY_REMOTE_BASE}/${DOMAIN}/releases && ls -1d 2*/ 2>/dev/null | sort -r | tail -n +4 | xargs -r rm -rf" \
+  && success "Releases pruned (kept newest 3)" \
+  || info "Prune nieudany (non-fatal)"
+
+# ==============================================================================
+# PHASE 5: CLOUDFLARE EDGE-CACHE PURGE (front ma Cache Rule z override edge-TTL 4h;
+# bez purge deploy serwuje stary HTML do 4h).
+# Non-fatal: deploy juz przeszedl health-gate; brak tokenu / nie-CF domena = skip.
+# ==============================================================================
+step "PHASE 5: CLOUDFLARE CACHE PURGE"
+
+if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+  info "CLOUDFLARE_API_TOKEN brak w env — pomijam purge (edge-cache odswiezy sie sam po TTL)."
+else
+  CF_ZONE_ID="$(curl -sS -m 15 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+    "https://api.cloudflare.com/client/v4/zones?name=${DOMAIN}" 2>/dev/null \
+    | grep -oE '"id":"[a-f0-9]{32}"' | head -1 | cut -d'"' -f4 || true)"
+  if [ -z "${CF_ZONE_ID}" ]; then
+    info "Zona CF dla ${DOMAIN} nieznaleziona — pomijam purge (nie-CF domena? ok)."
+  else
+    PURGE_OK="$(curl -sS -m 20 -X POST \
+      -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json" \
+      --data '{"purge_everything":true}' \
+      "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" 2>/dev/null \
+      | grep -o '"success":true' | head -1 || true)"
+    if [ -n "${PURGE_OK}" ]; then
+      success "Cloudflare cache purged (${DOMAIN})"
+    else
+      info "Purge CF nie potwierdzony (non-fatal) — sprawdz recznie lub poczekaj na TTL."
+    fi
+  fi
+fi
+
+# ==============================================================================
+# PHASE 6: EDGE-CACHE WARM (po purge, WYLACZNIE z --compressed)
+# CF trzyma JEDNA reprezentacje per URL i ignoruje Vary: Accept-Encoding — jesli
+# pierwszy strzal po purge to klient bez Accept-Encoding (monitor/health-curl),
+# WSZYSCY dostaja plain HTML do wygasniecia TTL.
+# Warm z --compressed wypelnia edge poprawna (gzip) reprezentacja kluczowych
+# stron. Obrazow nie warmujemy: /_next/image jest wykluczone z edge-cache
+# (CF ignoruje Vary: Accept -> AVIF ladowal sie u klientow bez AVIF), a warianty
+# na originie przezywaja deploy przez shared/next-image-cache.
+# Non-fatal (deploy juz zdrowy) — brak warm = strona dalej dziala, tylko 1. hit MISS.
+# ==============================================================================
+step "PHASE 6: EDGE-CACHE WARM"
+
+WARM_PATHS=("" "pricing/" "for-stylists/" "for-clients/" "for-studios/" "get-app/" \
+  "about/" "contact/" "compare/" "help-center/" "welcome/" \
+  "terms/" "privacy/" "cookies/" "content-moderation/" "en/" "de/")
+WARMED=0
+for p in "${WARM_PATHS[@]}"; do
+  curl -sS -m 20 --compressed -o /dev/null "https://${DOMAIN}/${p}" 2>/dev/null && WARMED=$((WARMED+1)) || true
+done
+info "Warmed ${WARMED}/${#WARM_PATHS[@]} paths (gzip representation)"
+
+# Post-deploy checks from the owner's private ops tooling are not part of this snapshot.
+
+success "Deployment to ${DOMAIN} complete! 🚀"
+play_success_sound
+exit 0

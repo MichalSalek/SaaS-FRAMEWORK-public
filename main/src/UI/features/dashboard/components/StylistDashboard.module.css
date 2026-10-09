@@ -1,0 +1,146 @@
+/* UI/features/dashboard/components/StylistDashboard.module.css
+ * Pieces of the stylist dashboard that no shared primitive covers: the
+ * checklist skin inside its disclosure, the one-line finished state and the
+ * clients strip. Layout and section titles: DashboardPage.module.css. */
+
+/* --- Activation checklist (inside DashboardDisclosure) ---
+ * The disclosure is already the white box: the list inside keeps its rows
+ * and gives up its own corners. */
+.checklist {
+  --nav-list-radius: 0;
+  --nav-list-surface: transparent;
+}
+
+/* F2-F6: trial urgency, shown when 7 days or fewer remain. Icon on the first
+ * line of the sentence (the text wraps on a phone). */
+.trialLine {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: 0;
+  padding: var(--space-4) var(--space-16) var(--space-12);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.trialIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-warning-dark);
+}
+
+.trialIcon > svg {
+  display: block;
+}
+
+/* --- Finished state in one line (gallery strength 100%) --- */
+.doneLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.doneText {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* --- Empty clients: on paper, compact (a section of a populated screen) --- */
+.emptyPairs {
+  --empty-surface: transparent;
+  --empty-pad-block: var(--space-16);
+  --empty-pad-block-end: var(--space-16);
+}
+
+/* Connected clients as one horizontally scrolling row of faces (owner vote
+   S124, variant C). Constant height at any client count; the closing tile
+   leads to the full list. */
+.clientStrip {
+  display: flex;
+  gap: var(--space-12);
+  overflow-x: auto;
+  margin: 0;
+  padding: var(--space-12) var(--space-16);
+  list-style: none;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  scrollbar-width: none;
+}
+
+.clientStripItem {
+  flex: 0 0 auto;
+  width: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.clientStripLink {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--style-radius-control);
+}
+
+.clientStripLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Positioning context for the attention dot; the avatar keeps its own size. */
+.clientStripFace {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Attention dot (owner 2026-09-25): solid primary at the avatar's top right.
+   The ring is the paper-ring role in the strip's surface colour (a border,
+   not a shadow), so the dot separates from avatars whose own background is
+   the primary red. */
+.clientStripDot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 16px;
+  height: 16px;
+  border: var(--style-border-ring) solid var(--color-surface-card);
+  border-radius: var(--style-radius-round);
+  background-color: var(--color-primary);
+}
+
+.clientStripName {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+/* Closing tile label: the word, then the count as one piece under it. */
+.clientStripAll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: var(--text-sm);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.clientStripAllCount {
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+}

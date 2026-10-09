@@ -1,0 +1,15 @@
+/* Cena wejściowa pod CTA. Rozmiar tekstu czytanego, nie przypisu — to jest
+   argument sprzedażowy, więc nie chowamy go pod najmniejszym stopniem pisma.
+   Kolor dziedziczony: ta sama molekuła stoi na jasnym hero i na ciemnym
+   bandzie finałowym, więc własny kolor złamałby kontrast na jednym z nich. */
+.note {
+  display: block;
+  margin-top: var(--space-12);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: inherit;
+}
+
+.yearly {
+  opacity: 0.8;
+}

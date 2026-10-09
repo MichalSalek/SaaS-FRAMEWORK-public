@@ -1,0 +1,252 @@
+/* ─── EmailUnsubscribePage — utility surface ───
+ *
+ * Confirmation page reached via the magic link in the email footer.
+ * Mood: calm, instant, "we respect your inbox".
+ *
+ * Editorial flat card — single centered slab (krem + pełny hairline),
+ * large gold check medallion for success,
+ * brand-consistent eyebrow chip + supportive subtitle. Depth comes from
+ * tonal surface steps + hairline borders — NEVER box-shadow / glow /
+ * gradient (Anti-AI-Slop §1+§2). Same visual language as LoginPage .card.
+ *
+ * Mobile-first — most people open this from a phone.
+ * Breakpoints: 480 / 768.
+ */
+
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72dvh;
+  padding: var(--space-48) var(--space-20);
+  background: var(--color-bg-main);
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+}
+
+/* ─── Status card — single editorial surface ─── */
+
+/* DECISION (nie usuwaj tego komentarza):
+ * Elevacja = SOLID powierzchnia + pełny hairline border, NIE box-shadow ani
+ * gradient. Anti-AI-Slop §1+§2. Ten sam język wizualny co LoginPage .card
+ * (referencja) — łącznie z motywem „Jeden krem" (S94/R2): karta statusu to
+ * JEDYNY slab tej strony, więc bierze token kremu; górna banda (::after,
+ * inset:0 0 auto 0) wycięta jako jednostronny pasek-akcent, floor §3. */
+.statusCard {
+  position: relative;
+  /* `isolation` zdjęte razem z dekoracją, którą izolowało: kontekst układania
+     istniał wyłącznie po to, żeby pseudo-element z ujemnym z-index chował się
+     pod treścią. Pseudo już nie ma (w pliku zero ujemnych z-index), a wiszący
+     kontekst układania to mina dla następnej osoby, która doda tu tooltip
+     albo sticky. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-64) var(--space-32) var(--space-48);
+  /* S116 („A3”): biel należy do tego, co klikalne, więc karta z formularzem
+     wraca na papier; inaczej białe pole i biały przycisk znikają na białej karcie. */
+  background: var(--color-surface-card);
+  /* Rama neutralna (kanon AppHero): krem plus hairline --color-divider.
+     Gold-mix zdjęty — złoto jako obwódka UI daje na bieli ~2,2:1, poniżej
+     progu 3:1 z SC 1.4.11, więc nie niosło granicy karty. */
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  text-align: center;
+  overflow: hidden;
+  animation: card-rise var(--duration-300) var(--ease-entrance) both;
+}
+
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ─── Icon medallion — large, gold ring around icon ─── */
+
+.iconMedallion {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  border-radius: var(--style-radius-pill);
+  /* Flat tonal fill + 1px hairline ring — no radial gradient/glow (§1+§2).
+     Matches LoginPage .sentMedallion. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-divider);
+  margin: var(--space-8) 0 var(--space-12);
+  animation: medallion-pop var(--duration-350) cubic-bezier(0.34, 1.56, 0.64, 1)
+    both;
+}
+
+.iconErrorMedallion {
+  background: color-mix(
+    in oklch,
+    var(--color-error) 12%,
+    var(--color-bg-paper)
+  );
+  border-color: color-mix(in oklch, var(--color-error) 30%, transparent);
+}
+
+@keyframes medallion-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Icon color variants */
+.iconSuccess {
+  color: var(--color-accent-fg);
+}
+
+.iconError {
+  color: var(--color-error);
+}
+
+.iconSpinner {
+  color: var(--color-accent-fg);
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Typography ─── */
+
+.title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-subhead);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.15;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.subtitle {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 36ch;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* ─── Resubscribe note (success only) ─── */
+
+/* Meaningful supportive copy (carries the resubscribe link) → secondary,
+   not disabled-gray (~2.3:1 fails WCAG 1.4.3). */
+.resubscribeNote {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: var(--space-8) 0 0;
+  text-wrap: pretty;
+}
+
+.resubscribeLink {
+  color: var(--color-accent-fg);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: var(--style-border-divider) solid var(--color-border-surface);
+  transition: border-color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .resubscribeLink:hover {
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+/* ─── Actions row ─── */
+
+.actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ─── Bottom support strip (outside the card) ─── */
+
+.supportStrip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  margin-top: var(--space-20);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.supportLink {
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  text-decoration: none;
+  border-bottom: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-text-secondary) 40%, transparent);
+  transition: border-color var(--duration-200) ease-out;
+}
+
+@media (hover: hover) {
+  .supportLink:hover {
+    border-bottom-color: var(--color-text-secondary);
+  }
+}
+
+/* ─── Responsive ─── */
+
+@media (min-width: 480px) {
+  .page {
+    padding: var(--space-96) var(--space-32);
+  }
+
+  .statusCard {
+    padding: var(--space-80) var(--space-64) var(--space-64);
+  }
+
+  .iconMedallion {
+    width: 68px;
+    height: 68px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 520px;
+  }
+}

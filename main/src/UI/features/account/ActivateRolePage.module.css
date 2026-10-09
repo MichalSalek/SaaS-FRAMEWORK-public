@@ -1,0 +1,193 @@
+/* UI/features/account/ActivateRolePage.module.css
+ * Activation of a second account. One decision on one screen:
+ *  - hero: the canonical <AppHeroOrganism> (title + one sentence)
+ *  - .benefitsCard: the one white box (grouped content: what the account gives)
+ *  - .facts: plain list on paper (how a second account behaves)
+ *  - .ctaSection: bottom bar with the consent right above the one filled action
+ *
+ * DECISION (nie usuwaj tego komentarza) — S126, 2026-10-08:
+ * obie trasy aktywacji mają JEDEN akcent, akcent marki, i tylko na przycisku.
+ * Trasa klientki miała własny koralowy róż, malinowe krążki przy korzyściach
+ * i numerowane medaliony kroków: cztery białe ramki i pasek na jedną decyzję,
+ * a te same fakty stały w chipach, w karcie „Funkcje konta” i w karcie „Jak to
+ * działa”. Trasy rozróżnia treść, nie barwa; każdy fakt pada raz. Wejście
+ * ekranu nie jest animowane kaskadą (reguła domu: zero staggered entry).
+ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+/* ─── Benefits (white box: grouped content) ─── */
+.benefitsCard {
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+}
+
+/* An icon next to text that may wrap: its box is exactly one line tall, so
+ * the glyph sits on the centre of the FIRST line, never of the paragraph. */
+.lineIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.lineIcon > svg {
+  display: block;
+}
+
+.benefitText {
+  text-wrap: pretty;
+}
+
+.benefitText:lang(pl) {
+  hyphens: auto;
+}
+
+/* ─── Facts (information: on paper, no box, no icons) ─── */
+.factsList {
+  margin: 0;
+  /* Flush with the title: the list has no markers, so an inset read as a
+     stray indent. */
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.factsList:lang(pl) {
+  hyphens: auto;
+}
+
+/* ─── Bottom bar: consent + the action ─── */
+.ctaSection {
+  position: sticky;
+  /* Rezerwa kontenera przewijania: DECISION przy `--sticky-flush-bottom` w AppLayout. */
+  bottom: var(--sticky-flush-bottom, 0px);
+  /* Ta sama rezerwa pod ostatnią klatką przewijania: bez tego pasek wraca
+   * na koniec strony do pozycji w przepływie, 12px nad krawędzią. */
+  margin-bottom: var(--sticky-flush-bottom, 0px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-8);
+  /* safe-area: gdy bottom-nav jest ukryty (AppLayout .contentNoBottomNav), ten
+   * sticky CTA przykleja się do PRAWDZIWEJ dolnej krawędzi — na iOS/Capacitor
+   * musi ustąpić home-indicatorowi (mirror kroku onboarding .actionBar). */
+  padding: var(--space-12) 0
+    calc(var(--space-20) + env(safe-area-inset-bottom, 0px));
+  /* Papier strony zamiast linii nad belką: jednostronna kreska cięła kartę
+   * pod spodem (zgłoszenie ownera) i jest poza regułą domu. */
+  background: var(--color-bg-main);
+  z-index: var(--z-sticky-bar);
+}
+
+.consent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.termsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+.termsLabel {
+  margin: 0;
+  /* The checkbox is a 44px target with its box centred in it; the label's
+   * first line is centred on that same 44px, later lines flow below. */
+  padding-top: calc((44px - 1lh) / 2);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+.termsLink {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Always in the flow with its final height; only its visibility changes. */
+.termsError {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin: 0;
+  min-height: var(--space-24);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-error);
+  visibility: hidden;
+}
+
+.termsError[data-visible] {
+  visibility: visible;
+}
+
+.ctaError {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-error);
+}
+
+.ctaButton {
+  width: 100%;
+}
+
+/* ─── Desktop CTA: static, nie sticky ───
+ * DECISION (nie usuwaj tego komentarza):
+ * Sticky bottom:0 to MOBILE thumb-zone (native feel: CTA zawsze pod kciukiem,
+ * #main-content scrolluje wewnątrz AppLayout). Na desktopie >=1280 ta strona
+ * renderuje się w AccountWebLayout, gdzie scrolluje documentElement — sticky
+ * przyklejałby pasek w ŚRODKU strony. Static = zgoda i przycisk stoją pod
+ * treścią, w jej szerokości czytania. Zero zmian na mobile (sticky zostaje). */
+@media (min-width: 1280px) {
+  .ctaSection {
+    position: static;
+    max-width: 480px;
+  }
+}

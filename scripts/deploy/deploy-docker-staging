@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+# scripts/deploy/deploy-docker-staging
+# =============================================================================
+# Deploy stagingu (host w LAN): SSH -> `npm run install:docker:staging:reset`.
+#
+# CO NAPRAWDE JEDZIE NA STAGING: nic z tego dysku. Chain po drugiej stronie robi
+# `git:pull:reset` (fetch + `reset --hard origin/master` na roocie i submodulach),
+# wiec staging dostaje dokladnie to, co jest na ORIGIN. Stad PHASE 1 = pre-flight
+# parytetu gita, a nie build — wczesniej byla tu atrapa (`echo` mierzone stoperem
+# i meldunek "Build finished"), przez ktora deploy z niewypushowanymi commitami
+# konczyl sie komunikatem "DEPLOY SUCCESSFUL" po wdrozeniu STARSZEGO kodu.
+#
+# GUARD PO DRUGIEJ STRONIE: `git:pull:reset` odmawia pracy, gdy na boxie sa
+# SLEDZONE niezacommitowane zmiany (kasowalby je bezpowrotnie). Box odtwarzany z
+# origin ma drzewo czyste, wiec chain dziala bez zmian; jesli deploy stanie z tym
+# komunikatem, znaczy to, ze ktos edytowal pliki NA BOXIE — obejrzyj je, zanim
+# przepuscisz reset przez `GIT_RESET_FORCE=1`.
+#
+# Konfiguracja (host/user/workdir/health): scripts/deploy/deploy.config.sh (SSOT).
+#
+# artifact-identity-allow: deploy PULL-BASED z SYNCHRONICZNYM lancuchem. Prod (Render,
+# hosting wspoldzielony) ma asynchronicznego odbiorce — push/scp konczy sie zerem, a build/restart
+# leci potem i potrafi paść w ciszy, wiec tam BUILD_ID jest jedynym dowodem „ten
+# artefakt jest live". Tutaj zdalny chain (reset --hard -> build -> up -> wlasny gate)
+# jest spiety `&&` w JEDNEJ sesji SSH: kazda awaria wraca kodem wyjscia do PHASE 3,
+# a nie zielonym healthem. Zmieni sie to (deploy w tle / kolejka) -> dolóż porownanie
+# SHA/BUILD_ID i skasuj ten escape.
+# Wywolanie: npm run deploy:staging
+# =============================================================================
+
+# 1. Source utils + SSOT config
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/deploy.config.sh"
+
+# 2. Configuration — SSOT z deploy.config.sh, z furtka na override przez env
+SSH_USER="${SSH_USER:-$STAGING_SSH_USER}"
+SSH_HOST="${SSH_HOST:-$STAGING_SSH_HOST}"
+REMOTE_WORKDIR="${REMOTE_WORKDIR:-$STAGING_REMOTE_WORKDIR}"
+check_required_vars "SSH_USER" "SSH_HOST" "REMOTE_WORKDIR"
+
+SSH_CONNECTION="${SSH_USER}@${SSH_HOST}"
+REMOTE_DEPLOY_CMD="npm run install:docker:staging:reset"
+
+SSH_ATTEMPTS=3          # ile RAZEM prob polaczenia (nie "ile powtorek")
+SSH_RETRY_DELAY=3
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+# 3. Banner
+header "DOCKER DEPLOY (STAGING)" "🐳"
+info "Timestamp:      ${BOLD}${TIMESTAMP}${RESET}"
+info "Environment:    ${BOLD}staging${RESET}"
+info "Server:         ${BOLD}${SSH_CONNECTION}${RESET}"
+info "Remote workdir: ${BOLD}${REMOTE_WORKDIR}${RESET}"
+echo ""
+
+if [ ! -d "$ROOT_DIR" ]; then
+  error "Root directory does not exist: $ROOT_DIR"
+  exit 1
+fi
+
+cd "$ROOT_DIR" || { error "Cannot enter root directory"; exit 1; }
+
+# ==============================================================================
+# PHASE 1: PRE-FLIGHT — parytet z origin (root + KAZDY submodul)
+# Staging odtwarza sie z origin/master, wiec niewypushowany commit = deploy kodu,
+# ktorego na boxie nigdy nie bedzie. Blokujemy TYLKO commity "ahead" (Twoja praca,
+# ktora myslisz, ze wdrazasz); dirty working tree = glosny WARN, bo w srodowisku
+# rownoleglych sesji to zwykle cudza robota w toku, ktorej i tak nie deployujesz.
+# Swiadomy deploy mimo rozjazdu: STAGING_DEPLOY_ALLOW_DRIFT=1 npm run deploy:staging
+# ==============================================================================
+step "PHASE 1: PRE-FLIGHT (parytet z origin/master)"
+
+PARITY_FAIL=0
+
+check_repo_parity() {
+  local label="$1" path="$2"
+  local branch ahead behind dirty
+
+  branch="$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+  if [ "$branch" != "master" ]; then
+    warn "${label}: jestes na branchu '${branch}', a staging odtworzy sie z origin/master"
+  fi
+
+  # behind = commity na origin/master nieobecne lokalnie; ahead = lokalne nieobecne
+  # na origin — to te drugie gina po cichu przy deployu pull-based. Mechanika
+  # (fetch + rev-list) jest wspolna dla wszystkich deployow: utils.sh.
+  read -r behind ahead <<< "$(git_parity_counts "$path")"
+
+  if [ "${ahead:-0}" -gt 0 ]; then
+    error "${label}: ${ahead} commit(ow) NIE jest na origin/master — staging ich NIE dostanie."
+    error "  -> wypushuj (npm run git:push) albo swiadomie: STAGING_DEPLOY_ALLOW_DRIFT=1 npm run deploy:staging"
+    PARITY_FAIL=1
+  fi
+  if [ "${behind:-0}" -gt 0 ]; then
+    warn "${label}: origin/master ma ${behind} commit(ow) wiecej niz Twoj HEAD — staging dostanie NOWSZY kod, niz masz lokalnie."
+  fi
+
+  dirty="$(git -C "$path" status --porcelain=v1 2>/dev/null | wc -l | tr -d ' ')"
+  if [ "${dirty:-0}" -gt 0 ]; then
+    warn "${label}: ${dirty} niescommitowanych zmian — NIE pojada na staging (deploy bierze origin/master)."
+  fi
+}
+
+check_repo_parity "root" "$ROOT_DIR"
+# Submoduly z .gitmodules (nie z listy na sztywno — nowy submodul objety automatycznie).
+# Kazdy jest na boxie resetowany do WLASNEGO origin/master (git:pull-reset, foreach).
+while read -r sm_path; do
+  [ -n "$sm_path" ] || continue
+  [ -d "${ROOT_DIR}/${sm_path}/.git" ] || [ -f "${ROOT_DIR}/${sm_path}/.git" ] || continue
+  check_repo_parity "submodul ${sm_path}" "${ROOT_DIR}/${sm_path}"
+done <<< "$(git config --file "${ROOT_DIR}/.gitmodules" --get-regexp '^submodule\..*\.path$' 2>/dev/null | awk '{print $2}')"
+
+if [ "$PARITY_FAIL" = "1" ]; then
+  if [ "${STAGING_DEPLOY_ALLOW_DRIFT:-0}" = "1" ]; then
+    warn "STAGING_DEPLOY_ALLOW_DRIFT=1 — jade mimo rozjazdu z origin (swiadoma decyzja)."
+  else
+    error "PRE-FLIGHT FAIL: staging wdrozylby inny kod, niz masz lokalnie. Deploy przerwany."
+    exit 2
+  fi
+fi
+
+success "Pre-flight OK"
+
+# ==============================================================================
+# PHASE 2: CONNECTIVITY TEST
+# ==============================================================================
+step "PHASE 2: CONNECTIVITY TEST"
+
+info "Testing connection to: ${BOLD}${SSH_CONNECTION}${RESET}"
+
+ssh -o ConnectTimeout=10 -o BatchMode=yes "$SSH_CONNECTION" "echo 'Connection OK'" > /dev/null 2>&1 || {
+  error "Cannot connect to staging server"
+  exit 1
+}
+
+success "SSH Connection OK"
+
+# ==============================================================================
+# PHASE 3: REMOTE DEPLOY
+# ==============================================================================
+step "PHASE 3: REMOTE DEPLOY"
+
+info "Remote Dir: ${BOLD}${REMOTE_WORKDIR}${RESET}"
+info "Command:    ${BOLD}${REMOTE_DEPLOY_CMD}${RESET}"
+warn "This operation may take a few minutes..."
+
+ATTEMPT=0
+RC=0
+DEPLOY_SUCCESS=false
+
+while [ $ATTEMPT -lt $SSH_ATTEMPTS ]; do
+  ATTEMPT=$((ATTEMPT+1))
+
+  if [ $ATTEMPT -gt 1 ]; then
+    warn "Retry ${ATTEMPT}/${SSH_ATTEMPTS}..."
+    sleep $SSH_RETRY_DELAY
+  fi
+
+  # `&&` (nie `;`) miedzy cd a komenda: przy nieudanych OBU cd deploy odpalal sie
+  # w katalogu domowym. -t = pseudo-terminal (zsh -l na zdalnym: PATH z profilu,
+  # bez niego docker nie jest widoczny).
+  set +e
+  ssh -t "$SSH_CONNECTION" "zsh -l -c 'cd \"${REMOTE_WORKDIR}\" 2>/dev/null || cd \"\$HOME/${REMOTE_WORKDIR}\" && ${REMOTE_DEPLOY_CMD}'"
+  RC=$?
+  set -e
+
+  if [ $RC -eq 0 ]; then
+    DEPLOY_SUCCESS=true
+    break
+  fi
+
+  # 255 = blad TRANSPORTU ssh (zerwane polaczenie, host down) — jedyny przypadek
+  # wart powtorki. Kazdy inny kod to wynik ZDALNEJ komendy: chain jest
+  # destrukcyjny (prune + reset --hard + pelny rebuild ~kilkanascie minut), a
+  # deterministyczny blad (czerwony build, brak miejsca) powtorzy sie identycznie.
+  if [ $RC -ne 255 ]; then
+    error "Zdalny deploy zakonczyl sie bledem (exit ${RC}) — to NIE jest problem polaczenia, nie powtarzam."
+    break
+  fi
+
+  warn "Proba ${ATTEMPT}/${SSH_ATTEMPTS} przerwana na transporcie SSH (exit 255)"
+done
+
+if [ "$DEPLOY_SUCCESS" = false ]; then
+  error "Deploy failed (prob: ${ATTEMPT}/${SSH_ATTEMPTS}, ostatni exit: ${RC})"
+  play_error_sound
+  exit 1
+fi
+
+success "Remote deploy chain finished"
+
+# ==============================================================================
+# PHASE 4: HEALTH GATE — zdalny chain konczy sie wlasnym gate'em (build-and-up-staging),
+# ale ten deploy raportuje sukces UZYTKOWNIKOWI, wiec potwierdza go z zewnatrz:
+# z tej maszyny, przez domene i cert, tak jak zobaczy to przegladarka.
+# ==============================================================================
+step "PHASE 4: HEALTH GATE"
+
+assert_http_ok "${STAGING_HEALTH_URL_FRONTEND}" 10 3 || {
+  error "Front stagingu nie odpowiada z tej maszyny (Caddy? DNS? cert?)."
+  error "Diagnostyka: ssh ${SSH_CONNECTION} \"zsh -l -c 'cd ${REMOTE_WORKDIR} && docker compose -f docker-compose.prod.yml -f docker-compose.staging.yml logs --tail 80'\""
+  play_error_sound
+  exit 10
+}
+assert_http_ok "${STAGING_HEALTH_URL_BACKEND}" 10 3 || {
+  error "Backend stagingu nie odpowiada (health-public)."
+  play_error_sound
+  exit 10
+}
+
+# ==============================================================================
+# SUCCESS
+# ==============================================================================
+header "DEPLOY SUCCESSFUL" "✅"
+info "Timestamp: ${TIMESTAMP}"
+info "Front:     ${STAGING_HEALTH_URL_FRONTEND}"
+play_success_sound
+exit 0

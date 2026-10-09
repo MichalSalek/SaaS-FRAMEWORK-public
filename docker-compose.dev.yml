@@ -1,0 +1,134 @@
+networks:
+  main_connector_network:
+    driver: bridge
+
+services:
+  main-dev:
+    container_name: main-dev
+    networks:
+      - main_connector_network
+    tty: true
+    env_file:
+      - ./main/.env.development
+    environment:
+      # DECISION (nie usuwaj tego komentarza): SSOT allowlisty HMR deva.
+      # Next 15.2+/16 blokuje dev-resources (/_next/*, w tym WebSocket HMR
+      # /_next/webpack-hmr i /__nextjs_original-stack-frames) z Origin spoza
+      # allowedDevOrigins (next.config.mjs czyta TĘ listę, CSV). Przeglądarka na
+      # devie używa DWÓCH originów: LAN IP hosta (http://192.168.0.10:3000) oraz
+      # subdomeny Caddy LE (https://dev.example.com, docker-compose.dev-ssl.yml).
+      # Origin poza listą = handshake WS pada → klient Next po 13 nieudanych próbach
+      # robi window.location.reload() (~co 50 s, bez zmian plików; HMR martwy).
+      # Lista żyje TU (plik BAZOWY), NIE w override SSL — regresja 2026-08-18:
+      # recreate main-dev z samym tym plikiem zgubił domenę z override'a.
+      # Strażnik: `npm run dev:preflight` (check D). Recreate: `npm run dev:recreate`.
+      # Zmienił się LAN IP (ipconfig/ip addr)? Dopisz nowy, domenę zostaw.
+      - ALLOWED_DEV_ORIGINS=192.168.0.10,dev.example.com
+    build:
+      context: ./main
+      dockerfile: docker.dev.Dockerfile
+    volumes:
+      - ./main/src:/app/src
+      - ./main/public:/app/public
+      - ./main/node_modules:/app/node_modules
+      - ./main/tsconfig.json:/app/tsconfig.json:ro
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
+      - ./tsconfig.base.json:/tsconfig.base.json:ro
+      # next.config bind-mount: zmiany headerow (COEP/CSP) live bez rebuildu image
+      - ./main/next.config.mjs:/app/next.config.mjs:ro
+    # HTTP upstream — TLS terminuje Caddy LE na subdomenie (dev.example.com).
+    # Secure-context dla Stripe (crypto.subtle) daje Caddy HTTPS na subdomenie, NIE ten upstream.
+    command: ["npm", "run", "dev"]
+    restart: no
+    ports:
+      - "3000:3000"
+
+  web-1-dev:
+    container_name: web-1-dev
+    tty: true
+    networks:
+      - main_connector_network
+    env_file:
+      - ./web-1/.env.development
+    build:
+      context: web-1
+      dockerfile: docker.dev.Dockerfile
+    volumes:
+      - ./web-1/src:/app/src
+      - ./web-1/node_modules:/app/node_modules
+      # Anonymous volume: keep the jiti/prisma.config build cache INSIDE the container.
+      # The container runs as root, so without this it writes root-owned files into the
+      # host's bind-mounted node_modules/.cache — which then breaks `npm run dev:init`
+      # (fix-node-modules can't chmod/rm root-owned paths as the host uid → whole chain fails).
+      - /app/node_modules/.cache
+      - ./web-1/prisma.config.mjs:/app/prisma.config.mjs:ro
+      - ./web-1/docker-entrypoint.sh:/app/docker-entrypoint.sh:ro
+      # NOTE: web-1/tsconfig.json is baked into the image (copied at build) and the
+      # entrypoint mutates it in place (inlines tsconfig.base for Turbopack), so it is
+      # NOT bind-mounted. After a paths change (e.g. BDX added @app/@domain) rebuild the
+      # dev image so the new tsconfig is baked: `docker compose -f docker-compose.dev.yml build web-1-dev`.
+      - ./tests:/tests  # Bind mount for smoke tests
+      - ./.shared-kernel:/.shared-kernel  # Shared kernel for tests
+      - ./tsconfig.base.json:/tsconfig.base.json:ro  # Base TS config for tests
+    # HTTP upstream — TLS terminuje Caddy LE (api.dev.example.com).
+    # entrypoint robi db push+seed, potem exec CMD.
+    command: ["npm", "run", "dev"]
+    restart: no
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+    ports:
+      - "3001:3000"
+
+  db:
+    container_name: db
+    tty: true
+    image: postgres:16
+    restart: always
+    shm_size: 128mb
+    # Enable pg_stat_statements at runtime so the P95 health probe behaves like prod/Neon.
+    # The extensions themselves are created on fresh-volume init by docker/postgres/initdb.d.
+    command: ['postgres', '-c', 'shared_preload_libraries=pg_stat_statements']
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=app_dev
+      - POSTGRES_PASSWORD=app_dev_password
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    networks:
+      - main_connector_network
+    volumes:
+      - db:/var/lib/postgresql/data
+      # Create required PostgreSQL extensions (pg_trgm, pg_stat_statements) once on a
+      # fresh data volume, BEFORE the backend runs `prisma db push`. See the SQL file
+      # for the full rationale (db push ignores migrations/, so it never creates them).
+      - ./docker/postgres/initdb.d:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U app_dev -d db'" ]
+      interval: 5s
+      timeout: 30s
+      retries: 15
+    ports:
+      - "3200:5432"
+
+  adminer:
+    container_name: adminer
+    tty: true
+    networks:
+      - main_connector_network
+    image: adminer:4-standalone
+    restart: always
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
+      - ADMINER_DEFAULT_DB_HOST=db
+      - ADMINER_DEFAULT_DB_NAME=db
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+volumes:
+  db:
+    driver: local

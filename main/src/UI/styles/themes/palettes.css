@@ -1,0 +1,203 @@
+/**
+ * Owner palette: raspberry CTA #a6074f (2026-10-07).
+ * Light primary is the exact sRGB color in OKLCH; dark roles retain readable contrast.
+ * Newsprint gray, saturated fuchsia CTA and electric-blue negative bands.
+ *
+ * DECISION: rouge-papier remains the stable production theme identifier so
+ * existing stored preferences and theme consumers keep their contract.
+ * The palette name describes appearance; the identifier is compatibility.
+ *
+ * DECISION (S118): white content surfaces sit on paper in light mode; surface
+ * and control frames stay transparent. Selection uses inverse ink roles.
+ * DECISION (S106/S109): ink, blue bands and their foreground/accent roles are
+ * mode-invariant. Accents on ink use color-accent-on-ink, not primary.
+ * DECISION (S109/S110): alert strips, scrims and photo overlays retain separate
+ * roles; the photo focus veil must preserve its 0.72 opacity for contrast.
+ * DECISION (S108/S110): Schibsted headings, Instrument body, Caveat accent;
+ * typography and interaction shapes are unchanged by this palette vote.
+ * DECISION: CTA fill remains solid; the approved living-CTA effect is separate.
+ */
+
+@layer tokens {
+  [data-theme='rouge-papier'][data-mode='light'] {
+    --color-primary: oklch(0.469533 0.185479 363.792305);
+    --color-primary-light: oklch(0.504533 0.185479 363.792305);
+    --color-primary-dark: oklch(0.434533 0.185479 363.792305);
+    --color-primary-contrast: oklch(0.995 0.002 80);
+
+    --color-secondary: oklch(0.45 0.01 80);
+    --color-secondary-light: oklch(0.79 0.0065 80);
+    --color-secondary-fg: oklch(0.35 0.01 80);
+
+    --color-bg-main: oklch(0.94 0.006 80);
+    --color-bg-paper: oklch(1 0 0);
+    --color-bg-elevated: oklch(1 0 0);
+    --color-bg-subtle: oklch(1 0 0);
+
+    --color-text-primary: oklch(0.215 0.006 80);
+    --color-text-secondary: oklch(0.395 0.006 80);
+    --color-text-tertiary: oklch(0.493 0.006 80);
+    --color-text-muted: oklch(0.475 0.006 80);
+    --color-text-disabled: oklch(0.575 0.006 80);
+    --color-text-inverse: oklch(0.99 0.004 80);
+
+    --color-accent: var(--color-primary);
+    --color-accent-hover: var(--color-primary-light);
+    --color-accent-text: var(--color-primary-contrast);
+    --color-cta: var(--color-primary);
+    --color-accent-fg: oklch(0.444533 0.17435 363.792305);
+    --color-accent-fg-strong: oklch(0.42 0.171 363.792305);
+    --color-focus-ring: oklch(0.19 0.005 80);
+
+    --color-ink: oklch(0.19 0.005 80);
+    --color-on-ink: oklch(0.99 0.004 80);
+    --color-accent-on-ink: oklch(0.78 0.13 363.792305);
+    --color-ink-band: oklch(0.47 0.17 262);
+    --color-ink-band-strong: oklch(0.43 0.1445 262);
+    --color-on-ink-band: oklch(0.98 0.008 262);
+
+    --color-banner-warning: oklch(78% 0.17 85);
+    --color-on-banner-warning: oklch(20% 0.05 85);
+    --color-banner-critical: oklch(50% 0.22 25);
+    --color-on-banner-critical: oklch(97% 0.01 25);
+    --color-scrim-soft: oklch(0 0 0 / 0.35);
+    --color-scrim: oklch(0 0 0 / 0.5);
+    --color-scrim-strong: oklch(0 0 0 / 0.6);
+    --color-photo-overlay: oklch(0 0 0 / 0.45);
+    --color-photo-overlay-strong: oklch(0 0 0 / 0.62);
+    --color-on-photo-overlay: oklch(1 0 0);
+    --color-photo-focus-veil: oklch(0 0 0 / 0.72);
+
+    --color-success: oklch(0.52 0.09 150);
+    --color-error: oklch(0.54 0.15 25);
+    --color-warning: oklch(0.755 0.13 78);
+    --color-warning-dark: oklch(0.375 0.13 78);
+    --color-on-warning: oklch(0.18 0.028 78);
+    --color-info: oklch(0.56 0.008 80);
+    --color-info-fg: oklch(0.375 0.008 80);
+    --color-success-fg: oklch(0.375 0.09 150);
+    --color-error-fg: oklch(0.375 0.13 25);
+    --color-warning-fg: var(--color-warning-dark);
+
+    --color-border: oklch(0.595 0.006 80);
+    --color-border-surface: transparent;
+    --color-divider: oklch(0.865 0.006 80);
+    --color-surface-card: oklch(1 0 0);
+    --color-surface-interactive: oklch(1 0 0);
+    --color-surface-input: var(--color-surface-interactive);
+    --color-control-border: transparent;
+    --color-surface-hover: oklch(0.905 0.006 80);
+    --color-surface-pressed: oklch(0.88 0.006 80);
+    --color-track: oklch(0.77 0.006 80);
+
+    --color-icon-muted: oklch(0.535 0.006 80);
+    --color-badge-bg: color-mix(
+      in oklch,
+      var(--color-secondary) 12%,
+      var(--color-bg-main)
+    );
+
+    --font-heading: var(--font-schibsted), sans-serif;
+    --font-body: var(--font-schibsted), sans-serif;
+    --font-reading: var(--font-instrument), sans-serif;
+    --font-weight-heading: 600;
+    --font-accent: var(--font-caveat), cursive;
+    --font-weight-body: 400;
+    --letter-spacing-heading: var(--ls-tight-25);
+    --letter-spacing-body: 0;
+
+    --color-nav-bg: oklch(0.94 0.006 80);
+    --color-nav-text: oklch(0.215 0.006 80);
+  }
+
+  [data-theme='rouge-papier'][data-mode='dark'] {
+    --color-primary: oklch(0.75 0.145 363.792305);
+    --color-primary-light: oklch(0.78 0.17 363.792305);
+    --color-primary-dark: oklch(0.7 0.17 363.792305);
+    --color-primary-contrast: oklch(0.2 0.015 80);
+
+    --color-secondary: oklch(0.75 0.01 80);
+    --color-secondary-light: oklch(0.82 0.005 80);
+    --color-secondary-fg: oklch(0.83 0.01 80);
+
+    --color-bg-main: oklch(0.16 0.004 80);
+    --color-bg-paper: oklch(0.215 0.004 80);
+    --color-bg-elevated: oklch(0.235 0.004 80);
+    --color-bg-subtle: oklch(0.25 0.006 80);
+
+    --color-text-primary: oklch(0.945 0.004 80);
+    --color-text-secondary: oklch(0.81 0.004 80);
+    --color-text-tertiary: oklch(0.68 0.004 80);
+    --color-text-muted: oklch(0.72 0.004 80);
+    --color-text-disabled: oklch(0.6 0.004 80);
+    --color-text-inverse: oklch(0.19 0.004 80);
+
+    --color-accent: var(--color-primary);
+    --color-accent-hover: var(--color-primary-light);
+    --color-accent-text: var(--color-primary-contrast);
+    --color-cta: var(--color-primary);
+    --color-accent-fg: oklch(0.8 0.1337903 363.792305);
+    --color-accent-fg-strong: oklch(0.775 0.14879030000000001 363.792305);
+    --color-focus-ring: oklch(0.84 0.004 80);
+
+    --color-ink: oklch(0.19 0.005 80);
+    --color-on-ink: oklch(0.99 0.004 80);
+    --color-accent-on-ink: oklch(0.78 0.15 363.792305);
+    --color-ink-band: oklch(0.47 0.17 262);
+    --color-ink-band-strong: oklch(0.43 0.1445 262);
+    --color-on-ink-band: oklch(0.98 0.008 262);
+
+    --color-banner-warning: oklch(78% 0.17 85);
+    --color-on-banner-warning: oklch(20% 0.05 85);
+    --color-banner-critical: oklch(50% 0.22 25);
+    --color-on-banner-critical: oklch(97% 0.01 25);
+    --color-scrim-soft: oklch(0 0 0 / 0.35);
+    --color-scrim: oklch(0 0 0 / 0.5);
+    --color-scrim-strong: oklch(0 0 0 / 0.6);
+    --color-photo-overlay: oklch(0 0 0 / 0.45);
+    --color-photo-overlay-strong: oklch(0 0 0 / 0.62);
+    --color-on-photo-overlay: oklch(1 0 0);
+    --color-photo-focus-veil: oklch(0 0 0 / 0.72);
+
+    --color-success: oklch(0.72 0.09 150);
+    --color-error: oklch(0.73 0.13 25);
+    --color-warning: oklch(0.79 0.13 78);
+    --color-warning-dark: oklch(0.83 0.06 78);
+    --color-on-warning: oklch(0.18 0.028 78);
+    --color-info: oklch(0.745 0.008 80);
+    --color-info-fg: oklch(0.83 0.008 80);
+    --color-success-fg: oklch(0.83 0.06 150);
+    --color-error-fg: oklch(0.83 0.06 25);
+    --color-warning-fg: var(--color-warning-dark);
+
+    --color-border: oklch(0.53 0.004 80);
+    --color-border-surface: transparent;
+    --color-divider: oklch(0.295 0.004 80);
+    --color-surface-card: oklch(0.215 0.004 80);
+    --color-surface-interactive: oklch(0.215 0.004 80);
+    --color-surface-input: var(--color-surface-interactive);
+    --color-control-border: transparent;
+    --color-surface-hover: oklch(0.305 0.006 80);
+    --color-surface-pressed: oklch(0.34 0.006 80);
+    --color-track: oklch(0.395 0.004 80);
+
+    --color-icon-muted: oklch(0.64 0.004 80);
+    --color-badge-bg: color-mix(
+      in oklch,
+      var(--color-secondary) 12%,
+      var(--color-bg-main)
+    );
+
+    --font-heading: var(--font-schibsted), sans-serif;
+    --font-body: var(--font-schibsted), sans-serif;
+    --font-reading: var(--font-instrument), sans-serif;
+    --font-weight-heading: 600;
+    --font-accent: var(--font-caveat), cursive;
+    --font-weight-body: 400;
+    --letter-spacing-heading: var(--ls-tight-25);
+    --letter-spacing-body: 0;
+
+    --color-nav-bg: oklch(0.19 0.004 80);
+    --color-nav-text: oklch(0.945 0.004 80);
+  }
+}

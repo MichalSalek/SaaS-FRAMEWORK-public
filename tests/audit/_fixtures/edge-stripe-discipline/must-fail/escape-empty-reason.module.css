@@ -1,0 +1,10 @@
+/* Escape BEZ powodu = wyjątek nie do zweryfikowania w review, czyli dokładnie
+   to, przed czym marker ma chronić. Ten sam kontrakt, co przy tint-allow. */
+/* edge-stripe-allow: */
+.rail::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-primary);
+}

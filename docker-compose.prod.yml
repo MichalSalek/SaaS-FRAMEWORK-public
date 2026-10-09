@@ -1,0 +1,41 @@
+networks:
+  main_connector_network:
+    driver: bridge
+
+services:
+  main-prod:
+    networks:
+      - main_connector_network
+    container_name: main-prod
+    tty: true
+    env_file:
+      - ./main/.env.production.local
+    build:
+      context: ./main
+      dockerfile: docker.prod.Dockerfile
+    restart: always
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+    ports:
+      - "80:3000"
+
+  web-1-prod:
+    networks:
+      - main_connector_network
+    container_name: web-1-prod
+    tty: true
+    env_file:
+      - ./web-1/.env.production.local
+    build:
+      context: web-1
+      dockerfile: docker.prod.Dockerfile
+    restart: always
+    environment:
+      - HOSTNAME=0.0.0.0
+    volumes:
+      - ./tests:/tests
+      - ./.shared-kernel:/.shared-kernel
+    ports:
+      - "3101:3000"

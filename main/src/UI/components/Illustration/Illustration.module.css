@@ -1,0 +1,23 @@
+.illustration {
+  display: block;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.sm {
+  width: var(--space-80);
+}
+
+.md {
+  width: var(--space-112);
+}
+
+.lg {
+  width: var(--space-128);
+}
+
+/* Rysunek ma atrament i tinty wpisane w plik; w trybie ciemnym odwracamy
+ * jasność i przywracamy odcień (ta sama receptura co ozdobniki LP). */
+:global([data-mode='dark']) .illustration {
+  filter: invert(1) hue-rotate(180deg);
+}

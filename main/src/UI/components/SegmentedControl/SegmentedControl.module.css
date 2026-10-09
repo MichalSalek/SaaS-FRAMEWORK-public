@@ -1,0 +1,154 @@
+/* SegmentedControl — one track, options in a single row that scrolls.
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Selection is inverted ink (DESIGN.md rule 14): background
+ * --color-text-primary, text --color-bg-main. Not primary red, not
+ * --color-state-selected. The track is --color-bg-elevated, the surface
+ * most of the old local copies already used. A control-shaped child is
+ * concentric: track radius minus --style-segmented-inset minus the track
+ * border. The track never wraps; overflow scrolls. */
+
+.root {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--style-segmented-gap);
+  /* Tor ma szerokość swoich opcji, nie rodzica: w kolumnie flex/grid
+   * rozciągał się na całą szerokość i zostawiał pustą pigułkę obok opcji. */
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  padding: var(--style-segmented-inset);
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--color-bg-elevated);
+  border: var(--style-border-surface) solid var(--color-divider);
+  -webkit-overflow-scrolling: touch;
+}
+
+.root::-webkit-scrollbar {
+  display: none;
+}
+
+.root[data-shape='pill'] {
+  border-radius: var(--style-radius-pill);
+}
+
+.root[data-shape='pill'] .option {
+  border-radius: var(--style-radius-pill);
+}
+
+.root[data-shape='control'] {
+  border-radius: var(--style-radius-control);
+}
+
+.root[data-shape='control'] .option {
+  border-radius: max(
+    0px,
+    calc(
+      var(--style-radius-control) - var(--style-segmented-inset) -
+        var(--style-border-surface)
+    )
+  );
+}
+
+.root[data-full-width='true'] {
+  width: 100%;
+  --_option-flex: 1 1 0px;
+}
+
+.option {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex: var(--segmented-option-flex, var(--_option-flex, 0 0 auto));
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  min-width: min-content;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--style-control-font);
+  font-weight: var(--style-control-weight);
+  letter-spacing: var(--style-control-tracking);
+  word-spacing: var(--style-control-word-spacing);
+  text-transform: var(--style-control-case);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root[data-size='sm'] .option {
+  min-height: var(--space-36);
+  padding: var(--space-4) var(--space-12);
+  font-size: var(--text-xs);
+}
+
+.root[data-size='md'] .option {
+  min-height: var(--style-control-min-h);
+  padding: var(--space-8) var(--space-16);
+  font-size: var(--text-sm);
+}
+
+.option[data-selected] {
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  /* Ink surface: the default ring IS ink in light mode (1:1), so remap it to
+   * the accent-on-ink role (audit:ink-focus-ring). */
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+.option:active {
+  transform: scale(0.97);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .option:not([data-selected]):hover {
+    color: var(--color-text-primary);
+  }
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+/* Unselected badge is ink on paper (the same pair as body text, flipped
+   onto a dark chip so it reads on the elevated track). Selected option is
+   already that ink, so the badge flips back to paper with ink text. */
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-16);
+  padding: 0 var(--space-6);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  --color-focus-ring: var(--color-accent-on-ink);
+  font-size: var(--text-xs);
+  font-weight: var(--style-control-weight);
+  line-height: 1.6;
+}
+
+.option[data-selected] .count {
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+}

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# DECISION (nie usuwaj tego komentarza):
+# Te dwa skrypty NIE sourcuja scripts/utils.sh, choc reszta repo to robi. Ich
+# kontraktem jest sciezka pliku na STDOUT (da sie podstawic: `restore "$(snapshot)"`),
+# a header/step z utils.sh zasmiecilby ten strumien. Komunikaty ida na stderr.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+OUT_DIR="${ROOT_DIR}/.local/db-snapshots"
+# Nazwa kontenera z compose, nadpisywalna — bylo zaszyte "db", wiec skrypt milczkiem
+# celowal w cudzy kontener o tej nazwie albo wywalal sie surowym bledem dockera.
+DB_CONTAINER="${DEV_DB_CONTAINER:-db}"
+
+if ! docker ps --format '{{.Names}}' | grep -qx "$DB_CONTAINER"; then
+  echo "Kontener bazy '${DB_CONTAINER}' nie dziala. Podnies dev (npm run dev) albo wskaz inny: DEV_DB_CONTAINER=<nazwa>" >&2
+  exit 1
+fi
+
+mkdir -p "$OUT_DIR"
+
+STAMP="$(date +%Y%m%d-%H%M%S)"
+OUT_FILE="${OUT_DIR}/dev-db-${STAMP}.sql"
+
+docker exec -i "$DB_CONTAINER" bash -lc 'pg_dump --clean --if-exists --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > "$OUT_FILE"
+
+echo "$OUT_FILE"

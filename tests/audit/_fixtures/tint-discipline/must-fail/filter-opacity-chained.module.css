@@ -1,0 +1,18 @@
+/* Dotychczasowa próbka miała `opacity()` na POCZĄTKU wartości, więc mutacja
+   zawężająca test do początku wartości przeżywała. W realnym kodzie filtr
+   prawie zawsze jest łańcuchem, a udział bywa zapisany procentem. */
+.washChained::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary);
+  filter: blur(2px) opacity(0.08);
+}
+
+.washPercent::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary);
+  filter: opacity(8%);
+}

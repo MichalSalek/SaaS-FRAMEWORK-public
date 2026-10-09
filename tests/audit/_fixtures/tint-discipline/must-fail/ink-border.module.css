@@ -1,0 +1,7 @@
+/* --color-ink jest ciemny w OBU trybach, więc jako rama wyróżnienia na
+   powierzchni strony w ciemności rysuje ciemną linię na ciemnym tle
+   i wyróżnienie znika (R8). */
+.featured {
+  background: var(--color-bg-main);
+  border: 2px solid var(--color-ink);
+}

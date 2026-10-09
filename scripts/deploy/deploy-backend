@@ -1,0 +1,287 @@
+#!/usr/bin/env bash
+# scripts/deploy/deploy-backend
+# =============================================================================
+# Deploy web-1 -> Render przez branch `deploy` (Render auto-deployuje na push).
+# Render serwuje SKOMPILOWANY .next z brancha `deploy` (.next w gicie); build LOKALNY.
+#
+# Mechanizm (deploy-branch dance):
+#   pre-flight (typecheck + test:unit) -> build .next z mastera
+#   -> git checkout -B deploy master -> odslon .next w .gitignore
+#   -> git add TYLKO .next + .gitignore -> commit --no-verify -> push --force origin deploy
+#   -> zweryfikowany powrot na master -> DB-free health-gate
+#      (uptime reset = nowy proces live).
+#
+# NIE uruchamia migracji DB. Migracje to OSOBNY, swiadomy krok PRZED deployem,
+# gdy schema sie zmienila:
+#   cd web-1 && npm run db:migrate:prod && npm run db:migrate:prod:logs
+# =============================================================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+source "${SCRIPT_DIR}/deploy.config.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+WEB1_DIR="${ROOT_DIR}/${BACKEND_PROJECT}"
+BRANCH="${BACKEND_RENDER_BRANCH}"
+
+header "DEPLOY BACKEND -> Render (branch ${BRANCH})" "🚀"
+info "Projekt:  ${BOLD}${BACKEND_PROJECT}${RESET}"
+info "Branch:   ${BOLD}${BRANCH}${RESET} (Render auto-deploy na push)"
+info "Health:   ${BACKEND_HEALTH_URL}"
+echo ""
+
+[[ -d "$WEB1_DIR" ]] || { error "web-1 nie znaleziony: ${WEB1_DIR}"; exit 2; }
+cd "$WEB1_DIR" || { error "cd ${WEB1_DIR} failed"; exit 2; }
+
+ORIG_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+# Przy kazdym wyjsciu (sukces, health-gate fail, Ctrl+C, nieosloniety errexit)
+# MUSIMY wrocic na branch zrodlowy. Deploy i tak wymaga mastera, ale trzymamy
+# ORIG_BRANCH w komunikatach, aby blad byl jednoznaczny. Poprzedni trap tlumil
+# checkout failure przez `|| true`, wiec skrypt mogl zakonczyc sie na `deploy`
+# bez czerwonego sygnalu dla operatora.
+restore_source_branch() {
+  local current_branch
+  current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
+
+  if [ "$current_branch" != "$ORIG_BRANCH" ]; then
+    info "Powrot z '${current_branch}' na '${ORIG_BRANCH}'..."
+    if ! git checkout "$ORIG_BRANCH"; then
+      error "KRYTYCZNE: nie udalo sie wrocic na '${ORIG_BRANCH}' (nadal: '${current_branch}')."
+      return 1
+    fi
+  fi
+
+  current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
+  if [ "$current_branch" != "$ORIG_BRANCH" ]; then
+    error "KRYTYCZNE: oczekiwano brancha '${ORIG_BRANCH}', ale aktywny jest '${current_branch}'."
+    return 1
+  fi
+}
+
+cleanup_branch_on_exit() {
+  local exit_code=$?
+  trap - EXIT
+
+  if ! restore_source_branch; then
+    # Nie ukrywaj awarii cleanupu za pierwotnym kodem health/build gate'a.
+    exit 12
+  fi
+
+  exit "$exit_code"
+}
+
+trap cleanup_branch_on_exit EXIT
+
+# --- Guard: wersja Node (artefakt .next musi zgadzac sie z pinem Rendera) -----
+LOCAL_NODE="$(node --version 2>/dev/null | sed 's/^v//' || true)"
+if [ "$LOCAL_NODE" != "$BACKEND_NODE_VERSION" ]; then
+  warn "Node lokalny '${LOCAL_NODE:-?}' != pin Rendera '${BACKEND_NODE_VERSION}' (web-1/.node-version)."
+  warn "Render moze nie wstac na niezgodnym artefakcie (historyczne fail'e parse'u). Zalecane: 'nvm use ${BACKEND_NODE_VERSION}'."
+  confirm "Kontynuowac mimo niezgodnosci Node?"
+fi
+
+# --- Guard: MUSISZ byc na master (.next budowany z WORKING TREE biezacego brancha) ---
+# Inaczej artefakt powstaje z feature-brancha/dirty, a commit klamie "z master" (spar #1).
+if [ "$ORIG_BRANCH" != "master" ]; then
+  error "Deploy backendu wymaga brancha 'master' (jestes na '${ORIG_BRANCH}')."
+  error ".next budowany jest z working tree — z innego brancha trafilby na PROD kod spoza master."
+  error "Zrob: git checkout master"
+  exit 3
+fi
+
+# --- Guard: parytet z origin/master (artefakt powstaje z LOKALNEGO drzewa) ----
+# Build bierze working tree, a `checkout -B deploy master` bierze LOKALNY master —
+# nigdzie w tym flow nie ma odwolania do origin. Dwa rozne bledy:
+#   behind: origin/master ma commity, ktorych nie masz -> wypychasz na PROD artefakt
+#           BEZ cudzej pracy, czyli COFASZ ja (i nastepny deploy z innej maszyny
+#           cofnie Twoja). To zawsze pomylka -> twardy STOP.
+#   ahead:  masz commity, ktorych nie ma origin -> na PROD jedzie kod, ktorego nie
+#           widzi nikt poza Toba (a `git:push` po fakcie moze go zmienic). Flow na
+#           to pozwala (build jest lokalny), wiec: swiadome potwierdzenie.
+step "GUARD: parytet z origin/master"
+read -r BEHIND AHEAD <<< "$(git_parity_counts "$WEB1_DIR")"
+
+if [ "${BEHIND:-0}" -gt 0 ]; then
+  error "Twoj master jest ${BEHIND} commit(ow) ZA origin/master."
+  error "Deploy zbudowalby PROD ze starszego kodu i COFNAL zmiany, ktore sa juz na origin."
+  error "Zrob: git pull --ff-only  (potem powtorz deploy)"
+  exit 13
+fi
+if [ "${AHEAD:-0}" -gt 0 ]; then
+  warn "Masz ${AHEAD} commit(ow) NIEwypushowanych — trafia na PROD, ale nie ma ich na origin."
+  confirm "Wdrozyc kod, ktorego nie ma na origin/master?"
+fi
+success "Parytet OK (behind=${BEHIND:-0}, ahead=${AHEAD:-0})"
+
+# --- Guard: kernel zsynchronizowany z kopiami w submodulach -------------------
+# web-1 buduje sie z KOPII kernela (src/READONLY-shared-kernel), nie z .shared-kernel.
+# Gdy SSOT zostal zmieniony i nie spropagowany, artefakt na PROD niesie STARY kernel,
+# a typecheck i testy przechodza (kompiluja te sama stara kopie) — bramka PHASE 0 tego
+# NIE widzi. Rozjazd wystepuje w tym repo realnie (rownolegle sesje edytuja kernel).
+# Audyt odpalany z ROOTA: `git rev-parse --show-toplevel` w web-1 zwraca submodul.
+step "GUARD: kernel-sync (kopie w submodulach == .shared-kernel)"
+if ! (cd "$ROOT_DIR" && bash tests/audit/kernel-sync.sh >/dev/null 2>&1); then
+  error "Kernel NIE jest zsynchronizowany — artefakt powstalby na starej kopii .shared-kernel."
+  error "Zrob: npm run system:kernel   (z roota; potem powtorz deploy)"
+  error "Szczegoly: (cd ${ROOT_DIR} && npm run audit:kernel)"
+  exit 14
+fi
+success "Kernel-sync OK"
+
+# --- Guard: .env.production musi istniec (jest gitignored, wiec swiezy klon go nie ma) ---
+# `build:production` -> `npm run production build:next` -> dotenv-run-script .env.production.
+# Bez tego pliku build leci z pustym env (m.in. NODE_ENV_MANUAL), co cicho zmienia
+# KSZTALT artefaktu (patrz asercja po buildzie).
+[[ -f .env.production ]] || {
+  error "Brak ${WEB1_DIR}/.env.production — build:production laduje z niego env (plik jest gitignored)."
+  exit 15
+}
+
+# --- Guard: niezacommitowany/untracked KOD ZRODLOWY trafi do artefaktu .next i na PROD (spar #2) ---
+# Generowany prisma js-client wykluczony (to nie kod feature'owy). Commitujemy tylko .next+.gitignore,
+# wiec ten kod NIE wejdzie do zrodel na deploy, ale ZOSTANIE WBUDOWANY w artefakt -> swiadome potwierdzenie.
+# Nie tylko `src/`: build czyta tez konfiguracje i zaleznosci, wiec dirty
+# next.config.mjs / package.json / lock / tsconfig zmienia artefakt dokladnie tak
+# samo jak dirty kod — guard mierzacy sam `src/` deklarowal wiecej, niz sprawdzal.
+DIRTY_SRC="$(git status --porcelain -- src next.config.mjs package.json package-lock.json tsconfig.json 2>/dev/null | grep -vE 'src/prisma/js-client/' || true)"
+if [ -n "$DIRTY_SRC" ]; then
+  warn "Niezacommitowane/untracked zmiany w src/ (rownolegla sesja?) — WBUDUJA sie w .next i wdroza na PROD:"
+  echo "$DIRTY_SRC" | sed 's/^/    /' >&2
+  confirm "Te niezacommitowane zmiany zostana wbudowane i wdrozone na prod. Kontynuowac?"
+fi
+
+# ==============================================================================
+# PHASE 0: PRE-FLIGHT GATE (typecheck + testy jednostkowe)
+# Build sam w sobie NIE odpala testow (pre:build = lint only) — deploy z HEAD
+# z czerwonymi testami przechodzilby po cichu (wzorzec deploy-frontend PHASE 0).
+# Vitest nie potrzebuje serwera/DB (mocked IO).
+# ==============================================================================
+step "PHASE 0: PRE-FLIGHT GATE (typecheck + test:unit)"
+info "typecheck (tsc --noEmit)..."
+npm run --silent typecheck || { error "PRE-FLIGHT FAIL: typecheck — nie deployuje HEAD z bledami typow"; exit 10; }
+info "test:unit (vitest)..."
+npm run --silent test:unit || { error "PRE-FLIGHT FAIL: testy jednostkowe — nie deployuje czerwonego HEAD"; exit 10; }
+success "Pre-flight OK (typecheck + unit)"
+
+# --- Build .next (z biezacego mastera) ---------------------------------------
+step "BUILD .next (production)"
+info "npm run build:production w ${WEB1_DIR} ..."
+npm run build:production || { error "Build failed"; exit 4; }
+[[ -d .next ]] || { error ".next brak po buildzie"; exit 5; }
+# KSZTALT artefaktu, nie tylko jego istnienie: `output: 'standalone'` w
+# next.config.mjs wisi na NODE_ENV_MANUAL, a dotenv NIE nadpisuje zmiennych juz
+# obecnych w powloce — wiec eksport z sesji deva/stagingu przelacza build na
+# standalone. Ponizej idzie `git add .next`, wiec standalone (kopia node_modules)
+# wjechalaby do HISTORII repo: setki MB, nieodwracalnie.
+if [ -d .next/standalone ]; then
+  error "STOP: build wyprodukowal .next/standalone — to NIE jest ksztalt artefaktu dla Rendera."
+  error "Przyczyna: NODE_ENV_MANUAL='${NODE_ENV_MANUAL:-?}' w powloce (dotenv nie nadpisuje istniejacych zmiennych)."
+  error "Zrob: unset NODE_ENV_MANUAL  (potem powtorz deploy)"
+  error "Gdyby to wjechalo do commita, .next/standalone wciagnelo by node_modules do historii repo."
+  exit 16
+fi
+BUILD_ID="$(cat .next/BUILD_ID 2>/dev/null || echo unknown)"
+MASTER_SHA="$(git rev-parse --short master 2>/dev/null || echo unknown)"
+success "Build OK (BUILD_ID ${BUILD_ID}, z master ${MASTER_SHA})"
+
+# --- Deploy-branch dance ------------------------------------------------------
+step "DEPLOY BRANCH '${BRANCH}' (= master + zacommitowany .next)"
+# checkout -B: deploy -> czubek mastera; fresh .next (untracked, ignorowany na master) PRZETRWA,
+# niezacommitowane zmiany src sa PRZENOSZONE (nie commitujemy ich).
+git checkout -B "$BRANCH" master || { error "checkout -B ${BRANCH} failed"; exit 6; }
+# Odslon .next na branchu deploy (master ignoruje /.next/). Preferuj dokladny .gitignore z origin/deploy,
+# fallback: zamien regule /.next/ na .next/cache/.
+git checkout "origin/${BRANCH}" -- .gitignore 2>/dev/null || sed -i 's#^/\.next/#.next/cache/#' .gitignore
+git add .next .gitignore
+
+# BRAMKA anty-wyciek: nic spoza .next/ i .gitignore nie moze trafic do commita
+# (ochrona niezacommitowanej pracy rownoleglej sesji).
+LEAK="$(git diff --cached --name-only | grep -vE '^\.next/' | grep -vxF '.gitignore' || true)"
+if [ -n "$LEAK" ]; then
+  error "STOP: w stage sa pliki spoza .next/.gitignore (ochrona pracy parallel-sesji):"
+  echo "$LEAK" | sed 's/^/    /' >&2
+  git reset >/dev/null 2>&1 || true
+  # Powrot na branch zrodlowy nalezy do trapa EXIT (weryfikuje wynik); inline
+  # `git checkout || true` tlumilo blad, ktorego trap by NIE przepuscil.
+  exit 7
+fi
+
+# Rozroznienie KRYTYCZNE: "nic sie nie zmienilo" (legalne) vs "`.next` w ogole nie
+# wszedl do indexu, bo .gitignore go dalej ignoruje" (awaria). Bez tego drugi przypadek
+# konczyl sie komunikatem "brak zmian" i EXIT 0 — falszywy sukces, a Render zostawal
+# na starym artefakcie. Reguly ignore zmieniaja sie (checkout z origin/deploy albo sed
+# fallback), wiec sprawdzamy WYNIK, nie zalozenie.
+NEXT_STAGED="$(git diff --cached --name-only | grep -cE '^\.next/' || true)"
+if [ "${NEXT_STAGED:-0}" -eq 0 ] && ! git ls-files --error-unmatch .next >/dev/null 2>&1; then
+  error "STOP: nic z .next/ nie trafilo do indexu — .gitignore nadal ignoruje artefakt."
+  error "Sprawdz .gitignore na branchu '${BRANCH}' (regula /.next/ musi zniknac; fallback sed zamienia ja na .next/cache/)."
+  exit 6
+fi
+
+if git diff --cached --quiet; then
+  warn "Brak zmian w .next od ostatniego deployu — nic do wypchniecia."
+  exit 0
+fi
+
+git commit --no-verify -m "build(production): deploy web-1 -> Render; .next BUILD_ID ${BUILD_ID} z master ${MASTER_SHA}" \
+  || { error "commit failed"; exit 8; }
+git push --force origin "$BRANCH" \
+  || { error "push --force origin ${BRANCH} failed"; exit 9; }
+if ! restore_source_branch; then
+  exit 12
+fi
+success "Wypchnieto na origin/${BRANCH} — Render redeployuje"
+
+# --- DB-free health-gate: APP_OK + TEN artefakt (BUILD_ID) live ---------------
+# Sam `uptime < 300` dowodzi tylko, ze proces jest SWIEZY — a swiezy proces potrafi
+# wstac na STARYM artefakcie (restart Rendera, OOM, `build_failed` na topie; precedens
+# 2026-07-19: 2x build_failed niezauwazone 2 tygodnie, health caly czas zielony).
+# Dlatego gate porownuje BUILD_ID zbudowany lokalnie z tym, ktory raportuje zywy proces
+# (`/api/health-check` -> `build_id`, patrz web-1/src/application/health/build-id.ts).
+# Degradacja do starego kryterium (uptime) TYLKO gdy ktoras strona nie zna swojego
+# BUILD_ID — z glosnym ostrzezeniem, bo wtedy artefakt pozostaje NIEPOTWIERDZONY.
+step "HEALTH GATE (Render redeploy ~2-6 min)"
+if [ "$BUILD_ID" = "unknown" ]; then
+  warn "Lokalny BUILD_ID nieznany (.next/BUILD_ID nieodczytany) — gate zdegradowany do uptime."
+fi
+HEALTHY=0
+LAST_LIVE_BUILD_ID=""
+for i in $(seq 1 40); do
+  health_payload="$(curl -fsS -m 20 "${BACKEND_HEALTH_URL}" 2>/dev/null || true)"
+  up="$(printf '%s\n' "$health_payload" | sed -n 's/.*"uptime_seconds":[" ]*\([0-9][0-9]*\).*/\1/p')"
+  live_build_id="$(printf '%s\n' "$health_payload" | sed -n 's/.*"build_id":"\([^"]*\)".*/\1/p')"
+  [ -n "$live_build_id" ] && LAST_LIVE_BUILD_ID="$live_build_id"
+
+  if printf '%s\n' "$health_payload" | grep -q '"status":"APP_OK"'; then
+    if [ -n "$live_build_id" ] && [ "$live_build_id" = "$BUILD_ID" ] && [ "$BUILD_ID" != "unknown" ]; then
+      success "Render redeploy LIVE (APP_OK, BUILD_ID ${BUILD_ID} — TEN artefakt serwuje prod)"
+      HEALTHY=1; break
+    fi
+    # Fallback: ktoras strona nie zna BUILD_ID -> wracamy do slabszego kryterium.
+    if { [ "$BUILD_ID" = "unknown" ] || [ "$live_build_id" = "unknown" ]; } \
+      && [ -n "$up" ] && [ "$up" -lt 300 ] 2>/dev/null; then
+      warn "Artefakt NIEPOTWIERDZONY (BUILD_ID lokalnie '${BUILD_ID}', na prodzie '${live_build_id:-brak}')."
+      success "Render redeploy LIVE wg slabszego kryterium (APP_OK, uptime ${up}s — swiezy proces)"
+      HEALTHY=1; break
+    fi
+  fi
+  info "health ${i}/40: uptime=${up:-brak}s, prod BUILD_ID=${live_build_id:-brak} (czekam na ${BUILD_ID})"
+  sleep 20
+done
+if [ "$HEALTHY" != "1" ]; then
+  if [ -n "$LAST_LIVE_BUILD_ID" ] && [ "$LAST_LIVE_BUILD_ID" != "$BUILD_ID" ]; then
+    error "HEALTH GATE: prod ODPOWIADA, ale serwuje INNY artefakt: '${LAST_LIVE_BUILD_ID}' != '${BUILD_ID}'."
+    error "To sygnatura cichej awarii deployu: build_failed na topie / Render zostal na poprzednim artefakcie."
+  else
+    error "HEALTH GATE: redeploy NIE potwierdzony w ~13 min (brak APP_OK z BUILD_ID ${BUILD_ID})."
+    error "Prod odpowiada, ale BEZ pola build_id? To proces sprzed tej zmiany — nowy artefakt jeszcze nie wstal."
+  fi
+  error "Render moze JESZCZE budowac LUB build failed — sprawdz dashboard Render + logi build."
+  error "Rollback: git checkout -B ${BRANCH} <poprzedni-sha> && git push --force origin ${BRANCH}"
+  exit 11
+fi
+
+header "BACKEND DEPLOY DONE" "✅"
+play_success_sound
+exit 0

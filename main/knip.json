@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "project": [
+    "src/**/*.{ts,tsx}"
+  ],
+  "ignore": [
+    "src/READONLY-shared-kernel/**",
+    "src/UI/shared/hooks/usePlaygroundVariant.ts"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    "dotenv-run-script",
+    "ts-morph",
+    "madge"
+  ]
+}

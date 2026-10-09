@@ -1,0 +1,99 @@
+/* AdminFeatureFlagsPage: the numbers are the shared StatTile band, a category
+   is an AdminPanel. This file lays out the setting rows inside a panel. */
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A setting row: text on the left, the switch on the first line's right. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--space-16);
+  padding: var(--space-16) 0;
+}
+
+.row:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.row:last-child {
+  padding-bottom: var(--space-4);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.label {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* A machine name: breaks anywhere rather than being cut. */
+.flagKey {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.state {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.stateError {
+  color: var(--color-error-fg);
+}
+
+/* Wide enough for the longer of the two words in any language; the text is
+   right-aligned, so the switch after it never moves. */
+.stateWord {
+  min-width: 4ch;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* The switch is centred on the label's first line and is a 44px target. */
+.control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-8);
+  min-width: 44px;
+  min-height: 44px;
+  margin-top: calc((1.4 * var(--text-base) - 44px) / 2);
+}

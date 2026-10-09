@@ -1,0 +1,5 @@
+/* Stub of the canon: this guard asserts its anchor exists and still names the
+ * marker. tnum-allow: <reason> is the documented escape. */
+.data-count {
+  font-family: var(--font-body);
+}

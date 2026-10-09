@@ -1,0 +1,114 @@
+/* AdminConfigPage: a list of setting rows in ONE white box. The controls are
+   the shared InputAtom / ToggleAtom / ButtonAtom / StatusPillAtom; this file
+   lays a row out and nothing else.
+
+   The split follows the list's OWN width (container query): admin routes also
+   render inside a 390px frame on a wide desktop, where a viewport query lies. */
+
+.list {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 var(--space-20);
+  list-style: none;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+/* Narrow: key and description, then the editor, then the save with its result. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+  padding: var(--space-20) 0;
+}
+
+.row:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* The key and its type wrap as two whole pieces. */
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-8);
+  margin: 0;
+}
+
+/* A machine name: long, so it breaks anywhere rather than being cut. */
+.keyName {
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.type {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.editor {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+}
+
+.editor > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+  min-width: 0;
+}
+
+/* Always mounted and one line tall: the result arriving moves nothing. */
+.status {
+  display: flex;
+  align-items: center;
+  min-height: var(--space-32);
+}
+
+/* Wide: text, editor and save side by side, the save ON the control's line
+   (it stood above it while its result had a line of its own under the
+   button). The result stands to the button's left; the save column has a
+   fixed width, so a result appearing cannot resize the editor. */
+@container (min-width: 720px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 272px;
+    align-items: center;
+    column-gap: var(--space-24);
+  }
+
+  .action {
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+}

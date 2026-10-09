@@ -1,0 +1,11 @@
+/* Surowa funkcja koloru: ani tokenu, ani hexa, ani color-mix — więc skan nie
+   miał czego dopasować, a hex-policy też jest ślepa (w pliku nie ma „#").
+   Kolor chromatyczny z alfą <= 45% to definicja washu, tyle że wpisana
+   liczbami. */
+.washRgba {
+  background: rgba(212, 168, 64, 0.12);
+}
+
+.washOklch {
+  background: oklch(0.82 0.12 88 / 0.12);
+}

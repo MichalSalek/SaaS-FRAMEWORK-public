@@ -1,0 +1,21 @@
+{
+	email contact@michalsalek.com
+}
+
+# Frontend — https://staging.example.com (:443). Caddy auto-redirects :80 -> :443.
+staging.example.com {
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+		resolvers 1.1.1.1 8.8.8.8
+	}
+	reverse_proxy main-prod:3000
+}
+
+# Backend — https://staging.example.com:3101 (same cert, TLS terminated here).
+staging.example.com:3101 {
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+		resolvers 1.1.1.1 8.8.8.8
+	}
+	reverse_proxy web-1-prod:3000
+}

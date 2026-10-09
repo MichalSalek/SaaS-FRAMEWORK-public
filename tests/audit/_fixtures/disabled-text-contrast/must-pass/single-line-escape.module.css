@@ -1,0 +1,2 @@
+/* text-disabled-allow: separator dekoracyjny */
+.sep { color: var(--color-text-disabled); }

@@ -1,0 +1,2 @@
+[.row:nth-of-type(even)]  zebra (R4)
+[.cell:nth-last-child(2n)]  zebra (R4)

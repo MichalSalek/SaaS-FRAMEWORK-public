@@ -1,0 +1,4 @@
+.band {
+  /* focus-ring-allow: sam jest przyciskiem, ring rysuje sie poza nim */
+  background: var(--color-ink);
+}

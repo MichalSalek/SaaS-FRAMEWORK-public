@@ -1,0 +1,10 @@
+@media (hover: hover) {
+  .row:hover {
+    background: var(--row-hover);
+    color: #ffffff;
+  }
+}
+
+:root {
+  --row-hover: oklch(0.3 0.02 288);
+}

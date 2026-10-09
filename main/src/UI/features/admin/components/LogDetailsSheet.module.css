@@ -1,0 +1,125 @@
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-8);
+  font-family: var(--font-heading);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.message {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(9rem, 11rem) minmax(0, 1fr);
+  gap: var(--space-12);
+  font-size: var(--text-sm);
+}
+
+.detailLabel {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.detailValue {
+  margin: 0;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.userLink {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.pre {
+  margin: 0;
+  padding: var(--space-12);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface-input);
+  border-radius: var(--style-radius-control);
+  user-select: text;
+}
+
+.stack {
+  margin: 0;
+  padding-left: var(--space-20);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+.occurrenceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.occurrenceButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-8) var(--space-12);
+  text-align: left;
+  font: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-surface-interactive);
+  border: none;
+  border-radius: var(--style-radius-control);
+  cursor: pointer;
+}
+
+.occurrenceButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.occurrenceMeta {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.groupMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  margin: 0 0 var(--space-12);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}

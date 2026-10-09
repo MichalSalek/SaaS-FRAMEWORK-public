@@ -1,0 +1,41 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>layout-shift fixture: must fail</title>
+<!-- The two shapes the owner reported on 2026-10-08: a counter mounted only after
+     the first selection, and a check icon mounted in flow inside the chosen card. -->
+<style>
+  body { font: 16px system-ui; margin: 20px; }
+  header { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  header h2 { flex: 1; margin: 0; }
+  .chips { display: flex; gap: 8px; margin-top: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 24px; }
+  .card { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 64px; padding: 12px 8px; }
+</style>
+<section>
+  <header><h2>Cechy</h2><span id="slot"></span></header>
+  <div class="chips">
+    <button aria-pressed="false" data-chip>French</button>
+    <button aria-pressed="false" data-chip>Ombre</button>
+  </div>
+</section>
+<div class="grid">
+  <button class="card" aria-pressed="false" data-card><span>Krótkie</span></button>
+  <button class="card" aria-pressed="false" data-card><span>Długie</span></button>
+</div>
+<script>
+  let n = 0;
+  for (const chip of document.querySelectorAll('[data-chip]')) {
+    chip.addEventListener('click', () => {
+      n += 1;
+      // conditional mount in the section header: a tall badge appears
+      document.getElementById('slot').innerHTML =
+        '<span style="display:block;padding:14px 10px;border:1px solid">' + n + ' cechy</span>';
+    });
+  }
+  for (const card of document.querySelectorAll('[data-card]')) {
+    card.addEventListener('click', () => {
+      // check icon mounted in flow: the card and its grid row grow
+      card.insertAdjacentHTML('beforeend', '<i style="display:block;width:14px;height:28px;background:currentColor"></i>');
+    });
+  }
+</script>

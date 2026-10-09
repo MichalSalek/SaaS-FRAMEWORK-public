@@ -1,0 +1,12 @@
+/* 16px = dokladnie floor, 18px powyzej — ani jedno nie moze lapac. */
+.atFloor {
+  font-size: 16px;
+}
+
+.above {
+  font-size: 18px;
+}
+
+.big {
+  font-size: 160px;
+}

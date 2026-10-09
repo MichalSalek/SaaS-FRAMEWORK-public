@@ -1,0 +1,11 @@
+/* Górna granica osi poziomej: 8px jeszcze jest paskiem (tak zapisano band
+   akcentu na karcie maintenance), 9px to już pas nagłówka. */
+.maintenanceCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--color-primary);
+}

@@ -1,0 +1,11 @@
+/* Trzeci moduł: ta sama nazwa, wartość NEUTRALNA. Wash pod nagłówkiem jest tu
+   szarością tekstu, nie kolorem marki, i strażnik nie ma prawa go zgłosić.
+   Przed domknięciem zasięgu zgłaszał: --eyebrow-color był w zbiorze złota
+   przez dwa CUDZE moduły. */
+.helpPage {
+  --eyebrow-color: var(--color-text-muted);
+}
+
+.helpPage .eyebrowWash {
+  background: color-mix(in oklch, var(--eyebrow-color) 12%, transparent);
+}

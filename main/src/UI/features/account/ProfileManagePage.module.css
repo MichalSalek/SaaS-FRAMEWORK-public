@@ -1,0 +1,9 @@
+/* ─── ProfileManagePage — układ pionowy sekcji (parytet z AccountPage.page).
+   Białe boksy niosą same sekcje (karta udostępniania, przypięte prace,
+   formularz wizytówki); kolumny od 720px daje PageColumnsMolecule. ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}

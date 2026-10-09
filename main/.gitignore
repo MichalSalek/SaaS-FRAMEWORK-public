@@ -1,0 +1,67 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+#/out/  zakomentowane, ponieważ build przenoszony jest na staging.
+
+# production
+/build
+# Tych dwóch nie musi być w gicie, bo out jest wysyłany po ssh, a nie po gicie.
+out_*.zip
+out_*.tar.gz
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files (contain secrets) — gitignored, realne sekrety OK.
+#   .env.development = DEVELOPMENT  |  .env.production.local = STAGING (!! NODE_ENV_MANUAL=STAGING, NIE produkcja)
+.env.development
+.env.production.local
+# .env.example = SZABLON (placeholdery)
+# Pelna konwencja + decyzje: docs/DOMAIN/ENVIRONMENT_REFERENCE.md + naglowek kazdego pliku .env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# Auto Generated PWA files
+**/public/sw.js
+**/public/workbox-*.js
+# Sentry Config File
+.env.sentry-build-plugin
+
+*.Identifier
+.idea
+
+# lint output (ad-hoc local artifact — never commit)
+lint_report.txt
+
+# adversarial-verification scratch (ad-hoc local artifact — never commit)
+.adv_*.txt
+
+.playwright-mcp/
+
+.env.preview
+main_*.tar.gz
+
+# Zrzuty konsoli z audytow — regenerowane przy KAZDYM przebiegu, wiec brudzily
+# drzewo po kazdym `npm run audit:all`. Ostatni realny commit tych plikow to
+# 2026-05-23; od tamtej pory byly wylacznie szumem w `git status`.
+.audit-logs/

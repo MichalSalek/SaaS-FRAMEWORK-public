@@ -1,0 +1,8 @@
+/* Paleta z DWUSTOPNIOWYM aliasem złota, zapisanym w kolejności odwrotnej niż
+   rozwiązywanie: --brand-wash wskazuje --brand-gold ZANIM --brand-gold zostanie
+   zdefiniowany. Pokrywa i samo dopisywanie aliasu do zbioru złota, i to, że
+   pętla musi przejść po źródle więcej niż raz. */
+:root {
+  --brand-wash: var(--brand-gold);
+  --brand-gold: var(--color-primary);
+}

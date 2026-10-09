@@ -1,0 +1,44 @@
+/* Canonical inline error state. Flat editorial: solid surface + hairline
+ * border (4 sides), no shadow, no gradient (anti-slop floor). */
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-48);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.errorState svg {
+  color: var(--color-error);
+}
+
+.errorText {
+  font-size: var(--text-base);
+  line-height: 1.55;
+  max-width: 48ch;
+}
+
+/* S108, głos 5 (desktop 1500): stan błędu sam jest zamkniętą ramą; kolor
+   i grubość ramy powierzchni (głos S114/D). */
+@media (min-width: 1280px) {
+  .errorState {
+    border: var(--style-border-surface) solid var(--color-border-surface);
+    background: transparent;
+    padding: var(--space-40);
+  }
+}
+
+/* `size='inline'`: the parent (a card, a dialog, a sheet) already is the box.
+ * Declared after the desktop rule and with higher specificity, so it holds at
+ * every width. */
+.errorState[data-size='inline'] {
+  padding: var(--space-16) 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}

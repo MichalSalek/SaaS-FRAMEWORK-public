@@ -1,0 +1,71 @@
+name: Security Audit - npm audit
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        workspace:
+          - { name: "root", path: "." }
+          - { name: "web-1", path: "web-1" }
+          - { name: "main", path: "main" }
+
+    name: npm audit - ${{ matrix.workspace.name }}
+
+    steps:
+      - name: Checkout code (with submodules)
+        # main/ and web-1/ are private SSH submodules — without them the matrix legs
+        # for web-1/main have no package-lock.json and npm audit cannot run.
+        # Requires repo secret SUBMODULES_SSH_KEY (see pr-check.yml).
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "${{ matrix.workspace.path }}/package-lock.json"
+
+      - name: Run npm audit (${{ matrix.workspace.name }})
+        run: |
+          cd "${{ matrix.workspace.path }}"
+          npm audit --production --audit-level=high
+
+      - name: Failure message
+        if: failure()
+        run: |
+          echo "❌ npm audit failed for ${{ matrix.workspace.name }} workspace"
+          echo "Run 'npm audit fix' in ${{ matrix.workspace.path }}/ to resolve HIGH/CRITICAL vulnerabilities"
+          exit 1
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: audit
+    if: always()
+    name: Security Audit Summary
+
+    steps:
+      - name: Check audit results
+        run: |
+          if [ "${{ needs.audit.result }}" = "failure" ]; then
+            echo "❌ Security audit failed"
+            exit 1
+          else
+            echo "✅ Security audit passed"
+          fi

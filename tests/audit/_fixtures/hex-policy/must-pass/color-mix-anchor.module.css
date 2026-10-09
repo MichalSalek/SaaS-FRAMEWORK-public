@@ -1,0 +1,6 @@
+/* KOTWICA w color-mix zostaje legalna — udokumentowany idiom repo
+   (wlosowe linie i tinty na ciemnym tle). To nie jest wartosc samodzielna. */
+.hairline {
+  border-color: color-mix(in oklch, white 16%, transparent);
+  background: color-mix(in oklch, black 22%, var(--color-ink));
+}

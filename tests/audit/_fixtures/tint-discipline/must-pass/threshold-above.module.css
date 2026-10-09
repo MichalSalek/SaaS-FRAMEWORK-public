@@ -1,0 +1,14 @@
+/* 46% to już nie wash, tylko pełnokolorowa powierzchnia akcentu — próg musi
+   być zakotwiczony także od tej strony, inaczej rozszerzenie go w górę
+   zamieniłoby strażnika w zakaz koloru marki jako takiego. */
+.at46 {
+  background: color-mix(in oklch, var(--color-primary) 46%, var(--color-bg-main));
+}
+
+.page {
+  --wash-46: color-mix(in oklch, var(--color-primary) 46%, var(--color-bg-main));
+}
+
+.introCard {
+  background: var(--wash-46);
+}

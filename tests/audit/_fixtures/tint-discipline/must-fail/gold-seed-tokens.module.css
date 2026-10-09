@@ -1,0 +1,18 @@
+/* Cztery z sześciu tokenów ZŁOTA nie miały ani jednej próbki: usunięcie ich
+   z listy startowej przechodziło przez meta-strażnika bezgłośnie, a każdy
+   z nich renderuje dokładnie ten sam kolor marki. */
+.viaSecondary {
+  background: color-mix(in oklch, var(--color-secondary) 12%, transparent);
+}
+
+.viaCta {
+  background: color-mix(in oklch, var(--color-cta) 13%, transparent);
+}
+
+.viaAccentFg {
+  background: color-mix(in oklch, var(--color-accent-fg) 14%, transparent);
+}
+
+.viaAccentHover {
+  background: color-mix(in oklch, var(--color-accent-hover) 15%, transparent);
+}

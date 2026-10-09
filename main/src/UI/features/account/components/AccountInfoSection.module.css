@@ -1,0 +1,131 @@
+/* AccountInfoSection.module.css — section „Dane profilu” and its dialog.
+ * The white box comes from `.cardStack > section` (AccountPage.module.css). */
+
+@keyframes infoSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: infoSpin 1s linear infinite;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  container-type: inline-size;
+  container-name: accountinfo;
+}
+
+.avatarSection {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) 0;
+}
+
+/* One rhythm at every width: the same gap as every other form of the app. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* Save status: always mounted, always one line tall at least, so the e-mail
+ * row below never moves when „saving” or a failure appears. */
+.saveStatus {
+  display: flex;
+  align-items: center;
+  min-height: var(--space-32);
+  /* Tucked under the field it describes. */
+  margin-top: calc(var(--space-6) * -1);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.saveStatusLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.saveStatusIcon {
+  flex: none;
+  display: flex;
+}
+
+.saveStatusIcon svg {
+  display: block;
+}
+
+.saveStatusError {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-10);
+  color: var(--color-error);
+}
+
+/* E-mail: label, value, one action. Stacked on a phone, side by side once
+ * the box has room. The address may break anywhere, it is never cut. */
+.emailRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-10);
+}
+
+@container accountinfo (min-width: 480px) {
+  .emailRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+  }
+}
+
+.emailBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.emailLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.emailValue {
+  font-size: var(--text-base);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.emailAction {
+  flex-shrink: 0;
+}
+
+/* ─── Change e-mail dialog ─── */
+
+.dialogBody {
+  padding: var(--space-12) var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* <form> w dialogu zmiany e-maila istnieje dla semantyki (Enter = wyślij),
+ * nie dla układu: popup dialogu to flex-kolumna, w której stopka z akcjami
+ * dosuwa się w dół przez margin-top:auto, więc formularz nie może tworzyć
+ * własnego pudełka. */
+.dialogForm {
+  display: contents;
+}

@@ -1,0 +1,75 @@
+/* ─── StickyCtaBar — Shared sticky CTA bar ─── */
+
+.stickyCtaBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky-bar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  padding-bottom: calc(var(--space-12) + env(safe-area-inset-bottom, 0px));
+  /* DECISION (anti-slop §2, nie usuwaj): solid fill, NIE backdrop blur.
+     Usunieto backdrop-filter blur(4px). */
+  background: var(--color-bg-elevated);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  transform: translateY(100%);
+  opacity: 0;
+  transition:
+    transform var(--duration-200) var(--ease-entrance),
+    opacity var(--duration-200) var(--ease-entrance);
+}
+
+.stickyCtaBar[data-visible] {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.stickyCtaText {
+  color: var(--color-text-secondary);
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .stickyCtaText {
+    display: block;
+    /* min-width max-content = tekst trzyma pełną szerokość 1 linii (nie daje się
+     * ścisnąć przez flex-shrink o sub-piksel → koniec łamania „…co naprawdę /
+     * robisz?"). Bar (fit-content) rośnie do treści, cap max-width:660 chroni
+     * przed rozjechaniem przy bardzo długim copy. */
+    min-width: max-content;
+  }
+
+  .stickyCtaBar {
+    padding: var(--space-12) var(--space-32);
+    /* fit-content + max-width 660 (głos ownera S45): szerokość dociśnięta do
+     * treści (bez zbędnego spacingu po bokach), a 660 (było 600) mieści dłuższe
+     * nagłówki jednolinijkowo np. „Gotowa pokazać klientce, co naprawdę robisz?"
+     * bez łamania wiersza. Centrowanie translateX(-50%) liczy od realnej szer. */
+    width: fit-content;
+    max-width: 660px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    bottom: var(--space-20);
+    /* Głos ownera S23/2 = A (2026-06-11): zamknięta karta radius-md zamiast
+     * pigułki radius-full ("kiełbasa") — spójna z systemem zamkniętych
+     * prostokątów; radius-full zostaje dla prawdziwych pigułek (chip/avatar).
+     * Wariant B (docked edge-to-edge) odrzucony: "nie ma co zakrywać
+     * viewportu białym pustym tłem, to jest sticky". */
+    border-radius: var(--style-radius-surface);
+    border: var(--style-border-surface) solid var(--color-divider);
+  }
+
+  .stickyCtaBar[data-visible] {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Wrapper primary CTA dla data-cta-shimmer — display:contents zachowuje flex
+ * layout paska; sam efekt sheen żyje w global.css [data-cta-shimmer]. */
+.shimmerWrap {
+  display: contents;
+}

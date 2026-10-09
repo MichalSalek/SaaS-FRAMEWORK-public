@@ -1,0 +1,3 @@
+.card {
+  border-radius: var(--radius-md, 8px);
+}

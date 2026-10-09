@@ -1,0 +1,40 @@
+/* ─── Section — kompozycja sekcji LP (band + kontener) ─── */
+
+.band {
+  /* Full-bleed breakout z kontenera layoutu (wzorzec stron LP).
+   * Wymaga overflow-x: clip na .content PublicLayout (fix S23). */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  /* Rytm domyślny — nadpisywalny przez --section-pad-block w className. */
+  padding-block: var(--section-pad-block, clamp(48px, 6vw, 88px));
+  padding-inline: var(--section-pad-inline, clamp(20px, 5vw, 56px));
+}
+
+.toneSubtle {
+  background: var(--color-bg-subtle);
+}
+
+/* Pełna rama hairline (top+bottom) — tint bez ramy „rozlewa się" na bieli
+ * (decyzja ownera S24); nigdy pojedynczy border (floor: zakaz jednostronnych
+ * borderów jako efektu — tu to RAMA banda, zawsze parą). */
+.bordered {
+  border-block: var(--style-border-divider) solid var(--color-divider);
+  /* DECISION (nie usuwaj tego komentarza) — owner S114 (2026-09-14): dwie
+   * ramy stykające się krawędzią dają linię podwójnej grubości. Sąsiednie
+   * bandy stron statycznych (drugi `bordered`, cezura pod sekcją, górna linia
+   * FinalCtaBand/PhotoFinaleCta) rysowały 1px + 1px jedna pod drugą, co
+   * sonda DOM znalazła na 8 stronach przy 1440px. Band z ramą nachodzi więc
+   * o grubość linii na obu sąsiadów: linie trafiają w te same piksele.
+   * `position: relative` podnosi band ponad sąsiada bez pozycji w kolejności
+   * malowania, inaczej tło następnej sekcji zamalowałoby jego dolną linię. */
+  position: relative;
+  margin-block: calc(var(--style-border-divider) * -1);
+}
+
+.inner {
+  margin-inline: auto;
+}
+
+.constrained {
+  max-width: var(--lp-content-width);
+}

@@ -1,0 +1,5 @@
+/* Parametryzowany oklch ZOSTAJE legalny: to przepis na kolor per uzytkownik
+   (deterministyczny hue awatara), a nie literal koloru. */
+.avatar {
+  background: oklch(0.86 0.075 var(--avatar-hue, 0));
+}

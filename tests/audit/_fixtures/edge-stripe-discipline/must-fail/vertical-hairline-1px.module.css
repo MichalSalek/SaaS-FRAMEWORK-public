@@ -1,0 +1,9 @@
+/* Dolna granica cienkości: 1px to nadal pasek akcentu, a nie „nic".
+   Bez tej próbki zawężenie zakresu do [2-6] przechodziło bez śladu. */
+.severityRail::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1px;
+  background: var(--color-primary);
+}

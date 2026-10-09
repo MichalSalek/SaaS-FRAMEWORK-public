@@ -1,0 +1,86 @@
+/* ─── PhoneQuoteStrip — pas „dowód + cytat" (S24/1 wariant B, 1:1) ───
+ * Zamknięta hairline-karta: telefon (0.9fr) + blockquote (1.4fr).
+ * Floor 7×ZERO: pełna rama, zero gradientów/cieni/hoverów (statyczny). */
+
+.strip {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+  padding: clamp(28px, 3.6vw, 56px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .strip {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  }
+}
+
+.phoneCol {
+  display: flex;
+  justify-content: center;
+}
+
+.quote {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 20px);
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.12;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+/* Gold-as-text = --color-accent-fg (AA), NIGDY --color-primary na bieli. */
+.title em {
+  color: var(--color-accent-fg);
+  font-style: italic;
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.note {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Wyeksponowany bundle konkretów pod cytatem („co dokładnie"). Górny pełny
+ * hairline (poziomy divider, floor §3 — nie jednostronny accent) oddziela
+ * od prozy body; medium-weight + text-primary = konkret bije italic-note.
+ * Człony nie łamane w środku (text-wrap: pretty). */
+.facts {
+  margin: 0;
+  padding-top: clamp(14px, 1.6vw, 20px);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  font-weight: 600;
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}

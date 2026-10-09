@@ -1,0 +1,9 @@
+/* Ten sam dzielnik zapisany skrótem — gałąź, która działała od początku,
+   ale też nie miała próbki. */
+.listCol::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--color-line);
+}

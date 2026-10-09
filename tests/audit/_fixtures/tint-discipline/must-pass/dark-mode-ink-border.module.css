@@ -1,0 +1,6 @@
+/* R8 pilnuje ramy, która NIE odwraca się z trybem. W nadpisaniu jawnie
+   przypisanym do trybu ciemnego atrament jest wyborem świadomym i widocznym
+   w selektorze — reguła musi ten wyjątek widzieć. */
+:root[data-mode='dark'] .featured {
+  border: 2px solid var(--color-ink);
+}

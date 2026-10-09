@@ -1,0 +1,977 @@
+/* UploadAssetPage.module.css
+ * Wave 2 portfolio-tier upload flow.
+ *
+ * Hierarchy: shared process header (step indicator; the title is in the app
+ * bar) → tip line → step content (drop zone | tag form | summary card) with
+ * sticky action bar on mobile.
+ *
+ * Depth approach: solid color-block via color-mix(in oklch) tonal surface steps
+ * + full hairline borders. Zero gradient/shadow/glow/blur.
+ * pulse-ring keyframe uses spread-only 0 0 0 Xpx (OK per spec — not glow).
+ *
+ * References:
+ *  - Notion file upload (illustrated dashed drop zone, drag highlight)
+ *  - Pinterest add board (clickable pills for tags)
+ */
+
+/* ============================================================
+ *  Motion keyframes
+ * ============================================================ */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes haloPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0
+      color-mix(in oklch, var(--color-text-primary) 18%, transparent);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 14px
+      color-mix(in oklch, var(--color-text-primary) 0%, transparent);
+  }
+}
+@keyframes iconPop {
+  0% {
+    transform: scale(0.5) rotate(-12deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15) rotate(4deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes stepFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.staggerIn {
+  animation: slideUp 320ms var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}
+
+/* ============================================================
+ *  Page shell
+ * ============================================================ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  /* Full-bleed page — pull against AppLayout padding. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  /* The process header brings its own measured spacing (48px in all), so it
+   * cancels this column's top padding and the gap under it: the step starts
+   * right below the indicator. */
+  --process-header-margin-top: calc(var(--space-20) * -1);
+  --process-header-margin-bottom: calc(var(--space-20) * -1);
+  /* DECISION (nie usuwaj tego komentarza) — pomiar 2026-09-09 (DOM,
+   * getBoundingClientRect):
+   * 1) padding-bottom = 0, bo dolną rezerwę trzyma JUŻ scrollport AppLayoutu
+   *    (`.content`: --bottom-nav-height + safe-area + odstęp końca). Stare
+   *    `--space-64 + 80px` = 144px liczyło tę samą rezerwę drugi raz i przy
+   *    maksymalnym scrollu odklejało listwę akcji od dolnej belki na 156px
+   *    pustej strony (zmierzone: listwa 560/632 przy belce 788). Zero zostawia
+   *    stały, mały prześwit 12px w tej samej okolicy, co 6px w stanie
+   *    przyklejonym. NIE dokładaj tu rezerwy na belkę — to podwójne liczenie.
+   * 2) `container-type: inline-size` (nazwa `upload-page`) czyni stronę
+   *    KONTENEREM ZAPYTAŃ: na desktopie trasa produktowa renderuje się w
+   *    sztywnej ramce telefonu 390px, a `@media (min-width: …)` mierzy OKNO
+   *    (1440) — kreator łamał się więc inaczej w ramce niż na telefonie o tej
+   *    samej szerokości. Wszystkie progi układu tej strony pytają odtąd
+   *    o szerokość STRONY. Progi układu (440px) są o 40px niższe niż dawne
+   *    viewportowe (480px), bo mierzą content-box strony (viewport minus 2×
+   *    --space-20). WYJĄTEK: próg listwy akcji (1240px) NIE jest
+   *    przeliczeniem dawnego 768px — to świadomie inna liczba, uzasadnienie
+   *    przy samej regule. */
+  container-type: inline-size;
+  container-name: upload-page;
+  padding: var(--space-20) var(--space-20) 0;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* ============================================================
+ *  TIP RIBBON — short reassurance per step
+ * ============================================================ */
+
+/* Solid hairline + tint — dashed is reserved for the dropzone affordance
+   (one meaning per pattern on this screen). */
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.stepContentEnter {
+  animation: stepFadeIn 240ms var(--ease-entrance) both;
+}
+
+.stepHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.stepHeaderTitle {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.stepHeaderSubtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  max-width: 50ch;
+  line-height: 1.55;
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+ *  DROP ZONE — empty-state frame (solid via --style-border-style-empty)
+ * ============================================================ */
+
+.dropzone {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  /* 80px góra-dół robiło z jedynej akcji ekranu wysoki, pusty prostokąt
+   * („strasznie rozlazły widok”, owner 2026-10-08). */
+  padding: var(--space-40) var(--space-24);
+  width: 100%;
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R1): pole zrzutu stoi na papierze — afordancję niesie
+     przerywana rama i halo ikony, nie podmalowany prostokąt. */
+  background: var(--color-surface-interactive);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+  transition:
+    border-color var(--transition-normal),
+    background var(--transition-normal),
+    transform var(--duration-200) var(--spring-curve);
+}
+
+@media (hover: hover) {
+  .dropzone:hover {
+    border-color: color-mix(in oklch, var(--color-primary) 55%, transparent);
+    background: var(--color-state-hover);
+    transform: translateY(-2px);
+  }
+}
+
+.dropzone:focus-visible {
+  outline: 3px solid
+    color-mix(in oklch, var(--color-focus-ring) 40%, transparent);
+  outline-offset: 3px;
+}
+
+.dropzoneActive {
+  border-color: var(--color-primary);
+  background: var(--color-state-selected);
+  transform: scale(1.005);
+}
+
+/* Icon halo — flat tonal circle. */
+.dropzoneIconHalo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: var(--space-4);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+}
+
+.dropzone:hover .dropzoneIconHalo {
+  animation: haloPulse 1.6s ease-in-out infinite;
+}
+
+.dropzoneActive .dropzoneIconHalo {
+  animation: haloPulse 1.2s ease-in-out infinite;
+}
+
+/* Sans semibold via Typography variant="subtitle" — H1 display-serif is
+   reserved for the hero; only the title color is lifted to primary here. */
+.dropzoneTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.dropzoneSubtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  max-width: 38ch;
+  line-height: 1.55;
+}
+
+.dropzoneFormats {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  padding: 5px var(--space-12) 5px var(--space-8);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-20);
+  color: var(--color-text-secondary);
+}
+
+.dropzoneFormats svg {
+  color: var(--color-primary);
+}
+
+/* ============================================================
+ *  CROP SKELETON — frame-sized placeholder for the lazy crop chunk
+ *  Mirrors .previewImageFrame footprint (aspect 3/4) to reserve layout.
+ * ============================================================ */
+
+.cropSkeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.cropSkeletonFrame {
+  width: 100%;
+  max-width: 360px;
+  /* min-height reserves the crop-frame footprint deterministically — wins over
+     the Skeleton .rect variant's height:20px regardless of CSS-module order.
+     Approximates the 3/4 frame (~360w → ~480h, capped at the preview max). */
+  min-height: 420px;
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.cropSkeletonLabel {
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================
+ *  PHOTO PREVIEW CARD — branded frame with badge + change btn
+ * ============================================================ */
+
+.previewCard {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.previewImageFrame {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  max-width: 360px;
+  width: 100%;
+}
+
+.previewImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: cover;
+  aspect-ratio: 3 / 4;
+}
+
+.previewBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 5px var(--space-10) 5px var(--space-8);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+}
+
+/* Podgląd w krokach 2 i 3: miniatura obok podpisu, nie pełnoekranowe
+ * zdjęcie. Duży kadr (do 420px wysokości) spychał formularz cech pod
+ * zagięcie, choć na tych krokach pracuje się na formularzu, a zdjęcie jest
+ * tylko przypomnieniem (owner 2026-10-08: „fokusuj na happy path”). */
+.previewCompact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  background: var(--color-bg-paper);
+  border-radius: var(--style-radius-surface);
+}
+
+.previewCompactImage {
+  display: block;
+  flex: 0 0 auto;
+  width: var(--space-64);
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--style-radius-control);
+}
+
+.previewCompactText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.previewCompactTitle {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.previewCompactHint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+}
+
+/* ============================================================
+ *  TAG SECTIONS — eyebrow header + content rows
+ * ============================================================ */
+
+.tagSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+/* DECISION (nie usuwaj tego komentarza) — pomiar 2026-09-09, zmiana S126:
+ * Ta karta NIE przypina liczby kolumn siatki kolorów. Do S126 stało tu
+ * `repeat(4, …)`, bo współdzielona siatka miała sztywne 5 kolumn i przy 310px
+ * karty strona jechała w bok o 3px. Siatka liczy teraz kolumny z WŁASNEJ
+ * szerokości (ColorSwatch.module.css), więc nie wyjeżdża w żadnej karcie, a
+ * cztery kolumny ucinały nazwy („Czerw…”, „Pomara…”). Nie przywracać przypięcia.
+ * Karta zjada 2×--space-20, więc przy 390px zostaje 310px: trzy komórki po
+ * 103px mieszczą najdłuższą nazwę (102px). Domyślne minimum komórki (104px)
+ * dałoby tu dwie kolumny, stąd niższy próg; przy 360px (280px) nadal trzy. */
+.tagSection .colorGrid {
+  --color-swatch-cell: 93px;
+}
+
+/* Komplet kolorów (3/3): niewybrane próbki są `disabled` i muszą to POKAZAĆ,
+   tym samym wygaszeniem co niedostępne opcje filtrów galerii (.traitDimmed).
+   Bez tego czwarte kliknięcie wyglądało na zepsuty przycisk. */
+.colorGrid button {
+  transition:
+    opacity var(--duration-200) ease,
+    transform var(--duration-100) var(--spring-snappy);
+}
+
+.colorGrid button:disabled {
+  opacity: 0.4;
+}
+
+.tagSectionHeader {
+  /* icon | title | counter on one centre line; the picking rule under the
+   * title as its own line (never inside the title: it broke mid-parenthesis). */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: var(--space-8);
+  row-gap: var(--space-2);
+  align-items: start;
+  /* The title's size and leading, so `1lh` below is one TITLE line. */
+  font-size: var(--text-lg);
+  line-height: 1.3;
+}
+
+/* Holder exactly one title line tall: the disc sits on the title's first line
+ * even when the title wraps. */
+.tagSectionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1lh;
+  color: var(--color-accent-fg);
+}
+
+.tagSectionIcon > svg {
+  display: block;
+  box-sizing: content-box;
+  padding: var(--space-4);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+}
+
+.tagSectionTitle {
+  margin: 0;
+  min-width: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.tagSectionCounterSlot {
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.tagSectionHint {
+  grid-column: 2 / -1;
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.tagSectionCounter {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--space-10);
+  border-radius: var(--style-radius-pill);
+  /* Motyw „Jeden krem" (R2): licznik jest pusty, dopóki nic nie wybrano —
+     stan „coś już jest" niesie wariant Filled niżej, nie krem na starcie. */
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  /* tnum-allow: "2/5 wybranych" changes in place on every tap; digits and a slash */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.tagSectionCounterFilled {
+  background: var(--color-state-selected);
+  border-color: var(--color-border-surface);
+  /* Złoto jako TEKST idzie przez accent-fg — surowy primary miał 2.2:1 na papierze. */
+  color: var(--color-accent-fg);
+}
+
+/* ============================================================
+ *  LENGTH GRID — 2 cols on mobile, 4 on tablet+
+ * ============================================================ */
+
+.lengthGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-12);
+}
+
+/* Kontener, nie okno — patrz DECISION przy .page. */
+@container upload-page (min-width: 440px) {
+  .lengthGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.lengthCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  min-height: 64px;
+  padding: var(--space-12) var(--space-8);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  /* Karta wyboru stoi w białym boksie sekcji: wypełnienie cichej kontrolki,
+   * nie biel (biel na bieli czytała się jak goły napis). */
+  background: var(--color-control-fill);
+  cursor: pointer;
+  font: inherit;
+  transition:
+    border-color var(--transition-normal),
+    background var(--transition-normal),
+    transform var(--duration-200) var(--spring-curve);
+}
+
+@media (hover: hover) {
+  .lengthCard:not(.lengthCardSelected):hover {
+    border-color: var(--color-border-surface);
+    background: var(--color-state-hover);
+    transform: translateY(-1px);
+  }
+}
+
+.lengthCard:active {
+  transform: scale(0.97);
+}
+
+/* Wybór = atrament odwrócony (kanon „A3”), ten sam co wybrany chip cechy. */
+.lengthCardSelected {
+  border-color: var(--color-text-primary);
+  background: var(--color-text-primary);
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+.lengthCardLabel {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color var(--transition-fast);
+}
+
+.lengthCardSelected .lengthCardLabel {
+  color: var(--color-bg-main);
+}
+
+/* DECISION (nie usuwaj tego komentarza) — zgłoszenie ownera 2026-10-08:
+ * znak wyboru stoi POZA przepływem (róg karty) i jest zamontowany zawsze,
+ * zmienia się tylko krycie. Montowany warunkowo jako trzecie dziecko kolumny
+ * flex dokładał wysokość karcie, a siatka rozciągała o nią cały wiersz. */
+.lengthCheck {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  color: var(--color-bg-main);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.lengthCardSelected .lengthCheck {
+  opacity: 1;
+}
+
+/* ============================================================
+ *  SUMMARY CARD — review rows + grouped layout
+ * ============================================================ */
+
+.summaryCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-4);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.summaryRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-12);
+  /* Solid hairline divider — dashed is reserved for the dropzone affordance. */
+  border-bottom: var(--style-border-divider) solid var(--color-border-surface);
+}
+
+.summaryRow:last-child {
+  border-bottom: none;
+}
+
+.summaryRowHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.summaryRowIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.summaryLabel {
+  color: var(--color-text-secondary);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  font-size: var(--text-xs);
+}
+
+/* Jeden system wartości dla WSZYSTKICH wierszy podsumowania: ten sam rząd,
+   ta sama typografia, ten sam odstęp. Kolor dokłada tylko kropkę. */
+.summaryValues {
+  display: flex;
+  gap: var(--space-8) var(--space-16);
+  flex-wrap: wrap;
+}
+
+.summaryValueItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+ *  POLICY NOTE — pre-publish privacy reminder (faces/docs/PII)
+ *  Flat tonal surface + hairline border (no gradient/shadow).
+ * ============================================================ */
+
+.policyNote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  margin-top: var(--space-12);
+  padding: var(--space-12) var(--space-12);
+  background: color-mix(in oklch, var(--color-bg-paper) 88%, var(--color-info));
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-info) 24%, transparent);
+  border-radius: var(--style-radius-surface);
+}
+
+.policyNoteIcon {
+  color: var(--color-info);
+  flex-shrink: 0;
+  margin-top: var(--space-2);
+}
+
+.policyNoteText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+}
+
+/* ============================================================
+ *  STICKY ACTION BAR — mobile sticky / desktop inline
+ * ============================================================ */
+
+/* DECISION (nie usuwaj tego komentarza) — pomiar 2026-09-09 (DOM):
+ * Listwa MUSI być RODZEŃSTWEM `.stepContent`, a nie jej dzieckiem — każdy krok
+ * renderuje ją więc z fragmentu, obok treści kroku, nigdy w środku.
+ * Powód: sticky nie wolno wyjść poza swój blok zawierający. Gdy listwa siedziała
+ * w `.stepContent`, blokiem zawierającym była treść kroku, która w kroku 2
+ * zaczyna się DOPIERO pod kartą podglądu zdjęcia (zmierzone: `.stepContent`
+ * start y=803, karta podglądu 360-820). Szczelina sticky leży przy 710-782, więc
+ * pasek był do niej DOCIĄGANY W GÓRĘ tylko do granicy własnego bloku i przy
+ * scrollTop 0 stał na 823-895 — kompletnie poza ekranem 844px, nad belką
+ * zaczynającą się na 788. Pojawiał się dopiero po ~200px przewinięcia.
+ * Jako dziecko `.page` blok zawierający obejmuje CAŁĄ stronę, więc pasek jest
+ * przyklejony od pierwszej klatki każdego kroku. NIE wciągaj go z powrotem do
+ * `.stepContent` ani nie owijaj w żaden nowy blok pośredni. */
+.stickyActionBar {
+  position: sticky;
+  /* DECISION (nie usuwaj tego komentarza) — owner 2026-09-09, zmienione
+   * 2026-09-14:
+   * Pierwsze zgłoszenie: pasek „latał 30-40 pikseli ponad belką", bo sticky
+   * pinuje się do scrollportu `.content` pomniejszonego o jego rezerwę na
+   * dolną belkę. Wtedy zostawiliśmy celowy prześwit 6px; drugie zgłoszenie
+   * (2026-09-14) mówi, że każda szpara pod przyklejoną belką akcji to błąd,
+   * bo przewija się przez nią treść. Offset liczy teraz AppLayout w jednym
+   * miejscu (`--sticky-flush-bottom`, DECISION tam): pasek siada równo na
+   * belce nawigacji przy każdym safe-area inset. NIE dopisuj tu insetu ani
+   * `--bottom-nav-height`, oba są już w rezerwie kontenera. */
+  bottom: var(--sticky-flush-bottom, 0px);
+  /* Ta sama rezerwa pod ostatnią klatką przewijania: bez tego pasek wraca
+   * na koniec strony do pozycji w przepływie, 12px nad krawędzią. */
+  margin-bottom: var(--sticky-flush-bottom, 0px);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-8);
+  /* `auto`, nie stały odstęp: przy krótkiej treści (kadr niższy niż ekran)
+   * belka stała w połowie ekranu, zaraz pod zdjęciem, bo `sticky` trzyma dół
+   * dopiero wtedy, gdy treść się przewija. Kolumna `.page` ma `min-height:
+   * 100%`, więc automatyczny margines dopycha belkę do krawędzi (S126). */
+  margin-top: auto;
+  padding: var(--space-8);
+  /* Motyw „Jeden krem" (R1): listwa akcji odcina się od treści ramą i tym,
+     że jest przyklejona — nie własnym odcieniem. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+/* Powód wyłączonego CTA — cała szerokość listwy, nad rzędem przycisków.
+   Mieszka W listwie (a nie w treści kroku), więc jedzie razem z przyciskiem
+   i jest czytelny dokładnie wtedy, kiedy „Dalej" nie działa. */
+.stickyActionBarReason {
+  flex: 1 0 100%;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+}
+
+.stickyPrimaryCta {
+  flex: 1;
+  min-width: 0;
+  max-width: 240px;
+}
+
+/* Szeroka strona: listwa wraca do zwykłego przepływu (nie ma dolnej belki,
+ * której miałaby unikać). Zapytanie idzie do KONTENERA, nie do okna — w ramce
+ * telefonu na desktopie okno ma 1440px, a strona 390px, więc `@media` odklejało
+ * tu listwę i chowało ją pod belką ramki. Patrz DECISION przy .page. */
+@container upload-page (min-width: 1240px) {
+  .stickyActionBar {
+    position: static;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+  .stickyPrimaryCta {
+    max-width: 320px;
+  }
+}
+
+/* Publish CTA — solid primary fill. */
+.publishCta {
+  background: var(--color-primary);
+}
+
+/* ============================================================
+ *  PLAN LIMIT GATE
+ * ============================================================ */
+
+.planGate {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-20) 0;
+}
+
+.planGateInner {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-64) var(--space-32);
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R3): moment upsellu niesie akcentowa rama i waga
+     typografii — wypełnienie tylko rozmywało granicę boksu. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.planGateIconHalo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+  margin-bottom: var(--space-8);
+  animation: iconPop 480ms var(--ease-entrance) both;
+}
+
+.planGateTitle {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.planGateBody {
+  margin: 0;
+  color: var(--color-text-secondary);
+  max-width: 42ch;
+  line-height: 1.55;
+}
+
+.planGateActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 320px;
+  margin-top: var(--space-12);
+}
+
+.planGateCta {
+  background: var(--color-primary);
+}
+
+/* ============================================================
+ *  UPLOAD PROGRESS — phase indicator
+ * ============================================================ */
+
+.uploadProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-96) var(--space-32);
+}
+
+.uploadProgressHalo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg-strong);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+  animation: haloPulse 1.4s ease-in-out infinite;
+}
+
+.uploadProgressBar {
+  width: 100%;
+  max-width: 320px;
+}
+
+.uploadProgressLabel {
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================
+ *  SUCCESS STATE — branded success confirmation
+ * ============================================================ */
+
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-32);
+  text-align: center;
+  /* DECISION (nie usuwaj tego komentarza) — pomiar 2026-09-09:
+   * `100%` (wysokość scrollportu), nie `60vh`. Po pierwsze `vh` mierzy OKNO,
+   * a na desktopie ekran sukcesu żyje w ramce telefonu 390×844 — 60vh liczyło
+   * się od 900px okna. Po drugie 60vh + padding --space-96 wypychały treść
+   * ku górze i zostawiały dolne ~55% ekranu puste. Pełna wysokość z
+   * `justify-content: center` stawia kolumnę na środku kadru. */
+  min-height: 100%;
+  justify-content: center;
+}
+
+.successIconHalo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  border-radius: var(--style-radius-pill);
+  background: color-mix(in oklch, var(--color-success) 16%, transparent);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-success) 24%, transparent);
+  color: var(--color-success);
+  animation: iconPop 480ms var(--ease-entrance) both;
+}
+/* Kadr, ktory wlasnie poszedl do galerii: pelna ramka hairline, bez cienia. */
+.successPhotoFrame {
+  overflow: hidden;
+  width: 180px;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.successPhoto {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.successTitle {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.successHint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  max-width: 38ch;
+}
+
+.successActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+  max-width: 280px;
+  margin-top: var(--space-20);
+}
+
+/* ============================================================
+ *  ERROR STATE
+ * ============================================================ */
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-64) var(--space-32);
+  text-align: center;
+}
+
+/* Dwie akcje błędu publikacji (ponów / wróć do podsumowania) w kolumnie,
+   ten sam rytm co akcje ekranu sukcesu. */
+.errorActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+  max-width: 280px;
+  margin-top: var(--space-8);
+}
+
+.errorIconHalo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: var(--style-radius-pill);
+  background: color-mix(in oklch, var(--color-error) 12%, transparent);
+  color: var(--color-error);
+  margin-bottom: var(--space-8);
+}

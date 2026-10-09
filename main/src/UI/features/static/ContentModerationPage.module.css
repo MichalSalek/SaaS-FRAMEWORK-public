@@ -1,0 +1,597 @@
+/* ─── ContentModerationPage ───
+ *
+ * Static info page (DSA compliance) + inline public report form.
+ * Hero/report slabs: editorial flat — eyebrow chip, solid gold-tint + hairline, no sparkle,
+ * solid tonal tint + hairline border (Anti-AI-Slop B28: zero gradientów/glow).
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Public report form is a `mailto:` builder, NOT a fetch to the
+ * authenticated `/gallery/report` endpoint. Visitors may be anon,
+ * may not know the photo ID, and DSA reporting must work even
+ * with a deleted account. mailto: gives a verifiable paper trail
+ * via the user's own email client and keeps the page zero-auth.
+ */
+
+/* UWAGA (root-cause 2026-06-11): skala spacingu kończy się na --sp-5 (48px,
+ * tokens.css). Każde użycie sp-6..sp-9 bez fallbacku jest „invalid at
+ * computed-value time" — CAŁY shorthand pada do wartości initial (margin:0
+ * zabijał auto-centrowanie .reportSection → karta przyklejona do x=0,
+ * padding:0 → inputy przy krawędzi, gap:0). Większe odstępy składamy
+ * calc()-iem z istniejących tokenów, NIE fantomowymi tokenami. */
+.page {
+  padding: var(--space-20) 0 var(--space-48);
+}
+
+/* ─── HERO — editorial slab ─── */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  /* Gutter viewportu dla slabów z borderem+radius (PublicLayout nie daje
+   * horyzontalnego paddingu — "pages own their padding"): poniżej ~784px
+   * karta trzyma 12px od krawędzi zamiast dotykać ekranu; na desktopie cap 760. */
+  width: calc(100% - 2 * var(--space-12));
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-48) var(--space-32) var(--space-32);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R2/R3): strona publiczna nosi JEDEN krem, więc slaby
+     stoją na papierze — elevację niesie zamknięta akcentowa rama, nie fill. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  overflow: hidden;
+  text-align: left;
+}
+
+.heading {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.15;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-12);
+  text-wrap: balance;
+}
+
+.lead {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  margin: 0;
+  max-width: 56ch;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.regNote {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);
+  /* Fine-print czytelny: --text-xs (10px) + disabled było pod progiem
+   * czytelności dla zdania; muted = AA-tier między secondary a disabled. */
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: var(--space-20) 0 0;
+  max-width: 56ch;
+  line-height: 1.5;
+}
+
+/* ─── TRUST STRIP — under hero ─── */
+
+/* DECISION (nie usuwaj tego komentarza):
+ * NIE migrowany na components/TrustSignals variant='grid' (W5.1 census).
+ * Struktura (icon + 1-linia tekstu, karta-grid) jest zbliżona, ALE wizual NIE
+ * jest pixel-identyczny: tu karta ma primary-tinted tło (color-mix primary 4%)
+ * + primary-tinted border (primary 18%), a TrustSignals grid używa płaskiego
+ * bg-elevated + color-divider. Migracja wymagałaby też edycji
+ * ContentModerationPage.tsx (JSX <div>→<ul>/<TrustSignals>) — poza partycją
+ * tego zadania. Forma zostaje per-page (forsowanie złamałoby pixel-parity). */
+
+.trustStrip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+  max-width: 760px;
+  margin: var(--space-32) auto 0;
+  padding: 0 var(--space-20);
+}
+
+@media (min-width: 480px) {
+  .trustStrip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .trustStrip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Motyw „Jeden krem": kafel dowodu stoi na papierze — wyróżnia go pełny
+   hairline (4 boki, Anti-AI-Slop §3), nie kolejna złota powierzchnia. */
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.trustIcon {
+  flex-shrink: 0;
+  /* Motyw „Jeden krem": ikona stoi na czystym papierze — złoto niosące
+     znaczenie idzie wariantem AA. */
+  color: var(--color-accent-fg);
+  display: inline-flex;
+}
+
+.trustText {
+  font-weight: 500;
+  text-wrap: pretty;
+}
+
+/* ─── Content container ─── */
+.content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-48) var(--space-20) var(--space-48);
+}
+
+/* ─── TOC ─── */
+.toc {
+  margin-bottom: var(--space-48);
+  padding: var(--space-20);
+  /* Motyw „Jeden krem": spis treści to papier w ramie — kolejna złota banda
+     na tej samej stronie rozmywała, co naprawdę jest wyodrębnione. */
+  background: var(--color-bg-paper);
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-divider);
+}
+
+.tocHeading {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  margin: 0 0 var(--space-12);
+}
+
+.tocList {
+  margin: 0;
+  padding-left: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  list-style: decimal;
+}
+
+.tocLink {
+  font-size: var(--text-sm);
+  color: color-mix(
+    in oklch,
+    var(--color-primary) 85%,
+    var(--color-text-primary)
+  );
+  text-decoration: none;
+  line-height: 1.5;
+  font-weight: 500;
+  border-bottom: var(--style-border-divider) solid transparent;
+  transition: border-color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Sections ─── */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-48) + var(--space-12));
+}
+
+.section {
+  scroll-margin-top: var(--space-48);
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-lg);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-12);
+  line-height: 1.25;
+}
+
+.sectionText {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  line-height: 1.75;
+  margin: 0 0 var(--space-12);
+}
+
+.sectionText:last-child {
+  margin-bottom: 0;
+}
+
+/* Motyw „Jeden krem" (R3): callout wyróżnia zamknięta rama plus waga 600
+   treści — bez fillu i bez lewego paska (Anti-AI-Slop §3). */
+.sectionNote {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-12) var(--space-20);
+  margin-top: var(--space-20);
+  line-height: var(--leading-body);
+}
+
+/* ─── Forbidden content list ─── */
+.list {
+  list-style: none;
+  margin: var(--space-12) 0 var(--space-20);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.listItem {
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-12) var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--color-bg-paper);
+  /* Static <li> — no hover interaction (Anti-AI-Slop §4). */
+}
+
+.listItemTitle {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--text-md);
+}
+
+.listItemDesc {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+/* ─── Report steps ─── */
+.stepsList {
+  list-style: none;
+  margin: var(--space-20) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.stepItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-20);
+  padding: var(--space-20);
+  /* Motyw „Jeden krem": krok procedury to papier w ramie — akcent zostaje
+     przy medalionie z numerem/ikoną, nie rozlewa się na cały wiersz. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+}
+
+.stepIcon {
+  flex-shrink: 0;
+  color: var(--color-accent-fg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem": medalion kroku to ZNAK — tint zostaje, przez token roli. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.stepBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.stepTitle {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--text-md);
+}
+
+.stepText {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+/* ─── Numbered list ─── */
+.numberedList {
+  list-style: decimal;
+  padding-left: var(--space-32);
+  margin: var(--space-12) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.numberedItem {
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.7;
+}
+
+/* ─── Inline links ─── */
+.inlineLink {
+  color: color-mix(
+    in oklch,
+    var(--color-primary) 85%,
+    var(--color-text-primary)
+  );
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--color-primary) 40%,
+    transparent
+  );
+  font-weight: 600;
+}
+
+/* ─── REPORT FORM — editorial section ─── */
+
+.reportSection {
+  position: relative;
+  isolation: isolate;
+  /* Gutter viewportu jak .hero — slab z borderem nie dotyka krawędzi ekranu. */
+  width: calc(100% - 2 * var(--space-12));
+  max-width: 760px;
+  /* margin-top z tokenów + AUTO centruje kartę w kolumnie ~760px jak callouty
+   * wyżej. Fantomowy token sp-6 unieważniał CAŁY shorthand → margin:0 →
+   * karta przyklejona do lewej krawędzi viewportu (CRITICAL, naprawione). */
+  margin: calc(var(--space-48) + var(--space-12)) auto 0;
+  padding: var(--space-48) var(--space-32);
+  /* Motyw „Jeden krem" (R3): formularz zgłoszenia stoi na papierze — niesie go
+     zamknięta akcentowa rama plus skala nagłówka, nie trzecia złota banda. */
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+}
+
+.reportEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  /* Gold-as-text = --color-accent-fg (AA-safe); --color-primary jako tekst =
+   * 2.2:1 FAIL (DESIGN.md). S60 fix: było ~2.2:1. Kropka usunięta (GLOBAL 28). */
+  color: var(--color-accent-fg);
+  margin-bottom: var(--space-12);
+  padding: var(--space-4) var(--space-10);
+  border-radius: var(--style-radius-pill);
+  /* Motyw „Jeden krem": eyebrow to ZNAK (chip) — tint przez token roli. Slab
+   * pod spodem jest teraz papierem, więc accent-fg ma pod sobą jaśniejsze tło
+   * niż w wariancie z ciepłym fillem (dawne 4.48:1) — AA trzyma. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.reportHeading {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-lg);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-12);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.reportLead {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  margin: 0 0 var(--space-32);
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.reportForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.reportFieldGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-20);
+}
+
+.reportField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.reportHint {
+  font-family: var(--font-body);
+  /* Helper-text formularza: 10px/disabled było nieczytelne — podniesione do
+   * --text-sm + secondary (czytelny kontrast na tincie karty). */
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.reportActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-8);
+}
+
+.reportLegal {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  max-width: 40ch;
+}
+
+/* Mobile: kolumna zamiast space-between — Button (komponent ma
+ * white-space:nowrap) z długim labelem wystawał za prawą krawędź karty.
+ * Pełna szerokość + zezwolenie na łamanie tekstu trzyma go w karcie. */
+@media (max-width: 479px) {
+  .reportActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reportLegal {
+    max-width: none;
+  }
+
+  .reportActions button {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+}
+
+/* ─── CTA bottom ─── */
+/* Motyw „Jeden krem": ta sama klamra co hero — papier plus pełny hairline
+ * i radius. Domknięcie strony niesie rama i rytm, nie kolejny fill. */
+.ctaSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-48) var(--space-20);
+  text-align: center;
+  /* Gutter viewportu jak .hero/.reportSection. */
+  width: calc(100% - 2 * var(--space-12));
+  max-width: 760px;
+  margin: calc(var(--space-48) + var(--space-12)) auto 0;
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+}
+
+.ctaHeading {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-lg);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.ctaBody {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 52ch;
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: var(--space-12);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-12);
+}
+
+.ctaInlineLink {
+  text-decoration: none;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 479px) {
+  .ctaButtons {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (min-width: 480px) {
+  .page {
+    padding: var(--space-32) 0 calc(var(--space-48) + var(--space-32));
+  }
+
+  .hero {
+    padding: calc(var(--space-48) + var(--space-12)) var(--space-48)
+      var(--space-48);
+  }
+
+  .reportSection {
+    padding: var(--space-48) var(--space-48);
+  }
+
+  .reportFieldGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .reportField.reportFieldFull {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding: calc(var(--space-48) + var(--space-32))
+      calc(var(--space-48) + var(--space-12))
+      calc(var(--space-48) + var(--space-12));
+  }
+}
+
+@media (hover: hover) {
+  .tocLink:hover {
+    border-bottom-color: color-mix(
+      in oklch,
+      var(--color-primary) 50%,
+      transparent
+    );
+  }
+
+  .inlineLink:hover {
+    text-decoration-color: var(--color-primary);
+  }
+}

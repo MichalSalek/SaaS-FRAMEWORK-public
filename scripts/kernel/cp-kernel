@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# scripts/kernel/cp-kernel
+
+# 1. Source Utils
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+SHARED_KERNEL=".shared-kernel"
+TARGET_PATH="src/READONLY-shared-kernel"
+
+header "COPY SHARED KERNEL" "🧠"
+
+if [ ! -d "${ROOT_DIR}/${SHARED_KERNEL}" ]; then
+  error "Shared kernel source not found: ${ROOT_DIR}/${SHARED_KERNEL}"
+  exit 1
+fi
+
+# Safety: warn if node_modules leaked into shared-kernel
+if [ -d "${ROOT_DIR}/${SHARED_KERNEL}/node_modules" ]; then
+  warn "node_modules found in ${SHARED_KERNEL} — excluding from copy"
+fi
+
+# Function to copy
+copy_kernel() {
+  local app_name="$1"
+  local dest="${ROOT_DIR}/${app_name}/${TARGET_PATH}"
+
+  # Submodul MUSI byc zainicjowany. Na swiezym klonie bez `--recursive` katalogi
+  # main/ i web-1/ sa PUSTE — bez tego guardu kopiowalismy kernel do pustego
+  # katalogu, meldowali "synchronized" (src_count==dst_count sie ZGADZA, bo liczy
+  # to co wlasnie wpisalismy) i trwale BLOKOWALI inicjalizacje submodulu:
+  # `git submodule update --init` konczy sie wtedy
+  # "fatal: 'main' already exists and is not a valid git repo" (zweryfikowane).
+  if [ ! -e "${ROOT_DIR}/${app_name}/.git" ]; then
+    error "Submodule '${app_name}' is not initialized (no ${app_name}/.git) — refusing to copy kernel into it."
+    error "Fix: git submodule update --init --recursive"
+    exit 1
+  fi
+
+  info "Updating: ${BOLD}${app_name}${RESET}"
+  rm -rf "${dest}"
+  mkdir -p "${dest}"
+
+  if command -v rsync &>/dev/null; then
+    rsync -a --exclude='node_modules' --exclude='.git' --exclude='.idea' \
+      "${ROOT_DIR}/${SHARED_KERNEL}/" "${dest}/"
+  else
+    # `${SRC}/.` — NIGDY `${SRC}/*`: glob pomija pliki ukryte (kernel dostaje
+    # dotfile → dst_count < src_count → skrypt pada juz po skopiowaniu), a `cp -r`
+    # na ISTNIEJACY katalog zagniezdza (ta sama klasa co incydent public/public
+    # 08-02; kanon `cp -Rp src/. dst/` z scripts/deploy/deploy-frontend).
+    cp -Rp "${ROOT_DIR}/${SHARED_KERNEL}/." "${dest}/"
+    # Symetria z --exclude gałęzi rsync ORAZ z filtrem src_count nizej.
+    rm -rf "${dest}/node_modules" "${dest}/.git" "${dest}/.idea" 2>/dev/null
+  fi
+
+  # Verify copy success
+  local src_count
+  local dst_count
+  src_count=$(find "${ROOT_DIR}/${SHARED_KERNEL}" -type f -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/.idea/*' | wc -l)
+  dst_count=$(find "${dest}" -type f | wc -l)
+
+  if [ "$src_count" != "$dst_count" ]; then
+    error "File count mismatch for ${app_name}: src=${src_count} dst=${dst_count}"
+    exit 1
+  fi
+
+  # Make target files read-only (READONLY enforcement)
+  find "${dest}" -type f -exec chmod 444 {} +
+
+  success "Copied to ${app_name} (${dst_count} files, chmod 444)"
+}
+
+# Execute for apps
+copy_kernel "main"
+copy_kernel "web-1"
+
+# Portable MD5 COMMAND (a variable, NOT a shell function — `xargs` execs a binary
+# and cannot call a function, so `xargs -0 <fn>` fails "No such file or directory").
+# GNU `md5sum` (Linux) vs BSD `md5 -r` (macOS) — same "<hash>  <file>" / stdin
+# "<hash>" output shape. The staging build box is macOS (no md5sum); without this
+# the checksum step below fails under `set -e`/pipefail and aborts cp-kernel
+# (exit 127), breaking `system:install` even though the kernel copy succeeded.
+# Used UNQUOTED below so "md5 -r" word-splits into command + flag for xargs/pipes.
+if command -v md5sum >/dev/null 2>&1; then
+  MD5_CMD="md5sum"
+else
+  MD5_CMD="md5 -r"
+fi
+
+# Write checksum for fast-path in kernel-sync audit
+CHECKSUM_FILE="${ROOT_DIR}/.kernel-checksum"
+{
+  find "${ROOT_DIR}/${SHARED_KERNEL}" -type f \
+    -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/.idea/*' \
+    -print0 | sort -z | xargs -0 $MD5_CMD
+  # Include file counts for quick sanity check
+  echo "FILES_MAIN=$(find "${ROOT_DIR}/main/${TARGET_PATH}" -type f | wc -l)"
+  echo "FILES_WEB1=$(find "${ROOT_DIR}/web-1/${TARGET_PATH}" -type f | wc -l)"
+  # Include target content hashes (detects edits to READONLY files)
+  echo "HASH_MAIN=$(find "${ROOT_DIR}/main/${TARGET_PATH}" -type f -print0 | sort -z | xargs -0 $MD5_CMD | $MD5_CMD | cut -d' ' -f1)"
+  echo "HASH_WEB1=$(find "${ROOT_DIR}/web-1/${TARGET_PATH}" -type f -print0 | sort -z | xargs -0 $MD5_CMD | $MD5_CMD | cut -d' ' -f1)"
+# `|| true`: the checksum file is an audit fast-path cache, never load-bearing —
+# a hashing hiccup must not abort the kernel sync under `set -e`.
+} > "$CHECKSUM_FILE" 2>/dev/null || true
+
+success "Shared kernel synchronized."
+exit 0

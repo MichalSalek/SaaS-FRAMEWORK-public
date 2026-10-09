@@ -1,0 +1,96 @@
+/* Pagination — one pager for page-numbered and cursor lists. */
+
+.pagination {
+  /* The pager lays itself out from its OWN width (it sits in pages, panels
+     and narrow asides). */
+  container-type: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8) var(--space-16);
+}
+
+.summary {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+  margin-left: auto;
+}
+
+.pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-8);
+  border: 0;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.page[aria-current='page'] {
+  /* Inverted ink: the default ring colour has no contrast on it. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+}
+
+.page:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.page:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.gap {
+  min-width: var(--space-16);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+@media (hover: hover) {
+  .page:not([aria-current='page']):not(:disabled):hover {
+    background: var(--color-state-hover);
+  }
+}
+
+/* Narrow pager: „Poprzednia” and „Następna” keep their arrows and drop their
+   words, so the page numbers and both steps stay on ONE line. Measured S126 at
+   390px on four admin pages: with the words, „Następna” fell alone onto a
+   second row. The buttons keep their accessible names (`aria-label`). */
+@container (max-width: 519.98px) {
+  .stepLabel {
+    display: none;
+  }
+
+  .step {
+    min-width: 44px;
+  }
+}

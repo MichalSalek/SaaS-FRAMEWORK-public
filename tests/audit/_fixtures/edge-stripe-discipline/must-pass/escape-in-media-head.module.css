@@ -1,0 +1,11 @@
+/* edge-stripe-allow: krawędź strony w widoku do druku — arkusz print nie ma
+   koloru tła, więc linia cięcia jest jedynym nośnikiem marki na kartce */
+@media print {
+  .printedEdge::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4px;
+    background: var(--color-primary);
+  }
+}

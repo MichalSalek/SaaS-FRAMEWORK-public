@@ -1,0 +1,16 @@
+/* opacity: 0 = element UKRYTY w stanie bazowym (wskaźnik aktywnej zakładki
+   animujący się do 1). To nie jest przygaszone złoto udające tint — jego
+   widoczny stan opisuje osobna reguła i to ona podlega ocenie.
+   Świadomie BEZ deklaracji rozmiaru: z `height: 2px` próbkę wyciszał
+   wyciszacz rozmiaru, a nie warunek `opacity > 0`, który miała pokrywać. */
+.tab::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  background: var(--color-primary);
+  opacity: 0;
+}
+
+.tab[data-active='true']::after {
+  opacity: 1;
+}

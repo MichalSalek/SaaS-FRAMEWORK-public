@@ -1,0 +1,4 @@
+/* border: 1px solid red; text-transform: uppercase; border-radius: var(--radius-md) */
+.card {
+  border: var(--style-border-surface) solid var(--color-border);
+}

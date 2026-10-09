@@ -1,0 +1,6 @@
+/* section-discipline-allow: padding asymetryczny, band reczny zostaje
+   (escape rozbity na dwie linie STOI NAD blokiem, nie w nim) */
+.trust {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}

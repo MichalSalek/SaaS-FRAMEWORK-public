@@ -1,0 +1,964 @@
+/* UI/features/auth/OnboardingPage.module.css
+ *
+ * Iter 4 — guided studio session, not a flat form.
+ *
+ * Hierarchy:
+ *   WELCOME: intro card (title → one sentence); later steps: the shared
+ *   ProcessHeader (title in the top bar, compact step indicator)
+ *   step card (focused single-decision surface; tonal paper + full hairline)
+ *   sticky action bar (solid paper + top hairline, safe-area aware on mobile)
+ *
+ * Anti-AI-Slop flat: depth via solid color-mix tonal blocks + full hairline
+ * borders. ZERO gradient washes / box-shadow elevation / glow. Mirrors the
+ * in-repo flat template ActivateRolePage.module.css (same brand warmth).
+ * Spread-ring (0 0 0 Npx) OK for focus/selection affordance (WCAG 2.4.7).
+ *
+ * Patterns inherited from the flat vocabulary:
+ *   - solid gold-tint + hairline, no sparkle (removed decorative mask)
+ *   - eyebrow = canonical <Eyebrow variant='chip'> (frozen-light, no dot)
+ *   - spring easing on press (cubic-bezier(0.34, 1.56, 0.64, 1))
+ *   - dark mode parity tuned via :root[data-mode='dark']
+ */
+
+/* ============================================================
+ * MOTION
+ * ============================================================ */
+
+/* Directional shared-axis slide-X (native push/pop). Forward = the new step
+ * rides in from the RIGHT, back = from the LEFT. Transform-only travel (no
+ * translateY); the small opacity 0->1 only softens the entry edge — the motion
+ * is CARRIED by translateX. Triggered by an explicit user action (next/back),
+ * so this is functional motion, NOT a scroll-reveal. Direction is selected via
+ * the `data-step-dir` attribute on the step card (see .stepCard[data-step-dir]). */
+@keyframes onboardingStepEnterFwd {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes onboardingStepEnterBack {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes onboardingDotPop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+ * PAGE SHELL — full-bleed compensation for the hero slab
+ * ============================================================ */
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  /* Compensate AppLayout content padding so hero reads full-bleed. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  /* No extra bottom padding: the action bar is `position: sticky` (in normal
+   * flow), so it already reserves its own height + safe-area inset. The old
+   * `+ 80px` reservation (a spacer meant for a `fixed` bar) left the sticky CTA
+   * floating ~80px above the true bottom on the last scroll frame. */
+  padding: var(--space-20) var(--space-20) 0;
+  /* Steps after WELCOME start with the shared process header. Under an app bar
+   * it brings its own measured spacing (48px in all), so it cancels this
+   * column's top padding and the shell's gap under it. As a visible title row
+   * (desktop account layout) the header ignores both. */
+  --process-header-margin-top: calc(var(--space-20) * -1);
+  --process-header-margin-bottom: calc(var(--space-20) * -1);
+  /* DECISION (nie usuwaj tego komentarza) — S126, 2026-10-09: układ kroków
+   * liczy się z WŁASNEJ szerokości strony, nie z szerokości okna. Na
+   * komputerze onboarding bywa rysowany w ramce telefonu (dev, admin,
+   * „zaloguj jako”): okno ma 1440 px, strona 390, a reguły `@media` włączały
+   * tam dwie kolumny pól i pasek akcji w przepływie, czyli układ komputera
+   * ściśnięty do telefonu. Progi niżej są te same co wcześniej. */
+  container-type: inline-size;
+  container-name: onboarding;
+  /* The column FILLS the scrollport (`data-fill-shell` on this element, rule
+   * in layouts/navigation-transition.module.css), so the action bar below can
+   * stand on the bottom edge on EVERY step. Measured S126: on the role step
+   * the content was 5.6px shorter than the screen, the bar sat in flow right
+   * under it and a strip of paper showed beneath; on longer steps it was
+   * flush. */
+}
+
+@container onboarding (min-width: 768px) {
+  .shell {
+    /* Wide: the action bar is inline (relative), so a normal bottom gutter
+     * keeps the flow from ending flush against the viewport edge. */
+    padding-bottom: var(--space-48);
+  }
+}
+
+/* Centered narrow column inside the page so long forms keep readable
+ * measure on desktop while hero still bleeds full-width. */
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  /* Takes the column's free height, so the bar's `margin-top: auto` has
+   * something to push against. */
+  flex: 1 0 auto;
+}
+
+/* ============================================================
+ * HERO — intro card of the WELCOME step (heading + one sentence)
+ * ============================================================ */
+
+.hero {
+  position: relative;
+  /* `isolation` zdjęte razem z dekoracją, którą izolowało: kontekst układania
+     istniał wyłącznie po to, żeby pseudo-element z ujemnym z-index chował się
+     pod treścią. Pseudo już nie ma (w pliku zero ujemnych z-index), a wiszący
+     kontekst układania to mina dla następnej osoby, która doda tu tooltip
+     albo sticky. */
+  margin: 0;
+  padding: var(--space-32) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (S94/R2): hero to JEDYNY pas kremu na onboardingu —
+     bierze token (mode-aware), więc ręczny duplikat tintu dla dark zniknął.
+     Pulsujący blob 280px w prawym górnym rogu (::after + keyframes
+     onboardingHeroGlow) WYCIĘTY: dekoracja spod R1, w dodatku jedyny ruch na
+     tej powierzchni, który niczego nie komunikował. */
+  /* S116 („A3”): biel należy do tego, co klikalne, więc karta z formularzem
+     wraca na papier; inaczej białe pole i biały przycisk znikają na białej karcie. */
+  background: var(--color-surface-card);
+  /* Rama neutralna, dokładnie jak w kanonie AppHero (AppHero.module.css):
+     krem plus hairline --color-divider. Złoto jako obwódka UI daje na bieli
+     ~2,2:1, czyli poniżej progu 3:1 z SC 1.4.11, więc nie niesie granicy
+     i tylko zjada headroom zarezerwowany dla CTA (R6). */
+  border: var(--style-border-surface) solid var(--color-divider);
+  overflow: hidden;
+}
+
+/* --- Hero typography --- */
+
+.heroTitle {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.15;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+  margin: 0 0 var(--space-8);
+}
+
+.heroTitleAccent {
+  color: var(--color-accent-fg);
+}
+
+.heroSubtitle {
+  position: relative;
+  z-index: 1;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 44ch;
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.heroSubtitle:lang(pl) {
+  hyphens: auto;
+}
+
+/* ============================================================
+ * STEP CARD — focused single-decision surface
+ * ============================================================ */
+
+/* Frameless section — the outer "card" chrome was removed (box-in-box: it
+ * double-framed the role cards / inputs / toggle rows, which carry their own
+ * closed rectangles). Step content sits directly on the page canvas. */
+/* Focus target only when a step change dropped focus (useStepScrollReset):
+ * a landmark for the next Tab / screen reader, not an interactive control, so
+ * no ring. */
+.stepCard:focus,
+.successCard:focus {
+  outline: none;
+}
+
+.stepCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-8) 0 0;
+}
+
+/* Directional re-trigger: the step card carries `key={currentStep}` so it
+ * remounts on every step change, replaying the enter animation. `data-step-dir`
+ * (set in handleNext='forward' / handleBack='back') picks the slide direction.
+ * Forward is the default when the attribute is absent. */
+.stepCardEnter {
+  animation: onboardingStepEnterFwd 300ms var(--spring-snappy) both;
+}
+
+.stepCardEnter[data-step-dir='back'] {
+  animation-name: onboardingStepEnterBack;
+}
+
+/* Step header (illustrated icon orb + heading + subtitle). */
+
+.stepHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.stepHeaderTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.stepHeaderOrb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.stepTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+.stepSubtitle {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+  max-width: 48ch;
+}
+
+.stepHint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+}
+
+/* ============================================================
+ * STEP — WELCOME (value-prop + risk reduction)
+ * ============================================================ */
+
+.welcomeBullets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.welcomeBullet {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.welcomeBulletIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.welcomeBulletText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.welcomeBulletTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+}
+
+.welcomeBulletDesc {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* Risk-reduction reassurance — dashed quiet-compliant frame, like .termsGate. */
+.welcomeReassure {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+/* Icon next to text that wraps: a box exactly one line tall, so the glyph
+ * sits on the centre of the FIRST line. */
+.welcomeReassureIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-accent-fg);
+}
+
+.welcomeReassureIcon > svg {
+  display: block;
+}
+
+.welcomeReassureText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.welcomeReassureTitle {
+  font-weight: 700;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+
+.welcomeReassureDesc {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* ============================================================
+ * STEP 1 — role cards (radio cards with halo on selection)
+ * ============================================================ */
+
+.roleCards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+}
+
+@container onboarding (min-width: 520px) {
+  .roleCards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.roleCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-interactive);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition:
+    border-color var(--transition-normal),
+    background var(--transition-normal),
+    transform var(--duration-100) var(--spring-snappy);
+}
+
+@media (hover: hover) {
+  .roleCard:hover {
+    border-color: var(--color-divider);
+    background: var(--color-state-hover);
+    transform: translateY(-1px);
+  }
+}
+
+.roleCard:active {
+  transform: scale(0.98);
+}
+
+.roleCard:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+.roleCardSelected {
+  /* Full accent frame — selection must be unambiguous at a glance. */
+  border-color: var(--color-primary);
+  /* Spread-ring (0 0 0 3px) = selected affordance (OK). */
+  background: var(--color-state-selected);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklch, var(--color-text-primary) 14%, transparent);
+}
+
+.roleCardSelected::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-primary);
+}
+
+.roleCardCheck {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 12px;
+  height: 12px;
+  color: var(--color-accent-text);
+  z-index: 1;
+}
+
+.roleCardIconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.roleCardTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+}
+
+.roleCardDescription {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* Age-gate row — quietly compliant (RODO Art. 8). */
+
+/* Terms / privacy gate — RODO Art. 6(1)(a) explicit consent before data
+ * processing starts. The age-16 declaration is merged into the terms row, so a
+ * separate age gate no longer exists. Short eyebrow + description explain what
+ * is being agreed to. */
+
+.termsGate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.termsGateHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.termsGateEyebrow {
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.termsGateDesc {
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.termsGateLink {
+  color: var(--color-accent-fg);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--color-primary) 40%,
+    transparent
+  );
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--duration-200) ease-out;
+}
+
+@media (hover: hover) {
+  .termsGateLink:hover {
+    text-decoration-color: var(--color-primary);
+  }
+}
+
+/* Consent rows (terms + marketing + select-all) sit at a quieter type size than
+ * body copy — legal/secondary weight, but still comfortably legible for PL
+ * (line-height >= 1.5). The label text is the LAST span inside the checkbox
+ * label (box span, then hidden input, then text span); targeting it by position
+ * is CSS-Modules-hash-proof across the Checkbox.atom boundary. The terms link
+ * keeps its own underlined-primary styling and stays clickable. */
+.consentRow label > span:last-child {
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+}
+
+.selectAllRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  background: var(--color-cta);
+  color: var(--color-accent-text);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-cta) 82%, black);
+  border-radius: var(--style-radius-surface);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.selectAllNativeInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.selectAllBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: var(--style-border-control) solid
+    color-mix(in oklch, var(--color-accent-text) 70%, transparent);
+  border-radius: var(--style-radius-control);
+  color: var(--color-accent-text);
+}
+
+.selectAllNativeInput:focus-visible + .selectAllBox {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+.selectAllText {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* ============================================================
+ * STEP 2 — fields grid
+ * ============================================================ */
+
+.fieldsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+@container onboarding (min-width: 600px) {
+  .fieldsGridStylist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+  }
+  .fieldsGridStylist > :nth-child(1) {
+    /* Display name spans full width on wider viewports for readability;
+     * city + phone share the second row. */
+    grid-column: 1 / -1;
+  }
+}
+
+.fieldError {
+  color: var(--color-error);
+  font-size: var(--text-xs);
+  margin-top: var(--space-4);
+}
+
+/* ============================================================
+ * STEP 3 — smart defaults (toggle rows)
+ * ============================================================ */
+
+.smartDefaults {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.smartDefaultsRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  transition: border-color var(--transition-normal);
+}
+
+.smartDefaultsRow:has(input:checked) {
+  border-color: var(--color-divider);
+  background: var(--color-state-selected);
+}
+
+.smartDefaultsHint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-left: var(
+    --space-56
+  ); /* aligns under the toggle label, past the switch */
+  line-height: 1.45;
+}
+
+/* Subtle summary card at the bottom of the preferences step that says
+ * "everything can be changed later" — defuses commitment anxiety. */
+.preferencesSummary {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-12);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  font-size: var(--text-xs);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+.preferencesSummaryIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-accent-fg);
+}
+
+.preferencesSummaryIcon > svg {
+  display: block;
+}
+
+/* ============================================================
+ * STEP — CHECKOUT (embedded plan choice + payment, W2 panel host)
+ * ============================================================ */
+
+/* Frame around the embedded PlanCheckoutPanel so the payment surface reads as a
+ * contained "card" inside the step. The panel renders its own summary +
+ * PaymentElement; this only provides the outer hairline + paper canvas. */
+.checkoutCard {
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+/* Quiet FREE-escape row under the checkout card — centered, low emphasis so it
+ * never competes with the panel's primary pay/trial CTA. */
+.checkoutFreeEscape {
+  display: flex;
+  justify-content: center;
+  margin-block-start: var(--space-12);
+}
+
+/* ============================================================
+ * SUCCESS — terminal "all set" view
+ * ============================================================ */
+
+.successCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-12);
+  margin-top: var(--space-32);
+  padding: var(--space-48) var(--space-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  /* Functional entrance (mount), pop scale — triggered once, not scroll. */
+  animation: onboardingDotPop 420ms var(--spring-snappy) both;
+}
+
+.successMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  margin-bottom: var(--space-8);
+}
+
+.successTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.15;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.successBody {
+  margin: 0;
+  max-width: 42ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.successCta {
+  margin-top: var(--space-12);
+  min-width: 220px;
+}
+
+/* ============================================================
+ * ACTION BAR — sticky on mobile, inline on desktop
+ * ============================================================ */
+
+.actionBar {
+  position: sticky;
+  /* Rezerwa kontenera przewijania: DECISION przy `--sticky-flush-bottom` w AppLayout. */
+  bottom: var(--sticky-flush-bottom, 0px);
+  left: 0;
+  right: 0;
+  /* Pull into the page padding so the bar reads as a separate strip. Dolny
+   * margines = ta sama rezerwa: bez niego pasek na ostatniej klatce
+   * przewijania wraca do pozycji w przepływie, 12px nad krawędzią. */
+  /* `auto` on top: on a step shorter than the screen the bar still stands on
+   * the bottom edge (see `.page` min-height); the shell's gap keeps it off the
+   * content on long steps. */
+  margin: auto calc(var(--space-20) * -1) var(--sticky-flush-bottom, 0px);
+  padding: var(--space-12) var(--space-20)
+    calc(var(--space-12) + env(safe-area-inset-bottom, 0px));
+  /* Flex column wrapper — the Back/Next row pins to the bottom edge as one
+   * sticky footer strip. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  /* Flat: solid paper, no line above (a one-sided rule is outside the house
+   * style; the paper fill alone separates the bar from the content). */
+  background: var(--color-bg-paper);
+  z-index: 5;
+}
+
+/* Back + Next sit on one horizontal line inside the sticky footer. */
+.actionBarRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+@container onboarding (min-width: 768px) {
+  .actionBar {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+  }
+}
+
+.actionBarBack {
+  flex: 0 0 auto;
+}
+
+.actionBarNext {
+  flex: 1 1 auto;
+}
+
+/* Checkout-step slot the plan chooser portals its CTA into: may shrink below
+ * the label's intrinsic width, so the CTA never overflows the bar. */
+.actionBarSlot {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
+/* The portaled CTA carries the longest label of the funnel (DE „30 Tage
+ * kostenlos starten”): on a 360px phone it overflowed its own button. Inside
+ * the slot it may shrink, wrap to two lines and use a tighter inline padding. */
+.actionBarSlot > * {
+  min-width: 0;
+  padding-inline: var(--space-16);
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* ============================================================
+ * STEP — DANE: żywy podgląd publicznej wizytówki (S123)
+ * Portret realnego nagłówka `/stylist/[identifier]`: biała karta,
+ * ciemny krążek z inicjałami, nazwa, pod nią wiersz z miastem.
+ * ============================================================ */
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-bottom: var(--space-20);
+}
+
+.previewLabel {
+  font-size: var(--style-kicker-size, var(--text-sm));
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.previewCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16) var(--space-20);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.previewIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.previewAvatar {
+  /* focus-ring-allow: krazek jest dekoracja (aria-hidden) i nie ma w nim ani
+     jednego elementu, ktory przyjmuje fokus, wiec pierscien nie ma sie tu gdzie
+     narysowac. Nazwa stoi OBOK jako widoczny tekst i to ona niesie tresc. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: var(--style-radius-avatar);
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--ls-tight-12);
+}
+
+.previewLines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.previewName {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.previewCity {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.previewCity svg {
+  flex-shrink: 0;
+  color: var(--color-accent-fg);
+}
+
+/* Pole jeszcze puste: podpowiedź wyciszona, karta trzyma rozmiar od
+ * pierwszej klatki (bez skoku treści pod palcem przy pisaniu). */
+.previewName[data-empty='true'],
+.previewCity[data-empty='true'] {
+  color: var(--color-text-muted);
+}
+
+/* The neutral tile of the step marks, not the input surface: an input is
+   white and so is this card, which left a blank hole where the avatar is. */
+.previewAvatar[data-empty='true'] {
+  background: var(--color-mark-bg);
+}
+
+/* R8: atrament jest ciemny w OBU trybach, więc w ciemnym krążek miał luminancję
+ * praktycznie równą karcie pod nim (zmierzone: L 7,7 krążka przy L 8,9 karty) i
+ * zostawały same białe litery wiszące w powietrzu. Sygnał przejmuje krok tonalny
+ * w górę, ta sama receptura co karta polecana w cenniku wyboru planu. */
+:root[data-mode='dark'] .previewAvatar {
+  background: color-mix(in oklch, var(--color-ink) 82%, var(--color-on-ink));
+}

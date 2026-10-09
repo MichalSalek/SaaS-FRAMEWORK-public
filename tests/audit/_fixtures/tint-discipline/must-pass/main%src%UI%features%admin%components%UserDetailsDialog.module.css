@@ -1,0 +1,9 @@
+/* Reguła „krem w prymitywie współdzielonym” celuje WYŁĄCZNIE w katalog
+   main/src/UI/components. UserDetailsDialog leży w features/admin/components
+   i jest częścią JEDNEJ strony, nie prymitywem montowanym na każdym ekranie,
+   więc jeden pas kremu ma tu prawo żyć. Bez tej próbki udokumentowana
+   decyzja nie miała żadnego dowodu i zawężenie wzorca do „components/”
+   przechodziło bezgłośnie. */
+.dialogIntro {
+  background: var(--color-bg-subtle);
+}

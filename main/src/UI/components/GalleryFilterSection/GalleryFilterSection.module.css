@@ -1,0 +1,58 @@
+/* --- GalleryFilterSection: FAB + Overlay wrapper --- */
+
+.filterFab {
+  position: fixed;
+  bottom: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) +
+      var(--space-20)
+  );
+  /* DECISION (nie usuwaj tego komentarza) — S113, 2026-09-10:
+     Stały odstęp, NIE `calc(50% - 215px + 20px)`. Tamta arytmetyka zakładała kolumnę
+     szerokości 430 px wyśrodkowaną w oknie (215 = połowa 430) i rozjeżdżała się wszędzie
+     tam, gdzie kolumna ma inną szerokość. Zmierzone na żywo (Explore, dev):
+     390 px → 20 px, 430 px → 20 px, ale 900 px → **248 px** (guzik odpływał na środek),
+     a w ramce desktopowej 1280/1440 → **0 px**, czyli przyklejony do krawędzi ramki bez
+     światła: ramka ma 390 px, więc `50%` daje 195, a 195 − 215 + 20 = 0 i cały zamierzony
+     odstęp znikał. Blok zawierający dla `position: fixed` już istnieje na każdej z tych
+     szerokości, więc wystarczy podać odstęp wprost — jedna wartość zamiast arytmetyki,
+     która musiała znać szerokość kolumny. */
+  right: var(--space-20);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: var(--style-border-control) solid var(--color-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-gallery-fab);
+  /* Hairline border (line above) carries elevation — NIE cień (anti-slop §2). */
+  transition: transform var(--transition-fast);
+}
+
+.filterFab:active {
+  transform: scale(0.95);
+}
+
+.filterFabBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--space-4);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* On mobile, position relative to viewport */

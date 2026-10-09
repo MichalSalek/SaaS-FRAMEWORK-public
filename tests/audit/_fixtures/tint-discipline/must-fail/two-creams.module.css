@@ -1,0 +1,8 @@
+/* Dwa kremy na jednej stronie — dokładnie to, czego zakazuje R2. */
+.heroBand {
+  background: var(--color-bg-subtle);
+}
+
+.footerBand {
+  background: var(--color-bg-subtle);
+}

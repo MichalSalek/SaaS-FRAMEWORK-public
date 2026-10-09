@@ -1,0 +1,95 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * WelcomePage — starter / welcome screen dla niezalogowanego w apce-wrapperze
+ * (Capacitor) ORAZ publiczna podstrona /welcome (stopka, SEO). Standalone,
+ * full-viewport (jak LoginPage — bez PublicLayout/header) i w TYM SAMYM
+ * idiomie co logowanie: biała karta bez ramy na papierze, wiersze pod nią.
+ * Wejście bez animacji. ───────────────────────────────────────────── */
+
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-20);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  padding: var(--space-20);
+}
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-24) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.brandLockup {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-8);
+}
+
+.brandMark {
+  height: 1.9em;
+  width: auto;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.15;
+  letter-spacing: var(--style-heading-tracking);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.cta {
+  width: 100%;
+  margin-top: var(--space-12);
+}
+
+.below {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+/* ─── Zachęcacz instalacji (mobile web, web-first D0): informacja na
+ * papierze; stan sklepów = GetAppStoreButtonsMolecule reużyty z /get-app. ─── */
+.installNudge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.installNudgeTitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-40) var(--space-40) var(--space-32);
+  }
+}

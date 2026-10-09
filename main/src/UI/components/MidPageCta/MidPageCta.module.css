@@ -1,0 +1,48 @@
+/* MidPageCta — lekki wyśrodkowany blok CTA między sekcjami LP (S81).
+ * Floor-safe (whitespace + centrowanie, zero band/gradient/cień). Sam przycisk
+ * niesie sankcjonowany efekt shimmer przez [data-cta-shimmer='on']. */
+
+.midCta {
+  padding: clamp(var(--space-48), 6vw, 80px) var(--space-20);
+  display: flex;
+  justify-content: center;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  text-align: center;
+  max-width: 560px;
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-subhead);
+  line-height: 1.25;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.headlineAccent {
+  color: var(--color-accent-fg);
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reassurance {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}

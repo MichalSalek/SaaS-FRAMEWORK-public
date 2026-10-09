@@ -1,0 +1,10 @@
+/* Alfa zapisana procentem, w obu składniach: nowoczesnej (ukośnik) i starej
+   (czwarty argument po przecinku). Wszystkie dotychczasowe próbki miały alfę
+   ułamkową, więc gałąź przeliczająca procent nie miała ani jednego dowodu. */
+.slashPercent {
+  background: rgb(212 168 64 / 12%);
+}
+
+.legacyPercent {
+  background: rgba(212, 168, 64, 12%);
+}

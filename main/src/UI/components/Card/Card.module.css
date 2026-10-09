@@ -1,0 +1,76 @@
+/* ─── Card base ─── */
+.card {
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+/* ─── Variant: Outlined ─── */
+.outlined {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+/* ─── Variant: Elevated (hairline + tonal step, NIE cień — anti-slop §2) ───
+ * Motyw „Jeden krem" (S94/R2 + głos S97): stopień tonalny idzie przez
+ * NEUTRALNY --color-surface-input, nie przez systemowy krem. Krem jest po
+ * głosie S97 zarezerwowany dla JEDNEJ powierzchni ekranu aplikacji — karty
+ * AppHero — więc każda `elevated` karta obok niej dokładała drugi kremowy pas
+ * (zmierzone na /app/favorites: trzy kremy na ekranie). --color-surface-input
+ * daje realny krok w OBU trybach (#f8f8f8 nad białą kartą, #1e1e1e nad
+ * #141414), czego --color-bg-elevated w light by nie dał (jest białe). */
+.elevated {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  /* S116: biel znaczy „klikalne”, więc informacja zostaje na papierze. */
+  background: var(--color-surface-card);
+}
+
+/* ─── Highlighted ─── */
+/* Motyw „Jeden krem" (S94/R3 + R8): wyróżnienie karty = ZAMKNIĘTA rama 4-bok
+ * w tokenie, który odwraca się z trybem.
+ * NIE krem jako linia: nieżyjący już token --color-pricing-highlight był
+ * KREMEM (#fdf8ea w light) i to on tu stał — krem użyty jako LINIA daje
+ * ~1.05:1 na białej karcie, więc kanoniczne „wyróżnienie" nie istniało
+ * wizualnie (jedyne żywe użycie: karta aktywacyjna dashboardu stylistki,
+ * gdzie R3 miało działać najmocniej). Token został wycięty z palety, ale
+ * reguła zostaje: krem jest powierzchnią (R1/R2), nigdy krawędzią.
+ * NIE --color-ink: ciemny w OBU trybach → w dark rysowałby ciemną linię na
+ * ciemnym tle i wyróżnienie znikałoby drugi raz (R8).
+ * GRANICA wobec głosu S98/B (nie usuwaj): „polecany plan W ZESTAWIE" dostaje
+ * pełny negatyw w atramencie, ale samotny Card.highlighted to „ważny", a nie
+ * „polecany spośród" — nie ma z czego się wyróżniać, więc zostaje na
+ * zamkniętej ramie 4-bok. Dotyczy jedynego żywego użycia
+ * (StylistDashboard.parts.organism.tsx). */
+/* S116: rama w atramencie odchodzi („za ciężka”). Wyróżniona karta stoi na
+ * bieli klikalnej powierzchni, a papier wokół robi resztę. */
+.highlighted,
+.highlighted.outlined {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  background: var(--color-surface-interactive);
+}
+.highlighted {
+  position: relative;
+}
+
+/* ─── CardHeader ─── */
+.header {
+  padding: var(--space-20) var(--space-20) var(--space-8);
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+}
+
+/* ─── CardContent ─── */
+.content {
+  padding: var(--space-12) var(--space-20);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+/* ─── CardActions ─── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) var(--space-20) var(--space-20);
+}

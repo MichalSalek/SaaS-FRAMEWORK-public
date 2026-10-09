@@ -1,0 +1,68 @@
+/* ─── Section header stack ─── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* ─── Alignment ─── */
+.start {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.center {
+  align-items: center;
+  text-align: center;
+}
+
+/* ─── Headline ─── */
+/*
+ * DECISION (nie usuwaj tego komentarza):
+ * Typografia, KOLOR i hyphenacja nagłówka są sterowane custom-property hookami,
+ * NIE redefinicją `.sectionHeadline` w CSS strony (FDX W5.1 — konsolidacja 9
+ * duplikatów `.sectionEyebrow + .sectionHeadline`; S37 — rozszerzenie o kolor/
+ * hyphens, by wchłonąć ostatnie wyjątki About/HelpCenter/Compare bez kopii
+ * struktury). Strona nadpisuje WYŁĄCZNIE te zmienne na wrapperze (przez
+ * `className` na <SectionHeader>), nie cały blok typografii:
+ *   --section-headline-size      → font-size (clamp())
+ *   --section-headline-leading   → line-height
+ *   --section-headline-tracking  → letter-spacing
+ *   --section-headline-measure   → max-width (np. 18ch); pomiń = brak limitu
+ *   --section-headline-color     → color (np. --color-on-ink dla band ink)
+ *   --section-headline-hyphens   → hyphens (np. auto dla wąskich PL nagłówków)
+ *   --section-lede-color         → kolor lede
+ *   --eyebrow-color              → kolor kickera (dziedziczony przez Eyebrow;
+ *                                   np. --color-accent-fg, on-ink); kreska chip
+ *                                   idzie za currentColor automatycznie
+ * Domyślne = dawny kanon (60px / 1.15 / -0.022em / bez measure / text-primary /
+ * hyphens manual). Wszystkie hooki opcjonalne — pominięcie = wizual 1:1.
+ */
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--section-headline-size, clamp(2rem, 5.2vw, 3.75rem));
+  line-height: var(--section-headline-leading, 1.15);
+  letter-spacing: var(
+    --section-headline-tracking,
+    var(--letter-spacing-heading)
+  );
+  max-width: var(--section-headline-measure, none);
+  color: var(--section-headline-color, var(--color-text-primary));
+  hyphens: var(--section-headline-hyphens, manual);
+  text-wrap: balance;
+}
+
+/* ─── Lede ─── */
+.lede {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+  color: var(--section-lede-color, var(--color-text-secondary));
+  text-wrap: pretty;
+}
+
+.header:has(+ [data-illustration]) {
+  margin-bottom: 0;
+}

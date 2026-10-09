@@ -1,0 +1,140 @@
+/* FilterBar — search + collapsible dimension controls. */
+
+.bar {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.bar[data-surface='box'] {
+  padding: var(--space-16);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.search {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.toggle {
+  flex-shrink: 0;
+}
+
+/* On screen from the first paint and disabled while nothing is set: setting a
+   filter moves nothing and no empty slot waits for it (DECISION in the tsx). */
+.clear {
+  flex-shrink: 0;
+}
+
+/* Idle, it must read as „nothing to clear”, not as a live accent link: the
+   button's own disabled look keeps the accent ink at 65% (a Button decision),
+   which three reviewers read as active (S126). Neutral ink through the
+   button's public quiet-ink variable. */
+.clear:disabled {
+  --btn-quiet-fg: var(--color-text-secondary);
+}
+
+/* Inside the panel the action starts the last line, under the controls. */
+.clearPanel {
+  align-self: flex-start;
+}
+
+/* Narrow bar with a panel: the action lives with the controls it clears. */
+@container (max-width: 719.98px) {
+  .bar[data-panel='true'] .clearTop {
+    display: none;
+  }
+}
+
+/* Phone-width bar: the search field takes the whole row and the „Filtry”
+   button starts the next one. Side by side the field was ~230px and its
+   placeholder was cut on four admin pages (S126: „Szukaj użytkownikó”). */
+@container (max-width: 479.98px) {
+  .search {
+    flex-basis: 100%;
+  }
+}
+
+/* ─── Controls panel ───
+   Narrow bar: closed by default, opens under the top row (grid 0fr → 1fr, so
+   the height animates without a measured value). `visibility` takes the closed
+   controls out of the tab order and the accessibility tree. */
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  margin-top: calc(var(--space-12) * -1);
+  transition:
+    grid-template-rows var(--duration-200) var(--ease-entrance),
+    margin-top var(--duration-200) var(--ease-entrance),
+    visibility 0s linear var(--duration-200);
+}
+
+.panel[data-open='true'] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  margin-top: 0;
+  transition:
+    grid-template-rows var(--duration-200) var(--ease-entrance),
+    margin-top var(--duration-200) var(--ease-entrance),
+    visibility 0s linear 0s;
+}
+
+.panelInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.quick,
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* A control never forces the bar wider than a 360px screen. */
+.controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.summary {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Wide bar: the controls are simply there, the „Filtry N” button is not. */
+@container (min-width: 720px) {
+  .toggle,
+  .clearPanel {
+    display: none;
+  }
+
+  .panel,
+  .panel[data-open='true'] {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    margin-top: 0;
+    transition: none;
+  }
+
+  .panelInner {
+    overflow: visible;
+  }
+}

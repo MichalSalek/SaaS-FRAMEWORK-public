@@ -1,0 +1,22 @@
+-- Kto zerwał relację klientka-stylistka.
+--
+-- DECISION (nie usuwaj tego komentarza):
+-- Bez tej kolumny status REVOKED był nierozróżnialny między „klientka zrezygnowała"
+-- (cancel własnej prośby / revoke po stronie klientki) a „stylistka usunęła klientkę"
+-- (revoke-access / DECLINE). Ponowna prośba klientki podnosiła KAŻDY wiersz REVOKED
+-- z powrotem do PENDING, a PENDING otwiera komunikator — czyli usunięta osoba
+-- jednostronnie cofała jedyną kontrolę „usuń tę osobę", jaką ma stylistka.
+--
+-- Kolumna jest nullowalna i BEZ backfillu: istniejące wiersze zostają NULL i są
+-- traktowane jak zerwanie po stronie klientki. Świadomie nie zgadujemy autora
+-- wstecz — fałszywe przypisanie „stylistka" zablokowałoby ponowne parowanie
+-- relacjom, które nigdy nie były zerwane przez stylistkę.
+--
+-- IF NOT EXISTS nie jest ozdobnikiem: ten projekt stawia schemat DWOMA drogami —
+-- `db push` (DEVELOPMENT, ratunkowe naprawy stagingu) i `migrate deploy` (STAGING /
+-- PREVIEW / PRODUCTION). W bazie, do której kolumna trafiła już przez `db push`,
+-- gołe ADD COLUMN kończy się błędem 42701, a Prisma zapisuje wtedy NIEUDANY wiersz
+-- w `_prisma_migrations` (P3018) — po czym ŻADNA kolejna migracja nie przejdzie bez
+-- ręcznego `migrate resolve`. Entrypoint biegnie pod `set -e`, więc na stagingu
+-- oznaczałoby to odmowę startu, nie ostrzeżenie.
+ALTER TABLE "ClientStylistPair" ADD COLUMN IF NOT EXISTS "revoked_by" "AccountType";

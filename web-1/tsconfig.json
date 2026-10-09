@@ -1,0 +1,31 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "paths": {
+      "@kernel/*": ["./src/READONLY-shared-kernel/*"],
+      "@app/*": ["./src/application/*"],
+      "@domain/*": ["./src/domain/*"]
+    },
+    "types": [],
+    "composite": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    ".open-next",
+    "dist",
+    "build",
+    "src/prisma/js-client/**",
+    "src/prisma-app-logs/js-client/**"
+  ]
+}

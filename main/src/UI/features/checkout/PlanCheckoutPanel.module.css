@@ -1,0 +1,393 @@
+/* PlanCheckoutPanel.module.css — SPE (W2) embedded checkout surface.
+ *
+ * Anti-AI-Slop (HARD): depth = solid color-mix(in oklch) tonal surface steps +
+ * full 4-sided hairline borders. ZERO gradient / box-shadow / glow / blur /
+ * one-sided-border / hover-on-static / scroll-fade. Editorial flat.
+ *
+ * References: AccountPayPage.module.css (W6), DESIGN.md §Anti-AI-Slop.
+ */
+
+/* ============================================================
+ *  Motion keyframes
+ * ============================================================ */
+
+@keyframes checkoutspin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  display: block;
+  animation: checkoutspin 1s linear infinite;
+}
+
+/* ============================================================
+ *  Panel shell
+ * ============================================================ */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  width: 100%;
+}
+
+/* ============================================================
+ *  Loading / processing state — centered, restrained
+ * ============================================================ */
+
+.statusViewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  /* Close to the height of the form that replaces it (summary + payment
+   * element + actions), so the dialog does not jump when the session arrives. */
+  min-height: 360px;
+  text-align: center;
+}
+
+/* The 32px status glyph keeps its own size (the inline variant is one line
+ * tall). */
+.statusViewport .inlineErrorIcon {
+  height: auto;
+}
+
+.statusIcon {
+  color: var(--color-accent-fg);
+}
+
+.statusText {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 36ch;
+}
+
+/* ============================================================
+ *  Recoverable-stall actions — retry + cancel (confirm() stalled)
+ * ============================================================ */
+
+.stallActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  margin-top: var(--space-12);
+}
+
+/* ============================================================
+ *  Screen-reader-only live region — always mounted, text-driven
+ *
+ *  Off-screen but in the a11y tree: state branches change its TEXT
+ *  (never mount/unmount role nodes, which SRs routinely miss).
+ * ============================================================ */
+
+.srStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+ *  ORDER SUMMARY — plan name + price (tonal surface + hairline)
+ * ============================================================ */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  /* A white box on paper (onboarding). Inside a surface that is already a
+   * white box (the account-pay dialog) the host zeroes the padding through
+   * --checkout-summary-pad, so there is no box inside a box. */
+  padding: var(--checkout-summary-pad, var(--space-20));
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.summaryRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.summaryPlan {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.summaryPlanIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--style-radius-round);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  flex: none;
+}
+
+.summaryPlanIcon svg {
+  display: block;
+}
+
+.summaryPlanName {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+}
+
+.summaryPlanCycle {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  font-weight: 600;
+}
+
+/* Motyw „Jeden krem" (S94/R4): linia strukturalna jest neutralna — złota
+   kreska rozdzielająca pozycje faktury udawała akcent bez znaczenia. */
+.summaryDivider {
+  height: 1px;
+  background: var(--color-divider);
+  border: 0;
+  margin: 0;
+}
+
+/* Faktura VAT — pojedyncze wiersze rozbicia (netto / VAT). */
+.summaryLineRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.summaryLineLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.summaryLineAmount {
+  /* An amount never parts from its currency. */
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.summaryTotalRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.summaryTotalLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.summaryTotalAmount {
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text-primary);
+  letter-spacing: var(--ls-tight-10);
+}
+
+/* ============================================================
+ *  TRIAL NOTE — risk-reduction line for paid plans
+ *
+ *  Flat: the green shield carries it, no tinted card and no frame. The text
+ *  wraps, so the icon's box is exactly one line tall and stays on line one.
+ * ============================================================ */
+
+.trialNote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+
+.trialNoteIcon {
+  display: block;
+  flex: none;
+  height: 1lh;
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  color: var(--color-success);
+}
+
+.trialNoteText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.trialNoteTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+}
+
+.trialNoteSub {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+ *  PAYMENT ELEMENT host — neutral container, Stripe iframe inside
+ * ============================================================ */
+
+.paymentElementHost {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* ============================================================
+ *  FAKTURA VAT — switch „Faktura na firmę" + opcjonalny subform
+ *
+ *  The subform is always mounted and OPENS (grid rows 0fr → 1fr); it used to
+ *  pop in and push the pay button down in one frame. Collapsed, it leaves the
+ *  tab order and the a11y tree once the animation ends (visibility delay).
+ * ============================================================ */
+
+.vatInvoiceSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.vatReveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--duration-200) var(--ease-entrance),
+    visibility 0s var(--duration-200);
+}
+
+.vatReveal[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--duration-200) var(--ease-entrance),
+    visibility 0s;
+}
+
+.vatRevealClip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Fields flow on the host surface: no box of their own (the dialog already is
+ * one). The padding keeps focus rings clear of the clip edge. */
+.vatInvoiceForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-4) var(--space-4);
+}
+
+.vatInvoiceHint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.vatInvoiceRow {
+  display: flex;
+  gap: var(--space-12);
+}
+
+.vatInvoicePostal {
+  flex: 0 0 40%;
+}
+
+.vatInvoiceCity {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ============================================================
+ *  Inline error — right above the pay button that caused it.
+ *  The red icon carries the alarm; no pink card, no pink frame.
+ * ============================================================ */
+
+.inlineError {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.inlineErrorIcon {
+  display: block;
+  flex: none;
+  height: 1lh;
+  color: var(--color-error);
+}
+
+/* ============================================================
+ *  Action row — pay + secondary cancel
+ * ============================================================ */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.payBtn {
+  width: 100%;
+}
+
+.cancelBtn {
+  width: 100%;
+}
+
+.secureHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.secureHintIcon {
+  display: block;
+  flex: none;
+  color: var(--color-success);
+}

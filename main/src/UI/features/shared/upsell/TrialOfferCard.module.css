@@ -1,0 +1,5 @@
+/* Inside a white surface (pinned manager, pair requests) a white tappable card
+   has no edge, so it takes the page tone instead. */
+.nested {
+  --nav-card-bg: var(--color-bg-main);
+}

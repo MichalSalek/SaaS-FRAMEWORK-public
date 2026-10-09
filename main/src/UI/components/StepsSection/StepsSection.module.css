@@ -1,0 +1,89 @@
+/* ─── StepsSection — kanoniczna sekwencja kroków ───
+ * DECISION (nie usuwaj tego komentarza): numeracja wyłącznie realne
+ * sekwencje (Style Policy §6); skala numerała ograniczona celowo —
+ * NumberMarker size='sm' (kanon get-app `.howStepNum`, ~28-45px), zakaz
+ * gigantycznych 90px+ numerali. Kroki są STATYCZNE — zero hover. */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.marker {
+  /* Wyrównanie kolumny numerałów w wariancie list (kanon home). */
+  min-width: 2ch;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-xl);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  max-width: 56ch;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.media {
+  margin-top: var(--space-12);
+}
+
+/* ─── Wariant: list — wertykalna lista, marker po lewej (kanon get-app /
+ * home). Para hairline top+bottom (PEŁNE krawędzie, collapsed przez
+ * margin -1px) — to celowo NIE jest jednostronny border-akcent. ─── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.list .step {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: clamp(16px, 2.4vw, 36px);
+  align-items: baseline;
+  padding-block: clamp(20px, 3vw, 36px);
+  border-block: var(--style-border-divider) solid var(--color-divider);
+}
+
+.list .step + .step {
+  margin-top: -1px;
+}
+
+/* ─── Wariant: columns — równe kolumny, marker nad treścią ─── */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 48px);
+}
+
+@media (min-width: 768px) {
+  .columns {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  }
+}
+
+.columns .step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  align-items: flex-start;
+}

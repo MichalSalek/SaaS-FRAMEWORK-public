@@ -1,0 +1,37 @@
+.button {
+  position: fixed;
+  bottom: calc(var(--space-32) + env(safe-area-inset-bottom, 0px));
+  right: var(--space-32);
+  z-index: var(--z-fab);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: var(--style-radius-pill);
+  /* DECISION (anti-slop §2, nie usuwaj): glebia z pelnego hairline + solid fill,
+     NIE z cienia. Usunieto box-shadow --shadow-md / --shadow-lg (hover). */
+  border: var(--style-border-surface) solid var(--color-primary-dark);
+
+  text-decoration: none;
+  cursor: pointer;
+  /* bottom anim = płynne wysunięcie nad StickyCtaBar gdy bar wjeżdża (PublicLayout
+     koordynuje pozycję; ease-entrance zgrane z reveal bara 200ms). */
+  transition:
+    transform var(--transition-fast),
+    bottom var(--duration-200) var(--ease-entrance);
+}
+
+@media (hover: hover) {
+  .button:hover {
+    transform: scale(1.08);
+  }
+}
+
+.button:active {
+  transform: scale(0.95);
+}

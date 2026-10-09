@@ -1,0 +1,169 @@
+/* ─── BillingToggle — segmentowy przełącznik Miesięcznie/Rocznie ───
+ *
+ * Floor 7×ZERO (flat): aktywna opcja = pełna pigułka (.thumb) — solidna
+ * powierzchnia + hairline, ślizgająca się spring-snappy pod aktywną opcją.
+ * Zero gradientu, zero cienia.
+ *
+ * Dwa warianty (W5.5 ekstrakcja 2 toggli, pixel-parity):
+ *  .togglePricing — kanon cennika (LP): opcje 11px/24px +600, hover rule,
+ *                   transition color 180ms ease-out.
+ *  .toggleAccount — kanon pay page (in-app): opcje 8px/18px +500 (aktywna +600),
+ *                   transition color 200ms ease-entrance, tap-highlight off;
+ *                   owinięty .wrap (kolumna + hint + stagger).
+ * Warianty różnią się TYPOGRAFIĄ i ruchem, nie powierzchnią: od głosu S98/A
+ * oba biorą ten sam tor i tę samą pigułkę (wcześniej jeden siedział na
+ * bg-main, drugi na kremie — dwa kanony tego samego przełącznika w jednej
+ * ścieżce zakupowej).
+ */
+
+/* ─── Track (wspólna baza: grid 2× równych → thumb px-w-px pod opcję) ─── */
+.toggle {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-pill);
+  padding: var(--style-segmented-inset);
+  isolation: isolate;
+  /* DECISION (nie usuwaj tego komentarza):
+     Tor PRZEŁĄCZNIKA zostaje na `--color-surface-input`, a NIE na roli
+     `--color-track`. To dwie różne role, mimo wspólnej nazwy „tor":
+     · tor POSTĘPU ma odróżniać się od POWIERZCHNI, na której leży, bo jego
+       długość niesie informację (dlatego `--color-track` jest ciemniejszy);
+     · tor PRZEŁĄCZNIKA ma leżeć POD uniesioną pigułką i to ona ma się
+       odróżniać od niego, a w trybie ciemnym uniesienie idzie W GÓRĘ jasności.
+     Przestawienie go na `--color-track` psuło oba końce naraz: w light rama
+     pigułki spadała do 2,66:1 (bo mierzy się wobec toru), a w dark pigułka
+     robiła się CIEMNIEJSZA od toru, czyli aktywny segment czytał się jak
+     wgłębienie. Sygnał niesie tu hairline, którego liczby stoją niżej. */
+  background: var(--color-surface-input);
+}
+
+/* ─── Spring thumb — solidna pigułka + hairline (zero cienia), w ruchu ─── */
+/* Pigułka aktywnej opcji = poziom karty. W ciemnym „wyniesienie" idzie W GÓRĘ
+ * jasności, więc pigułka musi być krok DALEJ od tła niż tor — inaczej aktywny
+ * segment czyta się jak wgłębienie zamiast jak nakładka.
+ *
+ * Hairline NIE jest tu ozdobą, tylko jedynym nośnikiem sygnału: wypełnienie
+ * pigułki wobec toru to 1,06:1 w light i 1,13:1 w dark, więc „która opcja jest
+ * aktywna" widać wyłącznie po obrysie. Dlatego rama ma własny token per tryb.
+ * Zmierzone w light: --color-border (#959595) na torze --color-surface-input
+ * = 2,82:1, czyli poniżej progu 3:1 z SC 1.4.11 (ten token był kalibrowany na
+ * BIELI, a tor zszedł z bieli w tej fali); --color-text-tertiary = 3,25:1 wobec
+ * toru i 3,45:1 wobec pigułki. W dark kierunek jest odwrotny i tam
+ * --color-border trzyma 3,88:1, a tertiary spadłby do 3,08:1 — stąd override. */
+.thumb {
+  position: absolute;
+  z-index: 0;
+  top: var(--style-segmented-inset);
+  bottom: var(--style-segmented-inset);
+  left: var(--style-segmented-inset);
+  width: calc((100% - (2 * var(--style-segmented-inset))) / 2);
+  border: var(--style-border-surface) solid var(--color-text-tertiary);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-surface-card);
+  transition: transform 420ms var(--spring-snappy);
+}
+
+.thumb[data-pos='yearly'] {
+  transform: translateX(100%);
+}
+
+:root[data-mode='dark'] .thumb {
+  border-color: var(--color-border);
+  background: var(--color-surface-hover);
+}
+
+/* ─── Opcja (button) ─── */
+.option {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  border: var(--style-border-surface) solid transparent;
+  border-radius: var(--style-radius-pill);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Wariant cennika: padding 11px/24px, waga 600, transition color 180ms. */
+.togglePricing .option {
+  padding: 11px var(--space-24);
+  font-weight: 600;
+  transition: color var(--duration-200) ease-out;
+}
+
+@media (hover: hover) {
+  .togglePricing .option:not([data-active]):hover {
+    color: var(--color-text-primary);
+  }
+}
+
+/* Aktywna opcja (cennik): tylko kolor — wizualną pigułkę niesie .thumb. */
+.togglePricing .option[data-active] {
+  color: var(--color-text-primary);
+}
+
+/* Wariant in-app: padding 8px/18px, waga 500, transition color 200ms. */
+.toggleAccount .option {
+  padding: var(--space-8) 18px;
+  font-weight: 500;
+  transition: color var(--duration-200) var(--ease-entrance);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Aktywna opcja (in-app): kolor + waga; wizualną pigułkę niesie .thumb. */
+.toggleAccount .option[data-active] {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* ─── Save badge (-20%) — wspólny: solid primary, zero cienia ─── */
+.saveBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide-40);
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--style-radius-pill);
+}
+
+/* ─── Wrapper kolumnowy + hint — TYLKO wariant account ─── */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Stagger-in (parytet z AccountPayPage.module.css .staggerIn) — payslideUp. */
+@keyframes billingToggleSlideUp {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: billingToggleSlideUp 320ms var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}

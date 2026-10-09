@@ -1,0 +1,11 @@
+/* POTWIERDZONA fałszywka: legalny neutralny dzielnik zapisany longhandem
+   (`background-color`) był zgłaszany jako pasek akcentu, bo test neutralności
+   pytał wyłącznie o skrót `background:`. Neutralny dzielnik jednostronny ma
+   status <hr> i zostaje. */
+.listRow::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1px;
+  background-color: var(--color-divider);
+}

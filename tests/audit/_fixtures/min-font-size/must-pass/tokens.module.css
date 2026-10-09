@@ -1,0 +1,8 @@
+/* Kanon: rozmiar bierze sie z tokenu skali. */
+.label {
+  font-size: var(--text-xs);
+}
+
+.body {
+  font-size: var(--text-base);
+}

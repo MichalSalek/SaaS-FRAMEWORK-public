@@ -1,0 +1,25 @@
+/* Znak klikalności S116: koło w kolorze CTA, strzałka w kolorze tekstu na CTA.
+ * Selektor atrybutu (0-2-0) celowo: znak dziedziczy klasy po dawnych chevronach
+ * (kolor wyciszony, obrót, margines), a kolor i tło znaku mają wygrać z nimi
+ * niezależnie od kolejności modułów w bundlu. Margines i położenie z tych klas
+ * zostają, bo znak stoi w tym samym miejscu siatki. */
+.disc {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  transition: transform var(--duration-100) var(--brand-spring);
+}
+
+.disc[data-size] {
+  width: var(--disc-size, 32px);
+  height: var(--disc-size, 32px);
+  border-radius: var(--style-radius-round);
+  background: var(--color-cta);
+  color: var(--color-accent-text);
+  opacity: 1;
+}
+
+.disc[data-size='sm'] {
+  width: var(--disc-size, 28px);
+  height: var(--disc-size, 28px);
+}

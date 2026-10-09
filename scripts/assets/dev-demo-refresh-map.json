@@ -1,0 +1,638 @@
+{
+  "version": 1,
+  "environment": "DEVELOPMENT",
+  "cloud": "dcuiuwkb0",
+  "folder": "demo-seed",
+  "refresh": "2026-10-08",
+  "sources": [
+    {
+      "id": "beauty-div-04-hands-jewelry--48e416ee",
+      "source": "zdjecia-paznokci/zaakceptowane/beauty-div-04-hands-jewelry--48e416ee.png",
+      "sha256": "ee346b13a8ae7b70f44a0b31f06159eb017b3974dba6d7a927d4401e232b425e",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Białe",
+        "Złote"
+      ],
+      "traits": [
+        "Zdobienia 3D",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "nail-discover-02--2f188859",
+      "source": "zdjecia-paznokci/zaakceptowane/nail-discover-02--2f188859.png",
+      "sha256": "b43c176cf019ec670d0c6937d8294f1b04787703344688ce5c90ea4ab30cb90a",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Brązowe"
+      ],
+      "traits": [
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "hero-nail-16-velvet-cat-eye--c58dbe3b",
+      "source": "zdjecia-paznokci/zaakceptowane/hero-nail-16-velvet-cat-eye--c58dbe3b.png",
+      "sha256": "2e1d65d3df774059238342505b6dcf938cc99f5e86a7c92ae0a99ada97672bea",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Fioletowe"
+      ],
+      "traits": [
+        "Magnetyczne"
+      ]
+    },
+    {
+      "id": "hero-nail-17-glazed-knit--23a5e64a",
+      "source": "zdjecia-paznokci/zaakceptowane/hero-nail-17-glazed-knit--23a5e64a.png",
+      "sha256": "12c7770bec296265474631883ff69566be35388f9d441798e208c671289b43db",
+      "nailLength": "LONG",
+      "colors": [
+        "Białe"
+      ],
+      "traits": [
+        "Zdobienia 3D"
+      ]
+    },
+    {
+      "id": "beauty-nails-home-cta-03-red-silk--2f1b1340",
+      "source": "zdjecia-paznokci/zaakceptowane/beauty-nails-home-cta-03-red-silk--2f1b1340.png",
+      "sha256": "003139f6f9cb8c6db8b707789f40e36645658d419650595eb099a0fdfc75a150",
+      "nailLength": "LONG",
+      "colors": [
+        "Czerwone"
+      ],
+      "traits": [
+        "Jednolite"
+      ]
+    },
+    {
+      "id": "nail-52-champagne-chrome-silk--733d9cf8",
+      "source": "zdjecia-paznokci/zaakceptowane/nail-52-champagne-chrome-silk--733d9cf8.png",
+      "sha256": "d94de902d31e50830f7d7abc44168b6e269caeb0093833909e74e3329b61cb99",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Złote"
+      ],
+      "traits": [
+        "Chromowane",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "hero-nail-19-molten-french--293c9dd4",
+      "source": "zdjecia-paznokci/zaakceptowane/hero-nail-19-molten-french--293c9dd4.png",
+      "sha256": "d2b4c2754a1d5b1053ad74eb511828abf054991ae771b609bac6f670a7f6f5c4",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Złote",
+        "Beżowe"
+      ],
+      "traits": [
+        "French",
+        "Zdobienia 3D"
+      ]
+    },
+    {
+      "id": "nail-discover-01--5c350588",
+      "source": "zdjecia-paznokci/zaakceptowane/nail-discover-01--5c350588.png",
+      "sha256": "7ad9a19231d5b99135124deef959268df7603d97766f36a34126fb650ca3c105",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Różowe"
+      ],
+      "traits": [
+        "Ombre",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "beauty-div-01-window-light--6f794797",
+      "source": "zdjecia-paznokci/zaakceptowane/beauty-div-01-window-light--6f794797.webp",
+      "sha256": "585b2cfe454890a4dfad109cab557210d773e0dfbefecdccd6cf307ec887f1c4",
+      "nailLength": "SHORT",
+      "colors": [
+        "Białe"
+      ],
+      "traits": [
+        "Jednolite"
+      ]
+    },
+    {
+      "id": "manicure-10--3875cc49",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-10--3875cc49.webp",
+      "sha256": "c53f627ebe294d04c18fde308306b416a2b3240c56670c542c4c1208c7486fb4",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Różowe",
+        "Szare"
+      ],
+      "traits": [
+        "Chromowane",
+        "Zdobienia 3D"
+      ]
+    },
+    {
+      "id": "manicure-09--48a4f4cb",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-09--48a4f4cb.webp",
+      "sha256": "de9053a1aa1255ae12e5d684bea036b92b7655eed4625dd4c0f306a6200d95a6",
+      "nailLength": "SHORT",
+      "colors": [
+        "Brązowe",
+        "Beżowe"
+      ],
+      "traits": [
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "beauty-nails-clients-cta-03-hands--cbc564e7",
+      "source": "zdjecia-paznokci/zaakceptowane/beauty-nails-clients-cta-03-hands--cbc564e7.png",
+      "sha256": "e54a76eacff4e6d2058861d251dfc639264a67a7c1cd2151f26d517fb9a02eb9",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Różowe"
+      ],
+      "traits": [
+        "French",
+        "Perłowe",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "hero-nail-14-bridal-milky-white--34ecc862",
+      "source": "zdjecia-paznokci/zaakceptowane/hero-nail-14-bridal-milky-white--34ecc862.webp",
+      "sha256": "4cae9ac14e6d6c7cb8c9f9c9d96cfd0e6a5457b6757034b50095da67ece96d24",
+      "nailLength": "LONG",
+      "colors": [
+        "Białe"
+      ],
+      "traits": [
+        "Jednolite"
+      ]
+    },
+    {
+      "id": "manicure-08--0a0b866c",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-08--0a0b866c.webp",
+      "sha256": "309e2b5ff5fabfd70058e28f76c9840526f5f45932f2dacf982d591ed9ca1e70",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Zielone",
+        "Fioletowe"
+      ],
+      "traits": [
+        "Chromowane"
+      ]
+    },
+    {
+      "id": "nail-42-medium-sage-micro-french--6264b8d1",
+      "source": "zdjecia-paznokci/zaakceptowane/nail-42-medium-sage-micro-french--6264b8d1.png",
+      "sha256": "44cded9382a19e11fcb39517d838ccc97d4af6a549f2d8385938a39c6f298830",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Zielone"
+      ],
+      "traits": [
+        "French",
+        "Magnetyczne"
+      ]
+    },
+    {
+      "id": "manicure-07--40a3b0f8",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-07--40a3b0f8.webp",
+      "sha256": "f045490b4a17fe911ef0481ac8ffe0bbb6238a3bd96b993f13a747f9349074b8",
+      "nailLength": "LONG",
+      "colors": [
+        "Fioletowe",
+        "Zielone"
+      ],
+      "traits": [
+        "French"
+      ]
+    },
+    {
+      "id": "beauty-div-02-two-hands--52a90ee1",
+      "source": "zdjecia-paznokci/zaakceptowane/beauty-div-02-two-hands--52a90ee1.png",
+      "sha256": "3dd6bb2580136dd799c6e19460f8bb46f205eb9e1f990f4c0df704ccb339bb23",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Fioletowe"
+      ],
+      "traits": [
+        "Chromowane",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "manicure-03--5416767d",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-03--5416767d.webp",
+      "sha256": "ce8403279b29cc8b0eacc7ba074937e9002d1d88ba669fe63a11dd08e5b3c88a",
+      "nailLength": "SHORT",
+      "colors": [
+        "Żółte"
+      ],
+      "traits": [
+        "Florystyczne"
+      ]
+    },
+    {
+      "id": "nail-08--7cf46212",
+      "source": "zdjecia-paznokci/zaakceptowane/nail-08--7cf46212.webp",
+      "sha256": "f718e0d226442e4f18a5515ebeb8332949192e78eaa1011633d65818dfdfd9a6",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Beżowe",
+        "Złote"
+      ],
+      "traits": [
+        "Chromowane"
+      ]
+    },
+    {
+      "id": "hero-nail-18-cherry-bottle--9be42dce",
+      "source": "zdjecia-paznokci/zaakceptowane/hero-nail-18-cherry-bottle--9be42dce.png",
+      "sha256": "c53517bd95662818e6c0f9f70f224f9312f0d447d3e16a9c05d81307eab223a7",
+      "nailLength": "LONG",
+      "colors": [
+        "Czerwone",
+        "Czarne"
+      ],
+      "traits": [
+        "Marble"
+      ]
+    },
+    {
+      "id": "hero-nail-20-application--0e3dd12c",
+      "source": "zdjecia-paznokci/zaakceptowane/hero-nail-20-application--0e3dd12c.png",
+      "sha256": "ad206e9f2a5b4e2bc48f137a04615b69c3385746f9c896a4281832b2c9e09bbf",
+      "nailLength": "LONG",
+      "colors": [
+        "Czerwone"
+      ],
+      "traits": [
+        "Chromowane"
+      ]
+    },
+    {
+      "id": "manicure-06--74cc296d",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-06--74cc296d.webp",
+      "sha256": "254c77df8adec0ed907b0f16b679d832a5987b1e815ed343962cd97e0037e172",
+      "nailLength": "SHORT",
+      "colors": [
+        "Pomarańczowe",
+        "Różowe",
+        "Fioletowe"
+      ],
+      "traits": [
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "nail-discover-03--294ad06b",
+      "source": "zdjecia-paznokci/zaakceptowane/nail-discover-03--294ad06b.png",
+      "sha256": "56df0e940a12fd595b6710b8f50380905b5b876968cce00dd5d9bf18ab6e9e25",
+      "nailLength": "LONG",
+      "colors": [
+        "Różowe",
+        "Niebieskie"
+      ],
+      "traits": [
+        "French",
+        "Florystyczne"
+      ]
+    },
+    {
+      "id": "manicure-05--9a1543a3",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-05--9a1543a3.webp",
+      "sha256": "3fa9dfafaaebb2a38a89d8ecbf093c100545cabb0ed2404b2c49b2dd5b61bbfc",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Różowe",
+        "Białe",
+        "Czarne"
+      ],
+      "traits": [
+        "French",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "nail-cobalt-glass--4cb6b2e1",
+      "source": "zdjecia-paznokci/nail-cobalt-glass--4cb6b2e1.png",
+      "sha256": "690066519cc206adcb273732c3dad590146d98f701f874a392c9aa7660d23edf",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Niebieskie",
+        "Złote"
+      ],
+      "traits": [
+        "Jednolite",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "beauty-nails-clients-cta-02--dd08288a",
+      "source": "zdjecia-paznokci/zaakceptowane/beauty-nails-clients-cta-02--dd08288a.webp",
+      "sha256": "453b8cfb50250f954d47e09c86025ae1beb0830090c2a5eee2a792739652130a",
+      "nailLength": "SHORT",
+      "colors": [
+        "Białe"
+      ],
+      "traits": [
+        "Jednolite"
+      ]
+    },
+    {
+      "id": "manicure-01--7c650518",
+      "source": "zdjecia-paznokci/zaakceptowane/manicure-01--7c650518.webp",
+      "sha256": "7fb0cf72c856c0d5a7b05644719168ede35adc43648f62bae2ac69dd4686b37b",
+      "nailLength": "LONG",
+      "colors": [
+        "Turkusowe"
+      ],
+      "traits": [
+        "Chromowane",
+        "Wzorki"
+      ]
+    },
+    {
+      "id": "hero-div-03-wide-forearm--2b301504",
+      "source": "zdjecia-paznokci/zaakceptowane/hero-div-03-wide-forearm--2b301504.webp",
+      "sha256": "4ea23d1e9c2bb539584e61c4fbeaec6cf6f6bd1c2948986e062946a3da5f78f4",
+      "nailLength": "SHORT",
+      "colors": [
+        "Różowe",
+        "Białe"
+      ],
+      "traits": [
+        "French"
+      ]
+    },
+    {
+      "id": "editorial-nail-03-chrome-salon-tools--6447e89b",
+      "source": "zdjecia-kontekstowe/zaakceptowane/editorial-nail-03-chrome-salon-tools--6447e89b.webp",
+      "sha256": "609281198e1347ca9ab0769393f93243d31d3b1a9267b954ed232fc06bf65d27",
+      "nailLength": "MEDIUM",
+      "colors": [
+        "Białe",
+        "Szare"
+      ],
+      "traits": [
+        "Chromowane"
+      ]
+    }
+  ],
+  "aliases": [
+    {
+      "publicId": "demo-seed/nail-09-short-nude_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414182/demo-seed/nail-09-short-nude_review20261008.webp",
+      "sourceId": "beauty-div-04-hands-jewelry--48e416ee"
+    },
+    {
+      "publicId": "demo-seed/nail-17-medium-ombre_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414182/demo-seed/nail-17-medium-ombre_review20261008.webp",
+      "sourceId": "nail-discover-02--2f188859"
+    },
+    {
+      "publicId": "demo-seed/nail-22-medium-wedding_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414182/demo-seed/nail-22-medium-wedding_review20261008.webp",
+      "sourceId": "hero-nail-16-velvet-cat-eye--c58dbe3b"
+    },
+    {
+      "publicId": "demo-seed/nail-30-long-floral_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414182/demo-seed/nail-30-long-floral_review20261008.webp",
+      "sourceId": "hero-nail-17-glazed-knit--23a5e64a"
+    },
+    {
+      "publicId": "demo-seed/nail-41-medium-baby-boomer_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414184/demo-seed/nail-41-medium-baby-boomer_review20261008.webp",
+      "sourceId": "beauty-nails-home-cta-03-red-silk--2f1b1340"
+    },
+    {
+      "publicId": "demo-seed/nail-45-long-champagne-chrome_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414184/demo-seed/nail-45-long-champagne-chrome_review20261008.webp",
+      "sourceId": "nail-52-champagne-chrome-silk--733d9cf8"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-01-nude_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414184/demo-seed/hero-nail-01-nude_review20261008.webp",
+      "sourceId": "hero-nail-19-molten-french--293c9dd4"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-03-geometric_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414184/demo-seed/hero-nail-03-geometric_review20261008.webp",
+      "sourceId": "nail-discover-01--5c350588"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-04-ombre_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414185/demo-seed/hero-nail-04-ombre_review20261008.webp",
+      "sourceId": "beauty-div-01-window-light--6f794797"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-05-floral_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414185/demo-seed/hero-nail-05-floral_review20261008.webp",
+      "sourceId": "manicure-10--3875cc49"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-06-ink-violet_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414185/demo-seed/hero-nail-06-ink-violet_review20261008.webp",
+      "sourceId": "beauty-div-04-hands-jewelry--48e416ee"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-09-dark-editorial_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414186/demo-seed/hero-nail-09-dark-editorial_review20261008.webp",
+      "sourceId": "manicure-09--48a4f4cb"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-10-bridal-floral_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414187/demo-seed/hero-nail-10-bridal-floral_review20261008.webp",
+      "sourceId": "beauty-nails-clients-cta-03-hands--cbc564e7"
+    },
+    {
+      "publicId": "demo-seed/nail-01_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414187/demo-seed/nail-01_review20261008.webp",
+      "sourceId": "beauty-div-01-window-light--6f794797"
+    },
+    {
+      "publicId": "demo-seed/nail-03_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414187/demo-seed/nail-03_review20261008.webp",
+      "sourceId": "hero-nail-14-bridal-milky-white--34ecc862"
+    },
+    {
+      "publicId": "demo-seed/nail-05_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414187/demo-seed/nail-05_review20261008.webp",
+      "sourceId": "manicure-08--0a0b866c"
+    },
+    {
+      "publicId": "demo-seed/nail-06_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414189/demo-seed/nail-06_review20261008.webp",
+      "sourceId": "nail-42-medium-sage-micro-french--6264b8d1"
+    },
+    {
+      "publicId": "demo-seed/nail-07_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414189/demo-seed/nail-07_review20261008.webp",
+      "sourceId": "manicure-07--40a3b0f8"
+    },
+    {
+      "publicId": "demo-seed/nail-08_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414189/demo-seed/nail-08_review20261008.webp",
+      "sourceId": "beauty-div-02-two-hands--52a90ee1"
+    },
+    {
+      "publicId": "demo-seed/nail-13-short-pastel_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414190/demo-seed/nail-13-short-pastel_review20261008.webp",
+      "sourceId": "beauty-nails-clients-cta-03-hands--cbc564e7"
+    },
+    {
+      "publicId": "demo-seed/nail-14-short-glitter_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414191/demo-seed/nail-14-short-glitter_review20261008.webp",
+      "sourceId": "hero-nail-16-velvet-cat-eye--c58dbe3b"
+    },
+    {
+      "publicId": "demo-seed/nail-20-medium-geometric_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414191/demo-seed/nail-20-medium-geometric_review20261008.webp",
+      "sourceId": "manicure-03--5416767d"
+    },
+    {
+      "publicId": "demo-seed/nail-21-medium-red_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414191/demo-seed/nail-21-medium-red_review20261008.webp",
+      "sourceId": "nail-08--7cf46212"
+    },
+    {
+      "publicId": "demo-seed/nail-24-medium-floral_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414191/demo-seed/nail-24-medium-floral_review20261008.webp",
+      "sourceId": "hero-nail-18-cherry-bottle--9be42dce"
+    },
+    {
+      "publicId": "demo-seed/nail-26-long-ombre_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414192/demo-seed/nail-26-long-ombre_review20261008.webp",
+      "sourceId": "nail-discover-01--5c350588"
+    },
+    {
+      "publicId": "demo-seed/nail-27-long-french_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414192/demo-seed/nail-27-long-french_review20261008.webp",
+      "sourceId": "hero-nail-20-application--0e3dd12c"
+    },
+    {
+      "publicId": "demo-seed/nail-32-long-minimal-line_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414192/demo-seed/nail-32-long-minimal-line_review20261008.webp",
+      "sourceId": "manicure-06--74cc296d"
+    },
+    {
+      "publicId": "demo-seed/nail-33-xl-dark-editorial_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414193/demo-seed/nail-33-xl-dark-editorial_review20261008.webp",
+      "sourceId": "hero-nail-17-glazed-knit--23a5e64a"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-12-pearl-chrome-portrait_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414194/demo-seed/hero-nail-12-pearl-chrome-portrait_review20261008.webp",
+      "sourceId": "nail-discover-03--294ad06b"
+    },
+    {
+      "publicId": "demo-seed/nail-40-xl-pastel_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414194/demo-seed/nail-40-xl-pastel_review20261008.webp",
+      "sourceId": "beauty-div-04-hands-jewelry--48e416ee"
+    },
+    {
+      "publicId": "demo-seed/nail-discover-01_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414194/demo-seed/nail-discover-01_review20261008.webp",
+      "sourceId": "manicure-05--9a1543a3"
+    },
+    {
+      "publicId": "demo-seed/nail-discover-02_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414194/demo-seed/nail-discover-02_review20261008.webp",
+      "sourceId": "beauty-div-01-window-light--6f794797"
+    },
+    {
+      "publicId": "demo-seed/nail-discover-03_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414196/demo-seed/nail-discover-03_review20261008.webp",
+      "sourceId": "nail-cobalt-glass--4cb6b2e1"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-14-bridal-milky-white_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414196/demo-seed/hero-nail-14-bridal-milky-white_review20261008.webp",
+      "sourceId": "hero-nail-14-bridal-milky-white--34ecc862"
+    },
+    {
+      "publicId": "demo-seed/nail-42-medium-sage-micro-french_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414196/demo-seed/nail-42-medium-sage-micro-french_review20261008.webp",
+      "sourceId": "nail-42-medium-sage-micro-french--6264b8d1"
+    },
+    {
+      "publicId": "demo-seed/nail-43-medium-cat-eye-rose-gold_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414197/demo-seed/nail-43-medium-cat-eye-rose-gold_review20261008.webp",
+      "sourceId": "nail-discover-02--2f188859"
+    },
+    {
+      "publicId": "demo-seed/nail-44-short-cherry-red_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414198/demo-seed/nail-44-short-cherry-red_review20261008.webp",
+      "sourceId": "beauty-nails-clients-cta-03-hands--cbc564e7"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-15-dark-chocolate_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414198/demo-seed/hero-nail-15-dark-chocolate_review20261008.webp",
+      "sourceId": "beauty-nails-clients-cta-02--dd08288a"
+    },
+    {
+      "publicId": "demo-seed/nail-46-medium-tortoiseshell_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414198/demo-seed/nail-46-medium-tortoiseshell_review20261008.webp",
+      "sourceId": "manicure-01--7c650518"
+    },
+    {
+      "publicId": "demo-seed/nail-47-medium-aura-blush_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414198/demo-seed/nail-47-medium-aura-blush_review20261008.webp",
+      "sourceId": "beauty-nails-home-cta-03-red-silk--2f1b1340"
+    },
+    {
+      "publicId": "demo-seed/nail-48-short-classic-french_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414200/demo-seed/nail-48-short-classic-french_review20261008.webp",
+      "sourceId": "hero-nail-19-molten-french--293c9dd4"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-16-velvet-cat-eye_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414200/demo-seed/hero-nail-16-velvet-cat-eye_review20261008.webp",
+      "sourceId": "hero-nail-20-application--0e3dd12c"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-17-glazed-knit_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414199/demo-seed/hero-nail-17-glazed-knit_review20261008.webp",
+      "sourceId": "hero-div-03-wide-forearm--2b301504"
+    },
+    {
+      "publicId": "demo-seed/nail-49-medium-marble-accent_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414200/demo-seed/nail-49-medium-marble-accent_review20261008.webp",
+      "sourceId": "beauty-div-02-two-hands--52a90ee1"
+    },
+    {
+      "publicId": "demo-seed/nail-50-long-black-cherry_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414201/demo-seed/nail-50-long-black-cherry_review20261008.webp",
+      "sourceId": "hero-nail-14-bridal-milky-white--34ecc862"
+    },
+    {
+      "publicId": "demo-seed/nail-51-medium-3d-gel-droplets_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414201/demo-seed/nail-51-medium-3d-gel-droplets_review20261008.webp",
+      "sourceId": "manicure-03--5416767d"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-18-cherry-bottle_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414201/demo-seed/hero-nail-18-cherry-bottle_review20261008.webp",
+      "sourceId": "hero-nail-18-cherry-bottle--9be42dce"
+    },
+    {
+      "publicId": "demo-seed/hero-nail-19-molten-french_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414202/demo-seed/hero-nail-19-molten-french_review20261008.webp",
+      "sourceId": "editorial-nail-03-chrome-salon-tools--6447e89b"
+    },
+    {
+      "publicId": "demo-seed/nail-52-champagne-chrome-silk_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414203/demo-seed/nail-52-champagne-chrome-silk_review20261008.webp",
+      "sourceId": "nail-52-champagne-chrome-silk--733d9cf8"
+    },
+    {
+      "publicId": "demo-seed/nail-53-jelly-oil-droplet_review20261008",
+      "url": "https://res.cloudinary.com/dcuiuwkb0/image/upload/v1791414204/demo-seed/nail-53-jelly-oil-droplet_review20261008.webp",
+      "sourceId": "nail-discover-03--294ad06b"
+    }
+  ]
+}

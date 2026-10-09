@@ -1,0 +1,3 @@
+# Treat .next build output as binary (no diff/merge conflicts)
+# Build output is committed for Render deploy (local build → git push)
+.next/** binary

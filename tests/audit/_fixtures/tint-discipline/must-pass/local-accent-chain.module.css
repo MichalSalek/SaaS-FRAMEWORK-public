@@ -1,0 +1,12 @@
+/* Łańcuch aliasów AKCENTU rozwiązywany w trzech przebiegach: --rose-alias
+   wskazuje token zdefiniowany NIŻEJ w pliku, więc pojedynczy przebieg
+   zostawiał go nierozpoznanym i mieszanina dwóch akcentów lądowała w raporcie
+   jako 45-procentowy tint. */
+.roleOrb {
+  background: color-mix(in oklch, var(--rose-alias) 55%, var(--color-primary));
+}
+
+.page {
+  --rose-alias: var(--client-rose);
+  --client-rose: #e16a8c;
+}

@@ -1,0 +1,149 @@
+/* NVT page-transition motion. The shell is a passive wrapper around routed
+ * page content; ALL states are keyed off html[data-nav-*] attributes written
+ * synchronously by NavigationTransitionController — so the exit keyframes
+ * start in the same frame as the tap, before any React render.
+ *
+ * Phases (html[data-nav-phase]): exiting → waiting → entering.
+ * Policy  (html[data-nav-policy]): slide | fade. 'instant' sets NO attrs.
+ * Direction (html[data-nav-direction]): forward | back (reversed keyframes).
+ *
+ * data-nav-incoming = shell mounted mid-transition (the NEW page): it must
+ * stay hidden until the entering phase and never play exit keyframes. */
+
+.shell {
+  --nav-exit-duration: 190ms;
+  --nav-enter-duration: var(--page-transition-duration);
+  --nav-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  min-height: 100%;
+}
+
+/* A page that ends with a bottom action bar may ask to FILL the shell
+ * (`data-fill-shell` on its root element): the shell then lays out as a
+ * column and the page takes its free height, so the bar can stand on the
+ * bottom edge also when the content is shorter than the screen. Opt-in on
+ * purpose: `min-height: 100%` on the page itself does not resolve here (this
+ * shell's own height is `auto`), and turning every shell into a flex column
+ * would change margin collapsing for every page. S126: the onboarding role
+ * step left the bar 5.6px above the edge. */
+.shell:has(> [data-fill-shell]) {
+  display: flex;
+  flex-direction: column;
+}
+
+.shell > [data-fill-shell] {
+  flex: 1 0 auto;
+}
+
+/* Input frozen while content is in motion (O9 — pointer-events only; the
+ * a11y channel is aria-busy on #main-content, never inert). */
+:global(html[data-nav-phase]) .shell {
+  pointer-events: none;
+}
+
+/* ── EXIT — current content only; the incoming shell never exits ── */
+
+:global(html[data-nav-phase='exiting'][data-nav-policy='slide'])
+  .shell:not([data-nav-incoming]) {
+  animation: slideExit var(--nav-exit-duration) var(--nav-ease) both;
+}
+
+:global(
+    html[data-nav-phase='exiting'][data-nav-policy='slide'][data-nav-direction='back']
+  )
+  .shell:not([data-nav-incoming]) {
+  animation-name: slideExitReverse;
+}
+
+:global(html[data-nav-phase='exiting'][data-nav-policy='fade'])
+  .shell:not([data-nav-incoming]) {
+  animation: fadeExit var(--nav-exit-duration) var(--nav-ease) both;
+}
+
+/* ── HIDDEN — incoming content before its enter; everything while waiting ── */
+
+:global(html[data-nav-phase='exiting']) .shell[data-nav-incoming],
+:global(html[data-nav-phase='waiting']) .shell {
+  opacity: 0;
+}
+
+/* ── ENTER — only the new shell is in the DOM by then ── */
+
+:global(html[data-nav-phase='entering'][data-nav-policy='slide']) .shell {
+  animation: slideEnter var(--nav-enter-duration) var(--nav-ease) both;
+}
+
+:global(
+    html[data-nav-phase='entering'][data-nav-policy='slide'][data-nav-direction='back']
+  )
+  .shell {
+  animation-name: slideEnterReverse;
+}
+
+:global(html[data-nav-phase='entering'][data-nav-policy='fade']) .shell {
+  animation: fadeEnter var(--nav-enter-duration) var(--nav-ease) both;
+}
+
+/* ── Keyframes ── */
+
+@keyframes slideExit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-6%);
+  }
+}
+
+@keyframes slideExitReverse {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(6%);
+  }
+}
+
+@keyframes slideEnter {
+  from {
+    opacity: 0;
+    transform: translateX(12%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideEnterReverse {
+  from {
+    opacity: 0;
+    transform: translateX(-12%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeExit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

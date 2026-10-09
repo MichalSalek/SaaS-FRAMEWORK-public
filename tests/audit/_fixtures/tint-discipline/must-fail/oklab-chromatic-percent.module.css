@@ -1,0 +1,6 @@
+/* Kontrola dla siostrzanej fixtury must-pass: skalowanie procentow ma
+   przeliczac, a nie WYCISZAC galaz. Tu a=0,06 i b=0,12, czyli chroma 0,134 —
+   ponad trzykrotnie ponad progiem tintu. */
+.oklabChromaticPercent {
+  background: oklab(70% 15% 30% / 0.12);
+}

@@ -1,0 +1,7 @@
+/* Górna granica wyciszacza rozmiaru: 1–6px to linia albo glif, 8px to już
+   pasek, pod którym da się położyć treść. Bez tej próbki rozszerzenie
+   zakresu do [1-9] przechodziło przez meta-strażnika bez śladu. */
+.thickBar {
+  height: 8px;
+  background: color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

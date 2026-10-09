@@ -1,0 +1,9 @@
+/* edge-stripe-allow: tor postępu formularza wieloetapowego — ten pasek JEST
+   danymi (procent ukończenia), nie dekoracyjnym wyróżnieniem karty */
+.progressTrack::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-primary);
+}

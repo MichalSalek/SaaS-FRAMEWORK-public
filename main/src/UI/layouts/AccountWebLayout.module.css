@@ -1,0 +1,285 @@
+/* ─────────────────────────────────────────────────────────────────────────
+ * AccountWebLayout — desktop (>=1280) account chrome.
+ * Ciemny lewy nav-rail + wyśrodkowana kolumna treści. Editorial flat:
+ * hairline bordery, solidne tonal surfaces, gold accent — zero cieni/gradientów.
+ * Renderowany WYŁĄCZNIE >=1280 (AppLayout gating) → brak media-queries mobile.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+.skipLink {
+  position: absolute;
+  top: -100%;
+  left: var(--space-12);
+  z-index: var(--z-skip-link);
+  padding: var(--space-8) var(--space-12);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: 0 0 var(--style-radius-control) var(--style-radius-control);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top var(--transition-fast);
+}
+
+.skipLink:focus-visible {
+  top: 0;
+}
+
+.layout {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--color-bg-main);
+}
+
+/* ─── Left nav-rail ─── */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  width: var(--account-rail-width);
+  flex-shrink: 0;
+  min-height: 100dvh;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  padding: var(--space-32) var(--space-20) var(--space-20);
+  gap: var(--space-48);
+  background: var(--color-nav-bg);
+  color: var(--color-nav-text);
+  border-right: var(--style-border-divider) solid var(--color-divider);
+  overflow-y: auto;
+}
+
+.railTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: var(--ls-tight-10);
+  color: inherit;
+  text-decoration: none;
+  padding: var(--space-8) var(--space-12);
+  opacity: 0.95;
+  transition: opacity var(--transition-fast);
+}
+
+.brand:active {
+  opacity: 0.7;
+}
+
+/* Sygnet nf w railu — skaluje się z font-size .brand. */
+.brandMark {
+  height: 1.4em;
+  width: auto;
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--style-radius-control);
+}
+
+/* Identity block — avatar + live name + plan (dane, nie marketing; taste-31) */
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-nav-text) 12%, transparent);
+  border-radius: var(--style-radius-surface);
+}
+
+.identityText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  --eyebrow-color: var(--color-nav-text);
+}
+
+.identityName {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.25;
+  /* DECISION (nie usuwaj tego komentarza) — zmierzone 2026-09-09:
+   * Imię i nazwisko ZAWIJA się do dwóch linii, zamiast obcinać wielokropkiem.
+   * Rail ma stałą szerokość, więc „Ania Wiśniewska" (scrollWidth 136 przy
+   * clientWidth 127) obcinało się do „Ania Wiśniew…" na KAŻDEJ szerokości
+   * desktopu, 1280/1440/1920, w obu trybach. Piętnastoznakowe polskie imię
+   * i nazwisko to nie przypadek brzegowy, a tożsamość użytkowniczki to złe
+   * miejsce na wielokropek. Klamra na dwóch liniach trzyma wysokość railu
+   * w ryzach przy naprawdę długich nazwach. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.identityPlan {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-accent-fg);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Sign-out — visible, top-of-rail action next to identity (owner: swobodny
+ * dostęp do wylogowania app-wide, nie schowany w danger-zone / drawer). */
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  padding: var(--space-10) var(--space-12);
+  color: inherit;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  text-align: left;
+  background: transparent;
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-nav-text) 12%, transparent);
+  border-radius: var(--style-radius-surface);
+  cursor: pointer;
+  opacity: 0.8;
+  transition:
+    background var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.logoutBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.logoutBtn:active {
+  opacity: 1;
+}
+
+/* ─── Nav ─── */
+
+/* The rail is 248px wide: grouped cells with a chevron leave the label about
+ * 114px, which wraps „Profil publiczny”. Tighter inset through the row's
+ * PUBLIC knobs (DESIGN.md §Style Policy 13) buys the missing width. */
+.nav {
+  display: flex;
+  flex-direction: column;
+  --nav-row-pad-inline: var(--space-12);
+  --nav-row-gap: var(--space-10);
+}
+
+/* Sections of „Konto” (account settings): the ONE fixed place of that menu on
+ * desktop. They are an extra row of the rail's white box under their parent
+ * item; the same neutral full-width line that separates the cells separates
+ * them from the item below (never the last row: „Wsparcie” follows).
+ * The LABEL is indented to stand under the parent's label (inset 12 + glyph
+ * 22 + gap 10 = 44px), not the row: the selected section fills its cell edge
+ * to edge like every other selected row. */
+.navSections {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--space-2) 0 var(--space-8);
+  list-style: none;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  --nav-row-indent: var(--space-32);
+  --nav-list-radius: 0;
+}
+
+/* ─── Footer — product-on-phone funnel ─── */
+
+.railFooter {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding-top: var(--space-20);
+  border-top: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-nav-text) 12%, transparent);
+}
+
+.footerTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0;
+  /* min-height 24px + padding: WCAG 2.5.8 (AA) minimalny target 24x24 dla linku. */
+  min-height: 24px;
+  padding: var(--space-2) 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.72;
+  transition: opacity var(--transition-fast);
+}
+
+.footerTitle:active {
+  opacity: 0.9;
+}
+
+.footerTitle:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--style-radius-control);
+}
+
+.androidBtn {
+  width: 100%;
+}
+
+.androidNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: inherit;
+  opacity: 0.72;
+}
+
+/* ─── Main content column ─── */
+
+/* Body scrolluje (jak AdminLayout web-shell), rail sticky zostaje w miejscu —
+ * NIE inner-scroll (phone-frame). Dzięki temu fullPage QA łapie całość i view-
+ * timeline reveal działa względem dokumentu. #main-content niesie tylko id dla
+ * AppHero.closest (observer) i parytet z resztą app. */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  width: 100%;
+  max-width: var(--account-content-max);
+  margin: 0 auto;
+  padding: var(--space-64) var(--space-64) var(--space-128);
+  box-sizing: border-box;
+}
+
+@media (hover: hover) {
+  .brand:hover {
+    opacity: 1;
+  }
+
+  .logoutBtn:hover {
+    background: color-mix(in oklch, var(--color-nav-text) 8%, transparent);
+    opacity: 1;
+  }
+
+  .footerTitle:hover {
+    opacity: 0.95;
+  }
+}

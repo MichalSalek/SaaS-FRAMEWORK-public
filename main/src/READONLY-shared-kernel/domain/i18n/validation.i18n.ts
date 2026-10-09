@@ -1,0 +1,333 @@
+/**
+ * VALIDATION_MESSAGES - SSOT dla kluczy i18n walidacji
+ *
+ * Ten plik definiuje klucze tłumaczeń używane w validation.policy.ts.
+ * Wartości są kluczami do plików common.json w sekcji "validation".
+ *
+ * Użycie:
+ * - W shared-kernel: używaj jako fallback (wartość = klucz)
+ * - W aplikacjach: mapuj na tłumaczenia z i18n
+ */
+
+export const VALIDATION_MESSAGES = Object.freeze({
+  general: {
+    fieldRequired: 'validation.general.fieldRequired',
+    booleanRequired: 'validation.general.booleanRequired',
+    // D5: osierocony surogat UTF-16 w treści pisanej przez człowieka.
+    invalidCharacters: 'validation.general.invalidCharacters',
+  },
+  email: {
+    invalid: 'validation.email.invalid',
+    noSpaces: 'validation.email.noSpaces',
+    tooLong: 'validation.email.tooLong',
+  },
+  name: {
+    tooShort: 'validation.name.tooShort',
+    tooLong: 'validation.name.tooLong',
+    invalid: 'validation.name.invalid',
+  },
+  displayName: {
+    required: 'validation.displayName.required',
+    tooShort: 'validation.displayName.tooShort',
+    tooLong: 'validation.displayName.tooLong',
+  },
+  user: {
+    noIdentifier: 'validation.user.noIdentifier',
+    invalidId: 'validation.user.invalidId',
+  },
+  session: {
+    missingToken: 'validation.session.missingToken',
+    missingId: 'validation.session.missingId',
+  },
+  payment: {
+    missingPlan: 'validation.payment.missingPlan',
+    invalidPlan: 'validation.payment.invalidPlan',
+    invalidBillingPeriod: 'validation.payment.invalidBillingPeriod',
+    invalidSource: 'validation.payment.invalidSource',
+    invalidPromo: 'validation.payment.invalidPromo',
+    missingPaymentId: 'validation.payment.missingPaymentId',
+  },
+  vatInvoice: {
+    companyNameRequired: 'validation.vatInvoice.companyNameRequired',
+    companyNameTooLong: 'validation.vatInvoice.companyNameTooLong',
+    nipInvalid: 'validation.vatInvoice.nipInvalid',
+    addressLineRequired: 'validation.vatInvoice.addressLineRequired',
+    addressLineTooLong: 'validation.vatInvoice.addressLineTooLong',
+    cityRequired: 'validation.vatInvoice.cityRequired',
+    cityTooLong: 'validation.vatInvoice.cityTooLong',
+    postalCodeInvalid: 'validation.vatInvoice.postalCodeInvalid',
+  },
+  eventLog: {
+    missingType: 'validation.eventLog.missingType',
+    invalidType: 'validation.eventLog.invalidType',
+  },
+  gallery: {
+    missingPhoto: 'validation.gallery.missingPhoto',
+    invalidAssetUrl: 'validation.gallery.invalidAssetUrl',
+    missingStyleTraits: 'validation.gallery.missingStyleTraits',
+    missingColorTraits: 'validation.gallery.missingColorTraits',
+    tooManyColorIds: 'validation.gallery.tooManyColorIds',
+    tooManyTraitIds: 'validation.gallery.tooManyTraitIds',
+    missingNailLength: 'validation.gallery.missingNailLength',
+    invalidNailLength: 'validation.gallery.invalidNailLength',
+    invalidRecordId: 'validation.gallery.invalidRecordId',
+    traitsRequired: 'validation.gallery.traitsRequired',
+    missingAssetId: 'validation.gallery.missingAssetId',
+  },
+  trait: {
+    invalidId: 'validation.trait.invalidId',
+    invalidTypeFlag: 'validation.trait.invalidTypeFlag',
+  },
+  account: {
+    invalidId: 'validation.account.invalidId',
+    avatarUrlInvalid: 'validation.account.avatarUrlInvalid',
+  },
+  location: {
+    cityRequired: 'validation.location.cityRequired',
+    cityTooLong: 'validation.location.cityTooLong',
+    businessNameTooLong: 'validation.location.businessNameTooLong',
+    streetTooLong: 'validation.location.streetTooLong',
+    postalCodeTooLong: 'validation.location.postalCodeTooLong',
+    countryInvalid: 'validation.location.countryInvalid',
+    phoneTooLong: 'validation.location.phoneTooLong',
+    websiteInvalid: 'validation.location.websiteInvalid',
+    websiteTooLong: 'validation.location.websiteTooLong',
+    descriptionTooLong: 'validation.location.descriptionTooLong',
+    invalidLatitude: 'validation.location.invalidLatitude',
+    invalidLongitude: 'validation.location.invalidLongitude',
+    invalidRadius: 'validation.location.invalidRadius',
+  },
+  dashboardNote: {
+    tooLong: 'validation.dashboardNote.tooLong',
+    invalidAccountType: 'validation.dashboardNote.invalidAccountType',
+  },
+  vanityUrl: {
+    invalidType: 'validation.vanityUrl.invalidType',
+    invalidLength: 'validation.vanityUrl.invalidLength',
+    invalidFormat: 'validation.vanityUrl.invalidFormat',
+  },
+  branding: {
+    invalidColor: 'validation.branding.invalidColor',
+  },
+  social: {
+    instagramNotString: 'validation.social.instagramNotString',
+    instagramTooLong: 'validation.social.instagramTooLong',
+    instagramInvalidChars: 'validation.social.instagramInvalidChars',
+  },
+  consentSource: {
+    notString: 'validation.consentSource.notString',
+    tooLong: 'validation.consentSource.tooLong',
+  },
+  profile: {
+    missingIdentifier: 'validation.profile.missingIdentifier',
+  },
+  favorite: {
+    invalidStylistId: 'validation.favorite.invalidStylistId',
+    invalidRecordId: 'validation.favorite.invalidRecordId',
+    invalidNote: 'validation.favorite.invalidNote',
+    noteTooLong: 'validation.favorite.noteTooLong',
+  },
+  admin: {
+    invalidNoteId: 'validation.admin.invalidNoteId',
+    missingNotes: 'validation.admin.missingNotes',
+    invalidName: 'validation.admin.invalidName',
+    invalidHexCode: 'validation.admin.invalidHexCode',
+    invalidDisplayOrder: 'validation.admin.invalidDisplayOrder',
+    invalidCategory: 'validation.admin.invalidCategory',
+    invalidId: 'validation.admin.invalidId',
+    invalidPolicyId: 'validation.admin.invalidPolicyId',
+    missingPolicyTitle: 'validation.admin.missingPolicyTitle',
+    missingPolicyContent: 'validation.admin.missingPolicyContent',
+    policyTitleTooLong: 'validation.admin.policyTitleTooLong',
+    policyContentTooLong: 'validation.admin.policyContentTooLong',
+    invalidIconUrl: 'validation.admin.invalidIconUrl',
+  },
+  pricing: {
+    limitReached: 'validation.pricing.limitReached',
+  },
+  pagination: {
+    invalidLimit: 'validation.pagination.invalidLimit',
+    invalidOffset: 'validation.pagination.invalidOffset',
+    invalidCursor: 'validation.pagination.invalidCursor',
+  },
+  search: {
+    queryTooLong: 'validation.search.queryTooLong',
+    cityTooLong: 'validation.search.cityTooLong',
+    invalidType: 'validation.search.invalidType',
+  },
+  address: {
+    cityRequired: 'validation.address.cityRequired',
+    cityTooShort: 'validation.address.cityTooShort',
+    cityTooLong: 'validation.address.cityTooLong',
+  },
+  phone: {
+    invalidFormat: 'validation.phone.invalidFormat',
+    tooShort: 'validation.phone.tooShort',
+    tooLong: 'validation.phone.tooLong',
+    invalidChars: 'validation.phone.invalidChars',
+  },
+  token: {
+    required: 'validation.token.required',
+    invalidFormat: 'validation.token.invalidFormat',
+    tooLong: 'validation.token.tooLong',
+  },
+  pairing: {
+    limitReached: 'validation.pairing.limitReached',
+    sessionClaimed: 'validation.pairing.sessionClaimed',
+    idRequired: 'validation.pairing.idRequired',
+    targetRequired: 'validation.pairing.targetRequired',
+    invalidUserId: 'validation.pairing.invalidUserId',
+    invalidAccountId: 'validation.pairing.invalidAccountId',
+  },
+  sharing: {
+    recordIdRequired: 'validation.sharing.recordIdRequired',
+    stylistIdRequired: 'validation.sharing.stylistIdRequired',
+  },
+  sessionContainer: {
+    sessionIdRequired: 'validation.sessionContainer.sessionIdRequired',
+    galleryRecordIdRequired:
+      'validation.sessionContainer.galleryRecordIdRequired',
+    nameTooLong: 'validation.sessionContainer.nameTooLong',
+    noteTooLong: 'validation.sessionContainer.noteTooLong',
+    noteRequired: 'validation.sessionContainer.noteRequired',
+    sideInvalid: 'validation.sessionContainer.sideInvalid',
+    stylistIdInvalid: 'validation.sessionContainer.stylistIdInvalid',
+  },
+  client: {
+    idRequired: 'validation.client.idRequired',
+  },
+  visit: {
+    clientUserIdRequired: 'validation.visit.clientUserIdRequired',
+    visitIdRequired: 'validation.visit.visitIdRequired',
+    visitDateRequired: 'validation.visit.visitDateRequired',
+    visitDateInvalid: 'validation.visit.visitDateInvalid',
+    visitDateInFuture: 'validation.visit.visitDateInFuture',
+    serviceNoteTooLong: 'validation.visit.serviceNoteTooLong',
+    assetUrlRequired: 'validation.visit.assetUrlRequired',
+    assetUrlInvalid: 'validation.visit.assetUrlInvalid',
+    photoIdRequired: 'validation.visit.photoIdRequired',
+    crmNoteTooLong: 'validation.visit.crmNoteTooLong',
+  },
+  role: {
+    required: 'validation.role.required',
+    invalid: 'validation.role.invalid',
+    staffRoleRequired: 'validation.role.staffRoleRequired',
+    permissionsRequired: 'validation.role.permissionsRequired',
+  },
+  permissions: {
+    roleIdRequired: 'validation.permissions.roleIdRequired',
+    permissionIdsRequired: 'validation.permissions.permissionIdsRequired',
+  },
+  featureFlag: {
+    invalidKey: 'validation.featureFlag.invalidKey',
+    invalidEnabled: 'validation.featureFlag.invalidEnabled',
+  },
+  bulk: {
+    userIdsRequired: 'validation.bulk.userIdsRequired',
+    userIdsTooMany: 'validation.bulk.userIdsTooMany',
+    userIdsInvalid: 'validation.bulk.userIdsInvalid',
+  },
+  announcement: {
+    titleInvalid: 'validation.announcement.titleInvalid',
+    messageInvalid: 'validation.announcement.messageInvalid',
+    typeInvalid: 'validation.announcement.typeInvalid',
+    isActiveInvalid: 'validation.announcement.isActiveInvalid',
+    startsAtInvalid: 'validation.announcement.startsAtInvalid',
+    endsAtInvalid: 'validation.announcement.endsAtInvalid',
+  },
+  report: {
+    periodRequired: 'validation.report.periodRequired',
+    periodInvalid: 'validation.report.periodInvalid',
+  },
+  timeline: {
+    pageMustBeNumber: 'validation.timeline.pageMustBeNumber',
+    pageMinOne: 'validation.timeline.pageMinOne',
+    limitMustBeNumber: 'validation.timeline.limitMustBeNumber',
+    limitRange: 'validation.timeline.limitRange',
+    eventTypeMustBeString: 'validation.timeline.eventTypeMustBeString',
+    eventTypeInvalid: 'validation.timeline.eventTypeInvalid',
+  },
+  config: {
+    keyRequired: 'validation.config.keyRequired',
+    valueMustBeString: 'validation.config.valueMustBeString',
+    valueTooLong: 'validation.config.valueTooLong',
+  },
+  sendLog: {
+    environmentRequired: 'validation.sendLog.environmentRequired',
+    namespaceRequired: 'validation.sendLog.namespaceRequired',
+    typeRequired: 'validation.sendLog.typeRequired',
+    messageRequired: 'validation.sendLog.messageRequired',
+    payloadRequired: 'validation.sendLog.payloadRequired',
+    userMetadataRequired: 'validation.sendLog.userMetadataRequired',
+    fieldTooLong: 'validation.sendLog.fieldTooLong',
+  },
+  checkAccess: {
+    urlRequired: 'validation.checkAccess.urlRequired',
+    urlMustBeString: 'validation.checkAccess.urlMustBeString',
+  },
+  getLogs: {
+    environmentMustBeString: 'validation.getLogs.environmentMustBeString',
+    applicationInvalid: 'validation.getLogs.applicationInvalid',
+    typeInvalid: 'validation.getLogs.typeInvalid',
+    searchInvalid: 'validation.getLogs.searchInvalid',
+    searchTooLong: 'validation.getLogs.searchTooLong',
+    dateInvalid: 'validation.getLogs.dateInvalid',
+    hideStartupNoiseInvalid: 'validation.getLogs.hideStartupNoiseInvalid',
+    cursorInvalid: 'validation.getLogs.cursorInvalid',
+    takeInvalid: 'validation.getLogs.takeInvalid',
+    attentionInvalid: 'validation.getLogs.attentionInvalid',
+  },
+  getLogDetails: {
+    idInvalid: 'validation.getLogDetails.idInvalid',
+  },
+  logIssueStatus: {
+    fingerprintRequired: 'validation.logIssueStatus.fingerprintRequired',
+    statusInvalid: 'validation.logIssueStatus.statusInvalid',
+    noteMustBeString: 'validation.logIssueStatus.noteMustBeString',
+    noteTooLong: 'validation.logIssueStatus.noteTooLong',
+  },
+  getNotes: {
+    idMustBeString: 'validation.getNotes.idMustBeString',
+  },
+  contact: {
+    nameRequired: 'validation.contact.nameRequired',
+    nameTooLong: 'validation.contact.nameTooLong',
+    topicRequired: 'validation.contact.topicRequired',
+    topicInvalid: 'validation.contact.topicInvalid',
+    messageRequired: 'validation.contact.messageRequired',
+    messageTooLong: 'validation.contact.messageTooLong',
+  },
+  moderation: {
+    galleryRecordIdRequired: 'validation.moderation.galleryRecordIdRequired',
+    reasonRequired: 'validation.moderation.reasonRequired',
+    reasonInvalid: 'validation.moderation.reasonInvalid',
+    descriptionTooLong: 'validation.moderation.descriptionTooLong',
+    reportIdRequired: 'validation.moderation.reportIdRequired',
+    reportIdInvalid: 'validation.moderation.reportIdInvalid',
+    actionRequired: 'validation.moderation.actionRequired',
+    actionInvalid: 'validation.moderation.actionInvalid',
+    userIdRequired: 'validation.moderation.userIdRequired',
+    strikeReasonRequired: 'validation.moderation.strikeReasonRequired',
+    adminNoteTooLong: 'validation.moderation.adminNoteTooLong',
+    strikeReasonTooLong: 'validation.moderation.strikeReasonTooLong',
+  },
+  support: {
+    categoryRequired: 'validation.support.categoryRequired',
+    subjectRequired: 'validation.support.subjectRequired',
+    subjectTooShort: 'validation.support.subjectTooShort',
+    subjectTooLong: 'validation.support.subjectTooLong',
+    messageRequired: 'validation.support.messageRequired',
+    messageTooShort: 'validation.support.messageTooShort',
+    messageTooLong: 'validation.support.messageTooLong',
+    threadIdRequired: 'validation.support.threadIdRequired',
+    contentRequired: 'validation.support.contentRequired',
+    contentTooShort: 'validation.support.contentTooShort',
+    contentTooLong: 'validation.support.contentTooLong',
+    statusInvalid: 'validation.support.statusInvalid',
+  },
+  messaging: {
+    pairIdRequired: 'validation.messaging.pairIdRequired',
+    contentRequired: 'validation.messaging.contentRequired',
+    contentTooLong: 'validation.messaging.contentTooLong',
+  },
+} as const);

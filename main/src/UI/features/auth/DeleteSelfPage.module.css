@@ -1,0 +1,166 @@
+/* ============================================================
+ * DeleteSelfPage — account-deletion flow (review, confirm, done)
+ *
+ * DECISION (nie usuwaj tego komentarza) — owner 2026-10-08:
+ * kolorowe ramki zniknęły. Ekran miał kremową kartę z pomarańczowymi
+ * punktorami, różową kartę ostrzeżenia, kreskowaną kartę „anulowania” i trzy
+ * rodziny tintów na jedną decyzję, a „90 dni” padało trzy razy. Teraz:
+ * informacja stoi na papierze (.note), dane objęte zamknięciem to JEDNA biała
+ * ramka z czytelną listą (.card), a ton zagrożenia niosą ikona listy i kolor
+ * przycisku (`variant='danger'`, jedyne wypełnienie ekranu). Droga powrotu to
+ * zawsze widoczny przycisk `outlined` pod akcją. Wejście bez kaskady animacji.
+ * Nagłówek (tytuł i wskaźnik kroku) to wspólny ProcessHeader: głos
+ * `s126-proces`, owner 2026-10-09, DECISION w DeleteSelfPage.composition.
+ * ============================================================ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  /* Under an app bar the process header brings its own measured spacing (48px
+   * in all), so it cancels the layout's 20px top padding and this column's
+   * gap under it. As a visible title row (desktop account layout) the header
+   * ignores both. */
+  --process-header-margin-top: calc(var(--space-20) * -1);
+  --process-header-margin-bottom: calc(var(--space-20) * -1);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+/* ============================================================
+ * NOTE — a fact on paper (title + one paragraph)
+ * ============================================================ */
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.noteTitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+.noteDescription {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+ * CARD — the one white box (grouped content)
+ * ============================================================ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+}
+
+.consequencesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.consequenceItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+/* An icon next to text that may wrap: its box is exactly one line tall, so
+ * the glyph sits on the centre of the FIRST line, never of the paragraph. */
+.lineIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.lineIcon > svg {
+  display: block;
+}
+
+.dangerIcon {
+  color: var(--color-error);
+}
+
+/* ============================================================
+ * CONFIRM GATE — type-to-confirm
+ * ============================================================ */
+
+.confirmInput {
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-20);
+}
+
+/* Always in the flow with its final height; only the content appears. */
+.confirmMatchHint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin: 0;
+  min-height: var(--space-24);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+ * ACTIONS — the destructive action + the way back
+ * ============================================================ */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.actionError {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}

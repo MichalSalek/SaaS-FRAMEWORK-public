@@ -1,0 +1,32 @@
+.link {
+  color: inherit;
+}
+
+.link:any-link {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  max-width: 100%;
+  white-space: normal;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: auto;
+}
+
+.label {
+  min-width: 0;
+}
+
+.arrow {
+  flex: 0 0 1em;
+  width: 1em;
+  height: 1em;
+  margin-top: calc((1lh - 1em) / 2);
+  transition: transform var(--duration-200) var(--ease-entrance);
+}
+
+.link:hover .arrow,
+.link:focus-visible .arrow {
+  transform: translateX(var(--space-4));
+}

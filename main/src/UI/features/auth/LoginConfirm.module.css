@@ -1,0 +1,30 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * LoginConfirm — the s34 "Logujesz się jako …" gate. Reuses the login card
+ * (LoginPage.module.css: wrapper, card, lockup, headline, subtitle); this
+ * file holds only what that card does not have: the address line under the
+ * headline and the two stacked answers. Flat: no shadow, no gradient.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Headline focus target (moved there on mount), a heading, not a control. */
+.title:focus {
+  outline: none;
+}
+
+/* The address is the one fact she must check, so it gets its own line in
+ * accent ink. Long addresses break anywhere instead of overflowing the card. */
+.email {
+  display: block;
+  margin-top: var(--space-8);
+  font-size: var(--text-2xl);
+  line-height: 1.25;
+  letter-spacing: normal;
+  color: var(--color-accent-fg);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}

@@ -1,0 +1,9 @@
+/* Kolizja nazw między modułami, żywa w drzewie: --eyebrow-color ustawia
+   AboutPage (złoto), PricingPage (złoto) i trzecia strona (neutralnie).
+   Deklaracja stoi w KLASIE, więc obowiązuje w poddrzewie tej klasy, a klasa
+   CSS Modules jest hashowana per plik. Rozwiązywanie aliasów po samej NAZWIE
+   zlewało te trzy zmienne w jedną i przenosiło „złoto" na moduł, który go nie
+   ma. */
+.aboutPage {
+  --eyebrow-color: var(--color-accent-fg);
+}

@@ -1,0 +1,144 @@
+/* ─── Drawer overlay ─── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-navigation-drawer-backdrop);
+  /* 0.5 (głos ownera 2026-07-13): wcześniej 0.8 dla separacji, ale przy półprzez-
+   * roczystym panelu (alfa 0.95) treść „pod spodem" ma prześwitywać — 0.8 czerni
+   * blokowało ten efekt (widać było scrim, nie treść). Trade-off separacja↔prześwit
+   * rozstrzygnięty na rzecz prześwitu (nowa prośba). Cofnięcie = z powrotem 0.8. */
+  background: var(--color-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+
+.overlayVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─── Drawer panel ─── */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  /* Full-height (głos ownera 2026-07-11): wcześniejsze zatrzymanie nad bottom
+   * nav ścinało od góry okrągły przycisk QR (wyglądało jak glitch). */
+  bottom: 0;
+  z-index: var(--z-navigation-drawer);
+  width: 300px;
+  max-width: 85vw;
+  /* DECISION (nie usuwaj tego komentarza) — owner 2026-10-08, zmienia własny
+   * głos z 2026-07-13 (5% alfy): „wyłącz przezroczystość menu drawera”.
+   * Panel jest w pełni kryjący; treść ekranu pod spodem przygasza scrim. */
+  background: var(--color-bg-main);
+  /* Bez ramki panelu (głos ownera 2026-07-13): top/bottom zdjęte wcześniej,
+   * teraz lewa hairline też — „w ogóle nie siedzi". Prawa = krawędź ekranu. */
+  transform: translateX(100%);
+  transition: transform var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  /* Allow vertical scroll inside the drawer; pointer-driven horizontal swipe
+   * uses our handlers (touch-action: pan-y lets vertical scroll co-exist). */
+  touch-action: pan-y;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+/* ─── Header ─── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-20) var(--space-20) var(--space-12);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.sessionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sessionName {
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+}
+
+.sessionRole {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: var(--color-surface-hover);
+  border-radius: var(--style-radius-pill);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.closeButton:active {
+  opacity: 0.6;
+}
+
+/* ─── Menu: groups of the shared NavRow primitive ─── */
+.rows {
+  padding: var(--space-16) var(--space-12);
+}
+
+/* Line between the landing link and the version in the footer. */
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-8) var(--space-20);
+}
+
+/* ─── Footer ─── */
+.footer {
+  margin-top: auto;
+  /* Full-height drawer: stopka nie może wjechać pod home-indicator/gesture bar. */
+  padding: var(--space-12) var(--space-20)
+    calc(var(--space-12) + env(safe-area-inset-bottom, 0px));
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.footerBrand {
+  display: block;
+  width: 100%;
+  padding: var(--space-8) 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-100);
+  color: var(--color-text-secondary);
+  text-align: center;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.footerBrand:active {
+  color: var(--color-text-primary);
+}
+
+.footerVersion {
+  display: block;
+  width: 100%;
+  font-size: var(--text-xs);
+  /* muted, nie tertiary: numer wersji to TRESC (uzytkownik ma go przeczytac
+     i podac przy zgloszeniu), a tertiary dawal 3,45:1 w light i 3,68:1 w dark. */
+  color: var(--color-text-muted);
+  text-align: center;
+}

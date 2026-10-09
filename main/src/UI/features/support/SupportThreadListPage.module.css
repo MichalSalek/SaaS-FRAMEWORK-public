@@ -1,0 +1,17 @@
+/* SupportThreadListPage.module.css
+ *
+ * The help hub (route SUPPORT): hero and two groups of shared rows (NavRow).
+ * The rows bring their own surface; this file only places the groups. The
+ * new-request form and the list of requests live on their own screens
+ * (SupportNewThreadPage / SupportThreadsPage).
+ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-height: 100%;
+  /* Full-bleed: pulls against the AppLayout padding. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) var(--space-32);
+}

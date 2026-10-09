@@ -1,0 +1,4 @@
+.rail {
+  border: var(--style-border-surface) solid var(--color-border);
+  border-left-width: 1px;
+}

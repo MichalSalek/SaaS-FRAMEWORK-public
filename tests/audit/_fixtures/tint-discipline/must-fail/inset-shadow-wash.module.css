@@ -1,0 +1,7 @@
+/* box-shadow nie jest tłem, ale `inset` z rozlaniem na pół ekranu zalewa
+   CAŁĄ powierzchnię — renderowo to ten sam wash co background, a lista
+   właściwości powierzchni go nie obejmowała. */
+.washByShadow {
+  box-shadow: inset 0 0 0 999px
+    color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

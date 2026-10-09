@@ -1,0 +1,81 @@
+.wrapper {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  overflow: hidden;
+  /* DECISION (nie usuwaj — S18 fix): line-height 1.25 (NIE 1). Marcellus ma
+     ascendery/cap-height > em-box; przy line-height:1 + overflow:hidden szczyty
+     duzych cyfr byly CIETE (PriceSlot lg, widoczne na cenach pricing). 1lh skaluje
+     sie z line-height, wiec digit-roll translateY(calc(var(--digit)*-1lh)) zostaje
+     matematycznie spojny (kazda cyfra nadal o 1lh nizej). */
+  line-height: 1.25;
+}
+
+.digit {
+  display: inline-block;
+  overflow: hidden;
+  height: 1lh;
+  position: relative;
+}
+
+.digitTrack {
+  display: flex;
+  flex-direction: column;
+  transition: transform 300ms ease-out;
+  transform: translateY(calc(var(--digit) * -1lh));
+}
+
+.digitTrack span {
+  display: block;
+  height: 1lh;
+  text-align: center;
+  /* Bez sztucznego min-width: slot odometru i tak przyjmuje szerokość
+     najszerszej cyfry toru 0-9; dodatkowy luft rozstrzeliwał cyfry
+     („5 5 PLN" zamiast „55 PLN"). tnum zwęża sloty do równych cyfr,
+     gdy font ma tabular figures (graceful no-op w Marcellus). */
+  /* tnum-allow: odometer slots hold single digits that roll in place */
+  font-variant-numeric: tabular-nums;
+}
+
+.loading .digitTrack {
+  animation: scroll 400ms linear infinite;
+}
+
+.suffix {
+  white-space: pre;
+}
+
+.sm {
+  font-size: var(--text-sm);
+}
+
+.md {
+  font-size: inherit;
+}
+
+.lg {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-10lh);
+  }
+}
+
+.fadeIn {
+  animation: fadeInSimple 200ms ease-in;
+}
+
+@keyframes fadeInSimple {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

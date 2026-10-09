@@ -1,0 +1,83 @@
+/* CropStep.module.css */
+
+@keyframes cropFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cropStep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.cropHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-12);
+}
+
+.cropStepEnter {
+  animation: cropFadeIn 200ms var(--ease-entrance) both;
+}
+
+.cropHint {
+  color: var(--color-text-secondary);
+}
+
+.cropWrapper {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--style-radius-surface);
+}
+
+.reactCrop {
+  max-width: 100%;
+  /* Limit wysokości MUSI siedzieć na korzeniu ReactCrop: arkusz biblioteki daje
+   * `.ReactCrop__child-wrapper > img { max-height: inherit }` (wyższa specyficzność
+   * niż klasa modułu), więc `max-height` zadeklarowany niżej na .cropImage nigdy
+   * nie działał i zrzut ekranu 1179x2556 renderował się na 752px. Stąd dziedziczy
+   * child-wrapper, a z niego obraz. */
+  /* Kadr bierze wysokość EKRANU, nie stałe 400px: na telefonie 844px zdjęcie
+   * kończyło się w połowie, a belka akcji wisiała pod nim nad pustym polem
+   * (S126). 58dvh zostawia miejsce na nagłówek kroku i belkę także przy
+   * 640px wysokości; górny limit trzyma kadr w ryzach na tablecie. */
+  max-height: min(58dvh, 640px);
+  border-radius: var(--style-radius-surface);
+}
+
+.cropImage {
+  display: block;
+  max-width: 100%;
+  max-height: min(58dvh, 640px);
+  border-radius: var(--style-radius-surface);
+  object-fit: contain;
+}
+
+/* Listwa akcji edytora kadru jest PRZYKLEJONA do dołu ekranu (kanon
+ * .stickyActionBar z podglądu kadru), nie leży pod zdjęciem. Dowód z produkcji
+ * (nagranie sesji 2026-08-26, iPhone 402x714): zrzut ekranu 1179x2556 renderował
+ * się na 752px wysokości, „Zatwierdź kadr" lądował 560px pod dolną krawędzią, a
+ * obraz ReactCrop ma touch-action:none, więc przesunięcie palcem po zdjęciu nie
+ * przewija strony. Jedyna stylistka, która dotarła do tego ekranu, stuknęła pięć
+ * razy w zakładkę „Dodaj" na dolnym pasku i wyszła bez zdjęcia. */
+.cropActions {
+  composes: stickyActionBar from '../UploadAssetPage.module.css';
+  flex-wrap: nowrap;
+}
+
+/* Główna akcja bierze resztę rzędu; poboczna ma szerokość własnej etykiety. */
+.cropConfirm {
+  flex: 1 1 auto;
+  min-width: 0;
+}

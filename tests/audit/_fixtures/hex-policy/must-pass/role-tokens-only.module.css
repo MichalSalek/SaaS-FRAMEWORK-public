@@ -1,0 +1,6 @@
+/* Kolory wylacznie przez role; `in oklch` to przestrzen mieszania,
+   nie literal — straznik nie moze tego mylic. */
+.band {
+  background: var(--color-ink-band);
+  color: color-mix(in oklch, var(--color-on-ink-band) 78%, transparent);
+}

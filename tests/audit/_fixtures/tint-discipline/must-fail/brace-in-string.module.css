@@ -1,0 +1,7 @@
+/* Klamra w CIĄGU ZNAKÓW (`content: '}'`). Parser nieświadomy stringów zamykał
+   na niej blok, więc deklaracja tła lądowała POZA jakimkolwiek blokiem
+   i wypadała ze skanu w całości. */
+.tinted::after {
+  content: '}';
+  background: color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

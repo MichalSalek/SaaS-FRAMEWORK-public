@@ -1,0 +1,63 @@
+/* ─── MaintenanceBanner ───
+ * Single full-width strip, sticky at the very top (above announcements + AppBar).
+ * Operational notice — amber solid fill, NON-dismissable.
+ * Anti-AI-slop: flat solid background, NO gradient / shadow / glow / one-sided border.
+ */
+
+.banner {
+  position: sticky;
+  top: 0;
+  /* Above AnnouncementBanner (z-app-bar + 1) — maintenance is the highest-priority strip. */
+  z-index: calc(var(--z-app-bar) + 2);
+  display: flex;
+  /* The message may wrap: the icon sits on its FIRST line (.icon is one line
+     tall), never centred against the whole paragraph. */
+  align-items: flex-start;
+  gap: var(--space-12);
+  width: 100%;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  /* DECISION (nie usuwaj tego komentarza) — S113, 2026-09-10:
+     Odstęp poziomy jest PŁYNNY i liczony w PROCENTACH, a nie z `@media`. Ścisłe
+     sformułowanie: procent w paddingu rozwiązuje się względem inline-size BLOKU
+     ZAWIERAJĄCEGO, nie własnej szerokości elementu — dziś wychodzi na to samo tylko
+     dlatego, że pas jest pełnej szerokości rodzica. Kto doda poziomy padding rodzicowi
+     albo odbierze pasowi rozciąganie, rozjedzie te 6% po cichu. Wcześniej stało tu `@media (min-width: 768px)` z
+     `var(--space-48)` — pytanie o szerokość OKNA, gdy pas mieszka wewnątrz ramki
+     telefonu. Na desktopie ≥1280 `.layoutFrame .appShell` ma sztywne 390 px, więc
+     zapytanie i tak się łapało i pas dostawał 48 px z każdej strony: 390 − 96 = 294 px
+     na tekst. Procent tego nie umie pomylić, bo pyta o element, nie o okno.
+     Świadomie NIE container query: `container-type: inline-size` implikuje
+     `contain: layout`, czyli robi z przodka blok zawierający dla `position: fixed`
+     (szuflada, dialogi, snackbary, dolna belka) — za duży promień rażenia jak na
+     odstęp w banerze. Zmierzone wartości: 390 px → ~23 px, 768 px → ~46 px,
+     1440 px → 48 px (ścięte), czyli szeroki widok wygląda jak dotąd. */
+  padding-block: var(--space-12);
+  padding-inline: clamp(var(--space-20), 6%, var(--space-48));
+  min-height: 44px;
+  /* One-line message: 44px strip, text centred in it by the padding. */
+  /* Pas ostrzegawczy — pełne wypełnienie z roli palety, bez gradientu. */
+  background: var(--color-banner-warning);
+  color: var(--color-on-banner-warning);
+}
+
+/* ─── Icon ─── */
+
+.icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.icon > svg {
+  display: block;
+}
+
+/* ─── Message ─── */
+
+.message {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+}

@@ -1,0 +1,173 @@
+/* UI/features/sessions/ClientSessionsPage.module.css
+ * The client's list of inspiration sessions.
+ *
+ * Order: AppHero (title + live counts) -> the one filled action „Utwórz
+ * sesję” -> open sessions (drafts first: they wait for her) -> history by
+ * month. White on paper: the sessions of a section (or of a month) are the
+ * cells of one white list, every session one tappable row with a single
+ * trailing disc; nothing else on the screen is filled. The row is
+ * SessionRowMolecule (features/shared/sessions), shared with the stylist's
+ * list: this file holds no row styles.
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Open and finished sessions share ONE row. They used to differ (a raspberry
+ * orb and three grey pills on the open ones; an initials avatar, a timeline
+ * rail and a dot on the finished ones), which made the same object look like
+ * two kinds of thing and put a second raspberry disc next to the affordance.
+ * State is carried by the status pill alone.
+ */
+
+/* ============================================================
+ * PAGE SHELL
+ * ============================================================ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) calc(var(--space-32) + 80px); /* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+     ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+     a `@media (min-width: …)` mierzy VIEWPORT, nie ramę — reguły szerokościowe
+     przełączały układ w tryb „szeroki" wewnątrz kadru 390px. Dlatego wszystko,
+     co zależy od szerokości, czyta tu kontener `app-view` (content-box strony),
+     a nie viewport. */
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* ============================================================
+ * PRIMARY ACTION — the only filled control of the screen
+ * ============================================================ */
+
+.primaryAction {
+  display: flex;
+}
+
+.primaryAction > * {
+  flex: 1 1 auto;
+}
+
+/* From a tablet-wide page the button takes its own width instead of a
+   900px slab. */
+@container app-view (min-width: 480px) {
+  .primaryAction > * {
+    flex: 0 0 auto;
+  }
+}
+
+.primaryActionSkeleton {
+  display: block;
+  width: 100%;
+}
+
+@container app-view (min-width: 480px) {
+  .primaryActionSkeleton {
+    width: 200px;
+  }
+}
+
+/* ============================================================
+ * SECTIONS
+ * ============================================================ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+ * HISTORY — finished sessions grouped by month
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Group sessions by month with sticky month headers so scrolling reads
+ * as a *narrative timeline* not a flat list. Each month is a section
+ * with sticky positioning that lets the eye anchor on temporal context.
+ * The sticky header is a solid paper strip: no blur, no rule under it.
+ * ============================================================ */
+
+.month {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.monthHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-12);
+  padding: var(--space-8) 0;
+  background: var(--color-bg-main);
+}
+
+.monthLabel {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.monthCount {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ============================================================
+ * EMPTY STATE — what a session is, and the three steps under the action
+ * ============================================================ */
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stepTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.stepHint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* The steps keep a readable measure on a wide page. */
+.howItWorks {
+  max-width: 60ch;
+}

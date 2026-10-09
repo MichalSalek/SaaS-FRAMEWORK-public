@@ -1,0 +1,4 @@
+[.viaSecondary]  tint tła (color-secondary 12%)
+[.viaCta]  tint tła (color-cta 13%)
+[.viaAccentFg]  tint tła (color-accent-fg 14%)
+[.viaAccentHover]  tint tła (color-accent-hover 15%)

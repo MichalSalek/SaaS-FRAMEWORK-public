@@ -1,0 +1,131 @@
+/* ─── GalleryQuickFilters ─── */
+/* Rytm pionowy przed nagłówkami sekcji = jedna wartość (census S26:
+ * było 6px+gap nad CECHY vs 2px+gap nad DŁUGOŚCI — nierówno). Gap sekcji
+ * var(--space-20) + symetryczne 2px trailing-paddingi rzędów poniżej. */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* WCAG 2.1 AA: fieldset+legend semantic group wrapper. Strip browser defaults. */
+.filterGroup {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.filterLegend {
+  margin-bottom: var(--space-6);
+}
+
+/* Scroll affordance = peek (last chip naturally cut off at the row edge) +
+ * proximity snap. No edge-fade mask (gradient-free floor). */
+.scrollableChips {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--space-2);
+  scroll-snap-type: x proximity;
+}
+
+.scrollableChips::-webkit-scrollbar {
+  display: none;
+}
+
+/* DECISION (nie usuwaj tego komentarza) — S111, 2026-09-14: rząd chipów MA
+ * przewijać się w poziomie. Wspólna grupa chipów (`Chip.module.css .group`)
+ * zawija wiersze, więc cechy i długości układały się w cztery rzędy, a cały
+ * blok filtrów jest przyklejony (`GalleryPage .filterWrap`): na telefonie
+ * zajmował ponad połowę ekranu i siatka zdjęć przewijała się w wąskim pasku
+ * pod nim. Selektor potomny (0-1-1) wygrywa z `.group` (0-1-0) niezależnie od
+ * kolejności modułów w bundlu. */
+.scrollableChips > * {
+  flex-wrap: nowrap;
+  width: max-content;
+}
+
+/* Refined pill chip — rounded full, brand-tinted, distinct active state. */
+/* DECISION (B2-F13): min-height 44px per WCAG 2.5.8 / Apple HIG touch-target minimum.
+ * Applies to both .chip and .chipSelected to keep consistent touch area. */
+.chip {
+  cursor: pointer;
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    background var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-6) var(--space-14);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-text-primary);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide-10);
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-divider);
+    background: var(--color-state-hover);
+  }
+}
+
+.chipSelected {
+  /* S116 („A3”): wybór to atrament odwrócony z ról tekstu i tła (działa w obu
+     trybach), nie czerwień ani tint. Czerwień zostaje dla jednego CTA. */
+  cursor: pointer;
+  /* Gold pill — solid brand-tinted fill (no gradient), primary border + bold
+   * weight signal the selected state against the neutral chips. */
+  background: var(--color-text-primary) !important;
+  /* Złoto jako TEKST idzie przez accent-fg (mode-aware, AA); color-mix primary
+     90% dawał blade złoto na papierze (2.2:1). Wariant `-strong`, bo chip stoi
+     na `--color-state-selected`, gdzie zwykły `accent-fg` daje 4,48:1. */
+  color: var(--color-bg-main) !important;
+  border: var(--style-border-control) solid transparent !important;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-6) var(--space-14);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide-20);
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+
+/* Scroll affordance = peek (last swatch naturally cut off at the row edge) +
+ * proximity snap, matching the chip rows. No edge-fade mask. */
+.colorSwatchRow {
+  display: flex;
+  gap: var(--space-10);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Trailing 2px = symetria z .scrollableChips — równy odstęp przed
+   * nagłówkiem kolejnej sekcji (rytm, census S26). */
+  padding: var(--space-2) 0;
+  scroll-snap-type: x proximity;
+}
+
+.colorSwatchRow > * {
+  scroll-snap-align: start;
+}
+
+.colorSwatchRow::-webkit-scrollbar {
+  display: none;
+}

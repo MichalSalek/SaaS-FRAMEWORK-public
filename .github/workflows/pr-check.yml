@@ -1,0 +1,225 @@
+name: PR Check — Lint, Typecheck, Audits
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - master
+      - "feature/**"
+      - "fix/**"
+      - "chore/**"
+
+# Cancel in-progress runs on the same branch/PR on new push
+concurrency:
+  group: pr-check-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (main + web-1)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (with submodules)
+        # Submodules main/ and web-1/ are PRIVATE repos with SSH URLs (.gitmodules).
+        # Without submodules the checkout leaves main/ and web-1/ empty and every job
+        # fails at setup-node (missing package-lock.json) — or worse, grep-based audits
+        # would pass vacuously. Requires repo secret SUBMODULES_SSH_KEY: a private key
+        # whose public half has READ access to MichalSalek/main and MichalSalek/web-1
+        # (user-level key or machine user; per-repo deploy keys cannot cover both).
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+
+      - name: Setup Node.js (main)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: main/package-lock.json
+
+      - name: Setup Node.js (web-1)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: web-1/package-lock.json
+
+      - name: Install dependencies — main
+        run: npm ci --prefix main
+
+      - name: Install dependencies — web-1
+        run: npm ci --prefix web-1
+
+      - name: Run lint — main
+        run: cd main && npm run lint:check
+
+      - name: Run lint — web-1
+        run: cd web-1 && npm run lint:check
+
+  typecheck:
+    name: Typecheck (main + web-1 + tests)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (with submodules)
+        # Submodules main/ and web-1/ are PRIVATE repos with SSH URLs (.gitmodules).
+        # Without submodules the checkout leaves main/ and web-1/ empty and every job
+        # fails at setup-node (missing package-lock.json) — or worse, grep-based audits
+        # would pass vacuously. Requires repo secret SUBMODULES_SSH_KEY: a private key
+        # whose public half has READ access to MichalSalek/main and MichalSalek/web-1
+        # (user-level key or machine user; per-repo deploy keys cannot cover both).
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+
+      - name: Setup Node.js (main)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: main/package-lock.json
+
+      - name: Setup Node.js (web-1)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: web-1/package-lock.json
+
+      - name: Setup Node.js (tests)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: tests/package-lock.json
+
+      - name: Install dependencies — root
+        run: npm ci
+
+      - name: Install dependencies — main
+        run: npm ci --prefix main
+
+      - name: Install dependencies — web-1
+        run: npm ci --prefix web-1
+
+      - name: Install dependencies — tests
+        run: npm ci --prefix tests
+
+      - name: Run typecheck (all workspaces)
+        run: npm run typecheck
+
+  audits:
+    name: Audits (full run-all suite)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (with submodules)
+        # Submodules main/ and web-1/ are PRIVATE repos with SSH URLs (.gitmodules).
+        # Without submodules the checkout leaves main/ and web-1/ empty and every job
+        # fails at setup-node (missing package-lock.json) — or worse, grep-based audits
+        # would pass vacuously. Requires repo secret SUBMODULES_SSH_KEY: a private key
+        # whose public half has READ access to MichalSalek/main and MichalSalek/web-1
+        # (user-level key or machine user; per-repo deploy keys cannot cover both).
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+
+      - name: Setup Node.js (main)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: main/package-lock.json
+
+      - name: Setup Node.js (web-1)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: web-1/package-lock.json
+
+      - name: Install dependencies — root
+        run: npm ci
+
+      - name: Install dependencies — main
+        run: npm ci --prefix main
+
+      - name: Install dependencies — web-1
+        run: npm ci --prefix web-1
+
+      - name: Run audit suite (audit:all)
+        run: npm run audit:all
+
+  test-unit-backend:
+    name: Unit tests — web-1 (Vitest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (with submodules)
+        # Submodules main/ and web-1/ are PRIVATE repos with SSH URLs (.gitmodules).
+        # Without submodules the checkout leaves main/ and web-1/ empty and every job
+        # fails at setup-node (missing package-lock.json) — or worse, grep-based audits
+        # would pass vacuously. Requires repo secret SUBMODULES_SSH_KEY: a private key
+        # whose public half has READ access to MichalSalek/main and MichalSalek/web-1
+        # (user-level key or machine user; per-repo deploy keys cannot cover both).
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+
+      - name: Setup Node.js (web-1)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: web-1/package-lock.json
+
+      - name: Install dependencies — web-1
+        run: npm ci --prefix web-1
+
+      - name: Run unit tests — web-1 (Vitest)
+        # No server, DB or .env needed: web-1/vitest.config.ts injects fake env
+        # (DATABASE_URL, BETTER_AUTH_SECRET, … + NODE_ENV_MANUAL=DEVELOPMENT so
+        # kernel validateEnv stays soft) and src/test-utils/setup.ts mocks the IO
+        # chokepoints (Prisma client, Better Auth session, runAfterResponse).
+        run: cd web-1 && npm run test:unit
+
+  test-unit-frontend:
+    name: Unit tests — main (Vitest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (with submodules)
+        # Submodules main/ and web-1/ are PRIVATE repos with SSH URLs (.gitmodules).
+        # Without submodules the checkout leaves main/ and web-1/ empty and every job
+        # fails at setup-node (missing package-lock.json) — or worse, grep-based audits
+        # would pass vacuously. Requires repo secret SUBMODULES_SSH_KEY: a private key
+        # whose public half has READ access to MichalSalek/main and MichalSalek/web-1
+        # (user-level key or machine user; per-repo deploy keys cannot cover both).
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ssh-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+
+      - name: Setup Node.js (main)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: main/package-lock.json
+
+      - name: Install dependencies — main
+        run: npm ci --prefix main
+
+      - name: Run unit tests — main (Vitest)
+        # No server or .env needed: main/vitest.config.ts stubs the NEXT_PUBLIC_*
+        # vars required by validateEnv (NEXT_PUBLIC_NODE_ENV_MANUAL=DEVELOPMENT →
+        # soft mode) and HTTP is mocked via MSW (vitest.setup.ts, jsdom).
+        run: cd main && npm run test:unit

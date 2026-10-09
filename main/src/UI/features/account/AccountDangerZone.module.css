@@ -1,0 +1,96 @@
+/* AccountDangerZone.module.css — section „Strefa krytyczna”.
+ *
+ * A destructive operation is a compact row in a white box: what it does in
+ * one sentence and one button in the danger tone. Danger is carried by the
+ * button (colour, icon), never by a tinted or framed card. The irreversible
+ * operation sits last, in its own box under its own label.
+ */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  container-type: inline-size;
+  container-name: dangerzone;
+}
+
+.caption {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.group {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.irreversible {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  /* Set apart from the reversible operations above. */
+  margin-top: var(--space-12);
+}
+
+.groupLabel {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16) 0;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.rowTitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+}
+
+.rowText {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.rowAction {
+  flex-shrink: 0;
+}
+
+/* Wide enough for the sentence and the button side by side. */
+@container dangerzone (min-width: 560px) {
+  .row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-20);
+  }
+}

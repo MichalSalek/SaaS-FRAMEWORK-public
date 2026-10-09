@@ -1,0 +1,355 @@
+/* UI/features/auth/components/OnboardingPlanChooser.module.css
+ *
+ * Card chooser for the onboarding CHECKOUT step (owner-voted Variant B, wired
+ * 1:1 from the /dev/onboarding-pricing playground). FREE/PRO/PRO+/STUDIO as
+ * tap-to-select cards, SCALE as a contact row, monthly/yearly toggle, recommended
+ * badge from usePricingPlans.isPopular.
+ *
+ * Floor 7×ZERO: zero gradientów, cieni/glow, jednostronnych borderów, blura,
+ * hover-na-statycznym, scroll-reveal, myślników w copy. Głębia = tonal surface
+ * steps + pełny hairline 1px. Selekcja = pełna obwódka --color-primary + tonalne
+ * tło (--color-state-selected), nigdy jednostronny accent border. Tokeny only.
+ */
+
+.notice {
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+  padding: var(--space-32) 0;
+  text-align: center;
+}
+
+/* ── Card stack ── */
+
+.cardStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.cardButton {
+  appearance: none;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .cardButton:not(:disabled):hover {
+    border-color: var(--color-primary);
+  }
+}
+
+.cardButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+/* Finding #3: paid card locked while Stripe prices are unavailable — dimmed +
+   non-interactive, so only FREE/Demo remains selectable. */
+.cardButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Prices-unavailable status notice (parity with AccountPay's hint). */
+.pricesNotice {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+  padding: var(--space-8) 0;
+}
+
+.cardSelected {
+  border-color: var(--color-primary);
+  /* Motyw „Jeden krem" (S94/R7): wybranie planu to STAN — token roli, jeden
+     procent akcentu dla wszystkich list wyboru w produkcie. */
+  background: var(--color-state-selected);
+}
+
+/* Karta polecana (dopóki użytkownik nie wybierze innej) = PEŁNY NEGATYW,
+   głos ownera S98/B. Wcześniej rama w złocie rozcieńczonym do 40% — trzeci
+   dialekt „polecanego" w tej samej ścieżce zakupowej i jeden z siedemnastu
+   procentów złota, jakimi produkt ramował wyróżnienia.
+   Po wybraniu tej karty wygrywa .cardSelected (TSX daje cardRecommended tylko
+   przy !isSel), więc negatyw ustępuje tokenowi STANU — wybranie jest zawsze
+   ważniejszym komunikatem niż rekomendacja. */
+.cardRecommended {
+  background: var(--color-ink);
+  /* focus-ring-allow: ta karta SAMA jest przyciskiem, a jej ring rysuje sie
+     poza border-boxem (outline-offset: 3px), czyli na plotnie strony, nie na
+     atramencie. Remap by go tu ZNISZCZYL. Powod pelny nizej. */
+  /* DECISION (nie usuwaj tego komentarza):
+     Ta karta jako JEDYNA powierzchnia atramentowa w produkcie sama jest
+     przyciskiem, a jej `:focus-visible` rysuje outline z `outline-offset: 3px`,
+     czyli POZA border-boxem — na płótnie strony, nie na atramencie. Remap
+     pierścienia, który na wszystkich pozostałych powierzchniach naprawia
+     kontrast, tutaj by go ZNISZCZYŁ (biel na białym płótnie = 1,00:1).
+     Reguła brzmi więc: remapuje powierzchnia, NA KTÓREJ ring się rysuje,
+     a nie ta, która ma atramentowe tło. */
+  color: var(--color-on-ink);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, var(--color-ink));
+}
+
+/* Dark (R8): ink jest ciemny w OBU trybach — na ciemnym ekranie negatyw
+   przestaje być inwersją, więc sygnał przejmuje krok tonalny w górę
+   plus gold-rama (receptura 1:1 z bandem premium /pricing). */
+:root[data-mode='dark'] .cardRecommended {
+  background: color-mix(in oklch, var(--color-ink) 89%, var(--color-on-ink));
+  border-color: color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+.cardRecommended .demoTag,
+.cardRecommended .priceCurrency,
+.cardRecommended .priceCycle,
+.cardRecommended .featureItem {
+  color: color-mix(in oklch, var(--color-on-ink) 74%, transparent);
+}
+
+/* Znak na negatywie: tint liczony NA ATRAMENCIE (mark-bg jest półprzezroczysty),
+   glif w roli akcentu na inku.
+   Akcent na atramencie bierze --color-accent-on-ink (DECISION S106):
+     czerwony --color-primary jest w LIGHT ciemny i daje na inku 3,6:1. */
+.cardRecommended .iconHalo,
+.cardRecommended .featureCheck {
+  background: var(--color-mark-bg-on-ink);
+  color: var(--color-accent-on-ink);
+}
+
+.cardRecommended .radioDot {
+  border-color: color-mix(in oklch, var(--color-on-ink) 40%, transparent);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.cardNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.iconHalo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--style-radius-control);
+  /* Motyw „Jeden krem" (S94/R2): znak wielkości glifu bierze token ZNAKU,
+     nie krem — jedyny krem onboardingu to hero (OnboardingPage .hero). */
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+}
+
+.planName {
+  font-size: var(--text-lg);
+  font-weight: 680;
+  letter-spacing: var(--ls-tight-10);
+}
+
+.demoTag {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  margin-top: var(--space-2);
+}
+
+/* Jedna receptura pigułki „polecany" na powierzchniach in-app: waga 700,
+   uppercase, tracking z tokenu eyebrow (bliźniak: AccountPayPage
+   .popularBadge). Cennik zostaje na markerze typograficznym (S82) — to osobny
+   język i nie zlewamy go z pigułką. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  padding: 3px var(--space-8);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  white-space: nowrap;
+}
+
+.radioDot {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--style-radius-round);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-contrast);
+}
+
+.radioDotOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+/* Price, currency and period are each one unbreakable piece; a narrow card
+ * moves the whole period under the amount, never breaks inside it. */
+.priceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-4);
+}
+
+.priceRow > * {
+  white-space: nowrap;
+}
+
+.priceAmount {
+  /* Cyfry tabelaryczne: ceny sasiadujacych pakietow musza stac w kolumnie,
+     a przelacznik miesiac/rok nie moze przesuwac znakow (F3.2). */
+  font-size: var(--text-2xl);
+  font-weight: 740;
+  letter-spacing: var(--ls-tight-20);
+}
+
+.priceCurrency {
+  font-size: var(--text-sm);
+  font-weight: 560;
+  color: var(--color-text-secondary);
+}
+
+.priceCycle {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.featureList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.featureCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+  /* The feature text may wrap: the check is centred on its FIRST line
+   * (16px mark, 1lh line box), never against the whole paragraph. */
+  margin-top: calc((1lh - 16px) / 2);
+}
+
+/* ── SCALE contact row (network of salons) ── */
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (S94/R2): chooser renderuje się POD kremowym hero
+     onboardingu — drugi krem na tej samej stronie robił z niej dwa pasy
+     bez hierarchii. Wiersz SCALE niesie zamknięta rama. */
+  background: var(--color-bg-paper);
+}
+
+.contactText {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.contactText strong {
+  color: var(--color-text-primary);
+  font-weight: 640;
+}
+
+/* ── Toggle + CTA spacing ── */
+
+.toggleRow {
+  margin-block: var(--space-8);
+}
+
+.ctaStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding-top: var(--space-8);
+}
+
+.fullBtn {
+  width: 100%;
+}
+
+/* Nota o okresie próbnym pod kwotą (S123). Mały druk: kwota zostaje bohaterem
+ * karty (kompozycja z głosu ownera), ale oferta wejścia przestaje być
+ * niewidoczna na kroku, na którym zapada decyzja. Akcent tekstowy, nie
+ * wypełnienie: headroom kontrastu trzymamy dla jednego CTA na ekran. */
+.trialNote {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-accent-fg);
+  margin-top: var(--space-2);
+}
+
+/* Karta polecana jest PEŁNYM NEGATYWEM, a `--color-accent-fg` jest
+ * skalibrowany na papierze: na atramencie dawał 2,07:1 (zmierzone sondą
+ * pikselową, S123). Akcent na negatywie ma własną rolę (DESIGN.md S106), a ta
+ * karta ma już komplet takich przesunięć dla ceny, cyklu i cech. Rodzeństwo
+ * bez override'u to klasa z taste-owner #56: komponent o dwóch tonach musi
+ * przesunąć KAŻDY kolor, nie tylko część. */
+.cardRecommended .trialNote {
+  color: var(--color-accent-on-ink);
+}
+
+/* Nota pod głównym CTA: karta jest wymagana przy planie płatnym. Mały druk,
+ * wyciszony, wyśrodkowany pod przyciskiem, nigdy nie konkuruje z nim wagą. */
+.ctaNote {
+  margin-top: var(--space-8);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+  text-align: center;
+}

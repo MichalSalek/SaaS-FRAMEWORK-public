@@ -1,0 +1,6 @@
+/* Chroma DOKŁADNIE na progu to jeszcze nie kolor (próg jest ostry: „>”).
+   Bez tej próbki mutacja podnosząca CHROMA_FLOOR przeżywała, bo wszystkie
+   naruszenia siedziały trzykrotnie nad progiem. */
+.washAtFloor {
+  background: oklch(0.82 0.04 88 / 0.12);
+}

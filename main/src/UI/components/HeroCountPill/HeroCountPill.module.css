@@ -1,0 +1,99 @@
+/* ─── HeroCountPill — licznik w nagłówku ekranu ───
+ *
+ * Receptura przeniesiona 1:1 z siedmiu modułów admina, w których stała
+ * bajtowo identyczna (Users, Policies, Permissions, Notes, ColorsTraits,
+ * Support, SupportThread). Zero zmian wizualnych — to konsolidacja, nie
+ * restyling.
+ */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  /* optical: ciasna pigułka licznika — 5/11 to dobrana wysokość glifu przy
+     --text-xs, nie stopień skali odstępów. */
+  padding: 5px 11px;
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-20);
+  /* Motyw „Jeden krem" (S97): chip-afordancja = ZNAK, token roli; kolor
+     tekstu = accent-fg (ręczny color-mix na primary = FAIL WCAG na papierze).
+     Trzy własności są ŻYWYMI punktami nadpisania (--hero-pill-*), bo pojedyncze
+     ekrany mają uzasadnione tony domenowe — notatki barwią pigułkę „głównej"
+     paletą notatki. Nadpisanie MUSI iść przez custom property, nie przez klasę
+     dorzuconą w call-site: klasa z modułu strony i `.pill` z modułu komponentu
+     mają równą specyficzność, więc o zwycięzcy decydowałaby kolejność w bundlu
+     CSS Modules, czyli przypadek. */
+  background: var(--hero-pill-bg, var(--color-mark-bg));
+  color: var(--hero-pill-fg, var(--color-accent-fg));
+  border: var(--style-border-surface) solid
+    var(--hero-pill-border, var(--color-border-surface));
+}
+
+.emphasized {
+  /* Motyw „Jeden krem" (S97): wariant wyróżniony (oryginał 18% ≥ 16%) →
+     mark-bg-strong + accent-fg. */
+  background: var(--color-mark-bg-strong);
+  /* `accent-fg` jest skalibrowany na BIELI, a `mark-bg-strong` to juz stopien
+     dalej: zmierzone 4,32:1 przy progu 4,5 (14px/600). Ta sama para i ta sama
+     liczba co w pigulce watku wsparcia. */
+  color: var(--color-accent-fg-strong);
+  border-color: var(--color-border-surface);
+}
+
+.alert {
+  /* Status FILL is light in rouge-papier; mixing it into the label (78%)
+     read 2.87:1 on this tint. Text on a status tint uses the -fg token. */
+  background: color-mix(in oklch, var(--color-warning) 14%, transparent);
+  color: var(--color-warning-fg);
+  border-color: color-mix(in oklch, var(--color-warning) 36%, transparent);
+}
+
+/* W modułach źródłowych klasa siedziała PROSTO na `<svg>`, tutaj ikona jest
+ * opakowana w `<span>`, żeby call-site nie musiał znać nazwy klasy. `inline-flex`
+ * jest tu warunkiem parytetu, nie ozdobą: goły `<span>` byłby elementem
+ * liniowym, a `<svg>` w środku dostałoby miejsce na wydłużenie dolne i pigułka
+ * urosłaby o kilka pikseli względem oryginału. */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  /* Motyw „Jeden krem" (S97): ikona niesie znaczenie → accent-fg. */
+  color: var(--hero-pill-icon, var(--color-accent-fg));
+  flex-shrink: 0;
+}
+
+.emphasized .icon {
+  color: var(--color-accent-fg-strong);
+}
+
+.alert .icon {
+  color: currentColor;
+}
+
+.pulseDot {
+  display: inline-block;
+  /* optical: kropka sygnalizacyjna wielkości glifu, nie odstęp. */
+  width: 6px;
+  height: 6px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-warning);
+  animation: heroPillPulse 2s ease-in-out infinite;
+}
+
+@keyframes heroPillPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}

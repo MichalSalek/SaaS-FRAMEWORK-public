@@ -1,0 +1,282 @@
+/* ============================================================
+ * PairingPage — the connection screens of both roles.
+ *
+ * „White on paper” (S116): the page is paper; what can be tapped and what is
+ * grouped sits in a white box with the surface radius, no frame, no shadow.
+ * Nothing here animates on entry and nothing moves when data arrives: lists
+ * load into a skeleton of their final box.
+ * ============================================================ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  min-height: 100%;
+  /* Compensate AppLayout content padding. The negative side margin cancels
+     AppLayout's content padding exactly; the inner side padding restores the
+     content inset and grows to clear the safe-area on landscape /
+     curved-corner devices (F-PAIR-7). Bottom space is layered above
+     AppLayout's own bottom-nav + env(safe-area-inset-bottom) reservation —
+     not re-added here to avoid double-counting the inset. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) max(var(--space-20), env(safe-area-inset-right))
+    calc(var(--space-32) + var(--space-48) + var(--space-32))
+    max(var(--space-20), env(safe-area-inset-left));
+}
+
+/* ─── A list with its heading (clients of a stylist, stylists of a client) ─── */
+
+.listSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+/* ─── People in a list ───
+ * Every person row of this feature is NavRowMolecule in a NavRowListMolecule
+ * (owner vote `s126-wiersze`): the look and the loading stand-in are the
+ * primitive's. What stays here is the action under the list and the knobs of
+ * the list inside a dialog. */
+
+/* The quiet way to the code under the list: a button of its own width, not a
+   bar across the column. */
+.listFooter {
+  display: flex;
+}
+
+/* Inside a dialog the dialog is the box: rows stand on its surface, flush
+   with its text (public knobs of the row primitive, no overrides). */
+.limitList {
+  --nav-list-surface: transparent;
+  --nav-list-radius: 0;
+  --nav-row-pad-inline: 0px;
+  --nav-row-end-pad: 0px;
+}
+
+/* ─── Connection requests (stylist): first on the screen, only when any ─── */
+
+.requestsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.requestsContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding: var(--space-20);
+}
+
+.requestsIntro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.requestsTitle {
+  margin: 0;
+}
+
+.requestsBody {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.requestsList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Name on the left, the two answers on the right; when the row is too narrow
+   the WHOLE pair of buttons moves under the name. */
+.requestRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-12) var(--space-16);
+  padding: var(--space-16) 0;
+}
+
+.requestRow:first-child {
+  padding-top: 0;
+}
+
+.requestRow:last-child {
+  padding-bottom: 0;
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+   Wiersz prośby NIE dostaje ramki góra/dół. Lista bywa jednoelementowa, więc
+   para hairline'ów obejmowała pojedynczy wiersz i czytała się jak glitch —
+   nie oddzielała niczego, bo nad i pod nią jest już biały boks sekcji.
+   Separator istnieje wyłącznie MIĘDZY wierszami (owner, 2026-09-17). */
+.requestRow:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.requestInfo {
+  flex: 1 1 140px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.requestName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.requestDate {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.requestActions {
+  flex: none;
+  display: flex;
+  gap: var(--space-8);
+}
+
+/* ─── Permanent QR code (stylist) ─── */
+
+/* The screen is one column: the code, and above it at most one notice row.
+   Capped through the column itself (never a viewport query: product routes
+   also render inside a 390px phone frame on a wide desktop) and centred, so
+   on a tablet the code does not sit in a 900px card. */
+.codeColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+}
+
+.codeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-16);
+  padding: var(--space-20);
+  text-align: center;
+}
+
+/* White in BOTH modes on purpose (--color-on-ink is mode-invariant, Style
+   Policy §2): a QR needs a light ground to scan, also in dark mode. The box
+   is always 244px, with the code or with its skeleton. */
+.qrFrame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  background: var(--color-on-ink);
+  border-radius: var(--style-radius-control);
+}
+
+.qrImage {
+  display: block;
+  width: 220px;
+  height: 220px;
+  image-rendering: pixelated;
+}
+
+/* The main button on its own line, the quiet ways out side by side under it;
+   a long German label takes a line of its own instead of being cut. */
+.codeActions {
+  display: grid;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 320px;
+}
+
+.codeActionsSecondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.codeActionsSecondary > * {
+  flex: 1 1 auto;
+}
+
+.codeNote {
+  margin: 0;
+  max-width: 44ch;
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Scan card (client): the screen's one action ─── */
+
+/* The card answers to ITS OWN width, not the viewport's: on a desktop the
+   product routes render inside a 390px phone frame where a viewport query
+   lies, and next to the list (PageColumns) the card is half the page. */
+.scanFrame {
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.scanCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.scanBody {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* Wide card: sentence left, button right, so the button is not 600px long. */
+@container (min-width: 560px) {
+  .scanCard {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-24);
+  }
+
+  .scanBody {
+    max-width: 44ch;
+  }
+}
+
+/* ─── Dialog bodies ─── */
+
+.limitModal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.limitModalDesc {
+  color: var(--color-text-secondary);
+}
+
+.freeSlotDeleteNote {
+  margin-top: var(--space-16);
+}

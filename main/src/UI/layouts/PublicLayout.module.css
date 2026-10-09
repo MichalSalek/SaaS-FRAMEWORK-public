@@ -1,0 +1,560 @@
+/* ─── PublicLayout ───
+ * Marketing-site layout: header (sticky, scroll-aware compact) + main + footer.
+ * Mobile-first. Breakpoints: 480 / 768 / 1024 / 1280.
+ */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--color-bg-main);
+  /* DECISION (nie usuwaj tego komentarza) — S126:
+   * strony publiczne trzymają BIAŁY cichy przycisk (świeżo zatwierdzony
+   * wygląd LP z 2026-10-08). Aplikacja i admin biorą domyślne
+   * `--color-control-fill` z prymitywu, bo tam przycisk stoi w białym boksie. */
+  --btn-quiet-bg: var(--color-surface-interactive);
+}
+
+/* ─── Skip link (WCAG 2.4.1) ─── */
+.skipLink {
+  position: absolute;
+  top: -100%;
+  left: var(--space-12);
+  z-index: var(--z-skip-link);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: var(--style-radius-control);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: top var(--transition-fast);
+}
+
+.skipLink:focus-visible {
+  top: var(--space-12);
+}
+
+/* ─── AppBar wrapper — owns sticky + scroll-aware compact state ─── */
+.appBarWrapper {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-app-bar);
+  /* Capacitor WebView: protect logo/nav from notch / status bar */
+  padding-top: env(safe-area-inset-top, 0px);
+  /* tint-allow: głos S111 C, ta sama płaszczyzna co pasek (AppBar), żeby pas pod notchem nie odcinał się od belki */
+  background: var(--color-bg-subtle);
+}
+
+/* AppBar override — let the wrapper own stickiness. Tło i dolną linię niesie
+ * sam AppBar (DECISION przy `.appBar` w AppBar.module.css); separator po
+ * przewinięciu to ta sama pełna linia, NIE cień (anti-slop §2). */
+.appBar {
+  position: static !important;
+  background: transparent;
+}
+
+.appBarWrapper[data-compact] .logoLink {
+  font-size: var(--text-base);
+}
+
+/* Logo link — overrides default <a> color reset */
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: font-size var(--duration-200) var(--ease-entrance);
+}
+
+/* Sygnet nf skaluje się z font-size logoLink — compact mode (44px bar)
+ * zmniejsza wordmark i znak spójnie, bez osobnej reguły. Znak celowo
+ * większy niż wordmark (owner 2026-07-17): sygnet = mocniejsza kotwica marki. */
+.logoMark {
+  height: 1.9em;
+  width: auto;
+}
+
+/* ─── Content ─── */
+.content {
+  flex: 1 1 auto;
+  width: 100%;
+  background: var(--color-bg-main);
+  /* Pages own their padding/max-width */
+  /* Full-bleed breakouty (width:100vw + margin-left:calc(50% - 50vw)) liczą
+   * szerokość Z paskiem przewijania — na klasycznych scrollbarach (Windows)
+   * każda strona z bandem dostawała ~15px poziomego scrolla. clip (NIE
+   * hidden: zero scroll-containera, position:sticky działa) ucina
+   * niewidoczny nadmiar; wzorzec z HomePage.module.css (jedyna strona,
+   * która była odporna — miała własny clip). */
+  overflow-x: clip;
+}
+
+/* ─── Footer ─── */
+/* Stopka ZAWSZE ciemna (głos ownera 2026-06-11): niezależnie od motywu
+ * light/dark footer siedzi na mode-invariant ink — jasno komunikuje koniec
+ * strony / koniec scrollowania (jasna stopka zlewała się z kontentem).
+ * Mechanizm: lokalny re-scope tokenów semantycznych na ink-paletę — całe
+ * drzewo (Typography, linki, badges, Input newslettera) dziedziczy inwersję
+ * bez per-komponentowych overrideów. --color-primary zostaje (gold button,
+ * gold hover ikon = kanon ink-bloków; pale-gold disabled DECISION nietknięty). */
+.footer {
+  /* Pogłębiony ink (tonal step PONIŻEJ ink-bandów stron): po F3 strony
+   * informacyjne kończą się ink-finałem — stopka w czystym --color-ink
+   * zlewałaby się z nim w jedną ścianę czerni. Krok w dół + hairline
+   * utrzymują czytelną granicę „to już ostatnia warstwa". */
+  --footer-bg: color-mix(in oklch, black 22%, var(--color-ink));
+
+  --color-text-primary: var(--color-on-ink);
+  --color-text-secondary: color-mix(
+    in oklch,
+    var(--color-on-ink) 72%,
+    transparent
+  );
+  --color-text-disabled: color-mix(
+    in oklch,
+    var(--color-on-ink) 40%,
+    transparent
+  );
+  --color-divider: color-mix(in oklch, white 16%, transparent);
+  --color-border: color-mix(in oklch, white 28%, transparent);
+  /* S116: powierzchnie bez ramy także na atramencie. Rola jest aliasem
+   * liczonym na <html>, więc lokalna paleta i tak musi ją podać sama. */
+  --color-border-surface: transparent;
+  /* Cała drabina powierzchni musi zostać przemapowana KOMPLETNIE: stopka jest
+   * lokalną paletą atramentową, więc każdy token pominięty tutaj wraca do
+   * wartości light-theme i błyska jasną plamą na ciemnym tle. Pressed doszedł
+   * w S98/A i został pominięty — ponieważ w tej samej fali `:active` cichych
+   * przycisków przeszedł z bg-subtle (remapowanego) właśnie na pressed
+   * (nieremapowany), pierwszy cichy przycisk w stopce błysnąłby #e8e8e8.
+   * Dziś w stopce stoi tylko przycisk `primary`, więc luka jest utajona. */
+  --color-surface-interactive: color-mix(in oklch, white 8%, var(--footer-bg));
+  /* S116: na atramencie sama powierzchnia nie wystarcza za granicę pola,
+     więc kontrolki w stopce zachowują cichą linię. */
+  --color-control-border: color-mix(in oklch, white 28%, transparent);
+  --color-surface-input: var(--color-surface-interactive);
+  --color-surface-hover: color-mix(in oklch, white 10%, var(--footer-bg));
+  --color-surface-pressed: color-mix(in oklch, white 14%, var(--footer-bg));
+  --color-bg-subtle: color-mix(in oklch, white 5%, var(--footer-bg));
+  --color-icon-muted: color-mix(in oklch, var(--color-on-ink) 60%, transparent);
+  /* Placeholder aktywnego pola bierze --color-text-muted (kanon Input), a ten
+     jest skalibrowany na JASNE tlo: w stopce dawal 3,21:1, czyli ponizej AA.
+     Newsletter jest jedynym polem stopki, ale renderuje sie na KAZDEJ stronie
+     publicznej. To ta sama luka co pressed: drabina musi byc przemapowana
+     KOMPLETNIE, bo token pominiety tutaj wraca do wartosci light-theme. */
+  --color-text-muted: color-mix(in oklch, var(--color-on-ink) 68%, transparent);
+
+  margin-top: auto;
+  background: var(--footer-bg);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Bierze role
+     --color-accent-on-ink (DECISION S106): czerwony --color-primary jest w
+     LIGHT ciemny i daje na atramencie 3,6:1, czyli ponizej AA, a ta rola jest
+     mode-invariant — jedna wartosc daje ten sam jezyk wskaznika w obu trybach.
+     Poprzednia wartosc (--color-primary) byla poprawna dla wycofanej palety
+     charcoal-gold, gdzie primary bylo jasnym zlotem. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border-top: var(--style-border-divider) solid
+    color-mix(in oklch, white 16%, var(--footer-bg));
+  /* Natywne kontrolki (checkbox zgody) renderują się ciemno. */
+  color-scheme: dark;
+  padding: var(--space-48) 0 var(--space-20);
+  /* Capacitor WebView: respect bottom safe area on devices without bottom nav */
+  padding-bottom: calc(var(--space-20) + env(safe-area-inset-bottom, 0px));
+}
+
+/* SupportFloatingButton (fixed bottom-right 48px + --sp-4, na ~wszystkich public
+ * stronach poza /contact i /help-center): bez buforu copyright/social/ostatni
+ * wiersz stopki chowa się pod FAB przy scroll-end (najwyraźniej na mobile, gdzie
+ * brak gutteru — desktop FAB siedzi w marginesie kolumny). Bufor = wysokość FAB
+ * + odstęp. Reguła PRZED sticky-CTA: gdy strona ma OBA, wyższy bufor sticky
+ * (źródłowo później, równa specyficzność) wygrywa. */
+.layout:has([data-support-fab]) .footer {
+  padding-bottom: calc(
+    var(--space-20) + 64px + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* FAB wysuwa się NAD StickyCtaBar gdy bar jest widoczny (mobile: bar full-width
+ * docked bottom:0, z-index 100 > FAB 50 — bez raise bar zasłaniał FAB, zostawał
+ * tylko sliver). ~80px = wysokość bara (~69px) + odstęp. Desktop: bar = karta
+ * wycentrowana max 600px, FAB w prawym gutterze — brak kolizji, raise zbędny. */
+@media (max-width: 767.98px) {
+  .layout:has([data-sticky-cta][data-visible]) [data-support-fab] {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Strony ze StickyCtaBar (floating CTA, [data-sticky-cta] w main): bar pływa
+ * nad stopką i zasłaniał copyright — stopka dostaje dodatkowy padding-bottom
+ * o wysokość bara (owner 2026-06-11). Mobile: docked bar ~60px; desktop:
+ * karta ~58px + odstęp bottom var(--space-20). */
+.content:has([data-sticky-cta]) ~ .footer {
+  padding-bottom: calc(
+    var(--space-20) + 64px + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* Strony z OBOMA (StickyCtaBar + FAB = wszystkie publiczne LP): przy scroll-end
+ * bar jest widoczny, więc FAB stoi uniesiony nad nim (~80px, top ~128px). Stopka
+ * musi wyczyścić uniesiony FAB, nie tylko sam bar (mobile). */
+@media (max-width: 767.98px) {
+  .layout:has([data-support-fab]) .content:has([data-sticky-cta]) ~ .footer {
+    padding-bottom: calc(
+      var(--space-20) + 120px + env(safe-area-inset-bottom, 0px)
+    );
+  }
+}
+
+@media (min-width: 768px) {
+  .content:has([data-sticky-cta]) ~ .footer {
+    padding-bottom: calc(var(--space-20) + 88px);
+  }
+}
+
+.footerInner {
+  width: 100%;
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  padding: 0 var(--space-20);
+}
+
+/* ─── Footer: Links (3 columns) ─── */
+.footerLinks {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-32);
+  margin-bottom: var(--space-32);
+}
+
+@media (min-width: 480px) {
+  .footerLinks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-20) var(--space-48);
+  }
+}
+
+.footerColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.footerTitle {
+  text-transform: var(--style-label-case);
+  font-weight: 700;
+  margin-bottom: var(--space-8);
+  color: var(--color-text-secondary);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+}
+
+.footerLink {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  /* Min 44px touch target (WCAG 2.5.5) */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.footerLink:active {
+  opacity: 0.7;
+}
+
+@media (hover: hover) {
+  .footerLink:hover {
+    color: var(--color-text-primary);
+  }
+}
+
+/* ─── Footer: Newsletter ─── */
+.newsletter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  max-width: 360px;
+  margin: 0 auto;
+  padding: var(--space-32) 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  text-align: center;
+}
+
+.newsletterForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+}
+
+.newsletterFormRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-12);
+  width: 100%;
+}
+
+.newsletterInput {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Success/error rozjaśnione miksem z bielą: stopka jest ZAWSZE ciemna,
+ * a light-theme'owe --color-success/--color-error (#15803d/#dc2626) dają
+ * na niej ~3:1 — poniżej AA dla małego tekstu. */
+.newsletterSuccess {
+  color: color-mix(in oklch, var(--color-success) 55%, white);
+  padding: var(--space-12) 0;
+}
+
+.newsletterError {
+  color: color-mix(in oklch, var(--color-error) 55%, white);
+  padding: var(--space-8) 0 0;
+}
+
+.newsletterConsent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  width: 100%;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+
+.newsletterConsentText {
+  flex: 1 1 auto;
+  line-height: 1.4;
+}
+
+.newsletterConsentLink {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+.newsletterConsentLink:hover {
+  opacity: 0.8;
+}
+
+/* ─── Footer: Trust badges ─── */
+.trustBadges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-12) var(--space-32);
+  padding: var(--space-20) 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  /* Reset list defaults */
+  list-style: none;
+  margin: 0;
+}
+
+.trustBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+/* ─── Footer: Social links ─── */
+.socialLinks {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-32);
+  padding: var(--space-12) 0 var(--space-20);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--style-radius-pill);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .socialLink:hover {
+    color: var(--color-primary);
+    background: var(--color-surface-hover);
+  }
+}
+
+.socialLink:active {
+  opacity: 0.7;
+}
+
+/* ─── Footer: Bottom (company info + copyright) ─── */
+.footerBottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  padding-top: var(--space-20);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.companyInfo {
+  color: var(--color-text-secondary);
+}
+
+/* Sygnet nf w stopce — sign-off marki nad metryczką. */
+.footerBrandMark {
+  height: 28px;
+  width: auto;
+}
+
+.buildVersion {
+  color: color-mix(in oklch, var(--color-on-ink) 58%, transparent);
+}
+
+/* ─── Language switcher ─── */
+.langSwitcher {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-12);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+  white-space: nowrap;
+  /* 44px touch target (WCAG 2.5.5) */
+  min-height: 44px;
+}
+
+.langSwitcher:active {
+  opacity: 0.7;
+}
+
+@media (hover: hover) {
+  .langSwitcher:hover {
+    border-color: var(--color-text-secondary);
+    background: var(--color-surface-hover);
+  }
+}
+
+.langIcon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* ─── Scroll-reveal — DISABLED per Anti-AI-Slop doctrine (DESIGN.md §5) ───
+ * DECISION (nie usuwaj tego komentarza):
+ *   Fade-in / slide-up on scroll is a banned AOS/jQuery "AI slop" tell.
+ *   Sections render immediately at full opacity — NO opacity/transform shift.
+ *   The `[data-scroll-reveal]` attrs remain in the page TSX (used by many
+ *   public pages) and the IntersectionObserver in PublicLayout still runs,
+ *   harmlessly setting `data-revealed`; it produces no visual effect now.
+ *   Neutralized at the source (shared layout) instead of stripping attrs
+ *   across every page. Reversible: restore the opacity/transform rules. */
+.layout :global([data-scroll-reveal]),
+.layout :global([data-scroll-reveal][data-revealed]) {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Responsive ───
+ * Mobile-first. Breakpoints: 480 / 768 / 1024 / 1280.
+ * AppBar handles its own desktop nav vs mobile hamburger split (>=1280px).
+ */
+
+/* SM (>=480px): newsletter inline */
+@media (max-width: 479px) {
+  .newsletterFormRow {
+    flex-direction: column;
+  }
+}
+
+/* MD (>=768px): wider footer padding */
+@media (min-width: 768px) {
+  .footerInner {
+    padding: 0 var(--space-32);
+  }
+
+  .newsletter {
+    max-width: 480px;
+  }
+}
+
+/* LG (>=1024px): footer links justify wider */
+@media (min-width: 1024px) {
+  .footerLinks {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-20) var(--space-48);
+  }
+}
+
+/* XL (>=1280px): cap content width */
+@media (min-width: 1280px) {
+  .footerInner {
+    padding: 0 var(--space-48);
+  }
+}
+
+/* ─── AppReturnBar — wyjście z powierzchni publicznej z powrotem do aplikacji
+ * (kiedy się pokazuje: DECISION w PublicLayout.returnBar.molecule.tsx).
+ * Powierzchnia belki nawigacji (--color-nav-*), żeby pasek czytał się jako
+ * chrome aplikacji, nie jako element strony. ─── */
+.returnBar {
+  /* Bez własnego `sticky`: przyklejaniem zarządza `.appBarWrapper`, w którym
+   * ten pasek siedzi (DECISION w PublicLayout.composition.tsx). */
+  display: flex;
+  background: var(--color-nav-bg);
+  border-bottom: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-nav-text) 18%, transparent);
+}
+
+.returnBarLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--style-control-min-h);
+  padding: var(--space-8) var(--space-16);
+  /* Bywa też przyciskiem (powrót w historii): zdejmujemy wygląd z przeglądarki. */
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-nav-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.returnBarLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .returnBarLink:hover {
+    background: color-mix(in oklch, var(--color-nav-text) 10%, transparent);
+  }
+}

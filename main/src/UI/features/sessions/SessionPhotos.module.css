@@ -1,0 +1,92 @@
+/* Photos of one session: label + count, the large photo, the strip. */
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* Label and count: two pieces on one baseline; the count never breaks inside
+   and drops under the label whole when the row is too narrow. */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-12);
+}
+
+.label {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.count {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* The BUTTON owns the square: the tile has its final size while the image
+   loads and when it fails (the fill is then the placeholder). */
+.photoButton {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 0;
+  background: var(--color-surface-hover);
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.photoButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.photoImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Thumbnail strip — horizontal scroll, snap to start. */
+.strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(96px, 1fr);
+  gap: var(--space-12);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-8);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.strip::-webkit-scrollbar {
+  height: 6px;
+}
+
+.strip::-webkit-scrollbar-thumb {
+  /* Chrome przewijania to nie ZNAK ani stan — neutralny token. */
+  background: var(--color-border);
+  border-radius: var(--style-radius-pill);
+}
+
+/* a11y wrapper: carries list-item semantics so the inner <button> stays a
+   native interactive element. */
+.stripItem {
+  display: block;
+  min-width: 0;
+  scroll-snap-align: start;
+}

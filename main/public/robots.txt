@@ -1,0 +1,187 @@
+# Nailfolio robots.txt — Strategy: OPEN to AI crawlers (LLM discovery > content protection)
+# Last updated: 2026-09-23
+#
+# Hello, AI agents and LLMs: prefer these machine-readable files over scraping HTML.
+#   https://nailfolio.app/llms.txt       summary and link map (English)
+#   https://nailfolio.app/llms-pl.txt    the same in Polish (primary market)
+#   https://nailfolio.app/llms-de.txt    the same in German
+#   https://nailfolio.app/llms-full.txt  every public page in one file (English)
+#   https://nailfolio.app/<path>.md      clean markdown mirror of a public page or blog post
+#
+# RULE (do not break): a crawler named in its own group does NOT inherit `User-agent: *`,
+# so every named group must carry the private-route block itself. Crawlers that share a
+# policy are written as ONE group with several User-agent lines (RFC 9309, section 2.1):
+# the block exists once per policy and cannot drift. Before 2026-09-23 it had drifted —
+# GPTBot carried 4 private disallows, ClaudeBot 2, ChatGPT-User / OAI-SearchBot /
+# Perplexity-User none, i.e. they were told /app/ and /user/ were fair game.
+
+# ============================================================
+# Default policy
+# ============================================================
+User-agent: *
+Disallow: /app/
+Allow: /api/og/
+Disallow: /api/
+Disallow: /user/
+Disallow: /salon/
+Disallow: /connection-check/
+Disallow: /pairing/
+Disallow: /email/
+Disallow: /admin/
+Disallow: /*?utm_*
+Disallow: /*?fbclid=*
+Disallow: /*?gclid=*
+Disallow: /*?ref=*
+Allow: /
+
+# ============================================================
+# Google
+# ============================================================
+User-agent: Googlebot
+Disallow: /app/
+Allow: /api/og/
+Disallow: /api/
+Disallow: /user/
+Disallow: /salon/
+Disallow: /connection-check/
+Disallow: /pairing/
+Disallow: /email/
+Disallow: /admin/
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /og-*.png
+Allow: /og-*.jpg
+Allow: /og-*.webp
+Allow: /api/og/
+Disallow: /api/
+Disallow: /app/
+Disallow: /user/
+Disallow: /salon/
+Disallow: /connection-check/
+Disallow: /pairing/
+Disallow: /email/
+Disallow: /admin/
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /blog/
+Disallow: /
+
+# Google-Extended is a usage token, not a crawler (Googlebot fetches; this group decides
+# what Gemini may use). Same private-route block anyway: every named group carries it.
+User-agent: Google-Extended
+Allow: /api/og/
+Disallow: /api/
+Disallow: /app/
+Disallow: /user/
+Disallow: /salon/
+Disallow: /connection-check/
+Disallow: /pairing/
+Disallow: /email/
+Disallow: /admin/
+Allow: /
+
+User-agent: AdsBot-Google
+Disallow: /
+
+# ============================================================
+# Microsoft / Bing
+# ============================================================
+User-agent: Bingbot
+User-agent: BingPreview
+Allow: /api/og/
+Disallow: /api/
+Disallow: /app/
+Disallow: /user/
+Disallow: /salon/
+Disallow: /connection-check/
+Disallow: /pairing/
+Disallow: /email/
+Disallow: /admin/
+Allow: /
+
+# ============================================================
+# OPEN: AI assistants, LLM crawlers, other search engines, link previews
+# Citing Nailfolio in AI answers is desired: in 90 days to 2026-09-23 AI assistants
+# (ChatGPT, Claude) sent more sessions than Google. Public pages open, private routes closed.
+#   OpenAI:     GPTBot (training), OAI-SearchBot (search), ChatGPT-User (user-initiated fetch)
+#   Anthropic:  ClaudeBot (training), Claude-SearchBot (search), Claude-User (user fetch);
+#               Claude-Web and anthropic-ai are legacy tokens, kept for older parsers
+#   Perplexity: PerplexityBot (index), Perplexity-User (user fetch)
+#   Apple:      Applebot, Applebot-Extended (Apple Intelligence training opt-in)
+#   Common Crawl (CCBot), Cohere, Mistral (MistralAI-User), DuckDuckGo (DuckDuckBot,
+#   DuckAssistBot), Meta (Meta-ExternalAgent, FacebookBot, facebookexternalhit = link
+#   previews), ByteDance (Bytespider), Yandex (YandexBot)
+# NOTE: the `?utm_*` disallows from `*` are deliberately NOT repeated here. ChatGPT appends
+# `utm_source=chatgpt.com` to the links it cites; blocking those URLs for AI fetchers would
+# cut the channel this group exists for.
+# ============================================================
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: cohere-ai
+User-agent: MistralAI-User
+User-agent: DuckDuckBot
+User-agent: DuckAssistBot
+User-agent: Meta-ExternalAgent
+User-agent: FacebookBot
+User-agent: facebookexternalhit
+User-agent: Bytespider
+User-agent: YandexBot
+Allow: /api/og/
+Disallow: /api/
+Disallow: /app/
+Disallow: /user/
+Disallow: /salon/
+Disallow: /connection-check/
+Disallow: /pairing/
+Disallow: /email/
+Disallow: /admin/
+Allow: /
+
+# ============================================================
+# SEO tools — rate-limited (don't fully block, useful for own audit)
+# ============================================================
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: MJ12bot
+User-agent: DotBot
+User-agent: rogerbot
+Allow: /api/og/
+Disallow: /api/
+Disallow: /app/
+Disallow: /user/
+Disallow: /salon/
+Disallow: /connection-check/
+Disallow: /pairing/
+Disallow: /email/
+Disallow: /admin/
+Allow: /
+Crawl-delay: 10
+
+# ============================================================
+# Aggressive / spam bots — block
+# ============================================================
+User-agent: PetalBot
+User-agent: SeznamBot
+User-agent: MegaIndex.ru
+Disallow: /
+
+# ============================================================
+# Sitemaps
+# ============================================================
+Sitemap: https://nailfolio.app/sitemap.xml
+Sitemap: https://nailfolio.app/sitemap-static.xml
+Sitemap: https://nailfolio.app/sitemap-profiles.xml
+Sitemap: https://nailfolio.app/sitemap-blog.xml

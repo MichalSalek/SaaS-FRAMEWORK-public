@@ -1,0 +1,36 @@
+/* UI/features/dashboard/components/ClientColdStart.module.css
+ * Cold-start client block: the shared empty state on paper plus a plain list
+ * of what connecting unlocks (words only: static, never button-like). */
+
+.empty {
+  --empty-surface: transparent;
+  --empty-pad-block: var(--space-8);
+  --empty-pad-block-end: var(--space-8);
+}
+
+.unlocks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.unlocksLabel {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.unlockList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}

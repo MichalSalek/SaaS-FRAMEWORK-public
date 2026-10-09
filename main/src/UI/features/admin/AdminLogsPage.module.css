@@ -1,0 +1,257 @@
+/* ═══════════════════════════════════════════════════════════════════════
+ * AdminLogsPage: verbose switch, stats strip, filter controls, cell parts
+ * and the group status editor. The lists themselves are the shared DataTable.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* DECISION (nie usuwaj): live-poll pulse ring — box-shadow 0 0 0 Npx ma ZERO blur radius
+ * (spread-only obwódka, NIE elevacja-glow → floor-OK). Funkcjonalna afordancja "verbose/live". */
+@keyframes pulseDot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0
+      color-mix(in oklch, var(--color-success) 60%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px
+      color-mix(in oklch, var(--color-success) 0%, transparent);
+  }
+}
+
+/* ─── Verbose Toggle Pill (in actions slot) ─── */
+
+.verboseToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 7px var(--space-14) 7px var(--space-12);
+  border-radius: var(--style-radius-pill);
+  border: var(--style-border-control) solid var(--color-border);
+  background: var(--color-surface-card);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 34px;
+}
+
+.verboseToggle:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.verboseToggle:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.verboseToggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.verboseToggle:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.verboseToggleOn {
+  background: color-mix(in oklch, var(--color-success) 14%, transparent);
+  border-color: color-mix(in oklch, var(--color-success) 48%, transparent);
+  color: var(--color-success-fg);
+}
+
+.verboseToggleOff {
+  background: var(--color-surface-card);
+}
+
+.verboseToggleDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--style-radius-pill);
+  flex-shrink: 0;
+}
+
+.verboseToggleOn .verboseToggleDot {
+  background: var(--color-success);
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+.verboseToggleOff .verboseToggleDot {
+  background: color-mix(in oklch, var(--color-text-disabled) 60%, transparent);
+}
+
+/* The two dates share a row with the selects instead of each taking the whole
+   bar (the form field is full width by default). */
+.dateField {
+  flex: 1 1 10rem;
+  width: auto;
+}
+
+/* ─── Presety („wciskane" pigułki) ─── */
+
+.quickFilters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.quickChip {
+  padding: var(--space-6) 13px;
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-surface-card);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.quickChip:hover:not(:disabled) {
+  border-color: var(--color-divider);
+  color: var(--color-text-primary);
+}
+
+/* Wciśnięcie ma być WYCZUWALNE — to główna afordancja tego paska. */
+.quickChip:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.quickChip:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.quickChip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quickChipActive {
+  /* Motyw „Jeden krem" (S97): trwały wybór filtra = STAN, token roli. */
+  background: var(--color-state-selected);
+  border-color: color-mix(in oklch, var(--color-primary) 55%, transparent);
+  color: var(--color-accent-fg);
+}
+
+.statusEditor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.panelLabel {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-secondary);
+}
+
+.statusPicker {
+  display: flex;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.noteInput {
+  flex: 1;
+  min-width: 200px;
+  padding: 7px var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface-input);
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.noteInput:focus,
+.noteInput:hover {
+  border-color: var(--color-divider);
+}
+
+.noteInput:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Controls: view switch above the shared filter bar ─── */
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.controls > :last-child {
+  align-self: stretch;
+}
+
+/* ─── Cell parts (inside DataTable cells) ─── */
+
+/* A second, quiet line under the value of a cell. */
+.cellQuiet {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* The row shown elsewhere is inverted ink and carries its own colour. */
+[data-selected='true'] .cellQuiet,
+[data-selected='true'] .statusWord {
+  color: inherit;
+}
+
+/* One piece that never breaks inside: a timestamp, a short remark in
+   parentheses. It moves to the next line whole. */
+.nowrap {
+  white-space: nowrap;
+}
+
+/* ONE status word per row. Red only where a reaction is expected. */
+.statusWord {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.statusWord[data-action='true'] {
+  color: var(--color-error);
+}
+
+.listNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Phone ─── */
+
+@media (max-width: 479px) {
+  .noteInput {
+    min-width: 0;
+    width: 100%;
+  }
+}

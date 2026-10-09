@@ -1,0 +1,7 @@
+/* AppHero i Section to DWA prymitywy, które mają prawo nieść krem (głos
+   S98/A): hero jest kartą-intro strony, nie atomem powtarzanym kilkanaście
+   razy na ekranie. Wyjątek dla AppHero nie miał próbki, więc jego usunięcie
+   przechodziło przez meta-strażnika bez śladu. */
+.heroBand {
+  background: var(--color-bg-subtle);
+}

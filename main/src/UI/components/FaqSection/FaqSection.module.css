@@ -1,0 +1,132 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * FaqSection — KANONICZNA skórka FAQ (jedno miejsce dla całego LP).
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * FaqSection = jedyny wzorzec FAQ na LP; skórka kanoniczna żyje tu,
+ * strony przestają nosić własne słowniki klas. Kanon = PricingPage W6
+ * polish (open-tint 4%, focus halo, spring chevron, answer 64ch +
+ * text-wrap pretty) z dwiema korektami względem źródła:
+ *  1) hover triggera = var(--color-accent-fg), nie var(--color-primary)
+ *     — AA gold na jasnym tle (fix przeniesiony z ForClients/Home,
+ *     komentarz S-audytu: "Interactive trigger hover on light bg → AA gold"),
+ *  2) reveal odpowiedzi keyed off [data-open] zamiast keyframe na klasie
+ *     (.faqContent z Pricing animował się RAZ przy mount — panel jest
+ *     ZAWSZE w DOM przez współdzieloną mechanikę grid-rows — więc nigdy
+ *     przy faktycznym otwarciu; tu fade+lift gra przy każdym otwarciu,
+ *     zsynchronizowany z 250ms grid-mechaniką).
+ * Mechanika rozwijania (grid-template-rows 0fr→1fr, 250ms, Style Policy §5:
+ * disclosure MUSI animować 150-300ms) pozostaje w Accordion.module.css —
+ * ten plik to wyłącznie skórka + szkielet sekcji. Sekcja siedzi
+ * w kontenerze rodzica: full-bleed band (100vw breakout, tło sekcji,
+ * --section-block padding) zostaje po stronie strony.
+ * Wartości clamp() przeniesione 1:1 z kanonu (parytet wizualny migracji);
+ * kolory wyłącznie var(--color-*) / color-mix solid-tint.
+ * ───────────────────────────────────────────────────────────────────── */
+
+.section {
+  width: 100%;
+}
+
+.header {
+  /* Kanoniczny oddech nagłówek → lista (ForClients/Pricing baseline). */
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+.list {
+  /* Wąska kolumna Q&A — kanoniczny measure 72ch, centrowana w szerokim
+     kontenerze rodzica (kontrast szerokości względem reszty strony). */
+  max-width: 72ch;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── Item — pełne poziome hairline'y listy (separatory, nie akcent) ─── */
+.item {
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  transition: background var(--transition-fast);
+}
+
+.item:last-child {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* Motyw „Jeden krem" (S94/R1): otwarta pozycja NIE dostaje własnego tła.
+   Poprzednie 4% złota nad papierem było poniżej progu widoczności — mdły
+   tint, który niczego nie komunikował, a mnożył powierzchnie w sekcji.
+   Otwarcie sygnalizuje odsłonięta odpowiedź plus obrócony chevron; rytm
+   listy trzymają pełne hairline'y. */
+
+/* ─── Trigger ─── */
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  padding: clamp(18px, 2vw, 26px) clamp(4px, 1vw, 12px);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-md);
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  text-align: left;
+  transition: color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .trigger:hover {
+    /* Interactive trigger hover na jasnym tle → AA gold. */
+    color: var(--color-accent-fg);
+  }
+}
+
+.trigger:focus-visible {
+  outline: 2px solid
+    color-mix(in oklch, var(--color-focus-ring) 60%, transparent);
+  outline-offset: 4px;
+  border-radius: var(--style-radius-control);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  /* Spring 200ms — w oknie 150-300ms (kanon Pricing miał hardcode 320ms,
+     poza oknem; tokeny --transition-normal + --spring-curve). */
+  transition: transform var(--duration-200) var(--spring-curve);
+}
+
+.chevron[data-open] {
+  transform: rotate(180deg);
+}
+
+/* ─── Content / answer ─── */
+.content {
+  padding: 0 clamp(4px, 1vw, 12px) clamp(18px, 2vw, 26px);
+}
+
+.answer {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 64ch;
+  text-wrap: pretty;
+  /* Reveal przy KAŻDYM otwarciu — zsynchronizowany z grid-mechaniką
+     (250ms, --ease-entrance) z Accordion.module.css. */
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 250ms var(--ease-entrance),
+    transform 250ms var(--ease-entrance);
+}
+
+.item[data-open] .answer {
+  opacity: 1;
+  transform: translateY(0);
+}

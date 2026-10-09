@@ -1,0 +1,53 @@
+/* ─── InkPanel — zamknięty ciemny prostokąt na jasnym tle ───
+ * Kanon (taste 14, głos S20): negatyw = zamknięty prostokąt z radiusem
+ * w kontenerze rodzica, NIGDY full-bleed pas. Źródła 1:1:
+ * HomePage .painInner / .trustCard (ink) + ForClientsPage featured card
+ * (violet). Floor: zero gradientów / cieni; rama = pełny 4-boczny hairline
+ * albo żadna. */
+
+.panel {
+  width: 100%;
+  border-radius: var(--style-radius-surface);
+  padding: clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px);
+}
+
+/* Negatyw mode-invariant: para ink/on-ink NIE flipuje między trybami.
+ * Pełny hairline z color-mix na on-ink (wzorzec painInner/trustCard). */
+.ink {
+  background: var(--color-ink);
+  /* S116: ciche przyciski na negatywie nie biorą białej powierzchni. */
+  --btn-quiet-bg: transparent;
+  --btn-quiet-border: var(--color-on-ink);
+  --btn-quiet-fg: var(--color-on-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Bierze role
+     --color-accent-on-ink (DECISION S106): czerwony --color-primary jest w
+     LIGHT ciemny i daje na atramencie 3,6:1, czyli ponizej AA, a ta rola jest
+     mode-invariant — jedna wartosc daje ten sam jezyk wskaznika w obu trybach.
+     Poprzednia wartosc (--color-primary) byla poprawna dla wycofanej palety
+     charcoal-gold, gdzie primary bylo jasnym zlotem. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 16%, var(--color-ink));
+}
+
+/* Violet — wzorzec featured card z ForClientsPage, 1:1 z DECISION źródła:
+ * w LIGHT mode czysty --color-secondary (oklch 0.58) daje white-text tylko
+ * ~4.38:1 (poniżej AA 4.5:1) — pogłębiamy o 15% primary-contrast → ~5.4:1
+ * PASS. Token współdzielony zostaje nietknięty, tint robimy lokalnie.
+ * Bez ramy (źródło: border transparent) — solid fill sam zamyka prostokąt. */
+.violet {
+  background: color-mix(
+    in oklch,
+    var(--color-secondary) 85%,
+    var(--color-primary-contrast)
+  );
+  color: var(--color-text-inverse);
+}
+
+/* DARK mode: secondary 0.66 + near-black text-inverse ma już 6.3:1 —
+ * wracamy do czystego tokena (1:1 ze źródłem). */
+[data-mode='dark'] .violet {
+  background: var(--color-secondary);
+}

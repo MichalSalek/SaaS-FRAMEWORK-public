@@ -1,0 +1,311 @@
+/* ─── AdminLayout ─── */
+
+/* Skip link — WCAG */
+.skipLink {
+  position: absolute;
+  top: -100%;
+  left: var(--space-12);
+  z-index: var(--z-skip-link);
+  padding: var(--space-8) var(--space-12);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: 0 0 var(--style-radius-control) var(--style-radius-control);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top var(--transition-fast);
+}
+
+.skipLink:focus-visible {
+  top: 0;
+}
+
+/* ─── Root layout wrapper ─── */
+
+.layout {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--color-bg-main);
+}
+
+/* ─── Sidebar — desktop only (>=1024px) ─── */
+
+.sidebar {
+  display: none;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--color-nav-bg);
+  color: var(--color-nav-text);
+  border-right: var(--style-border-divider) solid var(--color-divider);
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.sidebarHeader {
+  padding: var(--space-20);
+  border-bottom: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-nav-text) 10%, transparent);
+  flex-shrink: 0;
+}
+
+.sidebarBrand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-lg);
+  letter-spacing: var(--letter-spacing-heading);
+}
+
+.sidebarBrand .brandMark {
+  height: 1.7em;
+  width: auto;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-md);
+  padding: var(--space-8) 0;
+  opacity: 0.9;
+  transition: opacity var(--transition-fast);
+}
+
+.backButton:active {
+  opacity: 0.7;
+}
+
+/* The menu is drawn by the shared row primitive (components/NavRow): this
+   file only places it on the rail. The rail is 240px wide, so the rows take a
+   tighter inset through the primitive's PUBLIC knobs (DESIGN.md §Style Policy
+   13): „Harmonogram e-mail” with a badge stays on one line. */
+.sidebarNav {
+  --nav-row-pad-inline: var(--space-12);
+  --nav-row-gap: var(--space-10);
+
+  flex: 1;
+  padding: var(--space-16) var(--space-8);
+  overflow-y: auto;
+}
+
+/* ─── Sidebar footer: sign-out ─── */
+.sidebarFooter {
+  --nav-row-pad-inline: var(--space-12);
+  --nav-row-gap: var(--space-10);
+
+  flex-shrink: 0;
+  padding: var(--space-8);
+}
+
+/* ─── Mobile sidebar overlay ─── */
+
+.sidebarOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-navigation-drawer-backdrop);
+  background: var(--color-scrim);
+  animation: adminNavScrimIn var(--duration-300) var(--ios-sheet-curve);
+}
+
+/* Wejście panelu mobilnego: wysuw od lewej zamiast „wyskoczenia" (DESIGN.md:
+ * ujawnienie ma animować). Wyjście prowadzi gest (useSwipeDismiss) albo
+ * natychmiastowe zamknięcie przyciskiem. */
+@keyframes adminNavScrimIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes adminNavPanelIn {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebarOverlay {
+    display: none;
+  }
+}
+
+.sidebarMobile {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-nav-bg);
+  color: var(--color-nav-text);
+  overflow-y: auto;
+  z-index: var(--z-navigation-drawer);
+  animation: adminNavPanelIn var(--duration-300) var(--ios-sheet-curve);
+}
+
+.sidebarMobileClose {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-12) var(--space-12) 0 0;
+  flex-shrink: 0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: var(--space-8);
+  opacity: 0.8;
+  transition: opacity var(--transition-fast);
+  border-radius: var(--style-radius-control);
+}
+
+.closeButton:active {
+  opacity: 0.6;
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Hamburger button — mobile only (<1024px) ─── */
+
+.hamburgerButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: var(--space-8);
+  margin-right: var(--space-8);
+  border-radius: var(--style-radius-control);
+  transition: opacity var(--transition-fast);
+}
+
+.hamburgerButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1024px) {
+  .hamburgerButton {
+    display: none;
+  }
+}
+
+/* ─── Main area (right side) ─── */
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* leave room for bottom nav on mobile */
+  padding-bottom: var(--bottom-nav-height);
+}
+
+@media (min-width: 1024px) {
+  .main {
+    padding-bottom: 0;
+  }
+}
+
+/* ─── Top bar (header) — desktop: page title only, mobile: hamburger + title ─── */
+
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-app-bar);
+  background: var(--color-nav-bg);
+  color: var(--color-nav-text);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.topBarInner {
+  display: flex;
+  align-items: center;
+  height: var(--app-bar-height);
+  padding: 0 var(--space-20);
+}
+
+.topBarTitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-lg);
+  transition: opacity var(--duration-200) var(--ease-entrance);
+}
+
+/* The page header band is on screen: the bar would repeat its title, so it
+   stays quiet until the band scrolls away (same rule as the app bar). */
+.topBar[data-hero-title-hidden] .topBarTitle {
+  opacity: 0;
+}
+
+/* ─── Content area — wider than AppLayout (admin = dense data/tables) ─── */
+
+.content {
+  flex: 1;
+  padding: var(--space-20);
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .content {
+    padding: var(--space-32);
+  }
+}
+
+/* ─── Bottom nav override — show only on mobile (<1024px) ─── */
+/* BottomTabBar already hides at 768px, we extend that to 1024px for admin */
+
+.bottomNav {
+  display: flex;
+}
+
+@media (min-width: 1024px) {
+  .bottomNav {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  .backButton:hover {
+    opacity: 1;
+  }
+
+  .closeButton:hover {
+    opacity: 1;
+  }
+
+  .hamburgerButton:hover {
+    opacity: 0.8;
+  }
+}

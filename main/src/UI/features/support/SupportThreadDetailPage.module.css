@@ -1,0 +1,617 @@
+/* UI/features/support/SupportThreadDetailPage.module.css
+ * Support thread detail — direct line to your beauty product team.
+ *
+ * Anchor metaphor: "humans answering humans". Linear-style issue
+ * conversation (burst-grouped, named author) + Intercom warmth (named
+ * team avatar, role line) + Slack-quality compose dock. NIE corporate
+ * ticket UI z numerami sprawy.
+ *
+ * Anti-AI-Slop flat: depth via solid color-mix tonal blocks + full hairline
+ * borders. ZERO gradient washes / box-shadow elevation / glow. Mirrors the
+ * in-repo flat template ActivateRolePage.module.css.
+ * Spread-ring (0 0 0 Npx) OK for focus/state affordance (WCAG 2.4.7).
+ *
+ * Inherited vocabulary:
+ *  - Hero slab: eyebrow chip with gold dot, solid gold-tint + hairline, no sparkle, accent slab
+ *  - Spring easing (cubic-bezier(0.34, 1.56, 0.64, 1)) on hover/focus
+ *  - Wejście sekcji animowane przy montażu ekranu (scroll-reveal wycięty
+ *    w S116: floor zakazuje odsłaniania treści przewijaniem)
+ *  - Dark mode parity via :root[data-mode='dark']
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Burst grouping (consecutive messages from same sender = one header).
+ * Mirrors Linear/GitHub/Intercom — when team replies 3x in a row, we
+ * show the avatar+name once. Reduces visual repetition + creates rhythm.
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Status pill replaces generic <Chip color={...}> wrapper for variant
+ * styling that matches the hero — OPEN gets a pulsing live dot, RESOLVED
+ * gets a check-fill, CLOSED gets X-fill. Communicates "is this alive?"
+ * better than a colored badge.
+ */
+
+/* ─── Motion keyframes ─── */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ─── Page shell ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-height: 100%;
+  position: relative;
+  /* Bez dolnej rezerwy: ostatnim dzieckiem jest przyklejony dok odpowiedzi,
+   * który ma siedzieć równo na dolnej belce także na końcu przewijania. */
+}
+
+/* ============================================================
+ * HERO — editorial slab anchoring "Rozmowa z supportem"
+ * Reuses Dashboard/Gallery hero vocabulary for visual continuity.
+ * ============================================================ */
+
+.hero {
+  position: relative;
+  margin: 0;
+  padding: var(--space-20) var(--space-20) var(--space-32);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (S94/R2): hero to POWIERZCHNIA — siedzi na papierze,
+     a rolę anchoru niesie zamknięta akcentowa rama plus waga typografii.
+     Krem-tint na całym slabie robił drugie tło pod tłem i zjadał kontrast
+     bąbelków rozmowy, które są tu treścią.
+     ŚWIADOMY rozjazd z siostrzanym ekranem: lista wątków montuje AppHero,
+     które po głosie S97 (wariant B) jest kremowe. Ten ekran ma własny slab
+     z back-rowem i status-pillem, więc nie da się go zastąpić AppHero bez
+     utraty tej anatomii — a krem tutaj kosztowałby czytelność rozmowy.
+     R2 mówi „NAJWYŻEJ jeden krem", nie „dokładnie jeden", więc zero kremu
+     na tym ekranie jest zgodne z motywem. Nie „naprawiać" do pary. */
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  animation: slideUp 320ms var(--ease-entrance) both;
+}
+
+/* --- Hero back row (back link + status pill, top of hero) --- */
+
+/* Census S26: chip "← Skrzynka" (.backLink) usunięty — dublował nawigację
+ * wstecz z navbara; w rzędzie zostaje sam status pill, wyrównany do prawej
+ * (pozycja jak przed zmianą). */
+.heroBackRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  margin-bottom: var(--space-8);
+}
+
+/* Category of the request, on the left of the status row. The auto margin
+ * takes the free space, so the pill stays on the right with or without it. */
+.heroCategory {
+  margin-right: auto;
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.heroTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+  margin: var(--space-8) 0 0;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.heroTitle:lang(pl) {
+  hyphens: auto;
+}
+
+.heroSubtitle {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 46ch;
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.heroSubtitle:lang(pl) {
+  hyphens: auto;
+}
+
+/* StatusPill moved to components/StatusPill (FDX W5.5) — uppercase variant +
+ * icon (resolved/closed) + pulse (open). Color map: getSupportStatusColor. */
+
+/* ============================================================
+ * CLOSED BANNER — editorial info card (not inline text)
+ * ============================================================ */
+
+.closedBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  /* Flat solid tint fill + full hairline (no gradient, no inset/depth shadow). */
+  background: color-mix(in oklch, var(--color-info) 7%, var(--color-bg-paper));
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-info) 22%, transparent);
+  border-radius: var(--style-radius-surface);
+  animation: slideUp 280ms var(--ease-entrance) both;
+}
+
+.closedBannerIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--style-radius-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklch, var(--color-info) 16%, var(--color-bg-paper));
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-info) 28%, transparent);
+  color: var(--color-info);
+  flex-shrink: 0;
+}
+
+.closedBannerCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.closedBannerTitle {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.closedBannerHint {
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ============================================================
+ * MESSAGES LIST
+ * ============================================================ */
+
+.messagesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-12) 0 var(--space-20);
+  flex: 1;
+}
+
+/* ============================================================
+ * BURST — group of consecutive same-sender messages
+ * Pattern: Linear/GitHub/Intercom — avatar+name shown once per burst.
+ * ============================================================ */
+
+.burst {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  animation: slideUp 320ms var(--ease-entrance) both;
+}
+
+.burstUser {
+  align-items: flex-end;
+}
+
+.burstSupport {
+  align-items: flex-start;
+}
+
+/* --- Burst header (avatar + identity + time) --- */
+
+.burstHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  max-width: 88%;
+}
+
+.burstHeaderUser {
+  flex-direction: row-reverse;
+}
+
+.burstHeaderSupport {
+  flex-direction: row;
+}
+
+.burstAvatar {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--style-radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* (.burstAvatarUser usunięty S26: strona usera nie renderuje już avatara —
+ * census zdjął pusty avatar + etykietę "TY", zostaje sama meta czasowa.) */
+
+/* Motyw „Jeden krem": ZNAK wielkości glifu (avatar zespołu) zostaje złoty —
+ * token roli zamiast lokalnego color-mix. Glif idzie na accent-fg, bo po
+ * zdjęciu tintów dookoła blade primary nie trzyma kontrastu. */
+.burstAvatarSupport {
+  background: var(--color-mark-bg-strong);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+}
+.burstIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.burstName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--text-xs);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+}
+
+/* (.burstRole usunięty S26: "Pomoc Nailfolio" pod "ZESPÓŁ NAILFOLIO"
+ * mówiło to samo dwa razy — census zostawił jedną etykietę zespołu.) */
+
+.burstTime {
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.burstHeaderUser .burstTime {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.skeletonIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* --- Burst stack (the actual bubble column) --- */
+
+.burstStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 88%;
+  width: max-content;
+  min-width: 0;
+}
+
+.burstUser .burstStack {
+  align-items: flex-end;
+}
+
+.burstSupport .burstStack {
+  align-items: flex-start;
+}
+
+/* ============================================================
+ * MESSAGE BUBBLE
+ * Apple/Linear vocabulary: rounded corners, asymmetric pinch on
+ * the burst's first/last bubble to attach to the avatar side.
+ * ============================================================ */
+
+.messageBubble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-14) var(--space-8);
+  max-width: 100%;
+  border-radius: var(--style-radius-surface);
+  transition:
+    transform var(--duration-200) var(--spring-curve),
+    border-color var(--duration-200) var(--transition-normal),
+    background-color var(--duration-200) var(--transition-normal);
+  word-break: break-word;
+}
+
+.messageBubble:hover {
+  transform: translateY(-1px);
+}
+
+/* --- User bubble (right side, solid primary fill) --- */
+
+.messageBubbleUser {
+  /* Flat solid primary fill + full hairline (no gradient, no inset/depth shadow).
+   * Census S26: ciemny ink na złocie (~7.8:1) — wcześniejsze
+   * var(--color-on-primary) było widmowym tokenem i dawało biały tekst na
+   * złocie (~2:1 w obu trybach). primary-contrast = #1c1c20, mode-invariant. */
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+/* Asymmetric pinch — last bubble in user burst attaches to right edge */
+.messageBubbleUser.messageBubbleLast {
+  border-bottom-right-radius: var(--style-radius-control);
+}
+
+/* --- Support bubble (left side, solid paper tint + full hairline) ---
+ * Differentiated from the user bubble by side (left) + surface (paper tint
+ * vs solid primary), not by a one-sided accent stripe or shadow. */
+/* Motyw „Jeden krem" (S94/R2): 3% tintu było poniżej progu widoczności —
+ * niczego nie kodowało, a mnożyło powierzchnie. Bąbel odróżnia się stroną,
+ * kartowym tłem i pełną ramą; stroną nadawcy rządzi układ, nie kolor. */
+.messageBubbleSupport {
+  background: var(--color-bg-paper);
+  color: var(--color-text-primary);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+/* Floor §4 (zero hover na nie-interaktywnych): bąbel wiadomości wsparcia to
+   zwykły <div> bez onClick, href i role (SupportThreadBurst.organism) — nic
+   się po kliknięciu nie dzieje, więc nie wolno mu reagować na kursor.
+   Reguła `:hover` (border-color, a od S97 także tło) usunięta w całości. */
+
+/* Asymmetric pinch — last bubble in support burst attaches to left edge */
+.messageBubbleSupport.messageBubbleLast {
+  border-bottom-left-radius: var(--style-radius-control);
+}
+
+.messageContent {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  letter-spacing: var(--ls-wide-5);
+}
+
+.messageContent:lang(pl) {
+  hyphens: auto;
+}
+
+.messageTime {
+  display: block;
+  font-size: var(--text-xs);
+  letter-spacing: var(--ls-wide-20);
+  margin-top: var(--space-2);
+  align-self: flex-end;
+  font-weight: 500;
+}
+
+.messageBubbleUser .messageTime {
+  /* Pełny ink (bez wygaszenia mixem): timestamp też musi trzymać >=4.5:1 na
+   * złocie (census S26); de-emfazę daje mniejszy rozmiar. */
+  color: var(--color-primary-contrast);
+}
+
+.messageBubbleSupport .messageTime {
+  color: var(--color-text-secondary);
+  opacity: 0.75;
+}
+
+/* ============================================================
+ * EMPTY CONVERSATION — gentle invitation, branded illustration
+ * ============================================================ */
+
+/* Powierzchnia i typografia = kanon <EmptyState>. Zostają: kwadratowy
+   medalion 64px i wejście sekcji. */
+.emptyConversation {
+  --empty-medal-radius: var(--style-radius-surface);
+  --empty-title-maxw: 26ch;
+  --empty-body-maxw: 38ch;
+  --empty-pad-block-end: var(--space-32);
+} /* ============================================================
+ * ERROR STATE — warn-tinted variant
+ * ============================================================ */
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-32) var(--space-20);
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  /* Flat solid tonal surface inside the dashed frame (no radial wash). */
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 5%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    color-mix(in srgb, var(--color-warning) 30%, transparent);
+}
+
+.errorIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--style-radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 14%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) solid
+    color-mix(in srgb, var(--color-warning) 28%, transparent);
+  color: var(--color-warning);
+  margin-bottom: var(--space-8);
+}
+
+.errorTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 26ch;
+  text-wrap: balance;
+}
+
+.errorHint {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-8);
+  max-width: 38ch;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+ * COMPOSE DOCK — Slack-quality message input
+ * Sticky bottom, solid surround, prominent send button.
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * Custom send button (not <Button icon>) for a square 44x44 icon-only control
+ * that matches the bubble vocabulary (solid primary fill + spring press).
+ * Generic Button does not give a fixed square icon affordance. Flat: solid
+ * fill + hairline, no gradient/glow (Anti-AI-Slop floor).
+ * ============================================================ */
+
+.composeDock {
+  position: sticky;
+  /* Rezerwa kontenera przewijania: DECISION przy `--sticky-flush-bottom` w AppLayout. */
+  bottom: var(--sticky-flush-bottom, 0px);
+  /* Ta sama rezerwa pod ostatnią klatką przewijania: bez tego pasek wraca
+   * na koniec strony do pozycji w przepływie, 12px nad krawędzią. */
+  margin-bottom: var(--sticky-flush-bottom, 0px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-8);
+  /* Flat: solid bg + top hairline (no gradient scroll-fade scrim). */
+  background: var(--color-bg-main);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  z-index: 10;
+  margin-top: auto;
+}
+
+.composeFrame {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-8);
+  padding: var(--space-6) var(--space-6) var(--space-6) var(--space-12);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  /* Flat: solid paper + full hairline (no inset/depth shadow). */
+  background: var(--color-bg-paper);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.composeFrame:focus-within {
+  border-color: color-mix(in oklch, var(--color-primary) 50%, transparent);
+  /* Spread-ring (0 0 0 3px) = focus affordance (OK), no depth blur. */
+  box-shadow: 0 0 0 3px
+    color-mix(in oklch, var(--color-text-primary) 14%, transparent);
+}
+
+.composeInput {
+  flex: 1;
+  /* 44px touch-target minimum (Capacitor WebView primary chat action). */
+  min-height: 44px;
+  max-height: 144px;
+  padding: var(--space-8) var(--space-4);
+  border: none;
+  border-radius: var(--style-radius-surface);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+}
+
+.composeInput::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.composeInput:disabled,
+.composeInput:read-only {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Flat solid primary fill + full hairline (no gradient, no glow). Square
+ * 44x44 touch-target; spring press carries the tactile affordance. */
+/* Send-button = SKIN nad ButtonAtom variant='primary': fill (gold) + ink
+   (#1c1c20 z .primary — poprawny na złocie), rozmiar 44px (.iconOnly.md),
+   hover/active/focus/disabled = z ButtonAtom (spójne z appką). Nadpisujemy TYLKO
+   geometrię (radius-md + subtelny gold-hairline + flex-shrink). Specyficzność
+   .composeFrame .sendButton (0,2,0) > bazowe .button (0,1,0) — radius/border
+   wygrywają DETERMINISTYCZNIE, niezależnie od kolejności w bundlu. */
+.composeFrame .sendButton {
+  flex-shrink: 0;
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+.composeHint {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  opacity: 0.65;
+  letter-spacing: var(--ls-wide-20);
+  padding-left: var(--space-8);
+}
+
+/* ============================================================
+ * BREAKPOINTS — mobile-first refinements
+ * ============================================================ */
+
+@media (min-width: 768px) {
+  .page {
+    gap: var(--space-20);
+  }
+
+  .hero {
+    padding: var(--space-32) var(--space-32) var(--space-32);
+  }
+
+  .messageBubble {
+    padding: var(--space-12) var(--space-16) var(--space-10);
+  }
+
+  .burstStack {
+    max-width: 72%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .burstStack {
+    max-width: 64%;
+  }
+}

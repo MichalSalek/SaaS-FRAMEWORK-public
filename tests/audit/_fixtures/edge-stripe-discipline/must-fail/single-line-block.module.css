@@ -1,0 +1,5 @@
+/* Cały blok w JEDNEJ linii. Parser liczący klamry per LINIA miał tu
+   opens == closes, więc blok nie trafiał ani na stos, ani do ciała żadnego
+   bloku — ten sam zapis rozbity na linie failował, a jednolinijkowy
+   przechodził. Fałszywa zieleń nie do zauważenia w review. */
+.oneLineRail::before { content: ''; position: absolute; inset: 0 var(--sp-2) auto; height: 3px; background: var(--color-primary) }

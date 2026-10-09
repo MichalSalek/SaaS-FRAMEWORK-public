@@ -1,0 +1,50 @@
+/* ─── ColorDot base ─── */
+/* Flat color swatch (gloss removed per anti-slop floor): the inset hairline
+ * ring keeps the dot edge legible when the swatch hue matches the backdrop
+ * (e.g. white-on-white) — ring, not glow, zero blur. */
+.dot {
+  position: relative;
+  display: inline-block;
+  border-radius: var(--style-radius-round);
+  flex-shrink: 0;
+  vertical-align: middle;
+  overflow: hidden;
+  border: var(--style-border-surface) solid transparent;
+  /* Ring mode-aware (text-primary, nie ink): ink 18% znikał w dark na
+   * ciemnych lakierach — swatch „Ciemne i głębokie" był niewidoczny
+   * (fresh-eyes S25). Census S26: 22% nadal ginęło na czarnym lakierze
+   * w dark — wzmocnione do 35% (wciąż hairline, spójnie we wszystkich
+   * rozmiarach przez klasę bazową). */
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklch, var(--color-text-primary) 35%, transparent);
+}
+
+/* White color needs a visible border */
+.white {
+  border-color: var(--color-border);
+}
+
+/* ─── Sizes ─── */
+.sm {
+  width: 12px;
+  height: 12px;
+  border-width: var(--style-border-surface);
+}
+
+.md {
+  width: 16px;
+  height: 16px;
+  border-width: var(--style-border-surface);
+}
+
+.quick {
+  width: 24px;
+  height: 24px;
+  border-width: var(--style-border-surface);
+}
+
+.lg {
+  width: 40px;
+  height: 40px;
+  border-width: var(--style-border-surface);
+}

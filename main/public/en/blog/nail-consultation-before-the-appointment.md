@@ -1,0 +1,91 @@
+# Nail Consultation: Agree on the Design Before the Visit
+
+> A nail consultation in five steps: the questions to ask, what to say about a photo you cannot recreate, and how to agree on the design before the visit.
+
+HTML version of this page: https://nailfolio.app/en/blog/nail-consultation-before-the-appointment/ | Published: 2026-09-23 | Category: How-to Guides
+
+Your client sits down, unlocks her phone and shows you a Pinterest photo: long almond nails with hand-painted florals. Her own nails are short and square, she types all day, and she has forty-five minutes. You hold a ring of swatches in one hand and scroll your camera roll with the other, looking for something close. By the time you start working, the visit is already running late.
+
+A good **nail consultation** fixes that scene, and most of it can happen before the appointment. Here is a five-step version that works with a paper form, a notes app or a dedicated tool.
+
+## Why consultations drag
+
+Three things make the design conversation long:
+
+1. **Inspiration comes from strangers' work.** Pinterest and Instagram show nails on different nail beds, lengths and techniques. The photo sets an expectation you then have to walk back.
+2. **There is no shared record of what you agreed.** The last conversation is somewhere in DMs, a text thread and your memory.
+3. **The choice happens at the chair.** Every minute of browsing is a minute taken from the service or from your next client.
+
+## A 5-step consultation that starts before the visit
+
+### 1. Show your real work, organized the way clients think
+
+Clients do not think in dates. They think in color, length and style: "something nude, but short", "a French for a wedding". A camera roll or an Instagram grid sorts by date, so the right design is often buried.
+
+Organize your best work so it can be filtered by **color, length and style**, and photograph it in the same light so colors match what she will see on her hands. Even a set of albums named "short nude", "long French" and "chrome" is a big step up from the camera roll.
+
+### 2. Ask for her picks before the appointment
+
+Send your portfolio a day or two before the visit and ask her to choose two or three designs from it, with a short note on each: "this color, but shorter", "love the shape, not the glitter". You arrive at the appointment already knowing the direction.
+
+### 3. Ask the questions that change the result
+
+These are worth asking every new client, and once a year for regulars:
+
+- What length and shape does she keep, and what does she want this time?
+- What does she do with her hands every day: typing, gym, small children, cooking?
+- Any allergies or past reactions to products?
+- How long does she want the set to last before the next appointment?
+- How will it come off: soak-off at your station, or is she switching techniques?
+- How much time and budget does she have for this visit?
+- Which colors does she wear most, and which ones never?
+- What did she dislike about her last set, here or elsewhere?
+- Is there an event or a date the nails need to look perfect for?
+
+![Manicure in yellow tones](/img/lp/portfolio/nail-div-station-05.webp)
+
+### 4. Say what can and cannot be done on her nails
+
+This is the step most stylists skip because it feels awkward. Be specific: what her nail length and shape allow, how long a technique takes, and what will not last with her daily routine. Then offer the closest version **from your own work**, so she sees a real result instead of a promise.
+
+### 5. Write down what you agreed and what you did
+
+After the visit, save the photo of the finished set with a line of notes: color, product, shape, anything she mentioned. Next time, the consultation starts from there instead of from zero, and she feels remembered.
+
+## What to say when she brings a photo you cannot recreate
+
+A short script helps, because the goal is to keep her excitement and move it onto something real:
+
+"I love this color and the shape of the florals. On your nail length, the long almond won't look like the photo, but here is a set I did on short nails with the same palette. We could do this, or keep the length and go a shade softer. Which one feels closer?"
+
+It names what she likes, explains the limit in one sentence and gives her two concrete options from your work. That usually ends the scrolling.
+
+## Tools that help
+
+A paper consultation form and a notes app on your phone are enough to start. If you want the steps above in one place, this is where [Nailfolio](/en/for-stylists) fits:
+
+- **Step 1:** every design in your gallery is tagged by color, style and length, and clients filter your work with all three at once.
+- **Step 2:** a permanent QR code at your station opens your public profile. The client sends a connection request, you accept it with one tap, and before the visit she sends you an Inspiration Session with her picks and a note on each photo.
+- **Step 5:** you talk in Messages, and her client card keeps her choices and the history of recent visits.
+
+Nailfolio does not book appointments, so keep your booking app for the calendar.
+
+## FAQ
+
+### How long should a nail consultation take?
+
+For a new client, the goal is to settle the design before she sits down, so the in-person part is a few minutes of checking her nails and confirming the choice. A client who sent her picks in advance often needs no more than that.
+
+### What should a nail consultation form include?
+
+Her name and contact, nail length and shape, allergies and past reactions, daily activities that affect wear, preferred colors, the design she picked with notes, and a line about what you did and which products you used.
+
+### Should I charge for a consultation?
+
+It is your call. Some stylists fold it into the service price because it is part of doing the job well; others charge for long consultations or design sessions that do not lead to a booking. Whatever you choose, say it upfront.
+
+### How do I stop clients from changing their mind at the chair?
+
+Agree on the design in writing before the visit and bring it up when she sits down: "we said the rose chrome, short almond, still good?" Changes then become a conscious choice rather than a new round of scrolling.
+
+If you want clients to arrive with a design picked from your own work, [start for free](/en/for-stylists): the Free plan needs no card. Once your gallery grows, you can try Pro free for 30 days.

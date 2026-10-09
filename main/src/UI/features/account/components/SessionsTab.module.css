@@ -1,0 +1,158 @@
+/* SessionsTab.module.css — section „Bezpieczeństwo” (devices signed in).
+ *
+ * The section is ONE white box (the surface comes from `.cardStack > section`
+ * in AccountPage.module.css); rows sit inside it, separated by a full-width
+ * divider. No box inside the box, no tinted row for „this device”: the mark
+ * is the status pill.
+ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  container-type: inline-size;
+  container-name: sessions;
+}
+
+/* Title, then the one action of the list. Stacked on a phone, side by side
+ * once the box is wide enough for both. */
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+
+@container sessions (min-width: 560px) {
+  .head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.title {
+  margin: 0;
+}
+
+/* Odświeżenie w tle nie wyszło, ale mamy wcześniej wczytane dane: krótka
+ * informacja nad listą z ponowieniem, zamiast zastępowania listy błędem. */
+.staleNotice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6) var(--space-10);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* A row is a two-line layout by design on a phone: icon and text, then the
+ * one control under the text. From 440px of the box's own width the control
+ * moves to the end of the first line. */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--space-12);
+  row-gap: var(--space-8);
+  align-items: start;
+  padding: var(--space-12) 0;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+@container sessions (min-width: 440px) {
+  .row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    /* Two text lines: a row without the meta line keeps the same height. */
+    min-height: 64px;
+  }
+
+  /* …and with one line only (no browser and no address known) the name sits
+     on the button's axis instead of hanging above it. */
+  .row[data-lines='1'] {
+    align-items: center;
+  }
+}
+
+/* Nothing follows the list when there is no disclosure: no closing line. */
+.section > .list:last-child > .row:last-child {
+  border-bottom: none;
+}
+
+/* The icon sits on the name's FIRST line: its box is one line of the name
+ * tall, the glyph is centred inside it. */
+.rowIcon {
+  display: flex;
+  align-items: center;
+  height: calc(var(--text-base) * 1.35);
+  color: var(--color-text-secondary);
+}
+
+.rowIcon svg {
+  display: block;
+}
+
+.rowBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* The name wraps (the row grows), it is never cut. */
+.rowName {
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-4);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* One fact = one unbreakable piece: when the line is too narrow the whole
+ * piece moves down. An address may be wider than the line (IPv6), so that
+ * piece alone is allowed to break; nothing is ever cut. */
+.rowMetaPart {
+  white-space: nowrap;
+}
+
+.rowMetaPart[data-breakable] {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.rowAction {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-self: start;
+}
+
+@container sessions (min-width: 440px) {
+  .rowAction {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+  }
+}
+
+.restToggle {
+  align-self: flex-start;
+}

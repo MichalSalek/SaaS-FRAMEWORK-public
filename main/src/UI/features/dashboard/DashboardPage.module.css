@@ -1,0 +1,122 @@
+/* UI/features/dashboard/DashboardPage.module.css
+ * Shared dashboard layout for both role variants (S126): white on paper,
+ * one main action, waiting things first. Per-variant pieces live in the
+ * component modules next to it. */
+
+/* --- Page shell --- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  /* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+     ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+     a `@media (min-width: …)` mierzy VIEWPORT, nie ramę — reguły szerokościowe
+     przełączały układ w tryb „szeroki" wewnątrz kadru 390px. Dlatego każda
+     reguła szerokościowa tego ekranu to `@container app-view`. */
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* --- Section: a title on paper, then its content --- */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+
+/* One quiet line of words under a section title. The height is reserved even
+ * when the line is empty, so a late answer moves nothing below it. */
+.sectionMeta {
+  min-height: calc(var(--text-xs) * 1.4);
+  margin: calc(var(--space-8) * -1) 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* A quiet statement on paper (a finished state, a date). */
+.quietLine {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* --- The one main action of the screen --- */
+
+.mainAction {
+  display: flex;
+}
+
+.mainAction > * {
+  flex: 1 1 auto;
+}
+
+/* On a wide column the button keeps its own width instead of a 500px bar. */
+@container app-view (min-width: 480px) {
+  .mainAction > * {
+    flex: 0 0 auto;
+    min-width: 280px;
+  }
+}
+
+/* --- Static row inside a NavRowList (same box, no control) --- */
+
+.staticRow {
+  display: flex;
+  /* The label may wrap: the icon stays on its FIRST line. */
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  font-size: var(--text-base);
+  line-height: 1.3;
+  color: var(--color-text-secondary);
+}
+
+.staticRow:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.staticRowBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.staticRowHint {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.staticRowIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.staticRowIcon > svg {
+  display: block;
+}
+
+/* --- Skeleton (final geometry of the loaded screen) --- */
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}

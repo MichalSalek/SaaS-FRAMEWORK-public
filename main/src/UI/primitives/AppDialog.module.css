@@ -1,0 +1,198 @@
+/* AppDialog — fullscreen on mobile, centered card on desktop */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog-backdrop);
+  min-height: 100dvh;
+  background: var(--color-scrim-soft);
+  transition: opacity var(--transition-fast);
+}
+
+.backdrop[data-starting-style],
+.backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+/* DECISION (nie usuwaj tego komentarza): zasłona dialogu jest MOCNIEJSZA w
+ * ciemnym trybie i jest to nadpisanie LOKALNE, nie zmiana tokenu. Czerń 0.35
+ * na jasnej stronie realnie ją przygasza, ale na ciemnej niemal nic nie robi
+ * (czarne na czarnym) — treść pod dialogiem zostawała w pełni czytelna i biła
+ * się z nim o uwagę. Tokeny `--color-scrim-*` są świadomie MODE-INVARIANT
+ * (DECISION S110 w palettes.css) i mają jeszcze innych konsumentów (nakładki na
+ * cudzych bitmapach, szuflada, banery), więc podnoszenie ich w bloku dark
+ * łamałoby tamtą decyzję. Podnosimy tylko tę jedną powierzchnię: 0.35 -> 0.6,
+ * czyli tyle co `--color-scrim-strong`, który jest już ustaloną miarą
+ * „zasłona modala" w tym repo (DowngradeWarningDialog). */
+:root[data-mode='dark'] .backdrop {
+  background: var(--color-scrim-strong);
+}
+
+/* ---- Popup ---- */
+
+.popup {
+  position: fixed;
+  z-index: var(--z-dialog);
+
+  /* Mobile-first: full-screen */
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-paper);
+  color: var(--color-text-primary);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  -webkit-overflow-scrolling: touch;
+  /* DECISION (B2-F18): Removes browser default focus ring on the dialog container
+   * for mouse/touch users. :focus-visible below re-adds a keyboard ring (WCAG 2.4.7).
+   * Dialog container receives programmatic focus on open to trap keyboard navigation. */
+  outline: none;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+/* Restore visible focus ring for keyboard users (WCAG 2.4.7 / EAA).
+   `outline: none` above suppresses the default ring for mouse users on
+   the popup container; this counterpart re-adds it when the user is
+   navigating via keyboard. */
+.popup:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.popup[data-starting-style],
+.popup[data-ending-style] {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Desktop: centered card */
+@media (min-width: 640px) {
+  .popup {
+    padding-block: 0;
+    inset: unset;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(28rem, calc(100vw - 3rem));
+    max-height: calc(100dvh - 4rem);
+    border-radius: var(--style-radius-surface);
+    /* Hairline edge (NIE cień — anti-slop §2). Dialog czyta się nad scrimem 0.35. */
+    border: var(--style-border-surface) solid var(--color-border-surface);
+  }
+
+  .popup[data-starting-style],
+  .popup[data-ending-style] {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+/* ---- Actions footer ---- */
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  margin-top: auto;
+}
+
+.body {
+  padding: var(--space-12) var(--space-20);
+}
+
+@media (min-width: 1280px) {
+  .popup {
+    /* S108, głos 5 (desktop 1500): ciaśniejszy dialog potwierdzenia */
+    --dialog-popup-width: min(24rem, calc(100vw - 3rem));
+    width: var(--dialog-popup-width);
+  }
+
+  .actions {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--space-12);
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+}
+
+/* ---- Header (title + description) — also the swipe-down handle on mobile ---- */
+
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Title / Description ---- */
+
+.title {
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-20) var(--space-20) 0;
+}
+
+.titleRow > button {
+  flex-shrink: 0;
+}
+
+.description {
+  margin: 0;
+  padding: var(--space-8) var(--space-20) 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ---- Tryb makiety telefonu (desktop, trasa produktowa) ---- */
+
+/* DECISION (nie usuwaj tego komentarza): w ramce dialog jest ARKUSZEM
+ * PEŁNOEKRANOWYM TELEFONU, nie kartą desktopu. Media queries mierzą OKNO
+ * (1440), więc bez tego nadpisania popup dostawał desktopową geometrię
+ * `top/left: 50%` i centrował się na całym oknie — wychodził poza obudowę
+ * telefonu i nachodził na panel podglądu obok. Selektor atrybutowy, bo klasa
+ * ramki mieszka w innym module CSS (hashowana) i nie da się jej tu nazwać;
+ * `[data-app-frame]` ustawia AppLayout na skorupie, a popup jest jej potomkiem
+ * dzięki kontenerowi portalu (overlayContainer.context.ts).
+ * Zaokrąglenie i przycięcie do 44px obudowy niesie `overflow: hidden` skorupy,
+ * dlatego tutaj promień wraca do zera — inaczej róg dialogu odcinałby się od
+ * rogu ekranu telefonu. */
+[data-app-frame='true'] .popup {
+  padding-block: 0;
+  inset: 0;
+  width: auto;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  transform: none;
+}
+
+[data-app-frame='true'] .popup[data-starting-style],
+[data-app-frame='true'] .popup[data-ending-style] {
+  transform: translateY(8px);
+}
+
+[data-app-frame='true'] .actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+[data-app-frame='true'] .actions > * {
+  width: auto;
+}

@@ -1,0 +1,1022 @@
+/* ─── ForStylistsPage — Editorial anti-AI-slop pattern propagation ─── */
+
+.page {
+  --section-block: clamp(64px, 8vw, 128px);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 1. HERO — editorial split-font, left-aligned
+ * ───────────────────────────────────────────────────────────────────── */
+/* DECISION (nie usuwaj tego komentarza):
+ * Per-strona kolor-rola = pas fioletowy (B2B precyzja), żeby strona była
+ * rozpoznawalnie inna od strony głównej (test "usuń logo", digest
+ * distinctiveness #125). Wiodący color-block niesie dziś rola
+ * --color-ink-band-strong (S109) — problems-band; hero-panel i pull-quote stoją
+ * na --color-secondary. Akcent zostaje TYLKO na CTA / highlight (0% prowizji) /
+ * akcent-słowie. Tekst na pasie jest mode-stable jasny (color-mix na roli
+ * --color-on-ink-band) — NIE używamy --color-text-inverse, który flipuje między
+ * trybami. Floor: solid color-mix (zero gradientu), pełne 4-boczne pola, głębia
+ * z tonal-surface + overlap, nie z cienia.
+ * AKTUALIZACJA 2026-09-07: ten blok opisywał paletę charcoal-gold — mówił
+ * "gold-forward HOME", nazywał --color-secondary atramentem i podawał dla niego
+ * oklch 0.58/0.66. Dziś --color-secondary jest KOŚCIĄ (0.47 / 0.75, hue 75),
+ * a akcent produktu jest czerwony, nie złoty. */
+.hero {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-bg-main);
+  padding: clamp(72px, 10vw, 144px) var(--section-gutter)
+    clamp(52px, 7vw, 112px);
+  display: flex;
+  align-items: center;
+  min-height: clamp(480px, 72vh, 840px);
+}
+
+.heroInner {
+  width: 100%;
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 36px);
+  animation: hero-rise var(--duration-300) var(--ease-entrance) both;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.4vw, 30px);
+  min-width: 0;
+}
+
+/* The phone is the proof; it needs no second framed surface behind it. */
+.heroPhoneMockup {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .heroInner {
+    /* Text-forward column + bold ink panel — NOT home's 1fr/auto split */
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+    align-items: stretch;
+    gap: clamp(28px, 4vw, 64px);
+  }
+  .heroContent {
+    justify-content: center;
+  }
+  .heroPhoneMockup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    padding: 0;
+    min-width: 0;
+    position: relative;
+  }
+  .heroPhoneMockup > * {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.heroHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-3xl);
+  line-height: 1;
+  letter-spacing: var(--ls-tight-25);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 16ch;
+  text-wrap: balance;
+  hyphens: none;
+}
+
+/* Weight and color carry the accent within the shared sans heading role. */
+.heroHeadlineAccent {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: 1.04em;
+  color: var(--color-secondary);
+  letter-spacing: var(--ls-wide-5);
+}
+
+.heroLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 44ch;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  flex-wrap: wrap;
+  margin-top: clamp(8px, 1vw, 16px);
+}
+
+/* .heroProof — className on TrustSignalsMolecule variant='pills'; carries only
+   the margin-top + gap-override (canonical .list/.pills/.item handle display/flex/font/color). */
+.heroProof {
+  margin: clamp(8px, 1.4vw, 20px) 0 0;
+  gap: var(--space-10) var(--space-14);
+}
+
+/* Client-path secondary link (klientka „chodzę na paznokcie" → /for-clients);
+   wzorzec home .heroClientLink — flat text-link, hover tylko na interaktywnym. */
+.heroClientLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: clamp(8px, 1.2vw, 16px);
+}
+
+@media (hover: hover) {
+  .heroClientLink:hover {
+    color: var(--color-accent-fg);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Section header
+ * ───────────────────────────────────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: 60ch;
+  margin: 0 0 clamp(48px, 6vw, 88px);
+}
+
+/* Per-page headline scale dla <SectionHeader> — sterowanie przez var-hooki
+ * kanonu (NIE redefinicja .sectionHeadline; FDX W5.1). Wartości = dawny lokalny
+ * .sectionHeadline (clamp(28-48px) / 1.08 / -0.018em / 16ch), żeby nagłówki
+ * sekcji zostały pixel-identyczne.
+ * DECISION (nie usuwaj tego komentarza): lede renderuje teraz kanon
+ * (SectionHeader → .lede: --text-lg / max-width none), świadoma konwergencja
+ * na SSOT (wzorzec HomePage — dawny lokalny .sectionLede usunięty). Kanon nie
+ * wystawia hooków lede, więc tu sterujemy tylko skalą nagłówka. */
+.sectionHeaderScaled {
+  --section-headline-size: clamp(28px, 4.4vw, 48px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: 16ch;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2. SALON SCENES — solid INK-VIOLET identity band (B2B color-rola)
+ *    This is the "remove-the-logo" signature: charcoal-forward, not gold.
+ *    Text on ink is mode-stable white-mix; numerals are oversized ghost serif.
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band (breakout + padding-inline) niesie komponent Section — tu tylko
+ * ink-violet tło (FROZEN, głos ownera) + własny rytm pionowy. */
+/* WCAG 1.4.3: token, który wtedy dawał tło tej sekcji, był za jasny, by unieść AA
+ * dla małego jasnego tekstu — nawet czysta biel wychodziła 3.88-4.37:1 (FAIL).
+ * Ciemniejszy fiolet (L=0.42, hue 288) daje tekstowi przestrzeń na AA bez
+ * ruszania tamtego tokenu (zero blast-radius na pull-quote, bordery i tinty).
+ * Od S109 ta wartość jest ROLĄ palety (--color-ink-band-strong), nie lokalnym
+ * aliasem; pomiar powyżej opisuje historię decyzji, a nie dzisiejszą wartość
+ * --color-secondary, które jest teraz kością (0.47 / 0.75, hue 75). */
+.problemsSection {
+  --section-pad-block: clamp(80px, 11vw, 160px);
+  background: var(--color-ink-band-strong);
+  /* Pierścień fokusu na pasie fioletowym: bazowy ring to w LIGHT atrament,
+     który na tym polu daje ~2,3:1 (ta sama klasa, co zmierzony pas newslettera
+     na home). Rola --color-accent-on-ink (DECISION S106) trzyma tu kontrast
+     i mówi tym samym językiem, co pozostałe pasy negatywowe. Luka była
+     niewidzialna dla strażnika, dopóki wartość pasa siedziała w lokalnym
+     aliasie — patrz INK_BG w tests/audit/ink-focus-ring.sh (S109). */
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+.problemsSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: clamp(48px, 6vw, 88px);
+}
+
+/* Light-on-ink override for <Eyebrow variant='chip' className={styles.eyebrowInk}>
+ * on the dark problems section (background: var(--color-ink-band-strong)). Po S28/1=C
+ * chip to rule+caps (bez pudełka): wystarczy jasny `color` — kreska dziedziczy
+ * go przez `currentColor`. Specyficzność (0,2,0) bije .chip (0,1,0). */
+.problemsSection .eyebrowInk {
+  color: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 92%,
+    var(--color-ink-band-strong)
+  );
+}
+
+/* Standalone headline for the dark problems band — NIE .sectionHeadline
+ * (audyt eyebrow-headline-dup zakazuje tej klasy). Kanon SectionHeader nie
+ * potrafi przekolorować nagłówka na ciemnym bandzie (hardcoded color), więc
+ * ta sekcja zostaje ręcznie składana (patrz DECISION w ForStylistsPageSections
+ * .tsx ForStylistsProblemsSection). Pełna typografia = dawny .sectionHeadline
+ * + light-on-ink color + 18ch measure. */
+.problemsHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  margin: 0;
+  text-wrap: balance;
+  color: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 96%,
+    var(--color-ink-band-strong)
+  );
+  max-width: 18ch;
+}
+
+.problemsList {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(18px, 2.5vw, 32px);
+}
+
+.problemPair {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 22px);
+  padding: clamp(24px, 2.6vw, 40px);
+  background: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 7%,
+    var(--color-ink-band-strong)
+  );
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, white 16%, transparent);
+}
+
+@media (min-width: 768px) {
+  .problemsList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+}
+
+/* Keyword label — canonical chip on ink; padding is the old local rhythm. */
+.problemSceneLabel {
+  --eyebrow-color: var(--color-on-ink);
+  padding: var(--space-4) 0;
+}
+
+.problemSide {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 14px);
+  max-width: 46ch;
+}
+
+.problemTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-subhead);
+  line-height: 1.15;
+  letter-spacing: var(--ls-tight-12);
+  color: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 96%,
+    var(--color-ink-band-strong)
+  );
+  margin: 0;
+  text-wrap: balance;
+}
+
+.solutionText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.7;
+  /* Było white 82% na jasnym --color-secondary = 3.1:1 (FAIL). Na ciemniejszym
+   * --color-ink-band-strong bg ten sam mix (rebased) + bump do 90% czyta AA (≥4.5:1). */
+  color: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 90%,
+    var(--color-ink-band-strong)
+  );
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2b. PULL-QUOTE — full-bleed typographic statement, rhythm breaker
+ *     Warm-cream ground (a breath after the ink band), oversized serif quote
+ *     mark in ink-violet, one gold anchor word. Breaks header→grid cadence.
+ * ───────────────────────────────────────────────────────────────────── */
+.pullQuoteSection {
+  --section-pad-block: clamp(72px, 10vw, 144px);
+  /* białe tło — głos ownera S24: tint zlewał się z sekcją poniżej.
+     Bez własnego border-bottom: linię styku niesie rama banda benefits
+     poniżej (border-block) — podwójna hairline czytała się jak doklejka. */
+  background: var(--color-bg-main);
+}
+
+/* innerClassName Section — max-width/centrowanie niesie .inner.constrained. */
+/* Share the first-line metrics between the text and the brush. */
+.pullQuoteInner {
+  --pull-quote-size: clamp(28px, 4vw, 56px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(var(--space-16), 3vw, var(--space-32));
+  align-items: start;
+  font-size: var(--pull-quote-size);
+  line-height: 1.16;
+}
+
+.pullQuoteMark {
+  align-self: start;
+  display: block;
+  width: 1em;
+  height: 1em;
+  margin-top: calc((1lh - 1em) / 2);
+  color: var(--color-primary);
+  user-select: none;
+}
+
+.pullQuote {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* fluid-allow: 2xl z szerszym zakresem: 28 na telefonie, 56 na desktopie */
+  font-size: var(--pull-quote-size);
+  line-height: inherit;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2c. PLAYBOOK — product story for SEO and conversion
+ * ───────────────────────────────────────────────────────────────────── */
+.playbookSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+}
+
+.playbookGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  background: var(--color-divider);
+  border: var(--style-border-surface) solid var(--color-divider);
+}
+
+@media (min-width: 768px) {
+  .playbookGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.playbookItem {
+  min-width: 0;
+  background: var(--color-bg-main);
+  padding: clamp(24px, 3vw, 42px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.2vw, 18px);
+}
+
+.playbookTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.playbookIcon {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--style-radius-control);
+  /* Motyw „Jeden krem" (S94): ZNAK (42px kwadrat pod glifem kroku) zostaje
+     złoty przez token roli; glif bierze accent-fg zamiast primary (2.2:1). */
+  color: var(--color-accent-fg);
+  background: var(--color-mark-bg);
+}
+
+/* Dekoracyjny numeral kroku (aria-hidden w TSX, duplikuje kolejność wizualną).
+ * Kolor = --color-primary z palety, bez opacity-tricku. BYŁO: dociemniany
+ * warm-gold oklch(0.62 0.105 82) na sztywno, bo złoto wycofanej palety przy
+ * opacity .75 dawało 1.64:1 na bieli (FAIL <3:1 large-text). Czerwień
+ * rouge-papier jest ciemniejsza od tamtego obejścia, więc powód zniknął. */
+.playbookNumber {
+  font-family: var(--font-heading);
+  /* fluid-allow: poziom miedzy 2xl a 3xl, dobrany do dlugosci naglowka */
+  font-size: clamp(36px, 4vw, 58px);
+  line-height: 0.9;
+  color: var(--color-primary);
+}
+
+/* Numeral jako pseudo-content (nie textContent) — nie skleja sie w copy-paste
+ * ani SERP-snippetach; wartosc niesie data-num na spanie (markup). */
+.playbookNumber::before {
+  content: attr(data-num);
+}
+
+.playbookTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.18;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.playbookBody,
+.playbookMeta {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+.playbookBody {
+  color: var(--color-text-secondary);
+}
+
+.playbookMeta {
+  margin-top: auto;
+  color: var(--color-text-primary);
+  font-weight: 650;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3. BENEFITS — editorial numbered entries, variable rhythm
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band: tone='subtle' + pełna rama hairline (S24) niesie komponent Section. */
+.benefitsSection {
+  --section-pad-block: var(--section-block);
+}
+
+.benefitsSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: clamp(48px, 6vw, 88px);
+}
+
+/* Bordered container wraps the editorial list */
+.benefitsBordered {
+  max-width: var(--lp-content-width);
+  /* margin-bottom = section-block: oddech (szary pasek bg-subtle) między
+   * domkniętą ramą listy a pełnoszerokościowym ink-stage — symetria z dołem
+   * stage (gdzie padding-bottom sekcji + border na styku z Playbook robią to
+   * samo). Bez tego highlight „0% prowizji" sklejał się ze stage. */
+  margin: 0 auto var(--section-block);
+  /* Widoczna rama listy (nie hairline-divider — F2: ramka ginęła). */
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+}
+
+/* Split listy (S22, fix 8): tekstowe benefity w lewej kolumnie + realny
+ * dowód produktu (PhoneMockup, screen galerii z filtrami) w dotąd PUSTEJ
+ * prawej 1/3. Hairline między kolumnami techniką gap-1px (jak .playbookGrid),
+ * dzieci niosą solidne tło sekcji. Kolumna proof tylko ≥768 — na mobile
+ * dowód niesie InteractivePhoneStage poniżej (bez przeładowania). */
+.benefitsSplit {
+  display: block;
+}
+
+.benefitsProof {
+  display: none;
+}
+
+/* tint-allow: jeden pas kremu rozcięty hairlinem — patrz niżej.
+   Motyw „Jeden krem" (S94/R2) — to NIE są dwa kremy, tylko JEDEN.
+   `.benefitsSplit` to grid z `gap: 1px` na kolorze linii: oba panele muszą
+   mieć ten sam solidny krem, żeby szczelina czytała się jako hairline między
+   nimi, a nie jako prześwit tła. Cała sekcja to jedna `Section tone='subtle'`
+   (ForStylistsPageSections.organism) i jedyny kremowy pas tej strony.
+   Nie „naprawiać" tego na jedną deklarację — hairline zniknie. */
+@media (min-width: 768px) {
+  .benefitsSplit {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 1px;
+    background: var(--color-divider);
+  }
+
+  .benefitsSplit .benefitsList {
+    background: var(--color-bg-subtle);
+  }
+
+  .benefitsProof {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-subtle);
+    padding: clamp(28px, 3.5vw, 56px) clamp(24px, 3vw, 48px);
+  }
+}
+
+.benefitsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.benefit {
+  padding: clamp(24px, 3vw, 48px);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  position: relative;
+}
+
+/* Zawężone do listy tekstowej: highlight (gold band) żyje POZA
+ * .benefitsList (bezpośrednio w .benefitsBordered) i własny border-bottom
+ * zeruje jawnie w obu blokach media. */
+.benefitsList .benefit:last-of-type {
+  border-bottom: none;
+}
+
+@media (min-width: 768px) {
+  .benefit {
+    padding: clamp(32px, 4vw, 64px) clamp(32px, 4vw, 56px);
+  }
+
+  /* Highlight benefit — full-bleed gold band */
+  .benefit[data-highlight] {
+    padding: clamp(40px, 5vw, 80px) clamp(32px, 4vw, 56px);
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-bottom: none;
+    border-top: var(--style-border-divider) solid var(--color-primary);
+  }
+  .benefit[data-highlight] .benefitTitle {
+    font-size: var(--text-fluid-xl);
+    line-height: 1.1;
+    color: var(--color-primary-contrast);
+    max-width: 22ch;
+  }
+  .benefit[data-highlight] .benefitText {
+    font-size: var(--text-fluid-md);
+    max-width: 60ch;
+    color: var(--color-primary-contrast);
+  }
+}
+
+@media (max-width: 767px) {
+  .benefit[data-highlight] {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-bottom: none;
+  }
+  .benefit[data-highlight] .benefitTitle,
+  .benefit[data-highlight] .benefitText {
+    color: var(--color-primary-contrast);
+  }
+}
+
+.benefitContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1vw, 16px);
+  max-width: 60ch;
+  min-width: 0;
+}
+
+.benefitTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.22;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  text-wrap: balance;
+}
+
+.benefitDetail {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-secondary);
+  padding: var(--space-4) var(--space-10);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-pill);
+}
+
+.benefitText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.benefitHighlightAnchor {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(12px, 1.5vw, 20px);
+  margin-top: clamp(12px, 2vw, 24px);
+  padding-top: clamp(12px, 2vw, 20px);
+  border-top: var(--style-border-divider) solid
+    color-mix(in srgb, var(--color-primary-contrast) 22%, transparent);
+}
+
+.benefitHighlightFigure {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-display);
+  line-height: 0.9;
+  letter-spacing: var(--ls-tight-40);
+  color: var(--color-primary-contrast);
+}
+
+.benefitHighlightLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide-10);
+  color: var(--color-primary-contrast);
+}
+
+/* (S35: tryptyk → InteractivePhoneStage ink-stage z focal-swap;
+ * .benefitsTriptych/.benefitsFootnote usunięte jako martwe — „za darmo"
+ * żyje teraz w kickerze-kotwicy stage'a.) */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 4. PRICING PREVIEW — editorial numbered list
+ * ───────────────────────────────────────────────────────────────────── */
+/* Motyw „Jeden krem” (S94/R1): banda na PAPIERZE. Własny wash fioletu 4% był
+ * trzecią powierzchnią strony i odcieniem spoza palety charcoal-gold. */
+.pricingSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+  /* Po zdjęciu washu banda sąsiaduje z sekcją opinii na tym samym papierze
+     i szew ginął (zmierzone DOM-probem: dwie sekcje, to samo tło, zero
+     granicy). Granicę po tincie przejmuje hairline. */
+  border-block: var(--style-border-divider) solid var(--color-divider);
+}
+
+.pricingSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: clamp(20px, 2.4vw, 32px);
+}
+
+/* H-TRUST-1: discreet micro-trust line under the lede, before the tier list.
+ * Caption register (secondary text, xs) + solid gold rule lead-in (caption +
+ * rule, floor #7 no dash glyph, no gradient/shadow — flat).
+ * Tokens are mode-aware, so this reads correctly in light + dark. */
+.pricingTrustline {
+  max-width: var(--lp-content-width);
+  margin: 0 auto clamp(40px, 5vw, 72px);
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-10);
+  color: var(--color-text-secondary);
+}
+
+.pricingTrustline::before {
+  content: '';
+  flex-shrink: 0;
+  width: clamp(20px, 3vw, 32px);
+  height: 2px;
+  background: var(--color-primary);
+}
+
+/* Preview planów — język 5A „4 równe kolumny" (głos ownera S21):
+ * równe hairline-karty radius-md, wyróżniony plan (Pro) = zamknięty
+ * ink-negatyw, features jako hairline-wiersze bez ikon. Pełnia: /pricing. */
+.pricingList {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .pricingList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .pricingList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Scale (kontakt) — cichy pełnoszerokościowy wiersz POD siatką 4 kart
+ * (wzorzec .scaleCta z /pricing): domyka kompozycję zamiast karty-sieroty
+ * w 2. rzędzie. Bez numeracji — tiery to nie sekwencja (Style Policy §6). */
+
+/* Scale-kontakt = Link do /contact (S44): heading-scale prompt z gold-strzałką
+ * i hover-underline = wyraźna akcyjność (był martwy <span>). */
+
+.pricingTier {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 12px);
+  padding: clamp(20px, 2.4vw, 32px);
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  min-width: 0;
+}
+
+/* Wyróżniony plan (Pro) = ink-negatyw (kanon 5A; rama z on-ink — w dark
+ * tło strony też jest ciemne i rama w kolorze fillu byłaby niewidoczna). */
+.pricingTier[data-highlight] {
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Zloto zamiast bieli,
+     bo w DARK ring i tak JEST zloty — jedna wartosc daje ten sam jezyk
+     wskaznika w obu trybach, zamiast bieli w jednym i zlota w drugim. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, var(--color-ink));
+}
+
+/* Dark (R8, glos S98/B): karta bazowa siedzi na --color-bg-main (#0a0a0a),
+   a ink to #1c1c20 — zmierzony kontrast 1.17:1, czyli w ciemnosci negatyw
+   przestawal byc negatywem. Co gorsza rama wyroznionej (on-ink 18% na ink, w oklch =
+   #3e3e42) byla SLABSZA niz --color-border sasiadek (#7a7a7a), wiec plan
+   polecany mial cichszy kontur niz plany zwykle. Ta sama receptura co na
+   czterech pozostalych powierzchniach jezyka „polecany": krok tonalny w gore
+   + gold-rama. */
+:root[data-mode='dark'] .pricingTier[data-highlight] {
+  background: color-mix(in oklch, var(--color-ink) 89%, var(--color-on-ink));
+  border-color: color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+.pricingTier[data-highlight] .pricingName {
+  color: var(--color-on-ink);
+}
+
+.pricingTier[data-highlight] .pricingTrialLede {
+  color: var(--color-on-ink);
+}
+
+.pricingTier[data-highlight] .pricingTrialAfter {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+.pricingTier[data-highlight] .pricingFeatureItem {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, transparent);
+}
+
+.pricingContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 12px);
+  min-width: 0;
+  flex: 1;
+}
+
+.pricingHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pricingName {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.2;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Trial-framing (antipattern-cena, głos ownera S45): oferta bohaterem
+ * w miejscu ceny; kwota schowana małym drukiem. Parytet z /pricing. */
+.pricingTrialBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pricingTrialLede {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+}
+
+.pricingTrialAfter {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Features = hairline-wiersze (para top+bottom collapsed), bez ikon — 5A. */
+.pricingFeatures {
+  --pricing-feature-row-min: 40px;
+  list-style: none;
+  padding: 0;
+  margin: auto 0 0;
+  display: grid;
+  grid-template-rows: repeat(
+    var(--pricing-feature-row-count),
+    minmax(var(--pricing-feature-row-min), 1fr)
+  );
+  flex: 1;
+}
+
+.pricingFeatureItem {
+  min-height: var(--pricing-feature-row-min);
+  display: flex;
+  align-items: center;
+  padding-block: var(--space-8);
+  margin-top: -1px;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Per-plan primary CTA (S44) — pełna szerokość, dociśnięty do dołu karty
+ * (features mają margin:auto 0 0, więc CTA ląduje pod nimi na wspólnej linii
+ * dzięki równym wysokościom kart align-items:stretch). */
+.pricingTierCta {
+  display: block;
+  width: 100%;
+  margin-top: clamp(14px, 1.6vw, 20px);
+  text-decoration: none;
+}
+
+.pricingTierCtaButton {
+  width: 100%;
+}
+
+.pricingCta {
+  max-width: var(--lp-content-width);
+  margin: clamp(40px, 5vw, 72px) auto 0;
+}
+
+/* „Zobacz pełny cennik" — outlined Button dziedziczy gold --color-primary,
+ * za mały kontrast tekstu na jasnym tle sekcji (WCAG AA): tekst + rama na
+ * AA-gold --color-accent-fg (specyficzność 0,2,0 > .outlined 0,1,0). */
+.pricingCta .pricingCtaButton {
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent-fg);
+}
+
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 1024px) {
+    .pricingList {
+      grid-template-rows: auto repeat(4, minmax(40px, auto)) auto;
+      column-gap: clamp(16px, 2vw, 24px);
+      row-gap: 0;
+    }
+
+    .pricingTier {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 6;
+      row-gap: 0;
+    }
+
+    .pricingContent {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: 1 / span 5;
+      row-gap: 0;
+    }
+
+    .pricingHeader {
+      grid-row: 1;
+    }
+
+    .pricingFeatures {
+      grid-row: 2 / span 4;
+      grid-template-rows: subgrid;
+      margin: clamp(8px, 1vw, 12px) 0 0;
+    }
+
+    .pricingTierCta {
+      grid-row: 6;
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 5. FAQ — clean accordion
+ * ───────────────────────────────────────────────────────────────────── */
+.faqSection {
+  --section-pad-block: var(--section-block);
+  /* Motyw „Jeden krem" (S94/R2): band FAQ schodzi na papier — krem tej strony
+     jest już wydany na sekcję korzyści (Section tone='subtle'); drugi krem
+     tutaj łamał „jeden krem na stronę". Granicę przejmuje pełna rama hairline:
+     nad FAQ stoi sekcja opinii na bg-main, więc bez ramy szew znikał.
+     border-block = rama parą, nigdy jednostronna (floor §3). */
+  background: var(--color-bg-main);
+  border-block: var(--style-border-divider) solid var(--color-divider);
+}
+
+.faqSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+/* Lista + skórka akordeonu FAQ żyją w kanonicznym molecule
+ * (components/FaqSection) — strona trzyma tylko full-bleed band (tło,
+ * --section-block padding) i nagłówek sekcji. */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 6. TRUST — kanoniczny molecule TrustStatsSection
+ * (src/UI/components/TrustStatsSection/, ten sam co home) — zero
+ * per-page stylów.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 7. FINAL CTA — współdzielony molecule FinalCtaBand
+ * (src/UI/components/FinalCtaBand/) — zero per-page stylów.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Inline-link w odpowiedzi FAQ (a05 → /compare) — hairline underline, accent. */
+.faqInlineLink {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.faqInlineLink:hover {
+  color: var(--color-primary-dark);
+}
+
+.processIllustration {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.contextualIllustration {
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  height: auto;
+}
+
+.playbookHeading {
+  margin-bottom: clamp(48px, 6vw, 88px);
+}
+
+.playbookHeading .sectionHeader {
+  margin-bottom: 0;
+}
+
+.problemsSection .sectionHeader {
+  margin-bottom: 0;
+}

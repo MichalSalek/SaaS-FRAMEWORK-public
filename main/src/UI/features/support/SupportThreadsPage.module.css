@@ -1,0 +1,248 @@
+/* SupportThreadsPage.module.css
+ * „Twoje zgłoszenia”: the user's support requests on their own screen.
+ * White tappable rows on paper; flat (no gradients, shadows, one-sided lines). */
+
+@keyframes supThreadsSlideUp {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: supThreadsSlideUp 360ms var(--ease-entrance) both;
+  /* Capped: row 40 of an infinite list must not wait three seconds. */
+  animation-delay: calc(min(var(--stagger-index, 0), 8) * 70ms);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-height: 100%;
+  /* Full-bleed against the AppLayout padding, like the help hub. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) var(--space-32);
+  container-type: inline-size;
+  container-name: supthreads;
+}
+
+/* ============================================================
+ *  Thread list
+ * ============================================================ */
+
+.threadList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.threadRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: 'body status arrow';
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+  width: 100%;
+  min-height: var(--style-control-min-h);
+  padding: var(--space-16) var(--space-20);
+  background: var(--color-surface-interactive);
+  border-radius: var(--style-radius-surface);
+  text-decoration: none;
+  font-family: var(--font-body);
+  color: inherit;
+  transition:
+    transform var(--duration-200) var(--spring-curve),
+    background-color var(--duration-200) var(--ease-entrance);
+}
+
+.threadRow:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .threadRow:hover {
+    transform: translateY(-1px);
+    /* Hover = a neutral tonal step, the same for every row. */
+    background: var(--color-state-hover);
+  }
+
+  .threadRow:hover .threadArrow {
+    transform: translateX(4px);
+  }
+}
+
+.threadRow:active {
+  transform: translateY(0);
+}
+
+.threadBody {
+  grid-area: body;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* The derived title may take two lines; a third is cut with an ellipsis. */
+.threadTitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* Unread reply: a state marker in the colour of the unread badges of the
+ * navigation. Inline, so it sits on the first line of a wrapped title. */
+.threadUnreadDot {
+  display: inline-block;
+  width: var(--space-8);
+  height: var(--space-8);
+  margin-right: var(--space-8);
+  border-radius: var(--style-radius-round);
+  background: var(--color-primary);
+  vertical-align: middle;
+}
+
+.threadMetaLine {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-12);
+  row-gap: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.threadCategory {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.threadStatus {
+  grid-area: status;
+}
+
+.threadArrow {
+  grid-area: arrow;
+  flex-shrink: 0;
+  transition: transform var(--duration-200) var(--spring-curve);
+}
+
+/* Phone width: the status word moves under the text so the title keeps the
+ * whole line. */
+@container supthreads (max-width: 480px) {
+  .threadRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'body arrow'
+      'status arrow';
+    padding: var(--space-16);
+  }
+
+  .threadStatus {
+    justify-self: start;
+  }
+}
+
+/* ============================================================
+ *  Skeleton: same boxes as the rows
+ * ============================================================ */
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-16) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-interactive);
+}
+
+.skeletonRowBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+/* ============================================================
+ *  Empty state: surface and typography come from <EmptyState>; only the
+ *  knobs of this screen stay here.
+ * ============================================================ */
+
+.emptyState {
+  --empty-medal-size: 96px;
+  --empty-medal-bg: var(--color-mark-bg-strong);
+  --empty-medal-border: none;
+  --empty-medal-ring: 1px dashed
+    color-mix(in oklch, var(--color-primary) 32%, transparent);
+  --empty-title-size: var(--text-xl);
+  --empty-body-size: var(--text-base);
+  --empty-body-maxw: 38ch;
+  --empty-action-minw: 220px;
+  --empty-pad-block: var(--space-64);
+  --empty-pad-block-end: var(--space-64);
+}
+
+@media (min-width: 1280px) {
+  .emptyState {
+    --empty-pad-block: var(--space-40);
+    --empty-pad-block-end: var(--space-40);
+    --empty-pad-inline: var(--space-40);
+  }
+}
+
+/* ============================================================
+ *  Error state: the list could not be loaded at all
+ * ============================================================ */
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-48) var(--space-20);
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  background: color-mix(
+    in oklch,
+    var(--color-warning) 4%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-warning) 22%, transparent);
+}
+
+.errorIcon {
+  color: var(--color-warning);
+}
+
+.errorText {
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 42ch;
+}

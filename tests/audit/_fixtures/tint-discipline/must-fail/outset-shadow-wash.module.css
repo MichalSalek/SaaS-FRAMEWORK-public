@@ -1,0 +1,8 @@
+/* Cień BEZ `inset`. Warunek wymagający `inset` przepuszczał tę figurę
+   w całości, a `0 0 0 999px` maluje na ZEWNĄTRZ elementu, czyli zalewa
+   washem wszystko dookoła — ten sam efekt, tylko po drugiej stronie
+   krawędzi. */
+.floodRing {
+  box-shadow: 0 0 0 999px
+    color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

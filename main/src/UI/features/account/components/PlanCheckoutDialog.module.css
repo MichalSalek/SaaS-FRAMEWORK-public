@@ -1,0 +1,60 @@
+/* ─────────────────────────────────────────────────────────────────────────
+ * PlanCheckoutDialog — modal shell around the embedded W2 checkout panel.
+ * Editorial flat: solid scrim, hairline-bordered panel, no shadow/gradient/glow.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  background: color-mix(in oklch, var(--color-text-primary) 55%, transparent);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 440px;
+  /* Overlay is a flex box that fills the viewport and supplies the off-edge
+   * margin via its own `padding`. The panel therefore caps at 100% of that
+   * padded box — margin subtracted EXACTLY ONCE (a second subtraction clipped
+   * the BLIK/P24 form on short / landscape viewports so the pay button fell
+   * below the fold). */
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  /* The dialog IS the white box: the order summary inside sits flat. */
+  --checkout-summary-pad: 0;
+}
+
+/* The scrim is fixed to the VIEWPORT (portal), so a viewport query is the
+ * honest one here. On a phone the old 32px scrim + 48px padding left the card
+ * form 230px of a 390px screen. */
+@media (min-width: 768px) {
+  .overlay {
+    padding: var(--space-32);
+  }
+
+  .dialog {
+    gap: var(--space-24);
+    padding: var(--space-32);
+  }
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}

@@ -1,0 +1,11 @@
+/* Ta sama figura po prawej stronie i zapisana longhandem. `top`/`bottom`
+   z wartością inną niż 0 nadal rozpinają pasek na całą krawędź. */
+.threadRow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  background: var(--color-accent);
+}

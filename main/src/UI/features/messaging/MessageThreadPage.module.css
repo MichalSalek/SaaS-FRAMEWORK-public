@@ -1,0 +1,255 @@
+/* MessageThreadPage — czat 1:1. Floor-compliant: flat, pełne hairline bordery,
+   zero gradient/shadow/one-sided. Bąbelki różni fill + wyrównanie, nie cień. */
+
+/* Marginesy boczne daje powłoka (20px), jak na każdym ekranie: własne 12px
+ * w nagłówku, strumieniu i polu pisania dawało 32px i inną lewą krawędź niż
+ * reszta aplikacji (census S126). Na szerokim ekranie rozmowa trzyma czytelną
+ * miarę od LEWEJ krawędzi, tak samo jak lista rozmów. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  max-width: 720px;
+  width: 100%;
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) 0 var(--space-12);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.headerName {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  /* Imię nie jest cięte wielokropkiem: do dwóch linii, nagłówek rośnie. */
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.headerAction {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--color-text-secondary);
+}
+
+.header .headerAction:hover:not(:disabled) {
+  background-color: var(--color-surface-hover);
+}
+
+/* Baner ukrytej rozmowy: biała karta bez tintu i ramki (S116). Tekst i akcja
+ * stoją obok siebie, a gdy brakuje miejsca, CAŁY przycisk schodzi pod tekst. */
+.hiddenBanner {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin: var(--space-12) 0 0;
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background-color: var(--color-surface-card);
+}
+
+.hiddenBannerText {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* Licznik znaków wisi w górnym odstępie pola pisania (absolutnie), więc jego
+ * pojawienie się 200 znaków przed limitem niczego nie przesuwa. Para
+ * „liczba / limit” jest jednym nierozrywalnym kawałkiem. */
+.counter {
+  position: absolute;
+  top: var(--space-2);
+  right: calc(44px + var(--space-12));
+  font-size: var(--text-xs);
+  line-height: 1;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.stream {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20) 0;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+}
+
+.rowMine {
+  justify-content: flex-end;
+}
+
+.rowOther {
+  justify-content: flex-start;
+}
+
+.bubble {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  /* min-width: 0 + overflow-wrap niżej: długie słowo albo link łamie się
+     w dymku, zamiast rozpychać go poza 78% wiersza. */
+  min-width: 0;
+  max-width: min(78%, 520px);
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--style-radius-surface);
+}
+
+.bubbleMine {
+  /* S116 („A3 · Biel na papierze”): nadawcę koduje odwrócenie, nie tint.
+     Moja wiadomość to pełny atrament z tekstem w kolorze papieru (para liczy
+     się z ról tekstu i tła, więc odwraca się także w dark), cudza stoi na
+     bieli. Różowy tint odszedł razem z resztą różu. */
+  background-color: var(--color-text-primary);
+}
+
+.bubbleMine .bubbleText {
+  color: var(--color-bg-main);
+}
+
+.bubbleMine .bubbleTime {
+  color: color-mix(in oklch, var(--color-bg-main) 72%, transparent);
+}
+
+.bubbleOther {
+  background-color: var(--color-surface-interactive);
+}
+
+.bubbleText {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+}
+
+.bubbleTime {
+  align-self: flex-end;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Pusty wątek: kanon <EmptyState> na papierze, wyśrodkowany w strumieniu. */
+.emptyStream {
+  --empty-surface: transparent;
+  --empty-border: none;
+  margin: auto;
+}
+
+.composer {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-20) 0 var(--space-12);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Pole rośnie z treścią do max-height (tam, gdzie przeglądarka to umie). */
+  field-sizing: content;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-elevated);
+  border: var(--style-border-control) solid var(--color-control-border);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-10) var(--space-16);
+  resize: none;
+  max-height: 140px;
+  min-height: 44px;
+}
+
+.input:focus-visible {
+  outline: none;
+  /* Zloto jako JEDYNY wskaznik fokusu daje 1,96:1 na bieli (60% mix: 2,30:1),
+     a SC 1.4.11 wymaga 3:1. Ta regula zdejmuje globalny `outline`, wiec zlota
+     ramka jest tu calym sygnalem, wiec musi go uniesc. */
+  border-color: var(--color-focus-ring);
+}
+
+/* Okrągły send-button = SKIN nad ButtonAtom variant='primary': fill (gold) +
+   ink (#1c1c20 z .primary — poprawny kontrast na złocie w OBU trybach; poprzedni
+   --color-text-inverse dawał BIAŁY-na-złocie ~1.6:1 w light = latentny bug),
+   rozmiar 44px (.iconOnly.md), hover/active/disabled/focus = z ButtonAtom (spójne
+   z appką). Nadpisujemy TYLKO geometrię koła. Specyficzność .composer .sendButton
+   (0,2,0) > bazowe .button --radius-sm (0,1,0) — kółko wygrywa DETERMINISTYCZNIE,
+   niezależnie od kolejności CSS Modules w bundlu. */
+.composer .sendButton {
+  flex-shrink: 0;
+  border-radius: var(--style-radius-pill);
+}
+
+.closedBanner {
+  flex-shrink: 0;
+  padding: var(--space-16) var(--space-20);
+  margin: var(--space-12) 0;
+  border-radius: var(--style-radius-surface);
+  background-color: var(--color-surface-card);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* Paginacja historii (S82): przycisk nad najstarszą załadowaną wiadomością. */
+.loadOlderRow {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) 0 var(--space-12);
+}
+
+/* Focus-target strumienia (tabIndex=-1, S82 A1) — bez wizualnego ringa
+ * przy programowym focusie. */
+.stream:focus {
+  outline: none;
+}
+
+/* Szkielet rozmowy: dymki po obu stronach, własne dosunięte do prawej. */
+.skeletonStream {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+}
+
+.skeletonOwn {
+  align-self: flex-end;
+}

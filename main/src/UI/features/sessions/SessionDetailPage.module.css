@@ -1,0 +1,213 @@
+/* UI/features/sessions/SessionDetailPage.module.css
+ * The stylist's view of a session a client shared with her.
+ *
+ * Order on a phone: AppHero (name, state, received, expiry) -> who sent it +
+ * her photos -> one-time tip -> her message -> the private note -> earlier
+ * sessions. From 720px of the page's own width the photos and the notes
+ * column stand side by side (PageColumns). White on paper: read-only content
+ * sits in white boxes with no frame and no tint; the note is a plain field.
+ */
+
+/* ============================================================
+ * PAGE SHELL
+ * ============================================================ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) calc(var(--space-32) + 96px); /* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+     ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+     a `@media (min-width: …)` mierzy VIEWPORT, nie ramę — reguły szerokościowe
+     przełączały układ w tryb „szeroki" wewnątrz kadru 390px. Dlatego potomkowie
+     czytają kontener `app-view` (content-box strony), nie viewport. */
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* Kolumna strony na szerokim ekranie BEZ ramy (tablet, natywna apka na
+   tablecie). Zostaje w `@media`, bo dotyczy elementu, który sam jest
+   kontenerem — kontener nie odpytuje sam siebie. W ramie 390px te reguły są
+   no-opem (`max-width` nad torem 350px nic nie robi). */
+@media (min-width: 768px) {
+  .page {
+    max-width: 760px;
+    margin: calc(var(--space-20) * -1) auto 0;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: 960px;
+  }
+}
+
+/* ============================================================
+ * HERO FACTS — status, received, expiry: one meta member, pieces with a gap.
+ * Each piece is unbreakable; a piece that does not fit moves to the next
+ * line whole.
+ * ============================================================ */
+
+.heroFacts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-12);
+}
+
+.heroFact {
+  white-space: nowrap;
+}
+
+/* ============================================================
+ * CLIENT CREDIT — the sender (read-only) with the refresh control
+ * ============================================================ */
+
+.creditCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-12) var(--space-12) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.creditMain {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.creditLabel {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* A name is never cut: it wraps, the row grows. */
+.creditName {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* Loading: the photo's square box. */
+.photoSkeleton {
+  display: flex;
+  aspect-ratio: 1 / 1;
+}
+
+/* ============================================================
+ * BLOCK LABEL — heading of a white box or a plain section
+ * ============================================================ */
+
+.blockLabel {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+ * FIRST-SESSION TIP — one-time explanation, dismissible
+ * ============================================================ */
+
+.tip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.tipBody {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.tipAction {
+  display: flex;
+  margin-top: var(--space-4);
+}
+
+/* ============================================================
+ * CLIENT MESSAGE — read-only (see the DECISION in blocks.molecule.tsx)
+ * ============================================================ */
+
+.clientCallout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.calloutBody {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+  hyphens: auto;
+  white-space: pre-wrap;
+}
+
+/* „Klientka nie dodała wiadomości.” — a fact on paper, not a box. */
+.quietLine {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================
+ * STYLIST NOTE — a labelled field on paper
+ * ============================================================ */
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.noteHint {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* One line reserved for „Zapisywanie...” and the failure marker, so neither
+   pushes the page when it appears. Text colour only, no tint or frame. */
+.noteStatus {
+  display: flex;
+  align-items: center;
+  min-height: var(--space-24);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.noteSaveFailed {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  color: var(--color-error-fg);
+}

@@ -1,0 +1,13 @@
+/* JEDEN pas kremu, tyle że pod lokalną nazwą — alias sam w sobie nie jest
+   naruszeniem, limit dotyczy liczby pasów. */
+.page {
+  --band: var(--color-bg-subtle);
+}
+
+.benefitsBand {
+  background: var(--band);
+}
+
+.rest {
+  background: var(--color-bg-main);
+}

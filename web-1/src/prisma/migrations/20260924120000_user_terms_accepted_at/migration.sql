@@ -1,0 +1,11 @@
+-- Zapis pierwszej akceptacji regulaminu i deklaracji 16+ (owner, 2026-09-24).
+--
+-- DECISION (nie usuwaj tego komentarza):
+-- Jeden nullowalny znacznik stemplowany przez onboarding wyłącznie przy jawnym
+-- terms_accepted: true, tylko gdy pusty. Konta sprzed kolumny zostają NULL:
+-- onboarding wymagał zaznaczenia, ale go nie zapisywał, więc backfill datą
+-- byłby zmyśleniem. Bez indeksu (odczyt po kluczu głównym). Pełny opis:
+-- docs/DOMAIN/SCHEMA_DECISIONS.md#user-terms-accepted-at
+--
+-- IF NOT EXISTS, bo dev i staging bywają stawiane przez `db push`.
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "terms_accepted_at" TIMESTAMP(3);

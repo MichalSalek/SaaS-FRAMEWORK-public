@@ -1,0 +1,146 @@
+/* admin/components/UserDetailsDialog.module.css
+   The user sheet. Tabs, tables, pagers, empty and error states come from the
+   shared parts; this file styles the panel under the tabs, the facts of the
+   profile, cell content and the rows of the actions tab. */
+
+.tabPanel {
+  min-height: 200px;
+  margin-top: var(--space-20);
+}
+
+/* An inline error above the rows it could not refresh. */
+.tabStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* ─── Profile: facts ─── */
+
+.facts {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-12);
+}
+
+.fact:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.factLabel {
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
+.factValue {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* An identifier reads as stored. */
+.factRaw {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* Wide sheet: label and value side by side. */
+@container (min-width: 480px) {
+  .fact {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: var(--space-16);
+    align-items: baseline;
+  }
+}
+
+/* ─── Cells of the e-mail and activity tables ─── */
+
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.cellQuiet {
+  display: block;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* A date with its time moves to the next line whole. */
+.nowrap {
+  white-space: nowrap;
+}
+
+/* ─── Actions tab ───
+   Rows on the sheet's own surface, separated by hairlines: no box inside the
+   sheet and no tinted „danger” card (the button's colour carries it). */
+
+.actionsPanel {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+}
+
+.actionRow {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-12);
+  padding-block: var(--space-16);
+}
+
+.actionRow:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* Icon on the label's line: both are flex items centred on one line. */
+.actionLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.actionLabel > svg {
+  display: block;
+  flex: none;
+}
+
+.actionControl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+/* Destructive, but not the screen's filled action: red ink on the outlined
+   button (the button primitive has no outlined danger tone yet). */
+.actionDangerBtn {
+  color: var(--color-error);
+}
+
+@container (min-width: 480px) {
+  .actionRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-20);
+  }
+}

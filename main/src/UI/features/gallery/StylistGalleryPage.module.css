@@ -1,0 +1,426 @@
+/* UI/features/gallery/StylistGalleryPage.module.css
+ * A stylist's gallery as a client sees it.
+ *
+ * Hierarchy: stylist card (avatar, name, one line of numbers) → pairing
+ * invitation (unpaired only) → ONE filter control row → photo grid.
+ *
+ * White boxes on paper, no frames, no tints, nothing animates in on entry
+ * (owner 2026-10-08). ZERO gradient / shadow / glow / blur.
+ */
+
+/* Skeleton pulse — solid fill + opacity breathe (zamiast gradient-shimmer). */
+@keyframes skeletonPulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ─── Page shell ───────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+}
+
+/* ─── EXHIBIT HERO ──────────────────────────────────────────
+ * Editorial slab — cover color-block (deterministic hue from name)
+ * + solid gold-tint + hairline, no sparkle + avatar overlap + name + bio + city + Instagram.
+ * The "entering a studio" feel.
+ * Anti-AI-Slop: elevation = tonal surface (paper bg) + full hairline border,
+ * zero box-shadow.
+ */
+
+.exhibitHero {
+  position: relative;
+  isolation: isolate;
+  margin: 0;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  background: var(--color-surface-card);
+}
+
+/* Paired badge — in the meta column under the name (only shown when paired).
+ * Anti-AI-Slop: solid success tint fill + full hairline, zero gradient/shadow.
+ */
+.exhibitPairedBadge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-12);
+  border-radius: var(--style-radius-pill);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide-40);
+  background: color-mix(
+    in oklch,
+    var(--color-success) 88%,
+    var(--color-bg-paper)
+  );
+  color: var(--color-primary-contrast);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-success) 60%, transparent);
+}
+
+/* Dark: solidny mint (#4ade80) świecił neonowo na ciemnym coverze —
+ * odwrócenie wg konwencji frozen-tint: ciemnozielony tint bg + miętowy
+ * tekst/ikona (czytelny fg), pełna hairline (census S26). */
+:root[data-mode='dark'] .exhibitPairedBadge {
+  background: color-mix(
+    in oklch,
+    var(--color-success) 16%,
+    var(--color-bg-paper)
+  );
+  color: var(--color-success);
+  border-color: color-mix(in oklch, var(--color-success) 45%, transparent);
+}
+
+/* Body — sits beneath the cover, hosts avatar overlap + meta. */
+/* S118 (owner): pas „okładki” z tintem znika z całego produktu; nagłówek
+   galerii to rząd awatar + nazwa, jak na profilu publicznym. */
+.exhibitBody {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-14);
+  padding: var(--space-20);
+}
+
+/* Avatar — overlaps the cover/body boundary.
+ * Ring = wzorzec client-profile (.heroAvatarRing): złoty tint ring +
+ * biały odstęp (paper) wokół avatara — ujednolicone z client-profile
+ * zamiast szarego hairline'a (census S26). Flat: solid tint, zero shadow.
+ */
+.exhibitAvatar {
+  flex: none;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--style-radius-pill);
+  padding: var(--space-4);
+  background: var(--color-mark-bg);
+  isolation: isolate;
+}
+
+.exhibitAvatar > * {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: var(--style-radius-pill);
+  display: block;
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-bg-paper);
+}
+
+.exhibitMeta {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.exhibitName {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-subhead);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.15;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+  margin: 0;
+}
+
+.exhibitBusinessName {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.exhibitInlineMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+}
+
+.exhibitMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+/* Icon on the text's line: a non-stretching flex item, no descender gap. The
+ * accent colour stays with actions, so the glyph is as quiet as its label. */
+.exhibitMetaItem svg {
+  display: block;
+  flex: none;
+}
+
+.exhibitMetaItemLink {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .exhibitMetaItemLink:hover {
+    color: var(--color-text-primary);
+  }
+}
+
+/* ─── STATS LINE ─────────────────────────────────────────
+ * „9 prac, 7 kolorów, 7 stylów”: read-only numbers as one quiet line of text.
+ */
+
+.statsLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  flex-basis: 100%;
+  margin: var(--space-8) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.stat {
+  white-space: nowrap;
+}
+
+.stat strong {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ─── ACTION PANEL ─────────────────────────────────────────
+ * The pairing invitation: a white box with the screen's one filled action.
+ * On a narrow track the button drops under the text instead of squeezing it.
+ */
+
+.actionPanel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* The title may wrap: the icon's box is one line of the title tall, so the
+ * glyph sits on its FIRST line. */
+.actionPanelIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  font-size: var(--text-base);
+  line-height: 1.25;
+  color: var(--color-text-secondary);
+}
+
+.actionPanelIcon svg {
+  display: block;
+}
+
+.actionPanelText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.actionPanelTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.actionPanelHint {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.actionPanelCta {
+  flex: none;
+  margin-left: auto;
+}
+
+/* ─── PORTFOLIO SECTION ───────────────────────────────────
+ * The section is the size-query container of the grid: app routes also render
+ * inside a 390px phone frame on a wide desktop, where a viewport breakpoint
+ * lies. The floating filter button is a sibling of this section (a container
+ * becomes the containing block of `position: fixed`).
+ */
+
+.portfolioSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* ─── Gallery grids: use the width (2 → 3 → 4 tiles, 1 → 2 → 3 large) ─── */
+
+.galleryList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+
+.galleryListFullWidth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .galleryList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .galleryListFullWidth {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-20);
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .galleryList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-20);
+  }
+
+  .galleryListFullWidth {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ─── Skeleton ─────────────────────────────────────────── */
+
+/* SKELETON: solid surface fill + opacity pulse (zero gradient-shimmer). */
+
+.skeletonHero {
+  position: relative;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  overflow: hidden;
+}
+
+.skeletonCover {
+  /* Parity z .exhibitCover (7/2, census S26). */
+  aspect-ratio: 7 / 2;
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonBody {
+  position: relative;
+  padding: var(--space-32) var(--space-20) var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.skeletonAvatar {
+  position: absolute;
+  top: calc(var(--space-32) * -1);
+  left: var(--space-20);
+  width: 80px;
+  height: 80px;
+  border-radius: var(--style-radius-pill);
+  border: var(--style-border-ring) solid var(--color-bg-paper);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonLine {
+  height: 14px;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonLineLg {
+  height: 22px;
+  width: 65%;
+  margin-top: calc(var(--space-20) + 8px);
+  margin-left: calc(80px + var(--space-12));
+}
+
+.skeletonLineSm {
+  height: 11px;
+  width: 45%;
+  margin-left: calc(80px + var(--space-12));
+}
+
+.skeletonGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.skeletonCard {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--style-radius-surface);
+}
+
+/* ─── Empty state — branded ───────────────────────────── */
+
+/* Anti-AI-Slop: solid tint fill + dashed full hairline. Zero gradient/shadow. */
+/* Powierzchnia i typografia = kanon <EmptyState>. Zostaje medalion 72px
+   (kolumna galerii jest wąska, 64 gubi się między kaflami) i dolny oddech
+   pod kartą — jako custom property, nie gołe deklaracje. */
+.emptyState {
+  --empty-medal-size: 72px;
+  --empty-pad-block-end: calc(var(--space-48) + var(--space-20));
+  --empty-title-size: var(--text-xl);
+  --empty-body-maxw: 36ch;
+}
+
+/* ─── Error state: the shared <ErrorState> plus a way back ─── */
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+/* ─── Session pick mode banner ─── */
+
+/* Tryb wyboru zdjęcia do sesji: biały boks z jednym zdaniem. Bez ramy i bez
+ * tintu (S126: ramka w kolorze akcentu czytała się jak pole do kliknięcia);
+ * komunikat niesie waga tekstu. */
+.sessionPickBanner {
+  padding: var(--space-16) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Most lajki → sesja: rząd z przełącznikiem „tylko ulubione" (pick-mode). */
+.favoritesFilterRow {
+  display: flex;
+  justify-content: flex-start;
+}

@@ -1,0 +1,83 @@
+/* GalleryFilterBar — one compact control row above a gallery grid.
+ *
+ * Narrow (phone, and the 390px desktop frame): „Filtry N” and the layout
+ * toggle share the first line, the active chips wrap on their own line below.
+ * From 560px of the row's OWN width the chips sit between the two controls.
+ * The split reads the container, never the viewport (app routes also render
+ * inside a phone frame on a wide desktop). */
+
+.frame {
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.entry {
+  order: 1;
+  flex: none;
+}
+
+/* The count is part of the label („Filtry 2”): same line, same weight, a gap
+ * instead of punctuation. */
+.entryCount {
+  margin-left: var(--space-6);
+}
+
+.summary {
+  order: 2;
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.layoutToggle {
+  order: 3;
+  flex: none;
+  margin-left: auto;
+}
+
+.active {
+  order: 4;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+@container (min-width: 560px) {
+  .active {
+    order: 2;
+    flex: 1 1 0;
+  }
+
+  .summary {
+    order: 3;
+  }
+
+  .layoutToggle {
+    order: 4;
+  }
+}
+
+/* Floating filter button (GalleryFloatingFilters): fades in once the row above
+ * has left the screen. `button.` raises the specificity over the primitive's
+ * own `transition`, whatever the order of the two stylesheets. `visibility`
+ * takes it out of the tab order and away from taps while hidden. */
+button.floatingEntry {
+  transition:
+    opacity var(--duration-200) var(--ease-entrance),
+    visibility var(--duration-200) var(--ease-entrance),
+    transform var(--transition-fast);
+}
+
+button.floatingEntryHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}

@@ -1,0 +1,11 @@
+/* border-image maluje POWIERZCHNIĘ ramy, nie linię — tint wpuszczony tędy
+   renderuje się jak każdy inny wash, a lista właściwości powierzchni go nie
+   obejmowała. */
+.tickedFrame {
+  border-image: repeating-linear-gradient(
+      45deg,
+      color-mix(in oklch, var(--color-primary) 12%, transparent) 0 4px,
+      transparent 4px 8px
+    )
+    8;
+}

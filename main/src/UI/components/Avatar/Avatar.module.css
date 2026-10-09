@@ -1,0 +1,92 @@
+/* ─── Avatar base ─── */
+.avatar {
+  border-radius: var(--style-radius-avatar);
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+  background-color: var(--color-surface-input);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+/* ─── Sizes ─── */
+.sm {
+  width: 32px;
+  height: 32px;
+}
+
+.md {
+  width: 40px;
+  height: 40px;
+}
+
+.lg {
+  width: 56px;
+  height: 56px;
+}
+
+.xl {
+  width: 96px;
+  height: 96px;
+}
+
+/* ─── Initials (no photo, or the photo failed to load) ─── */
+/* DECISION (nie usuwaj tego komentarza):
+   Rozmiar inicjalow jest wpisany PER ROZMIAR AVATARA, nie relatywnie.
+   Wczesniej stal tu relatywny zapis 0.85em z intencja "skaluj sie z avatarem" —
+   `em` liczy sie jednak od ODZIEDZICZONEGO font-size rodzica, a nie od
+   szerokosci kola, wiec inicjaly w avatarze 56px i 32px wychodzily IDENTYCZNE
+   (~12,8px w kontekscie --text-sm), czyli intencja nie dzialala, a wynik
+   przebijal floor 14px skali tokenow (DECISION S37). Tokeny --text-* wiaza
+   rozmiar z KLASA ROZMIARU, dzieki czemu skalowanie jest realne i widoczne
+   dla straznika audit:min-font-size. */
+.initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Cztery tony z ról palety (pary tło + tekst, obie mode-aware); ton wybiera
+     skrót z imienia, więc ta sama osoba ma wszędzie ten sam kolor. Domyślny
+     (bez atrybutu) = ton 0. */
+  background-color: var(--_avatar-bg, var(--color-text-primary));
+  color: var(--_avatar-fg, var(--color-bg-main));
+  border-color: transparent;
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+}
+
+.sm.initials {
+  font-size: var(--text-xs);
+}
+
+.md.initials {
+  font-size: var(--text-base);
+}
+
+.lg.initials {
+  font-size: var(--text-xl);
+}
+
+.xl.initials {
+  font-size: var(--text-2xl);
+}
+
+/* ton 0: atrament odwrócony (w trybie ciemnym jasne kółko z ciemnym tekstem).
+ * Wszystkie tony są NEUTRALNE: akcent marki zostaje dla głównej akcji
+ * i znaku klikalności, a lista ośmiu klientek z malinowymi kółkami obok
+ * malinowych strzałek gasiła jedno i drugie. */
+.initials[data-tone='1'] {
+  --_avatar-bg: var(--color-surface-pressed);
+  --_avatar-fg: var(--color-text-primary);
+}
+
+.initials[data-tone='2'] {
+  --_avatar-bg: var(--color-text-secondary);
+  --_avatar-fg: var(--color-bg-main);
+}
+
+.initials[data-tone='3'] {
+  --_avatar-bg: var(--color-mark-bg-strong);
+  --_avatar-fg: var(--color-text-primary);
+}

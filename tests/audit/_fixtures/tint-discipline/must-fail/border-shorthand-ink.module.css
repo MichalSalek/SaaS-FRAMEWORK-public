@@ -1,0 +1,10 @@
+/* Rama akcentu zapisana SKRÓTEM i właściwością LOGICZNĄ. Lista samych
+   `border-*-color` widziała tylko zapis rozbity, a `border-top: 2px solid`
+   to najczęstszy realny zapis jednostronnego paska (R8). */
+.featuredTop {
+  border-top: 2px solid var(--color-ink);
+}
+
+.featuredStart {
+  border-inline-start: 2px solid var(--color-ink);
+}

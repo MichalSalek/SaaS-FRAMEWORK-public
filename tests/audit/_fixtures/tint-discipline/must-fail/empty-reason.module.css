@@ -1,0 +1,9 @@
+/* Escape bez powodu = brak informacji dla review, czyli wyjątek nie do
+   zweryfikowania. Tło jest tu ZGODNE z motywem (token roli), więc jedynym
+   powodem faila może być sam pusty marker: gdy gałąź „tint-allow bez powodu”
+   zniknie, ta próbka przechodzi i meta-strażnik to widzi. Wcześniej łamała
+   dwie rzeczy naraz i chroniła regułę, której nie sprawdzała. */
+.noReason {
+  /* tint-allow: */
+  background: var(--color-mark-bg);
+}

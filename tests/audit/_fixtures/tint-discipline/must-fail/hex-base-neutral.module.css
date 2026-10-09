@@ -1,0 +1,6 @@
+/* Baza mieszania zapisana HEXEM neutralnym (papier). To ta sama figura co
+   `var(--color-bg-main) 92%`, tylko z pominięciem tokenu — a rozpoznanie
+   hexa jako bazy nie miało próbki. */
+.overPaperHex {
+  background: color-mix(in oklch, #f7f5f2 92%, var(--color-primary));
+}

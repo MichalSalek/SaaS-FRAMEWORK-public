@@ -1,0 +1,56 @@
+/* ─── TrustProse — kanon prozy zaufania (głos ownera S52 = wariant C).
+ * Zastępuje ikona+bullet trust-listę (TrustSignals pills/chips/grid w roli
+ * „authority/trust") jednym editorial zdaniem serif z gold-italic akcentami.
+ * Zero ikon, zero cieni/gradientów (floor 7×ZERO). Statyczny → zero hover. */
+
+.wrap {
+  margin: 0 auto;
+}
+
+.prose {
+  max-width: 62ch;
+  margin: 0 auto;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-xl);
+  line-height: 1.5;
+  letter-spacing: var(--ls-tight-5);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.prose em {
+  font-style: italic;
+  color: var(--color-accent-fg);
+}
+
+.note {
+  max-width: 56ch;
+  margin: var(--space-14) auto 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* Wyrównanie do lewej (np. w splitach / kolumnach) */
+.start .prose,
+.start .note {
+  text-align: left;
+  margin-inline: 0;
+}
+
+/* ─── tone='ink' — na zamkniętej ink-karcie / negatywie ─── */
+.ink .prose {
+  color: var(--color-on-ink);
+}
+.ink .prose em {
+  /* gold jako FILL/akcent na ciemnym tle jest legalny (WCAG: jasny gold na ink) */
+  color: var(--color-primary);
+}
+.ink .note {
+  color: color-mix(in oklch, var(--color-on-ink) 70%, transparent);
+}

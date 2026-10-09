@@ -1,0 +1,9 @@
+/* Konektor kroków w grubości 2px: element wielkości LINII, nie powierzchnia
+   pod treścią. Wyciszenie po rozmiarze zostaje, ale wyłącznie dla jawnego
+   1–6px na height/width. */
+.stepsList::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  background: color-mix(in oklch, var(--color-primary) 25%, transparent);
+}

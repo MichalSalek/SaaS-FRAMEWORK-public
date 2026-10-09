@@ -1,0 +1,12 @@
+-- Zamknięcie karty „Siła galerii" przez stylistkę (owner, 2026-09-17).
+--
+-- DECISION (nie usuwaj tego komentarza):
+-- Jeden nullowalny znacznik: NULL = karta widoczna, data = stylistka zamknęła
+-- ją po osiągnięciu 100%. Nic go nie czyści — o pokazaniu karty decyduje
+-- WYNIK (spadek poniżej 100% przywraca kartę mimo znacznika), więc kolumna
+-- przechowuje fakt niemożliwy do odtworzenia z wyniku. Bez backfillu i bez
+-- indeksu: czytana wyłącznie przy odczycie własnego wiersza po kluczu głównym.
+--
+-- IF NOT EXISTS, bo dev i staging bywają stawiane przez `db push` — gołe ADD
+-- COLUMN na istniejącej kolumnie kończy się P3018 i blokuje kolejne migracje.
+ALTER TABLE "StylistAccount" ADD COLUMN IF NOT EXISTS "gallery_strength_dismissed_at" TIMESTAMP(3);

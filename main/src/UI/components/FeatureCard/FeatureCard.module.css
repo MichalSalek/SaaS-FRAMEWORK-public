@@ -1,0 +1,63 @@
+/* ─── FeatureCard — statyczna karta cechy (zero hover, floor §4) ─── */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--feature-card-gap, clamp(10px, 1.2vw, 16px));
+  padding: var(--feature-card-pad, clamp(24px, 2.6vw, 36px));
+  background: var(--feature-card-bg, var(--color-bg-main));
+  border: var(
+    --feature-card-border,
+    var(--style-border-surface) solid var(--color-divider)
+  );
+  border-radius: var(--style-radius-surface);
+}
+
+/* ─── Icon chip — ZNAK (motyw „Jeden krem": glif wielkości ikony zostaje
+ *     złoty, powierzchnie idą na papier). Tint przez token roli. ─── */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--feature-card-icon-size, var(--space-44));
+  height: var(--feature-card-icon-size, var(--space-44));
+  border-radius: var(--style-radius-control);
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+}
+
+/* ─── Title ─── */
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--feature-card-title-size, clamp(19px, 1.8vw, 25px));
+  line-height: 1.22;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+/* ─── Body ─── */
+.body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--feature-card-body-size, var(--text-fluid-sm));
+  line-height: var(--feature-card-body-lh, var(--leading-body));
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* ─── Meta footer (detal pod body) ─── */
+.meta {
+  margin: 0;
+  margin-top: auto;
+  padding-top: var(--space-8);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}

@@ -1,0 +1,68 @@
+/* AdminSupportPage — placement only. The filter bar, the table, the pager and
+   the status pill bring their own look (shared parts). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+
+/* The count in the title band is a link to the counted threads. */
+.heroDoor {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-radius: var(--style-radius-pill);
+  text-decoration: none;
+}
+
+.heroDoor:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Cells ─── */
+
+/* Second line of a cell (the e-mail under the name). */
+.cellQuiet {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* Last message: text a person wrote, clamped to two lines on purpose
+   (`data-truncate='content'` in the markup). */
+.preview {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.previewLabel {
+  font-weight: 600;
+}
+
+/* One piece that never breaks inside (a relative time, a date). */
+.nowrap {
+  white-space: nowrap;
+}
+
+/* ─── Under the last row ─── */
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}

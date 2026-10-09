@@ -1,0 +1,10 @@
+/* Złoty/akcentowy PAS ma oczekiwać --color-ink, więc nowa gałąź (celująca
+   w płaszczyzny ciemne) nie może go dotknąć nawet wtedy, gdy ring stoi
+   na --color-primary byłby tu bez sensu — pas remapuje na atrament. */
+.accentBandInkRing {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-primary);
+  --color-focus-ring: var(--color-ink);
+  color: var(--color-primary-contrast);
+}

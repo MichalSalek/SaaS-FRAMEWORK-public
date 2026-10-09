@@ -1,0 +1,5 @@
+/* Cały blok w JEDNEJ linii — parser oparty na „linia otwiera / linia zamyka”
+   nigdy takiego bloku nie widział: opens == closes, więc nie trafiał ani na
+   stos, ani do ciała żadnego bloku. Znaleziony przez ten fixture, nie przez
+   czytanie regexa. */
+.oneLiner { background: color-mix(in oklch, var(--color-primary) 12%, transparent); }

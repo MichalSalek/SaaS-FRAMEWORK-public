@@ -1,0 +1,7 @@
+/* `--color-text-primary` kończy się na „primary”, więc bez jawnego wyłączenia
+   rodziny color-text-* wpadałby do akcentów, a mieszanina „dwóch akcentów”
+   wychodzi ze skanu bez śladu. Tymczasem to token TEKSTU, czyli baza
+   powierzchni, i złoto jest tu resztą mieszania: 8% washu pod treścią. */
+.washedOnText {
+  background: color-mix(in oklch, var(--color-text-primary) 92%, var(--color-primary));
+}

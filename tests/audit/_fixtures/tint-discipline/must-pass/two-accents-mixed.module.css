@@ -1,0 +1,12 @@
+/* Dwa AKCENTY zmieszane w jeden odcień roli: hue klientki (--client-rose,
+   goły kolor chromatyczny) z 55-procentowym udziałem, złoto marki jako reszta.
+   To pełnokolorowy akcent, nie wash pod treścią — dokładnie ten zapis żyje
+   w ActivateRolePage i strażnik nie może go ruszać. */
+.page {
+  --client-rose: #e16a8c;
+  --activate-accent: color-mix(in oklch, var(--client-rose) 55%, var(--color-primary));
+}
+
+.roleOrb {
+  background: var(--activate-accent);
+}

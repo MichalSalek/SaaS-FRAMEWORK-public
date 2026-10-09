@@ -1,0 +1,112 @@
+/* StatTile — one number with its name; band = tiles in ONE box. */
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-16);
+  border: 0;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  text-align: left;
+  text-decoration: none;
+}
+
+.interactive {
+  min-height: 44px;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.interactive:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.interactive:active {
+  opacity: 0.75;
+}
+
+/* Chosen = inverted ink. */
+.selected {
+  /* Inverted ink: the default ring colour has no contrast on it. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+}
+
+.label {
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.value {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-xl);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.hint {
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
+.selected .label,
+.selected .hint {
+  color: inherit;
+}
+
+/* Same box as a rendered value, so the number arriving moves nothing. */
+.valuePending {
+  display: block;
+  width: 3ch;
+  height: 1.15em;
+  border-radius: var(--style-radius-control);
+  background: var(--color-divider);
+}
+
+/* ─── Band: ONE box, tiles separated by hairlines ───
+   The hairlines are the band's own background showing through 1px gaps, so
+   there is no one-sided border on any tile and a wrapped row needs no special
+   case. Tiles grow to fill their row: no empty cell ever shows the gap colour. */
+.band {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--style-border-divider);
+  overflow: hidden;
+  background: var(--color-divider);
+}
+
+.band[data-surface='box'] {
+  border-radius: var(--style-radius-surface);
+}
+
+.band > .tile {
+  flex: 1 1 132px;
+  border-radius: 0;
+}
+
+/* Tiles of one row share a height; the label takes the free part of it, so a
+   one-line label and a two-line label leave their VALUES on the same line
+   (S126: „292” and „380” stood at different heights in one strip). */
+.band > .tile > .label {
+  flex: 1 0 auto;
+}
+
+@media (hover: hover) {
+  .interactive:not(.selected):hover {
+    background: var(--color-state-hover);
+  }
+}

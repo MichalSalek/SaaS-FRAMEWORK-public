@@ -1,0 +1,9 @@
+/* Solidne złoto plus przezroczystość renderuje się PIKSEL W PIKSEL tak samo
+   jak tint 7% — a żaden skan po color-mix tego nie widzi. */
+.washByOpacity::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary);
+  opacity: 0.07;
+}

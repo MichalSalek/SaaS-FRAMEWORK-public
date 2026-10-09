@@ -1,0 +1,199 @@
+/* MessagesListPage — inbox rozmów. Floor-compliant: flat, pełne hairline
+   dividery między wierszami (nie one-sided), zero gradient/shadow. */
+
+/* Marginesy strony daje powłoka (AppLayout, 20px), jak na każdym innym
+ * ekranie. Do S126 ta strona miała własne 32px i wyśrodkowaną kolumnę 720px,
+ * więc tytuł i lista stały na innej krawędzi niż reszta aplikacji. Szerokość
+ * trzyma teraz PageColumnsMolecule: od 720px własnej szerokości lista dostaje
+ * czytelną miarę od LEWEJ krawędzi, a wiersz nie rozjeżdża się na 900px. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  width: 100%;
+  min-width: 0;
+}
+
+/* Tor filtra nie rozciąga się na szerokość kolumny. */
+.filter {
+  align-self: flex-start;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--style-radius-surface);
+  /* S116 („A3”): każdy wiersz jest klikalny, więc lista stoi na bieli. */
+  background: var(--color-surface-interactive);
+  overflow: hidden;
+}
+
+.list > li:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.rowShell {
+  display: flex;
+  align-items: flex-start;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-16) var(--space-4) var(--space-16) var(--space-16);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--duration-200) var(--ease-entrance);
+}
+
+/* Wiersz bez menu (rozmowa bez wiadomości): tekst trzyma prawy margines. */
+.rowShell > .row:last-child {
+  padding-right: var(--space-16);
+}
+
+.row:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.rowMain {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.nameLine {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+/* Imię ma całą linię i do dwóch linii: wiersz rośnie, imię nie jest cięte. */
+.name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.rowShell[data-unread] .name {
+  font-weight: 700;
+}
+
+/* Miejsce na znak nieprzeczytanej stoi ZAWSZE (wysokość pierwszej linii
+ * imienia), więc przeczytanie rozmowy nie zmienia łamania imienia. */
+.unreadSlot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--space-10);
+  height: 1.3em;
+  font-size: var(--text-base);
+}
+
+.unreadDot {
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: var(--style-radius-round);
+  background-color: var(--color-primary);
+}
+
+/* Cicha linia: kiedy, potem co. Dwie linie podglądu zamiast ~20 znaków. */
+.meta {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.rowShell[data-unread] .meta {
+  color: var(--color-text-primary);
+}
+
+.when {
+  margin-right: var(--space-8);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.neutralAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--style-radius-round);
+  background: var(--color-mark-bg);
+  color: var(--color-text-secondary);
+}
+
+/* Jedyna kontrolka na końcu wiersza. Środek przycisku (44px) stoi na osi
+ * awatara (40px od 16px paddingu wiersza). */
+.rowMenu {
+  margin: var(--space-14) var(--space-4) 0 0;
+}
+
+/* Powierzchnia = kanon <EmptyState>, bez własnej karty i ramki. */
+.empty {
+  --empty-surface: transparent;
+  --empty-border: none;
+  --empty-body-maxw: 360px;
+}
+
+/* Paginacja listy rozmów (S82). */
+.loadOlderRow {
+  display: flex;
+  justify-content: center;
+}
+
+/* Visually-hidden (SR-only) — wzorzec HelpCenterPage. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Wiersz szkieletu: te same odstępy co `.row`, żeby lista nie drgnęła. */
+.skeletonRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16);
+}
+
+.skeletonLines {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}

@@ -1,0 +1,6 @@
+/* Złoto BEZ procentu — jest resztą mieszania, więc jego udział to 100 minus
+   procent drugiego koloru. Regex wymagający cyfr po var(--color-primary)
+   przepuszczał to bezgłośnie. */
+.remainder {
+  background: color-mix(in oklch, var(--color-bg-main) 92%, var(--color-primary));
+}

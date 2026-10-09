@@ -1,0 +1,308 @@
+/* ─── GetAppPage — adapted from prototype archive (usunięty 2026-06-14) ─── */
+
+.page {
+  --section-block: clamp(48px, 6vw, 96px);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 1. HERO — kanoniczny <LpHero/> (components/LpHero); typografia i layout
+ * hero żyją TAM, a kolaż telefonów i kolumna sklepów w GetAppHero
+ * (współdzielone z /app/home od 2026-09-09). Tu zostaje tylko korekta
+ * łamania h1 na wąskim ekranie.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Hero headline (h1 renderuje kanon LpHero — jedyny h1 strony, stąd scope
+ * .page h1 zamiast klasy z cudzego modułu). Kanon ma text-wrap: balance,
+ * ale na 390px ostatnie słowo łamało się samotnie (balance w Chromium ma
+ * limit linii i nie gwarantuje braku sieroty). `pretty` = dedykowana
+ * prewencja sierot, bez limitu linii; tylko mobile — desktop zostaje na
+ * balansie kanonu. */
+@media (max-width: 767.98px) {
+  .page h1 {
+    text-wrap: pretty;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2. FEATURES — głos S24/7 wariant B (1:1 z playground
+ * S24Vote7GetAppFeatures.module.css, klasy v7Inner/v7bGrid/v7bList/
+ * v7bRow/v7bRowIcon/v7bRowContent/v7bRowTitle/v7bRowBody/v7bPhoneCol):
+ * hairline-lista z lewej szyny ikon + sticky screen.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Band przez <Section tone='subtle'> — tint bg-subtle + PEŁNA rama
+ * hairline top+bottom (S24: tint bez ramy "rozlewa sie" na bieli) +
+ * breakout + kontener lp żyją w Section; tu tylko rytm pionowy strony. */
+.featuresSection {
+  --section-pad-block: var(--section-block);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: 60ch;
+  margin: 0 0 clamp(48px, 6vw, 88px);
+}
+
+/* Per-page headline scale dla <SectionHeader> — sterowanie var-hookami kanonu
+ * (NIE redefinicja .sectionHeadline; FDX W5.1). Wartości = dawny lokalny
+ * .sectionHeadline (clamp(28-48px) / 1.08 / -0.018em / 16ch), żeby nagłówek
+ * sekcji features został pixel-identyczny.
+ * DECISION (nie usuwaj tego komentarza): lede renderuje teraz kanon
+ * (SectionHeader → .lede: --text-lg / max-width none), świadoma konwergencja
+ * na SSOT (wzorzec ForStylists/HomePage — dawny lokalny .sectionLede usunięty).
+ * Kanon nie wystawia hooków lede, więc tu sterujemy tylko skalą nagłówka. */
+.sectionHeaderScaled {
+  --section-headline-size: clamp(28px, 4.4vw, 48px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: 16ch;
+}
+
+/* FAQ title scale — tytuł FaqSection to <span> (FaqSection sam renderuje
+ * element nagłówkowy z headingId, więc nie owijamy go w kanoniczny h2 —
+ * patrz DECISION w GetAppPage.tsx). Ta klasa (samodzielna, NIE .sectionHeadline
+ * — audyt eyebrow-headline-dup) odwzorowuje dawny lokalny .sectionHeadline
+ * 1:1, by tytuł FAQ trzymał skalę pozostałych nagłówków sekcji. */
+.faqTitleScale {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+
+/* Split: lista | telefon (sticky od LG). */
+.featuresGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 4vw, 64px);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .featuresGrid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Wiersz: ikona w stałej lewej szynie (ikony, NIE numeracja — funkcje to
+ * równoległe możliwości, nie sekwencja; Style Policy §6). Jednorodne rzędy
+ * o wspólnej lewej linii — bez nth-child zig-zagu i bez full-bleed banda
+ * w środku listy (uzasadnienie: DECISION w GetAppPageFeatures.tsx). */
+.feature {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: clamp(12px, 1.4vw, 20px);
+  padding-block: clamp(24px, 2.8vw, 40px);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.feature:last-of-type {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.featureIcon {
+  display: inline-flex;
+  color: var(--color-primary);
+  margin-top: var(--space-2);
+}
+
+.featureContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 14px);
+  max-width: 56ch;
+  min-width: 0;
+}
+
+.featureTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.22;
+  letter-spacing: var(--ls-tight-12);
+  /* Display-digity ("Dodaj zdjęcie w 30 sekund" → "3O sekund"). */
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.featureText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.featuresPhoneCol {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .featuresPhoneCol {
+    position: sticky;
+    top: calc(
+      var(--public-header-height, var(--app-bar-height)) + var(--space-96)
+    );
+    align-self: start;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2.5. HOW — 3-step onboarding (dead-i18n activation)
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Band przez <Section> (plain) — breakout + kontener lp w Section.
+ * Tło bg-main jawnie; border-top CELOWO pojedynczy (separator domykający
+ * tint-band features powyżej, nie rama banda — dlatego bez prop bordered). */
+.howSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* Kontener lp + centrowanie daje constrained inner Section. */
+.howInner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 28px);
+}
+
+.howHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.howLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0 0 clamp(20px, 3vw, 40px);
+  max-width: 56ch;
+}
+
+/* Kroki 01-03 = kanoniczny <StepsSection variant='list'> (ta strona była
+   kanonem skali numerała) — skórka żyje w components/StepsSection. */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3. TRUST — głos S24/8 wariant B (1:1 z playground
+ * S24Vote8GetAppTrust.module.css, klasy v8bBand/v8Inner/v8bPanelWrap/
+ * v8bPanel/v8bGrid/v8bFact): zamknięta ink-karta 2x2.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Band bez tintu (1:1 v8bBand: bg-main, bez ramy — gładkie tło pod
+   zamkniętą ink-kartą; sąsiednie bandy mają własne hairline'y).
+   Breakout + rytm domyślny (clamp 48/6vw/88 = kanon) + kontener lp żyją
+   w <Section> (plain); jawne bg-main zostaje tu. */
+.trustSection {
+  background: var(--color-bg-main);
+}
+
+/* Kontener lp + centrowanie daje constrained inner Section. */
+.trustInner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 28px);
+  align-items: center;
+}
+
+/* Zwężenie negatywu (max 860px, do lewej): krótka karta zamiast ściany —
+ * strona ma już gold finalCta, ink zostaje lekki. */
+.trustPanelWrap {
+  width: 100%;
+  max-width: 50rem;
+  margin-inline: auto;
+}
+
+.trustPanel {
+  padding: clamp(28px, 3.4vw, 48px) clamp(24px, 3vw, 48px);
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+ * trust-fakty zostają page-local (NIE migrują na TrustSignals variant='grid').
+ * Kanon TrustSignals grid renderuje JASNE karty (bg-elevated + neutral border +
+ * text-secondary) — nieczytelne na ciemnym ink-panelu, a recolor on-ink przez
+ * page-className przegrywa specificity z .grid li (CSS-modules). On-ink grid =
+ * jedyny taki przypadek (rule of three niespełniony), więc bez wariantu w kanonie. */
+.trustGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(18px, 2.4vw, 32px) clamp(24px, 3vw, 48px);
+}
+
+@media (min-width: 640px) {
+  .trustGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.trustFact {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-on-ink);
+  min-width: 0;
+}
+
+/* Gold na ink = legalny fill-akcent (ciemne tło). */
+.trustFact svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 4. FINAL CTA — współdzielony molecule FinalCtaBand
+ * (src/UI/components/FinalCtaBand/) — zero per-page stylów.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * FAQ — kanoniczny <FaqSection> (skórka żyje w components/FaqSection);
+ * band = <Section tone='subtle' as='div'> (tint bg-subtle + pełna rama
+ * hairline S24 + breakout + kontener lp z kanonu). Tu tylko rytm strony.
+ * ───────────────────────────────────────────────────────────────────── */
+.faqSection {
+  --section-pad-block: var(--section-block);
+}
+
+.contextualIllustration {
+  margin-top: max(0px, calc(var(--illustration-gap) - clamp(16px, 2vw, 28px)));
+  display: block;
+  width: 100%;
+  max-width: 50rem;
+  height: auto;
+}

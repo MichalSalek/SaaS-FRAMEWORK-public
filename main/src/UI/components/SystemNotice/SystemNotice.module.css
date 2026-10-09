@@ -1,0 +1,84 @@
+/* SystemNotice — the shared intro of system pages (404, 500, catch-all error,
+ * connection check) and the page column they stand in. Information on paper:
+ * no card, no frame, no entry animation. */
+
+/* Page column: the notice and whatever follows it share one width, so a
+ * shortcut grid never ends up narrower or wider than the intro above it. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-20) var(--space-64);
+}
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+
+.illustration {
+  margin-bottom: var(--space-8);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.15;
+  letter-spacing: var(--style-heading-tracking);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.body {
+  margin: 0;
+  max-width: 52ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.body:lang(pl) {
+  hyphens: auto;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+}
+
+.meta {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Below 480px each action takes the full width: one thumb-sized target per
+ * line instead of two buttons of unequal width wrapping at random. */
+@media (max-width: 479px) {
+  .actions {
+    flex-direction: column;
+    align-self: stretch;
+  }
+}
+
+/* Rows of further links under the intro (status page, contact). */
+.links {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-top: var(--space-64);
+    padding-bottom: var(--space-96);
+  }
+}

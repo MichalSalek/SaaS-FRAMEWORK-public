@@ -1,0 +1,1222 @@
+/* ═════════════════════════════════════════════════════════════════
+ * HelpCenterPage — knowledge base, search-first.
+ * Anti-AI-Slop flat editorial: depth via solid color-block + tonal
+ * surface steps + full hairline borders. ZERO gradient/shadow/glow/blur.
+ * ═════════════════════════════════════════════════════════════════ */
+
+/* ─── Motion ─── */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ─── Utility ─── */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Page shell ─── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 6vw, 96px);
+  /* padding-bottom = inter-section gap: domyka spacing pod OSTATNIĄ sekcją
+   * (bottomCta), żeby jej góra↔dół były równe (owner S81). */
+  padding: 0 0 clamp(40px, 6vw, 96px);
+}
+
+/*
+ * DECISION (nie usuwaj tego komentarza):
+ * Nagłówki sekcji Help Center (wizard/FAQ/categories/popular) migrowane na
+ * kanon <SectionHeader align='center'> przez var-hooki (S37): kanon dostał
+ * --section-headline-hyphens (PL łamanie długich rzeczowników w wąskich,
+ * wycentrowanych nagłówkach knowledge-base) i brak measure to default. Skala/
+ * hyphens żyją na .helpHeader; .pageHeadline/.sectionLede page-local usunięte. */
+.helpHeader {
+  --section-headline-size: clamp(28px, 4.2vw, 44px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-hyphens: auto;
+  max-width: 56ch;
+  margin: 0 auto;
+  padding: 0 var(--space-12);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * 1. HERO — search-first knowledge base (Notion docs landing)
+ * ═════════════════════════════════════════════════════════════════ */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(48px, 7vw, 120px) var(--space-20) clamp(40px, 5vw, 80px);
+  display: flex;
+  justify-content: center;
+  isolation: isolate;
+  background: var(--color-bg-main);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+}
+
+.heroInner {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  text-align: center;
+  position: relative;
+}
+
+/* Decorative thread SVG — asymmetric right-side accent. aria-hidden.
+ * Positioned relative to heroInner. right:-90px clears the 620px search
+ * column entirely (search half-width 310px vs decor inner edge 310px from
+ * center): no under-lap. */
+.heroDecor {
+  position: absolute;
+  right: -90px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  height: auto;
+  opacity: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Hide where the offset decor would be clipped by the hero's overflow
+ * (right edge at 470px from center needs >=960px viewport) or crowd content. */
+@media (max-width: 959px) {
+  .heroDecor {
+    display: none;
+  }
+}
+
+.heroHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-3xl);
+  line-height: 1.02;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+  hyphens: auto;
+}
+
+.heroSubtext {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  max-width: 52ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ─── Search input — large, prominent (Notion-style) ─── */
+.heroSearch {
+  width: 100%;
+  max-width: 620px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  background: var(--color-bg-elevated);
+  border: var(--style-border-control) solid var(--color-divider);
+  /* DECISION (nie usuwaj tego komentarza) — narożniki współśrodkowe (S122):
+   * przycisk „Szukaj" siedzi w polu z wcięciem `--search-inset`, więc promień
+   * pola = promień przycisku + wcięcie + ramka pola. Dwa równe promienie (oba
+   * surface) dawały przy wcięciu 2 px na telefonie przycisk „przyklejony" do
+   * krawędzi z łukami, które się nie składały. Wcięcie zmienia się w jednym
+   * miejscu. */
+  --search-inset: var(--space-8);
+  border-radius: calc(
+    var(--style-radius-control) + var(--search-inset) +
+      var(--style-border-control)
+  );
+  padding: var(--search-inset) var(--search-inset) var(--search-inset) 0;
+  transition:
+    border-color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.heroSearch:focus-within {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  /* Focus indicator → AA-grade mode-aware ring (--color-focus-ring);
+   * gold outline = 2.2:1 < 3:1 (SC 1.4.11 FAIL). Gold border-color stays as accent. */
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 0;
+}
+
+.heroSearchIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-primary);
+  pointer-events: none;
+}
+
+.heroSearchInput {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  /* DECISION (B2-F18): Naked input inside .heroSearch container. Focus ring is on the
+   * container via :focus-within (border + glow + outline shadow). Removing input's own
+   * outline prevents double ring. Keyboard users see the container focus ring (WCAG 2.4.7). */
+  outline: none;
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  padding: 18px var(--space-8) 18px 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.heroSearchInput::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.heroSearchInput::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.heroSearchSubmit {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  cursor: pointer;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide-20);
+  padding: var(--space-12) 22px;
+  /* Wysokość wiersza, nie własna: wcięcie od góry, prawej i dołu jest równe. */
+  align-self: stretch;
+  border-radius: var(--style-radius-control);
+  transition:
+    background var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform var(--duration-120) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .heroSearchSubmit:hover {
+    /* #000 celowy — czarny do sciemniania primary w color-mix, nie kolor UI */
+    background: color-mix(in oklch, var(--color-primary) 88%, #000 12%);
+    transform: translateY(-1px);
+  }
+}
+
+.heroSearchSubmit:active {
+  transform: translateY(0);
+}
+
+/* Small screens: „Szukaj" drops to its own full-width row inside the field,
+ * with the same inset on the sides and bottom as the corner math above. */
+@media (max-width: 480px) {
+  .heroSearch {
+    --search-inset: var(--space-12);
+    grid-template-columns: 32px 1fr;
+    padding: var(--space-4) var(--search-inset) var(--search-inset);
+  }
+  .heroSearchSubmit {
+    grid-column: 1 / -1;
+    margin: var(--space-4) 0 0;
+    padding: var(--space-12) var(--space-20);
+  }
+}
+
+/* ─── Popular tags row ─── */
+.popularTagsRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  /* Task 6: chips blijven gecentreerd (search UX) maar ademen meer —
+   * --sp-4 (32px) distantiëert ze van de search terwijl de aangrenzende
+   * left-aligned secties er geen spanning van ondervinden. */
+  margin-top: var(--space-32);
+}
+
+.popularTagsLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-secondary);
+  opacity: 0.85;
+}
+
+.popularTagsChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  justify-content: center;
+  max-width: 620px;
+}
+
+.popularTagChip {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-14);
+  border-radius: var(--style-radius-pill);
+  border: var(--style-border-surface) solid var(--color-divider);
+  background: color-mix(in oklch, var(--color-bg-main) 80%, transparent);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide-10);
+  transition:
+    background var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.popularTagChip svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+@media (hover: hover) {
+  .popularTagChip:hover {
+    /* Ulotny hover = neutralny tonal step (R6); złoto zostaje ramie i etykiecie. */
+    background: var(--color-state-hover);
+    border-color: var(--color-border-surface);
+    /* Chip label hover text on light tint → AA gold (--color-accent-fg). */
+    color: var(--color-accent-fg);
+    transform: translateY(-1px);
+  }
+}
+
+.popularTagChip:active {
+  transform: translateY(0);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * 2. CATEGORIES GRID — Stripe Docs landing (6 cards, asymmetric accents)
+ * ═════════════════════════════════════════════════════════════════ */
+
+.categoriesSection {
+  padding: 0 var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .categoriesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .categoriesGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-20);
+  }
+}
+
+.categoryCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-16);
+  padding: 22px 22px var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-divider);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    background var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+}
+
+@media (hover: hover) {
+  .categoryCard:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-divider);
+    /* Ulotny hover = neutralny tonal step (R6). */
+    background: var(--color-state-hover);
+  }
+  .categoryCard:hover .categoryArrow {
+    transform: translateX(4px);
+  }
+}
+
+.categoryCard:active {
+  transform: translateY(-1px);
+}
+
+.categoryCard:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+/* Accent assignment via data attribute — single charcoal-gold family.
+ * Cards differentiated by tint INTENSITY and gold↔ink tone, never by foreign
+ * hues (multi-pastel drift removed 2026-06-11; palettes.css = SSOT barwy).
+ * Skala: gold-soft → gold → gold-deep → gold-solid (pełne złoto) + ink
+ * (węglowy kontrapunkt). gold-solid jest mode-invariant. */
+.categoryCard[data-accent='gold'] {
+  --category-icon-bg: var(--color-mark-bg);
+  --category-icon-fg: var(--color-accent-fg);
+}
+.categoryCard[data-accent='gold-deep'] {
+  --category-icon-bg: var(--color-mark-bg);
+  --category-icon-fg: var(--color-accent-fg);
+}
+.categoryCard[data-accent='gold-soft'] {
+  --category-icon-bg: var(--color-mark-bg);
+  --category-icon-fg: var(--color-accent-fg);
+}
+.categoryCard[data-accent='ink'] {
+  --category-icon-bg: color-mix(
+    in oklch,
+    var(--color-ink) 8%,
+    var(--color-bg-main)
+  );
+  --category-icon-fg: var(--color-text-primary);
+}
+.categoryCard[data-accent='gold-solid'] {
+  --category-icon-bg: var(--color-primary);
+  --category-icon-fg: var(--color-primary-contrast);
+}
+
+/* Dark: tinty mieszane w stronę bg-elevated (tło karty), żeby tile czytał się
+ * jako podniesiony stopień tonalny, nie dziura. gold-solid bez override. */
+[data-mode='dark'] .categoryCard[data-accent='gold'] {
+  --category-icon-bg: var(--color-bg-elevated);
+}
+[data-mode='dark'] .categoryCard[data-accent='gold-deep'] {
+  --category-icon-bg: color-mix(
+    in oklch,
+    var(--color-primary) 32%,
+    var(--color-bg-elevated)
+  );
+}
+[data-mode='dark'] .categoryCard[data-accent='gold-soft'] {
+  --category-icon-bg: var(--color-bg-elevated);
+}
+[data-mode='dark'] .categoryCard[data-accent='ink'] {
+  --category-icon-bg: color-mix(
+    in oklch,
+    var(--color-on-ink) 10%,
+    var(--color-bg-elevated)
+  );
+}
+
+/* Dark: 1 krok tonal-separacji karty od tła sekcji — divider w dark
+ * (#1e1e1e) ≈ bg-elevated karty, więc hairline znikał, a tile zlewał się
+ * z bg-main. Karta podniesiona o on-ink 5% + widoczna pełna rama.
+ * Light bez zmian (tam divider odcina się od bieli). */
+[data-mode='dark'] .categoryCard {
+  background: color-mix(
+    in oklch,
+    var(--color-on-ink) 5%,
+    var(--color-bg-elevated)
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--color-on-ink) 14%,
+    var(--color-bg-elevated)
+  );
+}
+
+@media (hover: hover) {
+  /* Hover-parytet dla podniesionej bazy — tło MUSI wrócić tutaj.
+   * `.categoryCard:hover` ma specyficzność (0,2,0), dokładnie tyle samo co
+   * reguła bazowa `[data-mode='dark'] .categoryCard` wyżej, a tamta stoi
+   * PÓŹNIEJ w pliku — więc w ciemności zjadała hover tła i zostawała sama
+   * gold-rama. Selektor (0,3,0) rozstrzyga to jednoznacznie.
+   * Wartość NIE może być gołym --color-state-hover: token jest
+   * PÓŁPRZEZROCZYSTY, a karta w dark leży na --color-bg-main (#0a0a0a)
+   * ciemniejszym od jej własnej podniesionej bazy, więc nałożony wprost
+   * PRZYGASIŁBY kartę zamiast ją podnieść. Hover w dark mówi więc tym samym
+   * językiem co baza, o krok wyżej: on-ink 5% → 11%. */
+  [data-mode='dark'] .categoryCard:hover {
+    background: color-mix(
+      in oklch,
+      var(--color-on-ink) 11%,
+      var(--color-bg-elevated)
+    );
+    border-color: color-mix(
+      in oklch,
+      var(--color-primary) 42%,
+      var(--color-bg-elevated)
+    );
+  }
+}
+
+.categoryIconWrap {
+  /* tint-allow: ZNAK kodujący DANE (R7). To 48px kafelek pod glifem, a jego
+     odcień niesie KATEGORIĘ pomocy — zmienia się z danymi, nie zdobi. Skala
+     gold-soft → gold → gold-deep → gold-solid + ink jest świadoma (decyzja
+     2026-06-11: różnicujemy intensywnością w jednej rodzinie charcoal-gold,
+     nigdy obcymi barwami). To NIE jest drabina kremu powierzchni, którą
+     zakazuje R2 — tamta ubierała sekcje strony, ta ubiera znak. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--style-radius-surface);
+  background: var(--category-icon-bg);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--category-icon-fg) 22%, transparent);
+  color: var(--category-icon-fg);
+  flex-shrink: 0;
+}
+
+.categoryBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.categoryTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-panel-title);
+  line-height: 1.2;
+  letter-spacing: var(--ls-tight-10);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.categoryDescription {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.categoryMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  /* Category meta label text on light bg → AA gold (--color-accent-fg). */
+  color: var(--color-accent-fg);
+  margin-top: var(--space-6);
+}
+
+.categoryArrow {
+  transition: transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * 3. POPULAR ARTICLES — Linear numbered list with read time
+ * ═════════════════════════════════════════════════════════════════ */
+
+.popularSection {
+  padding: 0 var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: 880px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Bordered container wrapping all 5 popular article links.
+ * Items separated by internal hairline dividers — NO unilateral borders on
+ * individual items (floor rule). Single outer 4-side border on the list. */
+.popularList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-divider);
+  background: var(--color-bg-elevated);
+  overflow: hidden;
+}
+
+.popularItem {
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+  /* Internal hairline between items — NOT a one-sided border on the link.
+   * Applied as border-top on all items except the first. */
+}
+
+.popularItem + .popularItem {
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* Clean link row: title + arrow. No ordinals, no outer card frame —
+ * the container handles the visual boundary. */
+.popularLink {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-20);
+  align-items: center;
+  padding: var(--space-20) var(--space-24);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .popularLink:hover {
+    /* Ulotny hover = neutralny tonal step (R6). */
+    background: var(--color-state-hover);
+  }
+  .popularLink:hover .popularArrow {
+    transform: translateX(4px);
+    color: var(--color-primary);
+  }
+}
+
+.popularLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.popularBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.popularCategory {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-secondary);
+  opacity: 0.85;
+}
+
+.popularTitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-fluid-md);
+  line-height: 1.3;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.popularMeta {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+  letter-spacing: var(--ls-wide-20);
+}
+
+.popularArrow {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * 4. WIZARD — 4-step (Notion onboarding) — kept + polished
+ * ═════════════════════════════════════════════════════════════════ */
+
+.wizardSection {
+  padding: 0 var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  align-items: stretch;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+}
+
+.wizardSteps {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+@media (min-width: 720px) {
+  .wizardSteps {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.wizardStepWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (min-width: 720px) {
+  .wizardStepWrap {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.wizardStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10);
+  text-align: center;
+  flex: 1;
+  padding: var(--space-20) var(--space-12);
+  position: relative;
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+}
+
+.wizardStepIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--style-radius-surface);
+  /* ZNAK: 56px kafelek pod glifem kroku — token roli, zostaje złoty. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Unified icon color: AA-safe gold (--color-accent-fg) for all 4 wizard
+   * icons at weight='regular'. Consistent set, single hue, single weight. */
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+}
+
+.wizardStepNumeral {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--ls-eyebrow);
+  /* Numeral kroku to TRESC (numer, ktory sie czyta), wiec podlega AA 4,5:1,
+     a nie progowi elementow graficznych. Mieszanka jasnego zlota z szarym
+     dawala 3,20:1 na bieli; --color-accent-fg to ten sam kolor marki
+     skalibrowany pod jasne tla (4,91:1). */
+  color: color-mix(
+    in oklch,
+    var(--color-accent-fg) 60%,
+    var(--color-text-secondary)
+  );
+  margin-top: var(--space-2);
+}
+
+.wizardStepTitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-fluid-sm);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.wizardStepBody {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  max-width: 22ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.wizardConnector {
+  flex-shrink: 0;
+  width: 2px;
+  height: 32px;
+  margin: 0 auto;
+  /* Linia przepływu kroków (dekoracyjna, aria-hidden) rysowana jako wypełniony
+   * element, NIE jednostronny border (floor §3). Motyw „Jeden krem": linia
+   * strukturalna jest NEUTRALNA — złota kreska udawała akcent. */
+  background: var(--color-divider);
+  border-radius: var(--style-radius-control);
+}
+
+@media (min-width: 720px) {
+  .wizardConnector {
+    width: 28px;
+    height: 2px;
+    margin: var(--space-32) 0 0;
+  }
+}
+
+.wizardCta {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.wizardCtaLink {
+  /* Link text on light bg → AA gold (--color-accent-fg). Underline stays as affordance. */
+  color: var(--color-accent-fg);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: var(--style-border-divider) solid var(--color-border-surface);
+  transition: border-color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .wizardCtaLink:hover {
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * 5. FAQ — tabs + accordion (kept + polished frame)
+ * ═════════════════════════════════════════════════════════════════ */
+
+.faqWrapper {
+  padding: 0 var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  max-width: 820px;
+  margin: 0 auto;
+  width: 100%;
+  scroll-margin-top: 80px;
+}
+
+.tabs {
+  align-self: center;
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: var(--space-12);
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+}
+
+/* ─── Accordion ─── */
+.faqSection {
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  border: var(--style-border-surface) solid var(--color-divider);
+  background: var(--color-bg-elevated);
+}
+
+/* Wszystkie panele zakładek są zawsze w DOM (SEO: FAQPage JSON-LD == markup,
+ * patrz DECISION w HelpCenterAccordion.molecule.tsx). Autor-CSS `display: flex`
+ * powyżej wygrywa z natywnym UA `[hidden] { display: none }`, więc nieaktywny
+ * panel byłby widoczny — przywracamy ukrycie jawnie (specyficzność klasa+atrybut
+ * > klasa; treść zostaje w markup dla crawlera). */
+.faqSection[hidden] {
+  display: none;
+}
+
+.accordionItem {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+}
+
+.accordionItem:last-child {
+  border-bottom: none;
+}
+
+.accordionTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-20) var(--space-24);
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  gap: var(--space-12);
+  transition:
+    color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    background var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.accordionTrigger:active {
+  opacity: 0.85;
+}
+
+@media (hover: hover) {
+  .accordionTrigger:hover {
+    /* Interactive trigger hover text on light bg → AA gold (--color-accent-fg). */
+    color: var(--color-accent-fg);
+    /* Ulotny hover = neutralny tonal step (R6). */
+    background: var(--color-state-hover);
+  }
+}
+
+.accordionChevron {
+  flex-shrink: 0;
+  transition: transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: var(--color-text-secondary);
+}
+
+.accordionChevron[data-open] {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+
+/* Accordion panel — always in DOM, animates via grid-template-rows 0fr→1fr.
+ * Pattern from Accordion.module.css (shared primitive) applied locally here
+ * because HelpCenterAccordion is intentionally NOT using the shared primitive
+ * (see DECISION in HelpCenterAccordion.tsx and AccordionItem.tsx). */
+.accordionPanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 250ms var(--ease-entrance),
+    visibility 0s 250ms;
+}
+
+.accordionPanel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows 250ms var(--ease-entrance),
+    visibility 0s;
+}
+
+.accordionPanelClip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.accordionContent {
+  padding: 0 var(--space-24) var(--space-20) var(--space-24);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* ─── Empty state ─── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-48) var(--space-20);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.emptyHint {
+  color: var(--color-text-secondary);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * 6. CONTACT FOOTER — Vercel-style "Still need help?"
+ * ═════════════════════════════════════════════════════════════════ */
+
+/* Anti-AI-Slop: contact footer depth via ink-negative block (single mid-page
+ * color break, solid — zero gradient/shadow). Full 4-side hairline border.
+ * --color-ink / --color-on-ink reverse the light surface entirely. */
+.contactFooter {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(var(--space-48), 6vw, 88px) var(--space-20);
+  margin: 0 var(--space-12);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R3): blok stoi na papierze — wyróżnienie niesie
+   * zamknięta rama akcentowa (albo pełny negatyw w wariancie .*Negative). */
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-divider);
+}
+
+/* Ink-negative modifier: overwrites the light tint surface with a full dark
+ * block. Text tokens flip to --color-on-ink; accent stays --color-primary. */
+.contactFooterNegative {
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Bierze role
+     --color-accent-on-ink (DECISION S106): czerwony --color-primary jest w
+     LIGHT ciemny i daje na atramencie 3,6:1, czyli ponizej AA, a ta rola jest
+     mode-invariant — jedna wartosc daje ten sam jezyk wskaznika w obu trybach.
+     Poprzednia wartosc (--color-primary) byla poprawna dla wycofanej palety
+     charcoal-gold, gdzie primary bylo jasnym zlotem. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  border-color: color-mix(
+    in oklch,
+    var(--color-accent-on-ink) 28%,
+    var(--color-ink)
+  );
+}
+
+/* Eyebrow component accepts className prop; we pass .contactFooterEyebrow
+ * so we can target it in the negative context without hacked selectors. */
+.contactFooterEyebrow {
+  /* base styles unchanged — purely a targeting hook */
+}
+
+.contactFooterNegative .contactFooterEyebrow {
+  color: color-mix(in oklch, var(--color-on-ink) 65%, transparent);
+}
+
+.contactFooterNegative .contactFooterHeadline {
+  color: var(--color-on-ink);
+}
+
+.contactFooterNegative .contactFooterLede {
+  color: color-mix(in oklch, var(--color-on-ink) 72%, transparent);
+}
+
+.contactFooterNegative .contactFooterIcon {
+  /* ZNAK w wariancie wyróżnionym (medalion na negatywie) — token roli.
+     Akcent na atramencie bierze --color-accent-on-ink (DECISION S106):
+     czerwony --color-primary jest w LIGHT ciemny i daje na inku 3,6:1. */
+  background: var(--color-mark-bg-strong);
+  border-color: color-mix(
+    in oklch,
+    var(--color-accent-on-ink) 36%,
+    transparent
+  );
+  color: var(--color-accent-on-ink);
+}
+
+.contactFooterNegative .contactFooterSecondary {
+  border-color: color-mix(in oklch, var(--color-on-ink) 22%, var(--color-ink));
+  color: var(--color-on-ink);
+}
+
+@media (hover: hover) {
+  .contactFooterNegative .contactFooterSecondary:hover {
+    /* tint-allow: hover na powierzchni-negatywie. Neutralny --color-state-hover
+       liczy się z --color-text-primary, który na ink-bloku jest CIEMNY w trybie
+       jasnym — hover byłby niewidoczny. Akcent-na-inku zostaje, bo to jedyny
+       tonal step działający na atramencie w obu trybach (DECISION S106:
+       --color-primary jest tu ciemną czerwienią, 3,6:1). */
+    background: color-mix(
+      in oklch,
+      var(--color-accent-on-ink) 12%,
+      var(--color-ink)
+    );
+    border-color: color-mix(
+      in oklch,
+      var(--color-accent-on-ink) 48%,
+      transparent
+    );
+    color: var(--color-accent-on-ink);
+  }
+}
+
+.contactFooterInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-14);
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.contactFooterIcon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--style-radius-pill);
+  /* ZNAK: 64px medalion pod ikoną — token roli, zostaje złoty. Glif przez
+     accent-fg, bo na jasnym tincie blade primary to ~2:1. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-accent-fg);
+  margin-bottom: var(--space-4);
+}
+
+.contactFooterHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* fluid-allow: naglowek centrum pomocy — wezszy zakres niz xl, zeby nie dominowal listy */
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+  hyphens: auto;
+}
+
+.contactFooterLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.contactFooterActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-12);
+  margin-top: var(--space-6);
+}
+
+.contactFooterSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) 18px;
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-divider);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    color var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.contactFooterSecondary svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+@media (hover: hover) {
+  .contactFooterSecondary:hover {
+    /* Ulotny hover = neutralny tonal step (R6). */
+    background: var(--color-state-hover);
+    border-color: var(--color-border-surface);
+    /* Link hover text on light bg → AA gold (--color-accent-fg). */
+    color: var(--color-accent-fg);
+    transform: translateY(-1px);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * 7. BOTTOM CTA — secondary path
+ * ═════════════════════════════════════════════════════════════════ */
+
+/* Ostatnia sekcja (owner S81): więcej oddechu (bliżej wysokości ContactFooter)
+ * + wyśrodkowana w pionie. Duży symetryczny padding-block; balans dołu domyka
+ * .page padding-bottom (= wartość inter-section gapu) — inaczej gap nad ostatnią
+ * sekcją nie ma odpowiednika u dołu i content spycha w dół. */
+.bottomCtaSection {
+  padding: clamp(var(--space-48), 5vw, 72px) var(--space-20);
+  display: flex;
+  justify-content: center;
+  animation: slideUp var(--duration-200) var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-offset));
+}
+
+.bottomCtaInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  text-align: center;
+  max-width: 480px;
+}
+
+.bottomCtaHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.bottomCtaActions {
+  display: flex;
+  gap: var(--space-12);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-8);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+ * Reduced motion — kill all entrance animations
+ * ═════════════════════════════════════════════════════════════════ */

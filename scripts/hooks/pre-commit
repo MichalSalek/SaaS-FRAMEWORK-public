@@ -1,0 +1,469 @@
+#!/bin/bash
+# Pre-commit hook — SSOT tracked in scripts/hooks/
+# Installed by: npm run system:install-hooks
+#
+# Smart targeted audits based on staged files.
+# Docs-only and scripts-only commits take a FAST PATH, not a free pass: they skip
+# npm audit and the app typecheck, but still run the guards aimed at those very
+# files. Docs-only runs `docs-ssot`.
+#
+# Guards that read `scripts/**` are driven by staged scripts being PRESENT
+# (`HAS_SCRIPTS`), not by the commit containing nothing else (`ONLY_SCRIPTS`) —
+# adding any unrelated file used to drop all of them. Their names live in the
+# single `SCRIPT_GUARDS` variable consumed by BOTH the scripts-only fast path and
+# the mixed-commit full path; keep them there and never inline the list at a call
+# site, or the two paths drift and a guard goes missing (that class has recurred
+# six times). The same applies to `tsc -p scripts/tsconfig.json`, which is a
+# function called from both paths. Staged `main/src` additionally runs the
+# tree-wide guards listed in `scripts/hooks/tree-guards.list` (shared SSOT with
+# the submodule hook).
+
+# Wywolanie z `git:push` — pomijamy CALY hook, bo push odtwarza te bramki u siebie,
+# a robi do trzech commitow (main, web-1, root), wiec bez tego skipu pakiet audytow
+# lecialby trzy razy.
+#
+# DECISION (nie usuwaj tego komentarza) — CO DOKLADNIE ODTWARZA PUSH (2026-09-16):
+# poprzednia wersja tego komentarza mowila po prostu „audits already ran in git:push"
+# i to bylo NIEPRAWDZIWE dla jednej pozycji: `npm audit` (bramka lancucha dostaw, nizej
+# w tym pliku) zyl WYLACZNIE tutaj. Push go nie mial, wiec ten skip nie deduplikowal go,
+# tylko go WYLACZAL — w normalnym przeplywie pracy kontrola podatnosci nie odpalala sie
+# ani razu, a bezposredni `git commit` blokowal sie na HIGH, ktorego `git:push` w tym
+# samym stanie drzewa nie widzial. Bramka zostala dolozona do `scripts/git/push`
+# (krok „supply-chain audit"), wiec dzis skip znowu znaczy to, co obiecuje.
+# Jesli dokladasz TU nowa bramke: upewnij sie, ze push ja odtwarza, albo nie polegaj
+# na tym hooku — na normalnej sciezce on nie chodzi.
+if [ "${SKIP_PRECOMMIT_AUDITS:-}" = "1" ]; then
+  echo "  Skipping pre-commit audits (already ran in git:push)"
+  exit 0
+fi
+
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+cd "$PROJECT_ROOT" || exit 1
+
+# ── Self-drift guard ────────────────────────────────────────────────────────
+# .git/hooks/pre-commit to KOPIA tego pliku (install-hooks robi `cp`), więc każda
+# zmiana SSOT jest MARTWA do ręcznego `npm run system:install-hooks` — i nikt tego
+# nie widzi. Realnie: przez dwa ratchety UI (no-sparkle, no-split-bg) bramka
+# chodziła na kopii sprzed ich dodania i po prostu ich nie uruchamiała.
+# Delegacja do SSOT zamyka klasę: kopia może być stara, egzekwowany jest repo-plik.
+# Bez pętli — po exec `$0` JEST już SSOT, więc cmp wypada identycznie.
+HOOK_SSOT="${PROJECT_ROOT}/scripts/hooks/pre-commit"
+if [ -f "$HOOK_SSOT" ] && ! cmp -s "$HOOK_SSOT" "$0"; then
+  echo "  (hook zdryfował od scripts/hooks/pre-commit — uruchamiam wersję z repo)"
+  exec bash "$HOOK_SSOT" "$@"
+fi
+
+# Collect staged files
+STAGED=$(git diff --cached --name-only)
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+# Classify staged files into categories
+HAS_KERNEL=false
+HAS_WEB1=false
+HAS_MAIN=false
+HAS_CONFIG=false
+HAS_SCHEMA=false
+HAS_AUDIT=false
+ONLY_DOCS=true
+ONLY_SCRIPTS=true
+HAS_SCRIPTS_TS=false
+# ONLY_SCRIPTS mowi „w commicie NIE MA nic poza skryptami"; HAS_SCRIPTS mowi
+# „skrypty SA w commicie". Do tej pory istniala tylko ta pierwsza flaga, wiec
+# straznicy `scripts/**` zyli WYLACZNIE na fast-pathcie: dorzucenie do commita
+# czegokolwiek spoza `scripts/` (najzwyklejszego CHANGELOG.md) zerowalo
+# ONLY_SCRIPTS, a pelna sciezka nie miala dla skryptow ani jednego audytu ani
+# typechecka. Ta sama klasa co brakujacy straznik na liscie, tylko ostrzejsza.
+HAS_SCRIPTS=false
+
+while IFS= read -r file; do
+  [ -z "$file" ] && continue
+
+  case "$file" in
+    .shared-kernel/*)   HAS_KERNEL=true; ONLY_DOCS=false; ONLY_SCRIPTS=false ;;
+    # schema.prisma PRZED web-1/src/* (case bierze pierwszy match) — zmiana schematu
+    # DB odpala dodatkowo audyty sprzężone ze schematem (bucket HAS_SCHEMA niżej).
+    web-1/src/prisma/schema.prisma)
+                        HAS_SCHEMA=true; HAS_WEB1=true; ONLY_DOCS=false; ONLY_SCRIPTS=false ;;
+    web-1/src/*)        HAS_WEB1=true; ONLY_DOCS=false; ONLY_SCRIPTS=false ;;
+    main/src/*)         HAS_MAIN=true; ONLY_DOCS=false; ONLY_SCRIPTS=false ;;
+    package.json|tsconfig*|.eslintrc*|web-1/package.json|main/package.json)
+                        HAS_CONFIG=true; ONLY_DOCS=false; ONLY_SCRIPTS=false ;;
+    docs/*|*.md|CHANGELOG.md)
+                        ONLY_SCRIPTS=false ;;
+    # PRZED scripts/*: kod TS w scripts/ ma wlasna bramke typow (scripts/tsconfig.json),
+    # wiec fast-path nie moze go przepuscic bez tsc.
+    scripts/*.ts|scripts/tsconfig.json)
+                        HAS_SCRIPTS_TS=true; HAS_SCRIPTS=true; ONLY_DOCS=false ;;
+    scripts/*)          HAS_SCRIPTS=true; ONLY_DOCS=false ;;
+    tests/audit/*)      HAS_AUDIT=true; ONLY_DOCS=false; ONLY_SCRIPTS=false ;;
+    *)                  ONLY_DOCS=false; ONLY_SCRIPTS=false ;;
+  esac
+done <<< "$STAGED"
+
+# Fast path: docs-only / scripts-only pomijają npm audit i typecheck (nie ma kodu
+# aplikacji w commicie), ale NIE audytów, które skanują właśnie te pliki — inaczej
+# bramka pomija dokładnie ten strażnik, którego commit dotyczy (ta sama luka co
+# TQM B38 przy web-1). Wszystkie poniżej idą w dziesiątkach ms.
+# SSOT listy straznikow celujacych w `scripts/**`. Uzywana przez OBIE sciezki:
+# fast-path „tylko skrypty" i sciezke pelna. Trzymanie jej w jednym miejscu jest
+# tu istotne — klasa „straznik zapomniany na liscie" nawracala juz szesc razy
+# (epizody wyliczone przy wywolaniu fast-path nizej — JEDNO miejsce z lista,
+# zeby licznik nie rozjezdzal sie sam ze soba, co juz sie zdarzylo).
+SCRIPT_GUARDS="dev-script-test-users pricing-parity copy-llms-de cp-recursive-nesting compose-file-pairs deploy-origin-parity deploy-artifact-identity dto-completeness dead-exports audit-count"
+
+# scripts/**/*.ts ma wlasna bramke typow (scripts/tsconfig.json) — czysty TS
+# o realnej stawce (generator DTO). Musi isc na obu sciezkach, nie tylko na
+# fast-pathcie, wiec jest funkcja, a nie wklejonym blokiem.
+run_scripts_typecheck() {
+  echo "  Running typecheck (scripts)..."
+  local SCRIPTS_TSC="$PROJECT_ROOT/web-1/node_modules/.bin/tsc"
+  if [ ! -x "$SCRIPTS_TSC" ]; then
+    # BRAK BINARKI = BLAD, NIE SKIP — parytet z `scripts/typecheck/check-all`,
+    # ktory dostal te doktryne w tej samej sesji. Nieobecny tsc to najczestszy
+    # stan po swiezym klonie albo czystce `node_modules`, czyli dokladnie wtedy,
+    # gdy bramka jest najbardziej potrzebna; `pre-push` typechecka nie uruchamia
+    # w ogole, wiec cicha zielen tutaj znaczyla brak JAKIEJKOLWIEK kontroli typow
+    # nad `scripts/**/*.ts` az do czyjegos recznego `npm run typecheck`.
+    echo ""
+    echo "  COMMIT BLOCKED: brak web-1/node_modules/.bin/tsc (uruchom npm run system:install)"
+    return 1
+  fi
+  if ! (cd "$PROJECT_ROOT/scripts" && "$SCRIPTS_TSC" -p tsconfig.json --noEmit); then
+    echo ""
+    echo "  COMMIT BLOCKED: scripts typecheck nie przeszedl"
+    return 1
+  fi
+}
+
+run_audit_subset() {
+  local label="$1"; shift
+  local failed=0 name log
+  echo "  ${label} — audyty celujące w te pliki: $*"
+  for name in "$@"; do
+    log="/tmp/precommit_fast_${name}_$$"
+    if ! bash "$PROJECT_ROOT/tests/audit/${name}.sh" > "$log" 2>&1; then
+      echo ""
+      echo "  COMMIT BLOCKED: audyt ${name} nie przeszedł"
+      tail -20 "$log" | sed 's/^/    /'
+      failed=1
+    fi
+    rm -f "$log"
+  done
+  return $failed
+}
+
+if $ONLY_DOCS; then
+  # docs-ssot pilnuje, że wymieniane dokumenty istnieją i nie zdryfowały.
+  run_audit_subset "Tylko dokumentacja" docs-ssot || exit 1
+  echo "  Only docs changed — skipping security checks and typecheck"
+  exit 0
+fi
+
+if $ONLY_SCRIPTS; then
+  # dev-script-test-users, cp-recursive-nesting i compose-file-pairs skanuja
+  # scripts/**; pricing-parity czyta scripts/generate-dto/config.ts; copy-llms-de
+  # czyta scripts/copy-grep.mjs; dto-completeness czyta scripts/generate-dto/config.ts
+  # (SKIP_ENUMS) i regeneruje DTO przez generator z tego katalogu; dead-exports
+  # traktuje scripts/ jako jedno ze zrodel uzyc, wiec skasowanie ostatniego
+  # wywolania wlasnie tam zmienia jego wynik. KAZDY straznik celujacy w scripts/**
+  # musi byc na tej liscie — inaczej fast-path przepuszcza zmiane dokladnie w tym
+  # miejscu, ktorego straznik pilnuje. Klasa nawracala juz SZESC razy:
+  # cp-recursive-nesting po S86, compose-file-pairs po S87, deploy-origin-parity
+  # po S88, dto-completeness + dead-exports po S98, audit-count po S98 (e5849e5),
+  # deploy-artifact-identity po S98 (09c2545).
+  # Siodma odmiana byla grozniejsza: straznicy zyli WYLACZNIE na fast-pathcie,
+  # wiec mieszany commit gubil ich WSZYSTKICH naraz (0d25cef) — stad `HAS_SCRIPTS`
+  # i jeden `SCRIPT_GUARDS` dla obu sciezek.
+  run_audit_subset "Tylko skrypty" $SCRIPT_GUARDS || exit 1
+
+  # scripts/**/*.ts ma bramke typow od momentu powstania scripts/tsconfig.json —
+  # bez tego bloku fast-path przepuszczalby zmiane w generatorze DTO (czysty TS
+  # o realnej stawce) bez ani jednego sprawdzenia typu.
+  if $HAS_SCRIPTS_TS; then run_scripts_typecheck || exit 1; fi
+
+  echo "  Only scripts changed — skipping security checks and app typecheck"
+  exit 0
+fi
+
+# Supply chain security: npm audit gate
+# Check HIGH and CRITICAL vulnerabilities in production dependencies across all workspaces
+echo "  Running npm audit (supply chain security)..."
+
+NPM_AUDIT_FAILED=0
+
+# Root package.json
+if ! npm audit --production --audit-level=high > /tmp/npm_audit_root_$$ 2>&1; then
+  NPM_AUDIT_FAILED=$((NPM_AUDIT_FAILED + 1))
+  echo "    ❌ Root workspace has HIGH/CRITICAL vulnerabilities"
+fi
+
+# web-1 workspace
+if [ -f "$PROJECT_ROOT/web-1/package.json" ]; then
+  (cd "$PROJECT_ROOT/web-1" && npm audit --production --audit-level=high > /tmp/npm_audit_web1_$$ 2>&1)
+  if [ $? -ne 0 ]; then
+    NPM_AUDIT_FAILED=$((NPM_AUDIT_FAILED + 1))
+    echo "    ❌ web-1 workspace has HIGH/CRITICAL vulnerabilities"
+  fi
+fi
+
+# main workspace
+if [ -f "$PROJECT_ROOT/main/package.json" ]; then
+  (cd "$PROJECT_ROOT/main" && npm audit --production --audit-level=high > /tmp/npm_audit_main_$$ 2>&1)
+  if [ $? -ne 0 ]; then
+    NPM_AUDIT_FAILED=$((NPM_AUDIT_FAILED + 1))
+    echo "    ❌ main workspace has HIGH/CRITICAL vulnerabilities"
+  fi
+fi
+
+if [ $NPM_AUDIT_FAILED -gt 0 ]; then
+  echo ""
+  echo "  COMMIT BLOCKED: $NPM_AUDIT_FAILED workspace(s) have HIGH/CRITICAL vulnerabilities!"
+  echo ""
+  if [ -f "/tmp/npm_audit_root_$$" ] && grep -q "high\|critical" "/tmp/npm_audit_root_$$"; then
+    echo "  --- Root audit output ---"
+    tail -15 "/tmp/npm_audit_root_$$" | sed 's/^/    /'
+    echo ""
+  fi
+  if [ -f "/tmp/npm_audit_web1_$$" ] && grep -q "high\|critical" "/tmp/npm_audit_web1_$$"; then
+    echo "  --- web-1 audit output ---"
+    tail -15 "/tmp/npm_audit_web1_$$" | sed 's/^/    /'
+    echo ""
+  fi
+  if [ -f "/tmp/npm_audit_main_$$" ] && grep -q "high\|critical" "/tmp/npm_audit_main_$$"; then
+    echo "  --- main audit output ---"
+    tail -15 "/tmp/npm_audit_main_$$" | sed 's/^/    /'
+    echo ""
+  fi
+  rm -f /tmp/npm_audit_*_$$
+  echo "  Run 'npm audit fix' in affected workspaces to resolve vulnerabilities."
+  exit 1
+fi
+
+rm -f /tmp/npm_audit_*_$$
+echo "  npm audit passed — no HIGH/CRITICAL vulnerabilities"
+
+
+# Config changes → run everything
+if $HAS_CONFIG; then
+  HAS_KERNEL=true
+  HAS_WEB1=true
+  HAS_MAIN=true
+fi
+
+# Build audit list (deduplicated via associative array)
+declare -A AUDITS
+TYPECHECK_MAIN=false
+TYPECHECK_WEB1=false
+
+if $HAS_KERNEL; then
+  AUDITS[kernel-sync]=1
+  AUDITS[ssot-routes]=1
+  AUDITS[ssot-events]=1
+  AUDITS[permissions]=1
+  AUDITS[dto-completeness]=1
+  AUDITS[typescript-strictness]=1
+  AUDITS[imports-health]=1
+  TYPECHECK_MAIN=true
+  TYPECHECK_WEB1=true
+fi
+
+if $HAS_WEB1; then
+  AUDITS[ssot-routes]=1
+  AUDITS[ssot-events]=1
+  AUDITS[permissions]=1
+  AUDITS[validation-coverage]=1
+  AUDITS[typescript-strictness]=1
+  AUDITS[imports-health]=1
+  AUDITS[legacy-code]=1
+  # TQM B38: security-critical audyty backendu — były w run-all.sh, ale pre-commit
+  # je pomijał (luka w bramce: zmiany web-1 mogły przejść bez kontroli IDOR/
+  # currentUser/response-event). Dodane do bramki dla zmian web-1.
+  AUDITS[security-idor]=1
+  AUDITS[currentuser-enforcement]=1
+  AUDITS[response-event-validation]=1
+  AUDITS[prisma-error-narrowing]=1
+  AUDITS[prisma-nested-sql]=1
+  AUDITS[lock-discipline]=1
+  TYPECHECK_WEB1=true
+fi
+
+# Zmiana schema.prisma → audyty sprzężone ze schematem: parytet DTO (regen-diff),
+# parytet enumów schema↔kernel, parytet PricingPlan, indeksy pod kolumnami FK.
+# Bez tego bucketa schema.prisma wpadała tylko w HAS_WEB1 i drift schema↔kernel
+# przechodził pre-commit niezauważony (łapał go dopiero git:push).
+if $HAS_SCHEMA; then
+  AUDITS[dto-completeness]=1
+  AUDITS[enum-parity]=1
+  AUDITS[pricing-parity]=1
+  AUDITS[prisma-fk-index]=1
+fi
+
+if $HAS_MAIN; then
+  AUDITS[i18n-coverage]=1
+  AUDITS[imports-health]=1
+  AUDITS[typescript-strictness]=1
+  AUDITS[legacy-code]=1
+  AUDITS[asset-paths]=1
+  AUDITS[min-font-size]=1
+  AUDITS[no-sparkle]=1
+  AUDITS[no-split-bg]=1
+  AUDITS[openapi-fresh]=1
+  # Strażnicy CAŁEGO DRZEWA (S98): skanują wyłącznie main/src/UI, a mimo to
+  # gatowały dopiero na git:push — czyli dowolna liczba commitów mogła wejść
+  # z długiem motywu, a autor dowiadywał się o nim dopiero przy wypychaniu
+  # całej serii. Wszystkie idą w dziesiątkach ms (skan CSS/TSX bez node_modules).
+  # Lista jest SSOT w scripts/hooks/tree-guards.list, bo ten sam zestaw
+  # uruchamia hook wstrzykiwany do submodułów — dwie ręczne kopie rozjeżdżały
+  # się po cichu (ratchet dopisany do jednego miejsca omijał drugie).
+  TREE_GUARDS_LIST="$PROJECT_ROOT/scripts/hooks/tree-guards.list"
+  if [ -f "$TREE_GUARDS_LIST" ]; then
+    # `|| [ -n "$_g" ]`: ostatnia linia BEZ końcowego znaku nowej linii nie
+    # byłaby przeczytana, więc ratchet dopisany na końcu listy po cichu by
+    # nie chodził. Ta sama pułapka wypadła w mechanizmie `.expect`.
+    _tree_seen=0
+    while IFS= read -r _g || [ -n "$_g" ]; do
+      _g="${_g%%#*}"; _g="$(echo "$_g" | tr -d '[:space:]')"
+      [ -z "$_g" ] && continue
+      # Nazwa idzie prosto do `bash "$AUDIT_DIR/$_g.sh"`, więc musi być NAZWĄ,
+      # a nie ścieżką: bez tego wpis z `../` uruchamiał kod spoza tests/audit.
+      case "$_g" in
+        *[!a-z0-9-]*)
+          echo "  [UWAGA] pomijam wpis '$_g' z tree-guards.list — dozwolone tylko [a-z0-9-]"
+          continue ;;
+      esac
+      AUDITS[$_g]=1
+      _tree_seen=$((_tree_seen + 1))
+    done < "$TREE_GUARDS_LIST"
+  else
+    # BRAK LISTY = BLAD, NIE WARN — ten sam parytet co przy brakujacej binarce
+    # tsc. Plik jest sledzony w gicie, wiec jego brak znaczy, ze ktos go usunal,
+    # a wtedy w ciszy znika SZESC ratchetow (tint, edge-stripe, section, hex,
+    # disabled-text-contrast, ink-focus-ring). Commit, ktory rozbraja polowe
+    # bramek UI, nie moze konczyc sie zielono.
+    echo ""
+    echo "  COMMIT BLOCKED: brak $TREE_GUARDS_LIST — strażnicy drzewa nie mają skąd się wziąć"
+    exit 1
+  fi
+  # Lista SAMYCH komentarzy jest rownie grozna co jej brak, tylko cichsza:
+  # `[ -f ]` przechodzi, petla nie dopisuje nic i nikt sie nie dowiaduje.
+  # Liczymy wpisy Z LISTY, nie rozmiar `AUDITS` — ta tablica ma juz dziewiec
+  # pozycji z bloku wyzej, wiec warunek na jej rozmiarze byl MARTWY (pierwsza
+  # wersja tego guarda nie mogla sie wykonac ani razu).
+  if [ "$_tree_seen" -eq 0 ]; then
+    echo ""
+    echo "  COMMIT BLOCKED: $TREE_GUARDS_LIST nie zawiera ANI JEDNEGO wpisu"
+    exit 1
+  fi
+  TYPECHECK_MAIN=true
+fi
+
+# Skrypty w commicie MIESZANYM: fast-path ich nie obsluzy, wiec straznicy musza
+# wejsc tutaj. Ta sama lista, jeden SSOT.
+if $HAS_SCRIPTS; then
+  for guard in $SCRIPT_GUARDS; do AUDITS[$guard]=1; done
+fi
+if $HAS_SCRIPTS_TS; then run_scripts_typecheck || exit 1; fi
+
+# Zmiana w tests/audit/ → meta-guard rejestru (nowy audyt bez wpięcia w run-all /
+# package.json / README przechodził pre-commit i padał dopiero w git:push).
+if $HAS_AUDIT; then
+  AUDITS[audit-count]=1
+  # Zmiana W STRAŻNIKU jest dokładnie tym momentem, w którym trzeba sprawdzić,
+  # czy nadal łapie własne naruszenie: oba udokumentowane przypadki fałszywej
+  # zieleni (S91, S97) powstały przy EDYCJI regexa, nie przy jego pisaniu.
+  AUDITS[audit-selftest]=1
+fi
+
+# Run targeted audits in parallel
+AUDIT_DIR="$PROJECT_ROOT/tests/audit"
+AUDIT_PIDS=()
+AUDIT_NAMES=()
+AUDIT_FAILED=0
+
+echo "  Running ${#AUDITS[@]} targeted audits..."
+
+for audit in "${!AUDITS[@]}"; do
+  bash "$AUDIT_DIR/${audit}.sh" > "/tmp/precommit_${audit}_$$" 2>&1 &
+  AUDIT_PIDS+=($!)
+  AUDIT_NAMES+=("$audit")
+done
+
+# Wait and collect results
+FAILED_AUDIT_NAMES=()
+for i in "${!AUDIT_PIDS[@]}"; do
+  if ! wait "${AUDIT_PIDS[$i]}"; then
+    AUDIT_FAILED=$((AUDIT_FAILED + 1))
+    FAILED_AUDIT_NAMES+=("${AUDIT_NAMES[$i]}")
+  fi
+done
+
+if [ $AUDIT_FAILED -gt 0 ]; then
+  echo ""
+  echo "  COMMIT BLOCKED: $AUDIT_FAILED audit(s) failed!"
+  echo ""
+  for failed_name in "${FAILED_AUDIT_NAMES[@]}"; do
+    echo "  --- ${failed_name} ---"
+    # (bez `local` — poza funkcją bash odrzuca je i log przestawał się drukować)
+    failed_log="/tmp/precommit_${failed_name}_$$"
+    if [ -f "$failed_log" ]; then
+      tail -20 "$failed_log" | sed 's/^/    /'
+    fi
+    echo ""
+  done
+  rm -f /tmp/precommit_*_$$
+  exit 1
+fi
+
+# Cleanup temp files
+rm -f /tmp/precommit_*_$$
+
+echo "  Audits passed (${#AUDITS[@]}/${#AUDITS[@]})"
+
+# Run targeted typecheck
+TYPECHECK_FAILED=0
+
+if $TYPECHECK_MAIN && $TYPECHECK_WEB1; then
+  echo "  Running typecheck (main + web-1)..."
+  (cd "$PROJECT_ROOT/main" && ./node_modules/.bin/tsc --noEmit > /tmp/tc_main_$$ 2>&1) &
+  PID_MAIN=$!
+  (cd "$PROJECT_ROOT/web-1" && ./node_modules/.bin/tsc --noEmit > /tmp/tc_web1_$$ 2>&1) &
+  PID_WEB1=$!
+
+  if ! wait $PID_MAIN; then
+    echo "  main tsc FAILED"
+    TYPECHECK_FAILED=$((TYPECHECK_FAILED + 1))
+  fi
+  if ! wait $PID_WEB1; then
+    echo "  web-1 tsc FAILED"
+    TYPECHECK_FAILED=$((TYPECHECK_FAILED + 1))
+  fi
+elif $TYPECHECK_MAIN; then
+  echo "  Running typecheck (main)..."
+  (cd "$PROJECT_ROOT/main" && ./node_modules/.bin/tsc --noEmit > /tmp/tc_main_$$ 2>&1)
+  if [ $? -ne 0 ]; then
+    echo "  main tsc FAILED"
+    TYPECHECK_FAILED=$((TYPECHECK_FAILED + 1))
+  fi
+elif $TYPECHECK_WEB1; then
+  echo "  Running typecheck (web-1)..."
+  (cd "$PROJECT_ROOT/web-1" && ./node_modules/.bin/tsc --noEmit > /tmp/tc_web1_$$ 2>&1)
+  if [ $? -ne 0 ]; then
+    echo "  web-1 tsc FAILED"
+    TYPECHECK_FAILED=$((TYPECHECK_FAILED + 1))
+  fi
+fi
+
+rm -f /tmp/tc_main_$$ /tmp/tc_web1_$$
+
+if [ $TYPECHECK_FAILED -gt 0 ]; then
+  echo ""
+  echo "  COMMIT BLOCKED: Typecheck failed!"
+  echo "   Run 'npm run typecheck' for details"
+  exit 1
+fi
+
+echo "  All checks passed — proceeding with commit"
+exit 0

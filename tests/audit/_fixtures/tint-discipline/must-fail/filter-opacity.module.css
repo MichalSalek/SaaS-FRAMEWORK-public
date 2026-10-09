@@ -1,0 +1,10 @@
+/* `filter: opacity(.08)` renderuje się PIKSEL W PIKSEL jak właściwość
+   `opacity`, a skan pytał o nazwę właściwości, więc solidne złoto przygaszone
+   filtrem uchodziło za pełny kolor marki. */
+.washByFilter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary);
+  filter: opacity(0.08);
+}

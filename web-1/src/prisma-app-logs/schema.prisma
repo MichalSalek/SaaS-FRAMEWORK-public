@@ -1,0 +1,64 @@
+generator client {
+  output        = "./js-client"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AppLogRecord {
+  id                 Int      @id @default(autoincrement())
+  created_at         DateTime @default(now())
+  event_log_chain_id String
+  type               String
+  namespace          String
+  message            String
+  payload            String
+  user_metadata      String
+  client_url         String
+  application        String
+  environment        String
+  user_id            String?
+
+  @@index([environment, id(sort: Desc)])
+  @@index([type, created_at(sort: Desc)])
+  @@index([user_id, created_at(sort: Desc)])
+  // Parytet z AiCrawlerEvent (web-1/src/prisma/schema.prisma): ten sam wzorzec
+  // agregatow po created_at. admin-health groupBy filtruje application=backend
+  // AND created_at>=cutoff -> composite (application, created_at DESC); retention
+  // deleteMany filtruje gole created_at -> bare @@index([created_at]).
+  @@index([application, created_at(sort: Desc)])
+  @@index([created_at])
+  // S122: „ten sam łańcuch żądania" w szczegółach logu (panel admina).
+  @@index([event_log_chain_id])
+}
+
+/// Status triage'u nadany RĘCZNIE przez admina jednej klasie błędu.
+///
+/// Kluczem jest odcisk palca grupy (md5 z application|type|namespace|znormalizowana
+/// wiadomość) liczony w SQL — patrz LOG_FINGERPRINT_SQL w admin-log-groups.operations.ts.
+/// Wiersz istnieje TYLKO dla grup faktycznie oznaczonych; brak wiersza == status `new`
+/// (SSOT: LOG_ISSUE_STATUSES w kernelu). Dzięki temu cofnięcie oznaczenia kasuje wiersz,
+/// a tabela nie puchnie o wpisy nic nie wnoszące.
+///
+/// Tabela ŻYJE DŁUŻEJ niż logi, których dotyczy: retencja czyści AppLogRecord po 90 dniach,
+/// a „naprawione" ma pozostać prawdą także wtedy, gdy ostatnie wystąpienie już wygasło.
+model LogIssueStatus {
+  fingerprint String   @id
+  status      String
+  note        String?
+  /// Kopie pól grupy z chwili oznaczenia — żeby wiersz był czytelny w bazie
+  /// nawet po tym, jak jego logi wypadną z retencji.
+  application String
+  type        String
+  namespace   String
+  message     String
+  /// Moment nadania statusu. Porównanie z `last_seen` grupy daje pochodny stan
+  /// `regressed` (błąd wrócił po oznaczeniu jako naprawiony).
+  updated_at  DateTime @default(now()) @updatedAt
+  updated_by  String?
+
+  @@index([status])
+}

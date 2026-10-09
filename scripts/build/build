@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# scripts/build/build
+
+# 1. Source Utils (Strict Mode & Helpers)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../utils.sh"
+
+# 2. Validation
+check_required_vars "ENV"
+
+# 3. Setup
+PARENT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+# Komendy wolane WPROST, nie przez rozwijanie zmiennej: `$COMMAND` bez cudzyslowow
+# dzieli sie po bialych znakach, wiec dzialalo tu wylacznie przez przypadek (zaden
+# argument nie mial spacji). Zmienna z komenda to takze falszywy trop przy czytaniu.
+
+header "AUTOMATED BUILD SCRIPT" "🚀"
+info "Environment: ${BOLD}${ENV}${RESET}"
+info "Root:        ${PARENT_DIR}"
+
+
+# ==============================================================================
+# PHASE 1: BUILD
+# ==============================================================================
+step "PHASE 1: BUILD"
+
+for dir in "$PARENT_DIR"/*; do
+  if [ -d "$dir" ] && is_app_dir "$(basename "$dir")"; then
+    APP_NAME=$(basename "$dir")
+    info "Building: ${BOLD}${APP_NAME}${RESET}"
+    info "Command:  npm run build:${ENV}"
+
+    (
+      cd "$dir"
+      if npm run "build:${ENV}"; then
+        success "Build OK: ${APP_NAME}"
+      else
+        error "Build Failed: ${APP_NAME}"
+        play_error_sound
+        exit 1
+      fi
+
+      info "Cleaning cache..."
+      rm -rf ./.next/cache > /dev/null 2>&1 || warn "Cache clean failed (non-critical)"
+    ) || exit 1
+    
+    echo ""
+  fi
+done
+
+# ==============================================================================
+# SUCCESS
+# ==============================================================================
+header "BUILD SUCCESSFUL" "✅"
+play_success_sound
+exit 0

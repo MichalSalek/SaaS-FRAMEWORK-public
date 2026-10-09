@@ -1,0 +1,8 @@
+:root {
+  --band: oklch(0.46 0.1 288);
+}
+
+.aliasBandNoRemap {
+  background: var(--band);
+  color: #ffffff;
+}

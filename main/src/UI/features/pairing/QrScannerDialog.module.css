@@ -1,0 +1,102 @@
+/* ─── QrScannerDialog — pełnoekranowy podgląd kamery w dialogu. ─── */
+
+.popup {
+  gap: var(--space-16);
+}
+
+/* Wcięcie boczne siedzi na TREŚCI, nie na popupie: tytuł i stopka dialogu mają
+ * własny padding var(--space-20) w AppDialog, więc padding na popupie dokładał
+ * się do nich i wpychał nagłówek na 40px od krawędzi. */
+.stage,
+.result {
+  padding-inline: var(--space-20);
+}
+
+.stage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-16);
+}
+
+/* Fazy bez podglądu (brak zgody, brak wsparcia): sam komunikat. Bez wyśrodkowania
+ * arkusz pełnoekranowy zostawiłby zdanie pod tytułem i ~700px pustki nad stopką. */
+.stageMessageOnly {
+  justify-content: center;
+}
+
+.viewport {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--color-ink);
+  border-radius: var(--style-radius-surface);
+  /* Powierzchnia atramentowa: pierścień fokusu przełącza się na akcent dla
+   * negatywu (S106) — w LIGHT --color-focus-ring == --color-ink, więc bez tego
+   * remapu wskaźnik na podglądzie kamery miałby 1,00:1. */
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Celownik: zamknięta ramka (cztery boki) w akcencie na atramencie — mówi
+ * „tutaj wyceluj", bez rogów-narożników udających skaner z filmu. */
+.reticle {
+  position: absolute;
+  inset: 14%;
+  border: var(--style-border-control) solid var(--color-accent-on-ink);
+  border-radius: var(--style-radius-control);
+  pointer-events: none;
+}
+
+/* Płótno dekodera (tor jsqr) nigdy nie jest oglądane. */
+.canvas {
+  display: none;
+}
+
+.status {
+  display: flex;
+  /* The message can run to three lines (camera denied): the icon stays on the
+   * FIRST line instead of floating against the middle of the paragraph. */
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-8);
+  min-height: var(--style-control-min-h);
+  /* Miara komunikatu: bez niej dłuższe zdanie (brak zgody na kamerę) rozlewa
+   * się na całą szerokość i ikona zostaje sama przy lewej krawędzi. */
+  max-width: 36ch;
+  margin-inline: auto;
+  text-align: center;
+  text-wrap: pretty;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* Exactly one line tall, glyph centred inside it. */
+.statusIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.statusIcon svg {
+  display: block;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  text-align: center;
+}

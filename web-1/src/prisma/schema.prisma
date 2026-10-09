@@ -1,0 +1,1135 @@
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │ 📖 UZASADNIENIA DECYZJI SCHEMATU -> docs/DOMAIN/SCHEMA_DECISIONS.md           │
+// │ Inline poniżej = TYLKO 1-linijkowe wskaźniki `// DECISION [id] -> ...`.       │
+// │ Pełna proza/rationale w pliku wyżej (anty-re-litygacja). Nie usuwać decyzji.  │
+// └─────────────────────────────────────────────────────────────────────────────┘
+
+generator client {
+  output        = "./js-client"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Better Auth Models
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String    @map("user_id")
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token") @db.Text
+  refreshToken          String?   @map("refresh_token") @db.Text
+  idToken               String?   @map("id_token") @db.Text
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  // DECISION [account-index-coverage]: index userId — Better Auth findMany per-login + GDPR cascade -> docs/DOMAIN/SCHEMA_DECISIONS.md#account-index-coverage
+  @@index([userId])
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  token       String   @unique @map("session_token")
+  userId      String   @map("user_id")
+  expires     DateTime
+  ip_address  String?
+  user_agent  String?
+  device_type String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expires])
+  @@index([userId, expires])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([identifier, value])
+}
+
+// D23 (run 25): admin impersonation backup token storage. Plaintext admin
+// session token never crosses the wire — only an opaque `ref_id` (DB lookup
+// key) signed with HMAC rides in the `become-user` header. Single active
+// impersonation per admin enforced via @unique on admin_user_id (a new
+// `become-user` deletes any prior row for that admin).
+model ImpersonationBackup {
+  ref_id                     String   @id
+  admin_user_id              String   @unique
+  backup_session_token       String   @db.Text
+  original_session_id        String
+  // DECISION [impersonationbackup-caller-binding]: pozytywne wiązanie switch-back z DB; NOT NULL efemeryczne, migracja truncate-first -> docs/DOMAIN/SCHEMA_DECISIONS.md#impersonationbackup-caller-binding
+  impersonated_user_id       String   @db.Text
+  impersonated_session_token String   @db.Text
+  expires_at                 DateTime
+  created_at                 DateTime @default(now())
+
+  @@index([expires_at])
+}
+
+// Business Domain Models
+
+model AdminNote {
+  id         String   @id @default(cuid())
+  notes      String   @db.Text
+  created_at DateTime @default(now())
+}
+
+model Policy {
+  id         String   @id @default(cuid())
+  title      String
+  content    String   @db.Text
+  is_main    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([is_main])
+}
+
+// Dynamic Permissions System
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  is_system   Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  permissions RolePermission[]
+  users       User[]
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  event_name  String   @unique
+  description String?
+  category    String
+  is_system   Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  roles RolePermission[]
+
+  @@index([category])
+}
+
+model RolePermission {
+  id            String   @id @default(cuid())
+  role_id       String
+  permission_id String
+  created_at    DateTime @default(now())
+
+  role       Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_id, permission_id])
+  @@index([permission_id])
+}
+
+model EventLog {
+  event_log_id       String       @id @default(cuid())
+  created_at         DateTime     @default(now())
+  event              String
+  // DECISION [eventlog-soft-fk]: soft-FK: wiersz audytu przeżywa delete usera z niepodpiętym user_id -> docs/DOMAIN/SCHEMA_DECISIONS.md#eventlog-soft-fk
+  created_by_user_id String
+  language           String?
+  location           String?
+  user_agent         String?
+  client_ip          String?
+  event_payload      Json?
+  event_type         EventLogType
+
+  // User activity/timeline pagination. The first index covers an optional type
+  // filter; the second covers the common all-types view. Both match total-order
+  // created_at DESC + event_log_id DESC instead of forcing a per-user sort.
+  @@index([created_by_user_id, event_type, created_at(sort: Desc), event_log_id(sort: Desc)])
+  @@index([created_by_user_id, created_at(sort: Desc), event_log_id(sort: Desc)])
+  // DD3-F3 (2026-05-26, pre-launch baseline regen):
+  // Hot query patterns: `WHERE event=X AND created_at >= ?` (dunning, lifecycle sweeps)
+  // and `WHERE event_type=Y AND created_at >= ?` (admin log filters, retention cleanup).
+  // Composite indexes with created_at DESC for "recent events of type" pagination.
+  @@index([event, created_at(sort: Desc)])
+  @@index([event_type, created_at(sort: Desc)])
+}
+
+// AI Crawler Analytics — tracking who crawls /llms.txt, /robots.txt, /sitemap*.xml
+// DECISION [aicrawler-varchar-indexes]: VarChar = defense-in-depth + composite (date,bot) indexes dla stats -> docs/DOMAIN/SCHEMA_DECISIONS.md#aicrawler-varchar-indexes
+model AiCrawlerEvent {
+  id           String   @id @default(cuid())
+  created_at   DateTime @default(now())
+  user_agent   String   @db.VarChar(2000)
+  path         String   @db.VarChar(500) // /llms.txt, /llms-pl.txt, /robots.txt, /sitemap.xml, etc.
+  ip_address   String?  @db.VarChar(100) // pełny adres IP crawlera, cap 100 znaków
+  country      String?  @db.VarChar(10) // CF-IPCountry header (Cloudflare) lub null
+  bot_name     String?  @db.VarChar(100) // parsed: GPTBot, ClaudeBot, PerplexityBot, Googlebot, etc.
+  bot_category String?  @db.VarChar(50) // ai-training, ai-search, search-engine, seo-tool, social, unknown
+
+  @@index([bot_name])
+  @@index([bot_category])
+  @@index([path])
+  @@index([created_at, bot_name])
+  @@index([created_at, bot_category])
+}
+
+// Stripe Webhook Idempotency
+model StripeEvent {
+  id              String    @id @default(cuid())
+  event_id        String    @unique @map("eventId")
+  event_type      String    @map("eventType")
+  processed       Boolean   @default(false)
+  processed_at    DateTime? @map("processedAt")
+  created_at      DateTime  @default(now()) @map("createdAt")
+  // D1 (run 25): janitor sweeper retry tracking + dead-letter handling.
+  // DECISION [stripeevent-last-attempt-default]: @default(now()) by janitor sweepował po age mimo DB outage -> docs/DOMAIN/SCHEMA_DECISIONS.md#stripeevent-last-attempt-default
+  retry_count     Int       @default(0) @map("retryCount")
+  last_attempt_at DateTime  @default(now()) @map("lastAttemptAt")
+  last_error      String?   @map("lastError") @db.Text
+  dead_lettered   Boolean   @default(false) @map("deadLettered")
+
+  // DD3-D8 (run 24): janitorial sweeper for unprocessed events ordered by age.
+  // WHERE processed = false AND dead_lettered = false ORDER BY created_at.
+  @@index([processed, dead_lettered, created_at])
+  // Admin/diagnostics: list dead-lettered rows for manual triage.
+  @@index([dead_lettered, created_at])
+}
+
+model StylistAccount {
+  account_id              String              @id @default(cuid())
+  created_at              DateTime            @default(now())
+  created_by_user_id      String              @unique
+  // DECISION [stylistaccount-display-name-nullable]: nullable w DB, app-required (walidator); odczyty z fallbackiem -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-display-name-nullable
+  display_name            String?
+  pricing_plan            PricingPlan
+  payment_status          PaymentStatus
+  account_status          AccountStatus
+  // Seat-billing: kolumna ZOSTAJE, ale per-seat jako mechanizm CENNIKOWY = SKASOWANY
+  // (Model B, owner 2026-07-19). Studio = CAŁY zespół w cenie do 10 kont (max_staff_members=9,
+  // fair-use cap); paid_staff_seats NIEUŻYWANY jako dopłata (default 0, nie +35/seat). Guard
+  // salon-staff nadal liczy effectiveLimit = max_staff_members + paid_staff_seats, więc kolumna
+  // może służyć jako ewentualny RĘCZNY bump limitu (nie cennik). SSOT: pricing.policy.ts DECISION
+  // (Model B) + PRICING_PACKAGING §2.4. Odwraca A-lite +35/seat (2026-07-12).
+  paid_staff_seats        Int                 @default(0)
+  account_expiration_date DateTime?
+  upcoming_payment_date   DateTime?
+  business_name           String?
+  address_street          String?
+  address_city            String?
+  address_postal_code     String?
+  address_country         String?
+  latitude                Float?
+  longitude               Float?
+  phone                   String?
+  website                 String?
+  description             String?             @db.Text
+  dashboard_note          String?             @db.Text
+  vanity_url              String?             @unique
+  // Public profile fields
+  instagram_handle        String?
+  // DECISION [stylistaccount-avatar]: wlasny upload zdjecia profilowego (account/set-avatar), null = fallback OAuth image -> inicjaly -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-avatar
+  avatar_url              String?
+  // DECISION [asset-public-id]: identyfikator pliku w chmurze wyprowadzony z adresu przy
+  // zapisie; indeks zastepuje skan calej kolumny adresow w bramce wlasnosci pliku.
+  // NULL = adresu nie dalo sie rozlozyc -> wiersz ZOSTAJE na wolniejszej sciezce
+  // porownania w kodzie (patrz cloudinary-asset.guard.ts). Swiadomie BEZ @unique:
+  // pytamy o istnienie, nie o unikalnosc, a ten sam plik moze byc legalnie wskazany
+  // przez wiersz historyczny. -> docs/DOMAIN/SCHEMA_DECISIONS.md#asset-public-id
+  avatar_public_id        String?
+  // Branding-light krok 1 (BRANDING_VALUE_LADDER, 2026-07-11): kolor akcentu
+  // publicznego profilu — hex z kuratorowanej palety kernela (walidacja
+  // po stronie API), gate planu can_brand_profile (Pro Marka+).
+  brand_accent_color      String?             @db.VarChar(7)
+  // Stripe subscription fields
+  stripe_customer_id      String?             @unique
+  subscription_id         String?
+  subscription_status     SubscriptionStatus?
+  cancel_at_period_end    Boolean?            @default(false)
+  cancel_at               DateTime?
+  current_period_end      DateTime?
+  // Out-of-order webhook guard: created-time of the most recent Stripe EVENT applied
+  // to this account. Webhook plan-writes are gated on it (skip if event.created is
+  // older) so a delayed/retried stale event cannot resurrect a canceled subscription.
+  // Null = no Stripe event applied yet (first event always wins). Non-webhook callers
+  // (login-sync / dunning) are authoritative and do NOT set/check it.
+  last_stripe_event_at    DateTime?
+  // Trial fields
+  trial_started_at        DateTime?
+  trial_ends_at           DateTime?
+  trial_reminder_sent     Boolean?            @default(false)
+  // DECISION [stylistaccount-plan-selected-at] (SPE D3, nie usuwaj): marker bramki wyboru planu,
+  // ODDZIELNY od trial_started_at. Ustawiany przy jawnym wyborze planu: Free -> od razu (free-branch op),
+  // paid -> przy utworzeniu checkout-session. App-guard: brak plan_selected_at -> redirect do wyboru planu.
+  // Porzucony paid-checkout zostawia plan_selected_at=set ale pricing_plan=FREE/default -> user NIE zablokowany
+  // (retry albo Free). Nullable, bez indeksu (read tylko per-account po PK). NIE myl z trial-lock.
+  plan_selected_at        DateTime?
+  // Email lifecycle preferences
+  // DECISION [stylistaccount-marketing-by-design]: domyślny JSON ma marketing:true; faktyczną wartość zapisuje onboarding (kolumna email_marketing) -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-marketing-by-design
+  email_preferences       Json?               @default("{\"trial_sequence\":true,\"marketing\":true}")
+  // DECISION [stylistaccount-email-bool-authoritative]: Boolean = autorytatywna ścieżka (Phase 2 shipped); JSON = shadow/rollback -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-email-bool-authoritative
+  email_marketing         Boolean             @default(true)
+  email_trial_sequence    Boolean             @default(true)
+  // DECISION [stylistaccount-admin-plan-override]: OWNER-001 — flaga chroni admin-set plan przed login-time Stripe sync -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-admin-plan-override
+  admin_plan_override     Boolean             @default(false)
+  // DECISION [stylistaccount-gallery-strength-dismissed-at]: decyzja stylistki o zamknieciu karty "Sila galerii" po osiagnieciu 100%; NULL = karta widoczna. Nie czyscimy jej przy spadku ponizej 100% — render decyduje po WYNIKU (score < 100 pokazuje karte mimo znacznika), wiec jedno zamkniecie nie gasi przyszlych podpowiedzi -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-gallery-strength-dismissed-at
+  gallery_strength_dismissed_at DateTime?
+  // Profile metrics
+  view_count              Int                 @default(0)
+  // DECISION [stylistaccount-cached-bookmark-count]: denormalized count anty-N+1; SoT = FavoriteStylist, drift recovery skryptem -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-cached-bookmark-count
+  cached_bookmark_count   Int                 @default(0)
+  // DECISION [stylistaccount-cached-gallery-count]: denormalized count anty-N+1; liczy WIDOCZNE rekordy (is_hidden=false) — parytet z write-path (gallery-count.helper) + backfill; RC-011 (wczesniejszy ALL-count driftowal public photo_count) -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-cached-gallery-count
+  cached_gallery_count    Int                 @default(0)
+  // DECISION [stylistaccount-cached-likes-count]: denormalized count anty-N+1; SoT = FavoriteGalleryRecord JOIN GalleryRecord WHERE is_hidden=false (lajki WIDOCZNYCH rekordow); single-owner writer favorite-count.helper.ts; drift recovery via cached-counts-backfill -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-cached-likes-count
+  cached_likes_count      Int                 @default(0)
+  created_by_user         User                @relation("StylistAccountRelation", fields: [created_by_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  gallery_record          GalleryRecord[]     @relation("GalleryRecordRelation")
+  favorited_by            FavoriteStylist[]   @relation("StylistBookmarks")
+  stylist_pairings        ClientStylistPair[] @relation("StylistPairings")
+  pairing_sessions        PairingSession[]    @relation("StylistPairingSessions")
+  staff_members           StaffMember[]       @relation("SalonStaff")
+  session_containers      SessionContainer[]
+  stylist_visits          VisitRecord[]       @relation("StylistVisits")
+
+  @@index([account_status, address_city, latitude, longitude])
+  @@index([subscription_status])
+  // Explore query: filter ACTIVE accounts then join via account_id — covering index for the subquery plan
+  @@index([account_status, account_id])
+  // DECISION [stylistaccount-explore-orderby-index]: covering index dla getStylistsWithLocation ORDER BY (H9 fix) -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-explore-orderby-index
+  @@index([account_status, cached_gallery_count(sort: Desc)])
+  @@index([avatar_public_id])
+  // Email sweep query: WHERE trial_started_at IS NOT NULL — avoids full table scan
+  @@index([trial_started_at]) // redundant-index-allow: retained for trial_started_at-only email-sweep scans (documented retention; technically covered by [trial_started_at, payment_status])
+  // PRMA C1-F2 (2026-05-27, HIGH): hot dunning + lifecycle sweeps filter on
+  // trial_started_at AND payment_status (e.g., trials still UNPAID after N days). Composite
+  // accelerates the AND clause; single-column index above retained for trial_started_at-only scans.
+  @@index([trial_started_at, payment_status])
+  // DECISION [stylistaccount-billing-cron-index]: paid-lifecycle crons (renewal-reminder: payment_status=PAID
+  // + current_period_end BETWEEN range ORDER BY current_period_end ASC; dunning-downgrade: payment_status=IN_PROGRESS
+  // ORDER BY current_period_end ASC). Composite serves the equality partition + range/seek AND eliminates the sort
+  // (current_period_end was in zero indexes). -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-billing-cron-index
+  @@index([payment_status, current_period_end])
+  // City filter (Explore + public stylists list) — equality lookup without lat/lng dependency
+  @@index([address_city])
+  // DECISION [stylistaccount-gin-trigram]: per-column GIN trgm dla fuzzy search (ILIKE), pg_trgm manual w migration -> docs/DOMAIN/SCHEMA_DECISIONS.md#stylistaccount-gin-trigram
+  @@index([display_name(ops: raw("gin_trgm_ops"))], type: Gin, map: "stylist_account_display_name_trgm_idx")
+  @@index([business_name(ops: raw("gin_trgm_ops"))], type: Gin, map: "stylist_account_business_name_trgm_idx")
+  @@index([address_city(ops: raw("gin_trgm_ops"))], type: Gin, map: "stylist_account_address_city_trgm_idx")
+}
+
+model ClientAccount {
+  client_account_id  String   @id @default(cuid())
+  created_at         DateTime @default(now())
+  created_by_user_id String   @unique
+
+  // Contact information (visible only to paired stylists)
+  contact_phone String?
+  contact_email String?
+
+  dashboard_note String? @db.Text
+
+  created_by_user    User               @relation("ClientAccountRelation", fields: [created_by_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  session_containers SessionContainer[]
+
+  @@index([contact_phone])
+  @@index([contact_email])
+}
+
+model Color {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  hex_code      String
+  display_order Int      @default(0)
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+
+  gallery_records GalleryRecordColor[]
+
+  @@index([is_active, display_order])
+}
+
+model Trait {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  category      String // 'technique', 'finish', 'decoration', 'style'
+  icon_url      String?
+  display_order Int      @default(0)
+  is_active     Boolean  @default(true)
+  is_featured   Boolean  @default(false)
+  created_at    DateTime @default(now())
+
+  gallery_records GalleryRecordTrait[]
+
+  @@index([is_active, is_featured(sort: Desc), category, display_order])
+  @@index([category])
+}
+
+model GalleryRecordColor {
+  id                String   @id @default(cuid())
+  gallery_record_id String
+  color_id          String
+  created_at        DateTime @default(now())
+
+  gallery_record GalleryRecord @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade)
+  color          Color         @relation(fields: [color_id], references: [id], onDelete: Cascade)
+
+  @@unique([gallery_record_id, color_id])
+  // Explore query: EXISTS subquery seeks color_id then needs gallery_record_id for join — covering index
+  @@index([color_id, gallery_record_id])
+}
+
+model GalleryRecordTrait {
+  id                String   @id @default(cuid())
+  gallery_record_id String
+  trait_id          String
+  created_at        DateTime @default(now())
+
+  gallery_record GalleryRecord @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade)
+  trait          Trait         @relation(fields: [trait_id], references: [id], onDelete: Cascade)
+
+  @@unique([gallery_record_id, trait_id])
+  // Explore query: EXISTS subquery seeks trait_id then needs gallery_record_id for join — covering index
+  @@index([trait_id, gallery_record_id])
+}
+
+model GalleryRecord {
+  gallery_record_id        String                  @id @default(cuid())
+  created_at               DateTime                @default(now())
+  created_by_account_id    String
+  asset_url                String
+  // DECISION [asset-public-id]: identyfikator pliku w chmurze wyprowadzony z adresu przy
+  // zapisie; indeks zastepuje skan calej kolumny adresow w bramce wlasnosci pliku.
+  // NULL = adresu nie dalo sie rozlozyc -> wiersz ZOSTAJE na wolniejszej sciezce
+  // porownania w kodzie (patrz cloudinary-asset.guard.ts). Swiadomie BEZ @unique:
+  // pytamy o istnienie, nie o unikalnosc, a ten sam plik moze byc legalnie wskazany
+  // przez wiersz historyczny. -> docs/DOMAIN/SCHEMA_DECISIONS.md#asset-public-id
+  public_id                String?
+  nail_length              NailLength
+  is_pinned                Boolean                 @default(false)
+  is_hidden                Boolean                 @default(false)
+  created_by_account       StylistAccount          @relation("GalleryRecordRelation", fields: [created_by_account_id], references: [account_id], onDelete: Cascade, onUpdate: Cascade)
+  favorited_by             FavoriteGalleryRecord[] @relation("FavoriteRecords")
+  colors                   GalleryRecordColor[]
+  traits                   GalleryRecordTrait[]
+  content_reports          ContentReport[]
+  session_container_photos SessionContainerPhoto[]
+
+  @@index([is_pinned, created_at(sort: Desc)])
+  @@index([created_by_account_id, nail_length])
+  // Explore query: filter by nail_length + ORDER BY created_at DESC — avoids sort step
+  @@index([nail_length, created_at(sort: Desc)])
+  // Explore query: cursor pagination seeks (created_at, gallery_record_id) for stable ordering
+  @@index([created_at(sort: Desc), gallery_record_id])
+  // PRMA C1-F1 (2026-05-27, CRITICAL): public profile + Explore feed dominant queries always
+  // include is_hidden filter (= false) and order by created_at DESC. Composite indexes below cover
+  // both per-account profile pagination and global Explore pagination with a single seek.
+  @@index([created_by_account_id, is_hidden, created_at(sort: Desc)])
+  @@index([is_hidden, created_at(sort: Desc)])
+  // Public profile gallery (publicGetGalleryRecordsByAccount_IO): WHERE created_by_account_id
+  // + is_pinned=true + is_hidden=false ORDER BY created_at DESC (+ gallery_record_id tiebreaker).
+  // Covers equality prefix + sort in one seek; existing [..,is_pinned] / [..,is_hidden,created_at]
+  // indexes each miss one predicate so the planner falls back to a sort.
+  @@index([created_by_account_id, is_pinned, is_hidden, created_at(sort: Desc)])
+  // Paired-client gallery (getGalleryForPairedClient_IO): WHERE created_by_account_id + is_hidden
+  // ORDER BY is_pinned DESC, created_at DESC, gallery_record_id DESC. Covers the multi-key sort
+  // (is_pinned → created_at → cuid tiebreaker) so pinned-first pagination is a single index walk.
+  @@index([created_by_account_id, is_pinned, created_at(sort: Desc), gallery_record_id])
+  @@index([public_id])
+}
+
+model User {
+  id                     String      @id @default(cuid())
+  email                  String      @unique
+  emailVerified          Boolean     @default(false) @map("email_verified")
+  image                  String?
+  name                   String      @default("") @db.VarChar(200)
+  role_id                String
+  createdAt              DateTime    @default(now()) @map("created_at")
+  updatedAt              DateTime    @updatedAt @map("updated_at")
+  is_active              Boolean     @default(true)
+  disabled_at            DateTime?   @map("disabled_at")
+  // DECISION [user-soft-delete-model-a]: Model A soft-delete §13.1; deleted_at=self vs disabled_at=ban -> docs/DOMAIN/SCHEMA_DECISIONS.md#user-soft-delete-model-a
+  deleted_at             DateTime?   @map("deleted_at")
+  recovery_available     Boolean     @default(false) @map("recovery_available")
+  account_type           AccountType @default(CLIENT)
+  notifications_enabled  Boolean     @default(true)
+  // DECISION [user-terms-accepted-at]: first acceptance of terms + 16+ declaration, stamped by onboarding -> docs/DOMAIN/SCHEMA_DECISIONS.md#user-terms-accepted-at
+  terms_accepted_at      DateTime?   @map("terms_accepted_at")
+  moderation_strikes     Int         @default(0)
+  // DECISION [user-delete-confirm-version]: monotoniczny licznik unieważniający single-use delete-token (anty-replay) -> docs/DOMAIN/SCHEMA_DECISIONS.md#user-delete-confirm-version
+  delete_confirm_version Int         @default(0)
+
+  // Relations
+  role                      Role                    @relation(fields: [role_id], references: [id])
+  stylist_account           StylistAccount?         @relation("StylistAccountRelation")
+  client_account            ClientAccount?          @relation("ClientAccountRelation")
+  favorite_stylists         FavoriteStylist[]       @relation("ClientBookmarks")
+  favorite_records          FavoriteGalleryRecord[] @relation("ClientFavoriteRecords")
+  client_pairings           ClientStylistPair[]     @relation("ClientPairings")
+  client_visits             VisitRecord[]           @relation("ClientVisits")
+  staff_memberships         StaffMember[]           @relation("StaffMemberships")
+  announcements             Announcement[]          @relation("AnnouncementRelation")
+  runtime_config_updates    RuntimeConfig[]         @relation("RuntimeConfigUpdater")
+  moderation_strike_records ModerationStrike[]      @relation("ModerationStrikeRelation")
+
+  // Better Auth relations
+  accounts Account[]
+  sessions Session[]
+
+  @@index([role_id])
+  @@index([name])
+  @@index([is_active])
+  @@index([createdAt])
+  // Recovery cron: WHERE recovery_available=true AND deleted_at < (now-90d) (DOMAIN_SSOT §13.1)
+  @@index([recovery_available, deleted_at])
+  // PLQS C1-5D (2026-05-28): admin metrics GROUP BY account_type + admin user-list
+  // filter by type ordered by date. Composite avoids full table scan + sort step.
+  @@index([account_type, createdAt(sort: Desc)])
+  // DECISION [user-gin-trigram]: per-column GIN trgm dla fuzzy admin user-search (ADMIN_GET_USERS_PAGINATED
+  // ILIKE %term% na email+name — leading wildcard omija btree). Mirror wzorca StylistAccount GIN trgm,
+  // pg_trgm manual w migration. -> docs/DOMAIN/SCHEMA_DECISIONS.md#user-gin-trigram
+  @@index([email(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_email_trgm_idx")
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_name_trgm_idx")
+  @@map("users") // REQUIRED by Better Auth adapter mapping - users table name.
+}
+
+model DeletedUser {
+  user_id              String    @id @default(cuid())
+  created_at           DateTime  @default(now())
+  body                 Json
+  // Denormalized copy of body.email (lookup key for recovery). Nullable: rows written
+  // before the column existed have NULL — findMatchingBackup falls back to the legacy
+  // JSON scan for those (recovery.operations.ts). Writers (deleteUser_IO backup upsert
+  // + moveExpiredUserToArchive_IO) fill it from the snapshot.
+  email                String?
+  recovery_offered     Boolean   @default(false)
+  recovered_at         DateTime?
+  recovered_as_user_id String?
+  // DECISION [deleteduser-is-gdpr-erased]: marker terminal-delete NA ŻĄDANIE (self-GDPR + admin-takedown): true = pełne body, NIE-restorable (loadRecentRecoverableBackups filtruje not:true). Wiersz usuwa admin hard-purge. -> docs/DOMAIN/SCHEMA_DECISIONS.md#deleteduser-is-gdpr-erased
+  is_gdpr_erased       Boolean   @default(false)
+  // DECISION [deleteduser-is-move-archive]: true=archiwum z 90d MOVE, pełne body, NIE-restorable; recovery filtruje not:true -> docs/DOMAIN/SCHEMA_DECISIONS.md#deleteduser-is-move-archive
+  is_move_archive      Boolean   @default(false)
+
+  @@index([created_at])
+  @@index([email])
+}
+
+model FavoriteStylist {
+  id                 String   @id @default(cuid())
+  client_user_id     String
+  stylist_account_id String
+  created_at         DateTime @default(now())
+
+  client  User           @relation("ClientBookmarks", fields: [client_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stylist StylistAccount @relation("StylistBookmarks", fields: [stylist_account_id], references: [account_id], onDelete: Cascade, onUpdate: Cascade)
+  // FAZA A (2026-06-03, owner): fizyczny rename FollowedStylist -> FavoriteStylist (usunięte @@map).
+  // PPC „avoid ALTER TABLE" nadpisane — pre-launch 0 rows, czysty baseline na końcu sesji.
+
+  @@unique([client_user_id, stylist_account_id])
+  @@index([client_user_id, created_at(sort: Desc)])
+  @@index([stylist_account_id])
+}
+
+model FavoriteGalleryRecord {
+  id                String   @id @default(cuid())
+  client_user_id    String
+  gallery_record_id String
+  note              String?  @db.VarChar(500)
+  created_at        DateTime @default(now())
+
+  client User          @relation("ClientFavoriteRecords", fields: [client_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  record GalleryRecord @relation("FavoriteRecords", fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([client_user_id, gallery_record_id])
+  @@index([client_user_id, created_at(sort: Desc)])
+  // Public profile total_likes aggregate: COUNT joined via record.created_by_account_id
+  @@index([gallery_record_id])
+}
+
+enum EventLogType {
+  ACCOUNT
+  LOGIN
+  GALLERY
+  ADMIN
+  DOMAIN
+  EMAIL
+}
+
+enum AccountType {
+  STYLIST
+  CLIENT
+}
+
+enum NailLength {
+  SHORT
+  MEDIUM
+  LONG
+  XL
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  TRIALING
+  UNPAID
+  PAUSED
+}
+
+enum PricingPlan {
+  FREE
+  PRO
+  PRO_PLUS
+  STUDIO
+  SCALE
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  IN_PROGRESS
+  // DECISION [paymentstatus-rejected-scaffold]: SCAFFOLD pod charge.dispute; dziś dispute via UNPAID, zostaje na przyszłość -> docs/DOMAIN/SCHEMA_DECISIONS.md#paymentstatus-rejected-scaffold
+  REJECTED
+}
+
+enum AccountStatus {
+  ACTIVE
+  NOT_ACTIVE
+  EXPIRING
+  EXPIRED
+}
+
+// Staff Accounts (Studio plan feature)
+enum StaffRole {
+  OWNER
+  MANAGER
+  EMPLOYEE
+}
+
+model StaffMember {
+  id                 String    @id @default(cuid())
+  stylist_account_id String
+  user_id            String
+  role               StaffRole @default(EMPLOYEE)
+  permissions        String[] // ['GALLERY_VIEW', 'GALLERY_EDIT', 'PAIRING_MANAGE', 'SESSION_SHARE_RECEIVE']
+  invited_at         DateTime  @default(now())
+  // DECISION [staffmember-accepted-at]: zgoda zaproszonej na pokazanie imienia i zdjecia w zespole (pisze ja WYLACZNIE respondToStaffInvitation_IO), null = zaproszenie czeka -> docs/DOMAIN/SCHEMA_DECISIONS.md#staffmember-accepted-at
+  accepted_at        DateTime?
+  is_active          Boolean   @default(true)
+
+  stylist_account StylistAccount @relation("SalonStaff", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+  user            User           @relation("StaffMemberships", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([stylist_account_id, user_id])
+  @@index([user_id, is_active])
+  @@index([stylist_account_id, is_active])
+}
+
+model PairingSession {
+  id                        String    @id @default(cuid())
+  token                     String    @unique @db.VarChar(32)
+  stylist_account_id        String
+  issued_by_user_id         String
+  created_at                DateTime  @default(now())
+  expires_at                DateTime
+  claimed_by_client_user_id String?
+  claimed_at                DateTime?
+  revoked_at                DateTime?
+
+  stylist_account StylistAccount @relation("StylistPairingSessions", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+
+  @@index([stylist_account_id, created_at(sort: Desc)])
+  @@index([expires_at])
+}
+
+model ClientStylistPair {
+  id                            String        @id @default(cuid())
+  client_user_id                String
+  stylist_account_id            String
+  paired_at                     DateTime      @default(now())
+  // DECISION [clientstylistpair-soft-ref]: soft-reference audyt-only do PairingSession.id, gwarancja app-level (0 orphanów) -> docs/DOMAIN/SCHEMA_DECISIONS.md#clientstylistpair-soft-ref
+  paired_via_pairing_session_id String?
+  status                        PairingStatus @default(ACTIVE)
+  revoked_at                    DateTime?
+  // DECISION [pair-revoked-by]: kto zerwał relację — bez tego REVOKED było nierozróżnialne między rezygnacją klientki a usunięciem jej przez stylistkę, więc usunięta osoba jednostronnie cofała jedyną kontrolę „usuń tę osobę" (ponowna prośba podnosiła wiersz do PENDING, a PENDING otwiera komunikator); NULL = wiersze sprzed kolumny, liczone jak zerwanie po stronie klientki -> docs/DOMAIN/SCHEMA_DECISIONS.md#pair-revoked-by
+  revoked_by                    AccountType?
+  crm_note                      String?       @db.Text
+  crm_note_updated_at           DateTime?
+
+  // Komunikator stylistka<->klientka (jeden strumień per para). last_message_at =
+  // denormalizacja do sortowania listy rozmów + wykrycia "ma wiadomości" bez
+  // agregacji. *_last_read_at = per-strona znacznik przeczytania (unread =
+  // wiadomości drugiej strony z created_at > mój last_read_at).
+  last_message_at      DateTime?
+  client_last_read_at  DateTime?
+  stylist_last_read_at DateTime?
+  // DECISION [pair-hidden-at] (D2, 2026-09-05): ukrycie rozmowy = WYCISZENIE po
+  // JEDNEJ stronie pary. Strona ukrywająca: wątek znika ze skrzynki i liczników,
+  // prośba o parowanie znika z listy oczekujących, zero powiadomień (mail/in-app)
+  // dla nowych wiadomości i ponownych próśb. Druga strona NICZEGO się nie
+  // dowiaduje (wysyłka zwraca sukces, wiadomości są zapisywane — anty-oracle).
+  // Nowa wiadomość NIE odkrywa wątku; przywrócenie = null. Nullowalne, bez
+  // backfillu; bez indeksu (zbiory ukrytych są małe, skrzynkę napędzają indeksy
+  // (owner, last_message_at DESC, id DESC) z filtrem IS NULL).
+  stylist_hidden_at    DateTime?
+  client_hidden_at     DateTime?
+
+  client_user     User                   @relation("ClientPairings", fields: [client_user_id], references: [id], onDelete: Cascade)
+  stylist_account StylistAccount         @relation("StylistPairings", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+  messages        StylistClientMessage[]
+
+  @@unique([client_user_id, stylist_account_id], name: "client_user_id_stylist_account_id")
+  @@index([client_user_id, status, paired_at(sort: Desc)])
+  @@index([stylist_account_id, status, paired_at(sort: Desc)])
+  // Lista rozmów (per strona, najnowsza wiadomość pierwsza): pokrywa
+  // getConversations_IO WHERE <owner> AND last_message_at IS NOT NULL ORDER BY last_message_at DESC.
+  @@index([client_user_id, last_message_at(sort: Desc), id(sort: Desc)])
+  @@index([stylist_account_id, last_message_at(sort: Desc), id(sort: Desc)])
+}
+
+enum PairingStatus {
+  ACTIVE
+  REVOKED
+  // Prosba o polaczenie ze stalego kodu QR / publicznego profilu (2026-07-11):
+  // wiersz PENDING NIE daje dostepu do CHRONIONYCH zasobow stylistki (galeria,
+  // karta klientki, sesje — te sciezki filtruja status=ACTIVE). WYJATEK
+  // (S75/S82, celowy): komunikator dopuszcza PENDING (canSendToPair) — klientka
+  // moze napisac do stylistki PRZED akceptacja ("anuluj prosbe + napisz").
+  // Powierzchnia spamu ograniczona: rate-limit 60/h/user + throttle mailowy
+  // 15 min/pare + stylistka moze decline (REVOKED zamyka watek read-only).
+  // Stylistka podnosi PENDING na ACTIVE (accept) albo znika/wraca do REVOKED
+  // (decline). Claim kodu 15-min upsertuje PENDING→ACTIVE.
+  PENDING
+}
+
+enum StylistClientMessageSender {
+  STYLIST
+  CLIENT
+}
+
+// Komunikator stylistka<->klientka: jeden ciągły strumień wiadomości per para
+// (ClientStylistPair). Wysyłka dozwolona gdy para PENDING/ACTIVE (klientka może
+// pisać czekając na akceptację prośby); REVOKED = historia read-only.
+model StylistClientMessage {
+  id          String                     @id @default(cuid())
+  pair_id     String
+  sender_type StylistClientMessageSender
+  // @db.Text = long-form free text (parytet SupportMessage). Na Postgres bare String
+  // i tak mapuje się na TEXT (unbounded) — anotacja jest jawnością intencji, nie zmianą
+  // typu (VARCHAR(191) to zachowanie MySQL, nie PG).
+  content     String                     @db.Text
+  created_at  DateTime                   @default(now())
+
+  pair ClientStylistPair @relation(fields: [pair_id], references: [id], onDelete: Cascade)
+
+  // Thread + latest preview: Postgres reverse-scan obsługuje ASC listy wątku,
+  // a DESC + id domyka deterministyczny latest-message lookup.
+  @@index([pair_id, created_at(sort: Desc), id(sort: Desc)])
+  // Conversation unread aggregate: pair + other-side + read timestamp cutoff.
+  @@index([pair_id, sender_type, created_at(sort: Desc)])
+}
+
+enum VisitRecordSource {
+  SESSION
+  MANUAL
+}
+
+model ContactAccessLog {
+  id              String   @id @default(cuid())
+  client_user_id  String
+  stylist_user_id String
+  accessed_at     DateTime @default(now())
+  // DECISION [contactaccesslog-access-type]: DTO ContactAccessType override, kolumna String; EXPORT_CONTACT=SCAFFOLD -> docs/DOMAIN/SCHEMA_DECISIONS.md#contactaccesslog-access-type
+  access_type     String
+  ip_address      String?
+  user_agent      String?
+
+  // DECISION [contactaccesslog-soft-fk]: client_user_id + stylist_user_id = soft-FK, append-only; wiersz przeżywa delete usera -> docs/DOMAIN/SCHEMA_DECISIONS.md#contactaccesslog-soft-fk
+
+  @@index([client_user_id, accessed_at])
+  @@index([stylist_user_id, accessed_at])
+  @@index([client_user_id, stylist_user_id, accessed_at])
+  // DD3-D8 (run 24): GDPR retention sweeper scans WHERE accessed_at < cutoff across ALL users.
+  // Existing composite indexes are user-scoped — they cannot cover this global range scan.
+  @@index([accessed_at])
+}
+
+model FeatureFlag {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  description String?
+  is_enabled  Boolean   @default(false)
+  // DECISION [featureflag-expires-nullable]: nullable dla legacy compat; nowe flagi wymagają expires_at w admin UI -> docs/DOMAIN/SCHEMA_DECISIONS.md#featureflag-expires-nullable
+  expires_at  DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@index([expires_at])
+}
+
+model PlanConfig {
+  id      String @id @default(cuid())
+  plan_id String @unique
+
+  max_gallery_records Int
+  max_pinned_records  Int
+  max_paired_clients  Int
+  max_shares_per_hour Int // Rate limit: -1 = unlimited
+
+  can_use_session_share  Boolean
+  can_use_multi_session  Boolean
+  can_use_staff_accounts Boolean // Staff Accounts feature (Studio+)
+
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("plan_config")
+}
+
+model Announcement {
+  id                 String    @id @default(cuid())
+  title              String    @db.VarChar(200)
+  message            String    @db.Text
+  type               String    @default("info")
+  is_active          Boolean   @default(true)
+  starts_at          DateTime?
+  ends_at            DateTime?
+  // DECISION [announcement-author-setnull]: NULLABLE + SetNull (był Cascade) — globalny broadcast nie ginie z autorem -> docs/DOMAIN/SCHEMA_DECISIONS.md#announcement-author-setnull
+  created_by_user_id String?
+  created_at         DateTime  @default(now())
+
+  created_by_user User? @relation("AnnouncementRelation", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([is_active, starts_at, ends_at])
+  @@index([created_at])
+  // DECISION [announcement-author-index]: @@index([created_by_user_id]) — FK scan na User-delete (SetNull) -> docs/DOMAIN/SCHEMA_DECISIONS.md#announcement-author-index
+  @@index([created_by_user_id])
+}
+
+model RuntimeConfig {
+  id                 String   @id @default(cuid())
+  key                String   @unique
+  value              String
+  value_type         String
+  description        String?
+  is_predefined      Boolean  @default(false)
+  // DECISION [runtimeconfig-author-setnull]: NULLABLE + SetNull (był Restrict) — GDPR delete admina nie wywala P2003 na configu -> docs/DOMAIN/SCHEMA_DECISIONS.md#runtimeconfig-author-setnull
+  updated_by_user_id String?
+  updated_at         DateTime @updatedAt
+  created_at         DateTime @default(now())
+
+  updated_by_user User? @relation("RuntimeConfigUpdater", fields: [updated_by_user_id], references: [id], onDelete: SetNull)
+
+  // PRMA C1-F4 (2026-05-27, HIGH): unindexed FK forces sequential scan on every cascade check
+  // when User updates/deletes happen. Index needed for ON DELETE SetNull enforcement perf
+  // and for admin audit queries (configs touched by user X).
+  @@index([updated_by_user_id])
+  @@map("runtime_configs")
+}
+
+// Content Moderation
+enum ContentReportReason {
+  INAPPROPRIATE
+  FACE
+  SPAM
+  OTHER
+}
+
+enum ContentReportStatus {
+  PENDING
+  APPROVED // Report accepted — action taken
+  REJECTED // Report dismissed — no action
+}
+
+model ContentReport {
+  id                String              @id @default(cuid())
+  gallery_record_id String?
+  reporter_id       String
+  reason            ContentReportReason
+  description       String?             @db.VarChar(1000)
+  status            ContentReportStatus @default(PENDING)
+  admin_note        String?             @db.Text
+  // DECISION [contentreport-resolved-soft-fk]: resolved_by_id = soft-FK audit-trail (kto rozwiązał), append-only > integralność -> docs/DOMAIN/SCHEMA_DECISIONS.md#contentreport-resolved-soft-fk
+  resolved_by_id    String?
+  created_at        DateTime            @default(now())
+  resolved_at       DateTime?
+
+  // DECISION [contentreport-reporter-soft-fk]: reporter_id = soft-FK, zgłoszenie przeżywa usunięcie zgłaszającego (kaskada kasowała PENDING zgłoszenia na treści, która zostawała żywa); parytet z resolved_by_id w tym samym modelu i z eventlog-soft-fk -> docs/DOMAIN/SCHEMA_DECISIONS.md#contentreport-reporter-soft-fk
+  gallery_record GalleryRecord? @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: SetNull)
+
+  // DECISION [contentreport-no-broad-unique]: brak broad @@unique — re-report po resolve; PENDING-only guard app-level -> docs/DOMAIN/SCHEMA_DECISIONS.md#contentreport-no-broad-unique
+  @@index([gallery_record_id])
+  @@index([status, created_at(sort: Desc)])
+  @@index([reporter_id, created_at])
+  // DECISION [contentreport-global-list-index]: composite [created_at DESC, id DESC] dla global moderation list (where={} cursor) -> docs/DOMAIN/SCHEMA_DECISIONS.md#contentreport-global-list-index
+  @@index([created_at(sort: Desc), id(sort: Desc)])
+}
+
+// Newsletter Subscribers (public form, no auth required)
+// RODO Art. 7(1) — double opt-in flow.
+model NewsletterSubscriber {
+  id                 String                   @id @default(cuid())
+  email              String                   @unique
+  created_at         DateTime                 @default(now())
+  is_active          Boolean                  @default(false)
+  confirmation_token String?                  @unique
+  confirmed_at       DateTime?
+  consent_timestamp  DateTime?
+  ip_address         String?
+  consent_source     String?
+  consent_events     NewsletterConsentEvent[]
+
+  @@index([email])
+  @@index([is_active, created_at])
+  @@index([confirmation_token])
+}
+
+// RODO Art. 30 — append-only consent audit trail.
+// Every subscribe (double opt-in confirmed) and unsubscribe creates a new row.
+// NEVER update or delete records from this table.
+model NewsletterConsentEvent {
+  id                Int                  @id @default(autoincrement())
+  newsletter_id     String
+  // DECISION [newsletterconsent-restrict]: brak onDelete => Restrict CELOWO; append-only consent audit (RODO Art.30), GDPR=anonimizacja nie delete -> docs/DOMAIN/SCHEMA_DECISIONS.md#newsletterconsent-restrict
+  newsletter        NewsletterSubscriber @relation(fields: [newsletter_id], references: [id])
+  action            String // NEWSLETTER_CONSENT_ACTION: "SUBSCRIBE" | "UNSUBSCRIBE"
+  consent_timestamp DateTime             @default(now())
+  ip_address        String?
+  user_agent        String?
+
+  @@index([newsletter_id, consent_timestamp(sort: Desc)])
+}
+
+// Session Container — multi-photo session inspiration container
+// Lifecycle: DRAFT → READY → SHARED → ACTIVE → EXPIRED/CLOSED
+enum SessionContainerLifecycleState {
+  DRAFT
+  READY
+  SHARED
+  ACTIVE
+  EXPIRED
+  CLOSED
+}
+
+model SessionContainer {
+  id                 String                         @id @default(cuid())
+  client_account_id  String
+  stylist_account_id String?
+  name               String?                        @db.VarChar(100)
+  lifecycle_state    SessionContainerLifecycleState @default(DRAFT)
+  stylist_note       String?                        @db.VarChar(500)
+  client_note        String?                        @db.VarChar(500)
+  shared_at          DateTime?
+  expires_at         DateTime?
+  closed_at          DateTime?
+  created_at         DateTime                       @default(now())
+  updated_at         DateTime                       @updatedAt
+
+  client_account  ClientAccount           @relation(fields: [client_account_id], references: [client_account_id], onDelete: Cascade)
+  stylist_account StylistAccount?         @relation(fields: [stylist_account_id], references: [account_id], onDelete: SetNull)
+  photos          SessionContainerPhoto[]
+  visit_record    VisitRecord?            @relation("SessionVisit")
+
+  // DECISION (nie usuwaj tego komentarza): partial-unique 'session_container_active_pair_uq'
+  // jest nieekspresowalny w Prisma schema (filtered WHERE lifecycle_state NOT IN (CLOSED,EXPIRED)
+  // AND stylist_account_id IS NOT NULL) → tworzony idempotentnie raw-SQL na starcie w
+  // web-1/src/application/startup/ensure-db-indexes.ts (wpiety w instrumentation.ts krok 8.55).
+  // db push go NIE zarzadza. Catch P2002 'active_pair' (create + add-photo operations) polega
+  // na tym indeksie jako strukturalnym backstopie invariantu SC-2 (max 1 niesterminalna sesja
+  // per para client/stylist) + per-client cap.
+
+  @@index([client_account_id, lifecycle_state])
+  @@index([client_account_id, shared_at])
+  @@index([stylist_account_id, lifecycle_state])
+  @@index([expires_at])
+}
+
+model SessionContainerPhoto {
+  id                String   @id @default(cuid())
+  session_id        String
+  gallery_record_id String
+  position          Int      @default(0)
+  created_at        DateTime @default(now())
+
+  session        SessionContainer @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  gallery_record GalleryRecord    @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade)
+
+  @@unique([session_id, gallery_record_id])
+  // DD2-D2 (run 24): enforce dense ordering within a session — race-condition guard.
+  // `addPhotoToSessionContainer_IO` reads max(position) then inserts; two concurrent inserts
+  // could pick the same nextPosition. Unique forces P2002 → retry with incremented position
+  // (max 5 retries, see session-container-commands.operations.ts).
+  // Implicitly covers @@index([session_id, position]) — Postgres uses the unique B-tree
+  // for both ORDER BY position queries and uniqueness checks. No separate index needed.
+  @@unique([session_id, position])
+  @@index([gallery_record_id])
+}
+
+model VisitRecord {
+  id                 String            @id @default(cuid())
+  client_user_id     String
+  stylist_account_id String
+  visit_date         DateTime          @default(now())
+  service_note       String?           @db.VarChar(1000)
+  source             VisitRecordSource @default(MANUAL)
+  session_id         String?           @unique
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @updatedAt
+
+  client_user     User               @relation("ClientVisits", fields: [client_user_id], references: [id], onDelete: Cascade)
+  stylist_account StylistAccount     @relation("StylistVisits", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+  session         SessionContainer?  @relation("SessionVisit", fields: [session_id], references: [id], onDelete: SetNull)
+  result_photos   VisitResultPhoto[]
+
+  @@index([stylist_account_id, client_user_id, visit_date(sort: Desc)])
+  @@index([client_user_id, visit_date(sort: Desc)])
+}
+
+model VisitResultPhoto {
+  id                 String   @id @default(cuid())
+  visit_record_id    String
+  stylist_account_id String
+  asset_url          String
+  // DECISION [asset-public-id]: identyfikator pliku w chmurze wyprowadzony z adresu przy
+  // zapisie; indeks zastepuje skan calej kolumny adresow w bramce wlasnosci pliku.
+  // NULL = adresu nie dalo sie rozlozyc -> wiersz ZOSTAJE na wolniejszej sciezce
+  // porownania w kodzie (patrz cloudinary-asset.guard.ts). Swiadomie BEZ @unique:
+  // pytamy o istnienie, nie o unikalnosc, a ten sam plik moze byc legalnie wskazany
+  // przez wiersz historyczny. -> docs/DOMAIN/SCHEMA_DECISIONS.md#asset-public-id
+  public_id          String?
+  position           Int      @default(0)
+  created_at         DateTime @default(now())
+
+  visit_record VisitRecord @relation(fields: [visit_record_id], references: [id], onDelete: Cascade)
+
+  @@unique([visit_record_id, position])
+  @@index([public_id])
+}
+
+// ─��� Email Dead Letter ──────────────────────────────────────────────────────────
+
+model FailedEmail {
+  id          String    @id @default(cuid())
+  recipient   String
+  template    String
+  subject     String
+  payload     Json
+  error       String
+  attempts    Int       @default(3)
+  created_at  DateTime  @default(now())
+  resolved_at DateTime?
+  // DECISION [failedemail-resolved-soft-fk]: resolved_by = soft-FK audit-trail (admin zamykający), append-only > integralność -> docs/DOMAIN/SCHEMA_DECISIONS.md#failedemail-resolved-soft-fk
+  resolved_by String?
+
+  @@index([created_at])
+  @@index([resolved_at])
+  // PLQS C1-5D (2026-05-28): admin lookup / dedup by recipient email address.
+  @@index([recipient])
+}
+
+// ── Support Messaging ──────────────────────────────────────────────────────────
+
+enum SupportThreadStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
+
+enum SupportSenderType {
+  USER
+  SUPPORT
+}
+
+// What the request is about, picked by the user instead of typing a subject (S126).
+enum SupportThreadCategory {
+  QUESTION
+  BILLING
+  BUG
+  IDEA
+  ACCOUNT
+  OTHER
+}
+
+model SupportThread {
+  id                String                 @id @default(cuid())
+  user_id           String
+  // Since S126 derived by the server from the first line of the first message
+  // (support-subject.resolver.ts); still NOT NULL and still the title everywhere.
+  subject           String
+  // DECISION [supportthread-category]: nullable; null = a thread created before categories existed, never backfilled -> docs/DOMAIN/SCHEMA_DECISIONS.md#supportthread-category
+  category          SupportThreadCategory?
+  status            SupportThreadStatus    @default(OPEN)
+  created_at        DateTime               @default(now())
+  updated_at        DateTime               @updatedAt
+  // DECISION [supportthread-user-last-read-at] (nie usuwaj tego komentarza):
+  // The moment the OWNER of the thread last opened it. A thread has an unread
+  // reply when a SUPPORT message exists with created_at > user_last_read_at.
+  // The default makes every existing and every new thread start as "read", so
+  // shipping the marker lights no badge for history. Written ONLY by raw SQL
+  // (support-read-marker.operations.ts): a Prisma update would bump
+  // @updatedAt, which is the admin's optimistic-concurrency token.
+  // -> docs/DOMAIN/SCHEMA_DECISIONS.md#supportthread-user-last-read-at
+  user_last_read_at DateTime               @default(now())
+
+  // DECISION [supportthread-soft-fk]: user_id = soft-FK; historia supportu przeżywa hard-delete/MOVE usera -> docs/DOMAIN/SCHEMA_DECISIONS.md#supportthread-soft-fk
+  messages SupportMessage[]
+
+  @@index([user_id])
+  // PRMA C1-F3 (2026-05-27, HIGH): admin support queue paginates threads filtered by status
+  // ordered by id DESC (cuid lexicographic ~= insertion order). Composite removes sort step
+  // for the dominant "list OPEN threads, newest first" admin query.
+  // DECISION [supportthread-status-index]: standalone [status] usunięty — composite [status, id DESC] = left-prefix -> docs/DOMAIN/SCHEMA_DECISIONS.md#supportthread-status-index
+  @@index([status, id(sort: Desc)])
+}
+
+model SupportMessage {
+  id          String            @id @default(cuid())
+  thread_id   String
+  sender_type SupportSenderType
+  // @db.Text = unbounded long-form (paragraph descriptions, stack traces). Na Postgres
+  // bare String i tak mapuje się na TEXT — anotacja dokumentuje intencję, nie zmienia
+  // typu (VARCHAR(191) to zachowanie MySQL, nie PG). Walidator CONTENT_MAX=2000 mieści się w TEXT.
+  content     String            @db.Text
+  created_at  DateTime          @default(now())
+
+  thread SupportThread @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+
+  // PLQS C1-5D (2026-05-28): message listing always orders by created_at ASC within a thread.
+  // Composite eliminates the sort step for getSupportThreadMessages_IO + adminGetThreadMessages_IO.
+  @@index([thread_id, created_at(sort: Asc)])
+}
+
+// Moderation Strikes — rolling window (365 days).
+// Each strike is a time-bounded record. Active = expires_at > now().
+// User.moderation_strikes kept for backwards compat (monotonic counter).
+model ModerationStrike {
+  id         String   @id @default(cuid())
+  user_id    String
+  // DECISION [moderationstrike-reason-varchar]: VarChar(2000) MUSI = STRIKE_REASON_MAX; węższy => 22001 truncation rollback -> docs/DOMAIN/SCHEMA_DECISIONS.md#moderationstrike-reason-varchar
+  reason     String   @db.VarChar(2000)
+  issued_at  DateTime @default(now())
+  expires_at DateTime
+  // DECISION [moderationstrike-issued-by-soft-fk]: issued_by = soft-FK audit-trail (admin nadający strike), append-only > integralność -> docs/DOMAIN/SCHEMA_DECISIONS.md#moderationstrike-issued-by-soft-fk
+  issued_by  String
+
+  user User @relation("ModerationStrikeRelation", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, expires_at(sort: Desc)])
+}

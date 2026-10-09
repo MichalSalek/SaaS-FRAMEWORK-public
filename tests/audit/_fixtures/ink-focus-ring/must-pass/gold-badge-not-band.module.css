@@ -1,0 +1,4 @@
+.badge {
+  background: var(--color-primary);
+  border-radius: 999px;
+}

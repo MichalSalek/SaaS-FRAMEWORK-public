@@ -1,0 +1,119 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.legend {
+  display: block;
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.reasonList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.reasonItem {
+  margin: 0;
+}
+
+.reasonLabel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-12);
+  row-gap: var(--space-2);
+  padding: var(--space-12) var(--space-20);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  cursor: pointer;
+  background: transparent;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+  align-items: start;
+}
+
+.reasonRadio {
+  grid-row: 1 / span 2;
+  margin-top: var(--space-2);
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+}
+
+.reasonTitle {
+  min-width: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+}
+
+.reasonDesc {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+.descriptionWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.descriptionLabel {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: var(--space-12);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-paper);
+  color: var(--color-text-primary);
+  font: inherit;
+  resize: vertical;
+  /* DECISION (B2-F18): Textarea — :focus-visible below provides keyboard ring via border-color. */
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.textarea:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.charCounter {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  align-self: flex-end;
+}
+
+.errorText {
+  color: var(--color-error);
+}
+
+@media (hover: hover) {
+  .reasonLabel:hover {
+    border-color: var(--color-primary);
+  }
+}

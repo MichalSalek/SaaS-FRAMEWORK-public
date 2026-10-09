@@ -1,0 +1,6 @@
+/* Pas OSTRZEGAWCZY jest jasny (L 0.78) — bazowy atramentowy ring trzyma sie
+   na nim sam, wiec ta rola celowo NIE jest ciemna plaszczyzna. */
+.warningStrip {
+  background: var(--color-banner-warning);
+  color: var(--color-on-banner-warning);
+}

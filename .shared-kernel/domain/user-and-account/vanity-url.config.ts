@@ -1,0 +1,36 @@
+/**
+ * Reserved vanity URLs that cannot be used by accounts.
+ * These include infrastructure paths, common routes, and static asset paths.
+ */
+export const RESERVED_VANITY_URLS: readonly string[] = [
+  'admin',
+  'api',
+  'www',
+  'app',
+  'mail',
+  'help',
+  'support',
+  'login',
+  'logout',
+  'register',
+  'signup',
+  'signin',
+  'account',
+  'settings',
+  'profile',
+  'user',
+  'users',
+  'dashboard',
+  'home',
+  'about',
+  'contact',
+  'terms',
+  'privacy',
+  'static',
+  'assets',
+  'public',
+  'cdn',
+  'media',
+  'images',
+  'files',
+];

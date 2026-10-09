@@ -1,0 +1,513 @@
+/* ─── /ui — component catalog (dev-only) ───
+ * Gallery rhythm: name + status + live demo. Implementation text lives in
+ * borderless disclosures. Floor 7xZERO + Style Policy: var(--color-*),
+ * radius enum, full hairlines only (no one-sided borders), no shadow/gradient. */
+
+.page {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-20) var(--space-48);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  line-height: var(--leading-body);
+}
+
+/* ─── Nagłówek strony ─── */
+
+.header {
+  margin-block-end: var(--space-32);
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  max-width: 72ch;
+  margin: var(--space-8) 0 0;
+}
+
+/* ─── Library rules (collapsed disclosure, no chrome) ─── */
+
+.rules {
+  margin-block-end: var(--space-20);
+}
+
+.rules .disclosure {
+  margin-block-start: 0;
+}
+
+.rulesList {
+  margin: 0;
+  padding-inline-start: var(--space-20);
+  display: grid;
+  gap: var(--space-8);
+  color: var(--color-text-secondary);
+  max-width: 90ch;
+}
+
+.rulesList strong {
+  color: var(--color-text-primary);
+}
+
+.rulesList code {
+  font-size: var(--text-sm);
+  /* Motyw „Jeden krem" (R2): chip kodu to ZNAK w zdaniu — neutralny krok
+     tonalny, nie krem. */
+  background: var(--color-surface-input);
+  border-radius: var(--style-radius-control);
+  padding: 0 var(--space-4);
+}
+
+/* ─── Table of contents (compact index, no box) ─── */
+
+.toc {
+  padding: 0;
+}
+
+.tocTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  margin: 0 0 var(--space-12);
+}
+
+.tocGroups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-20);
+}
+
+.tocGroupTitle {
+  font-size: var(--text-sm);
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  margin: 0 0 var(--space-8);
+}
+
+.tocGroupTitle a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.tocList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.tocLink {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tocStatus {
+  font-size: var(--text-xs);
+  letter-spacing: var(--ls-micro-label);
+  color: var(--color-text-muted);
+}
+
+/* ─── Sekcje-grupy ─── */
+
+.section {
+  margin-block-start: var(--space-48);
+  /* Anchor z TOC nie chowa tytułu pod górną krawędzią. */
+  scroll-margin-top: var(--space-32);
+}
+
+.hairline + .section {
+  margin-block-start: 0;
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  margin: 0 0 var(--space-24);
+}
+
+/* Full-width 1px rule: a block with divider fill, not border-top. */
+.hairline {
+  height: 1px;
+  background: var(--color-divider);
+  margin-block: var(--space-32);
+}
+
+/* ─── Catalog entry ───
+ * No card: whitespace + a hairline between siblings. Name, status and
+ * demo share the same left edge. Demo stages that need contrast keep
+ * their own frames (ink, phone, band). */
+
+.entry {
+  scroll-margin-top: var(--space-32);
+}
+
+.entry + .entry::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--color-divider);
+  margin-block: var(--space-32);
+}
+
+.entryHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.entryName {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  margin: 0;
+}
+
+.status {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  border-radius: var(--style-radius-pill);
+  padding: var(--space-4) var(--space-12);
+  line-height: 1.2;
+}
+
+.statusFrozen {
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Bierze role
+     --color-accent-on-ink (DECISION S106): czerwony --color-primary jest w
+     LIGHT ciemny i daje na atramencie 3,6:1, czyli ponizej AA, a ta rola jest
+     mode-invariant — jedna wartosc daje ten sam jezyk wskaznika w obu trybach.
+     Poprzednia wartosc (--color-primary) byla poprawna dla wycofanej palety
+     charcoal-gold, gdzie primary bylo jasnym zlotem. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+}
+
+.statusDraft {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-text-secondary);
+  background: transparent;
+}
+
+.importPath {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.whenToUse {
+  margin: 0;
+  color: var(--color-text-secondary);
+  max-width: 80ch;
+}
+
+.note {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  max-width: 80ch;
+}
+
+/* ─── Implementation disclosure (no border, no surface) ─── */
+
+.disclosure {
+  margin-block-start: var(--space-16);
+}
+
+.disclosureTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  text-align: start;
+  transition: color var(--transition-normal);
+}
+
+.disclosureTrigger:hover {
+  color: var(--color-text-secondary);
+}
+
+.disclosureChevron {
+  flex-shrink: 0;
+  color: currentColor;
+  transition: rotate var(--transition-normal);
+}
+
+.disclosureChevron[data-open] {
+  rotate: 180deg;
+}
+
+.disclosurePanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--transition-normal),
+    opacity var(--transition-normal);
+}
+
+.disclosurePanel[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.disclosureClip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.disclosureBody {
+  display: grid;
+  gap: var(--space-12);
+  padding-block-start: var(--space-12);
+}
+
+/* ─── Pole demo ───
+ * Celowo blokowy flow (flow-root), NIE grid/flex: molecules centrujące się
+ * przez max-width + margin-inline auto (PhoneTriptych, FaqSection) jako
+ * grid-item shrink-wrapują do zera (auto-marginesy wygrywają ze stretch)
+ * — w block flow zachowują się jak na realnych stronach. */
+
+.demo {
+  margin-block-start: var(--space-16);
+  display: flow-root;
+}
+
+.demo > * + * {
+  margin-block-start: var(--space-12);
+}
+
+.demoRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.demoLabel {
+  flex-basis: 100%;
+  font-size: var(--text-xs);
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  color: var(--color-text-muted);
+  margin-block-start: var(--space-8);
+}
+
+/* Komórki o stałej szerokości: mockup bez figcaption nie ma intrinsic
+ * width ([data-no-caption] width:100%) i w luźnym flexie zabiera cały
+ * rząd — sztywna komórka daje mu wymiar (lekcja S21: kolaps figury). */
+.phoneRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 220px);
+  gap: var(--space-32);
+  align-items: start;
+}
+
+/* Klatka dla demosów z position: fixed (StickyCtaBar) — transform tworzy
+ * containing block, więc fixed pozycjonuje się względem tej ramki,
+ * a nie viewportu. */
+.fixedScope {
+  position: relative;
+  transform: translate(0);
+  min-height: 140px;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R2/R3): scena demo stoi na TYM SAMYM papierze co
+     realne strony — biblioteka kłamiąca o kontekście jest gorsza niż żadna.
+     Granicę sceny niesie zamknięta rama powyżej. */
+  background: var(--color-bg-main);
+  overflow: hidden;
+}
+
+/* Komórki o stałej szerokości dla demo kart — Card to blok bez intrinsic
+ * width i w luźnym flexie rozjechałby się na całą szerokość; sztywna
+ * kolumna daje mu sensowny wymiar obok pozostałych wariantów. */
+.cardRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 260px));
+  gap: var(--space-20);
+  align-items: start;
+}
+
+/* ─── Skórka demo dla gołego AccordionItem ───
+ * Kanoniczna skórka FAQ żyje w FaqSection.module.css; ta tutaj istnieje
+ * tylko po to, by pokazać kontrakt slotu classNames. */
+
+.accItem {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-paper);
+}
+
+.accItem + .accItem {
+  margin-block-start: var(--space-8);
+}
+
+.accTrigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: start;
+  cursor: pointer;
+}
+
+.accChevron {
+  flex-shrink: 0;
+  color: var(--color-icon-muted);
+  transition: rotate var(--transition-normal);
+}
+
+.accChevron[data-open] {
+  rotate: 180deg;
+}
+
+.accContent {
+  padding: 0 var(--space-20) var(--space-12);
+}
+
+.accAnswer {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Wnętrza demo InkPanel (panel daje tylko pole i ramę) ─── */
+
+.inkDemoContent {
+  padding: var(--space-32);
+  display: grid;
+  gap: var(--space-8);
+}
+
+.inkDemoTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  margin: 0;
+}
+
+.inkDemoBody {
+  margin: 0;
+  max-width: 60ch;
+}
+
+/* ─── Demo aplikacji (S28) ─── */
+
+/* Telefonowa klatka dla BottomTabBar — pasek ma sens dopiero w wąskim,
+ * mobilnym kontenerze; ramka udaje viewport telefonu. */
+.phoneFrame {
+  position: relative;
+  /* Blok zawierający dla `position: fixed` belki: bez niego BottomTabBar
+   * rysował się przy dolnej krawędzi OKNA, poza ramką, a od 768px wcale. */
+  transform: translate(0);
+  width: 320px;
+  max-width: 100%;
+  margin-inline: auto;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-paper);
+  overflow: hidden;
+}
+
+/* Belka chowa się od 768px (aplikacja pokazuje ją sama w AppLayout), a demo
+ * w bibliotece ogląda się na desktopie. */
+.phoneFrameTabBar {
+  display: flex !important;
+}
+
+.phoneFrameBody {
+  min-height: 120px;
+  padding: var(--space-32);
+  /* Belka jest `fixed` w ramce, więc treść rezerwuje jej wysokość sama. */
+  padding-bottom: calc(var(--bottom-nav-height) + var(--space-32));
+  display: grid;
+  place-items: center;
+  color: var(--color-text-secondary);
+}
+
+/* Klatka dla demosów z position: fixed bez własnego sterowania widocznością
+ * (SupportFloatingButton) — transform tworzy containing block. */
+.floatingScope {
+  position: relative;
+  transform: translate(0);
+  min-height: 140px;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  /* Motyw „Jeden krem" (R2/R3): scena demo na papierze realnych stron,
+     granica z ramy (jak .fixedScope). */
+  background: var(--color-bg-main);
+  overflow: hidden;
+}
+
+/* Górna belka aplikacji rozciąga się na 100% — ramka udaje krawędzie ekranu. */
+.appBarScope {
+  /* Pas „ekranu" pod paskiem: pełna dolna linia paska nie może się sklejać
+   * z dolną krawędzią ramki (ta sama zasada co rama planu w tabeli cennika). */
+  padding-bottom: var(--space-32);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+}
+
+/* Siatka kart galerii — kafle mają intrinsic mobilny rozmiar. */
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+  gap: var(--space-20);
+  align-items: start;
+}
+
+/* Pojedyncza karta-organizm o sensownej szerokości (GalleryStrength). */
+.appCardCol {
+  max-width: 420px;
+}
+
+/* Rząd etykiet w taksonomii — pozwala zestawić różne badge obok siebie. */
+.labelRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  align-items: center;
+}
+
+/* Demo BrandMark — atom sam nie ma rozmiaru (steruje className konsumenta),
+ * więc katalog nadaje mu przykładowe wysokości. */
+.brandMarkDemoLg {
+  height: 56px;
+  width: auto;
+}
+
+.brandMarkDemoMd {
+  height: 36px;
+  width: auto;
+}
+
+.brandMarkDemoSm {
+  height: 24px;
+  width: auto;
+}

@@ -1,0 +1,148 @@
+/* AccountRecoveryPage.module.css — account recovery, all six states.
+ *
+ * Every state has the same shape as the sister screens: the screen intro
+ * (AppHeroOrganism), one sentence on paper, ONE action, then what the person
+ * may want to read (a white box). No tinted slabs, no giant numeral, no halo:
+ * the days-left number is stated once, in the intro.
+ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  /* Full-bleed — pull against AppLayout padding. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) var(--space-32);
+  /* Container queries: app routes also render inside a 390px phone frame on a
+   * wide desktop, where a viewport breakpoint lies. */
+  container-type: inline-size;
+  container-name: recpage;
+}
+
+.checking {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.lead {
+  margin: 0;
+  max-width: 56ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* The action group: stacked and full width on a phone, in a row from 480px
+ * of the page's own width (a button is never stretched across a tablet). */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-8);
+}
+
+@container recpage (min-width: 480px) {
+  .actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-12);
+  }
+}
+
+/* ─── White box: what comes back / what erasure does ─── */
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.boxTitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+}
+
+.boxText {
+  margin: 0;
+  max-width: 64ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.checkList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+}
+
+@container recpage (min-width: 480px) {
+  .checkList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* The check sits on the FIRST line of an item that may wrap. */
+.checkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  font-size: var(--text-base);
+  line-height: 1.45;
+  color: var(--color-text-primary);
+}
+
+.checkIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-success);
+}
+
+.checkIcon svg {
+  display: block;
+}
+
+/* ─── Quiet facts about how the data is kept ─── */
+
+.trustList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Dialogs ─── */
+
+.dialogBodyText {
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.dialogBtn {
+  width: 100%;
+}

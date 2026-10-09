@@ -1,0 +1,9 @@
+/* Powierzchnia atramentowa z remapem na ROLĘ akcentu na negatywie.
+   BYŁO: var(--color-primary) — poprawne dla wycofanej palety charcoal-gold,
+   gdzie primary było jasnym złotem. Po rouge-papier primary jest ciemną
+   czerwienią (3,6:1 na atramencie), więc ta wartość jest dziś naruszeniem
+   i pilnuje jej must-fail/ink-remap-on-primary. */
+.band {
+  background: var(--color-ink);
+  --color-focus-ring: var(--color-accent-on-ink);
+}

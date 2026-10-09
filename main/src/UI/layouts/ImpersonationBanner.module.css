@@ -1,0 +1,109 @@
+/* layouts/ImpersonationBanner.module.css
+ *
+ * Sticky-top warning banner shown while an admin is impersonating another
+ * user. Uses --color-warning tokens to visually signal that the current
+ * session is NOT the user's own.
+ */
+
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky-bar);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20);
+  background: color-mix(in oklch, var(--color-warning) 22%, transparent);
+  /* DECISION (nie usuwaj): border-bottom (jednostronny) to separator sticky-banera od
+   * treści poniżej (divider/underline), NIE dekoracyjny accent-stripe — pełny border 4 boki
+   * nie ma sensu na pasku przyklejonym do krawędzi viewportu. */
+  border-bottom: var(--style-border-divider) solid var(--color-warning);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.labelText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity {
+  font-weight: 700;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex: 0 0 auto;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-12);
+  height: 32px;
+  border-radius: var(--style-radius-control);
+  border: var(--style-border-surface) solid var(--color-warning);
+  background: var(--color-bg-paper);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition:
+    background var(--duration-200) var(--spring-curve),
+    transform var(--duration-200) var(--spring-curve);
+}
+
+.buttonPrimary {
+  background: var(--color-warning);
+  color: var(--color-on-warning);
+  border-color: var(--color-warning);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    background: color-mix(
+      in srgb,
+      var(--color-warning) 18%,
+      var(--color-bg-paper)
+    );
+  }
+  .buttonPrimary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-warning) 88%, black);
+  }
+}
+
+@media (max-width: 479px) {
+  .banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-12);
+  }
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .label {
+    width: 100%;
+  }
+}

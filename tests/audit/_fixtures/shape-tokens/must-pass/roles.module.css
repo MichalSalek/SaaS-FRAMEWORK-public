@@ -1,0 +1,19 @@
+.card {
+  border: var(--style-border-surface) solid var(--color-border);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+}
+.pill {
+  border-radius: var(--style-radius-pill);
+}
+.reset {
+  border-radius: 0;
+  border: 0;
+}
+.label {
+  text-transform: var(--style-label-case);
+}
+.focus:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  box-shadow: 0 0 0 1px var(--color-border);
+}

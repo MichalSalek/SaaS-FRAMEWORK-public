@@ -1,0 +1,95 @@
+/* CheckoutReturnPage.module.css — the landing after a payment.
+ *
+ * One white box on paper: mark, one sentence, one action. The waiting state
+ * has the same geometry as the result that replaces it.
+ */
+
+@keyframes returnspin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  display: block;
+  animation: returnspin 1s linear infinite;
+}
+
+.viewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-16);
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-32) var(--space-20) var(--space-20);
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* The mark is a bare glyph: its colour carries the state, no tinted disc. */
+.mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-48);
+  height: var(--space-48);
+  color: var(--color-text-secondary);
+}
+
+.mark svg {
+  display: block;
+}
+
+.markSuccess {
+  color: var(--color-success);
+}
+
+/* Two lines reserved: the waiting sentence and the result may differ in
+ * length, the button under them must not move. */
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.4em;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.body {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  margin-top: var(--space-8);
+}
+
+.actionBtn {
+  width: 100%;
+}

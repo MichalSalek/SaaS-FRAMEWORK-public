@@ -1,0 +1,4 @@
+/* Zaslona modala jako surowy rgba — do S110 straznik tego nie widzial. */
+.backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}

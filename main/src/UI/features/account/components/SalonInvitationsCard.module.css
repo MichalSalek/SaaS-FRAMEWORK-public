@@ -1,0 +1,103 @@
+/* Tappable card: white interactive surface + AffordanceDisc (S116 „A3 · Biel
+   na papierze”); no frame, no shadow. Same row anatomy as the web-home links. */
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: var(--space-16) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-interactive);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Error variant: information, not a link, so it sits on paper inside a
+   closed 4-sided hairline frame; the retry button is the only action. */
+.errorCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-16);
+  padding: var(--space-16) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-divider);
+}
+
+.errorText {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-error-fg);
+}
+
+.errorAction {
+  display: flex;
+  margin-top: var(--space-4);
+  /* Text button: pull its inner padding back so the label aligns with the text. */
+  margin-inline-start: calc(var(--space-8) * -1);
+}
+
+/* The icon sits on the message's FIRST line: its box is one line tall (the
+   glyph keeps its 16px and is centred inside), no margin nudges. */
+.errorIcon {
+  flex: none;
+  display: block;
+  height: 1lh;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  border-radius: var(--style-radius-control);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  font-family: var(--style-heading-font);
+  font-size: var(--text-base);
+  font-weight: var(--style-heading-weight);
+  letter-spacing: var(--style-heading-tracking);
+  color: var(--color-text-primary);
+}
+
+.desc {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.disc {
+  flex-shrink: 0;
+  transition: transform var(--duration-200) var(--spring-curve);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    background: var(--color-state-hover);
+  }
+
+  .card:hover .disc {
+    transform: translateX(var(--space-4));
+  }
+}

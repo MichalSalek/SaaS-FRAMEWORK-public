@@ -1,0 +1,11 @@
+/* Klamra w ciągu znaków. Parser nieświadomy stringów zamykał regułę już na
+   `content: '}'`, więc `inset`, `width` i `background` lądowały poza ciałem
+   jakiegokolwiek bloku i pasek stawał się niewidzialny. Ta sama klasa, którą
+   tint-discipline domknął fixturem brace-in-string. */
+.decoratedRail::before {
+  content: '}';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-primary);
+}

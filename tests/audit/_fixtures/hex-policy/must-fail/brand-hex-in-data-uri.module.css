@@ -1,0 +1,5 @@
+/* Kolor marki zamrozony w data-URI: var() tam nie dziala, wiec wymiana palety
+   nigdy tego nie ruszy — dokladnie tak przezyly zlote numeraly. */
+.icon {
+  background: url("data:image/svg+xml,%3Csvg fill='%23d9a441'%3E%3C/svg%3E");
+}

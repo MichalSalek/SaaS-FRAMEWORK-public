@@ -1,0 +1,6 @@
+/* Tint w SKRÓCIE background, za obrazem — skan wymagający color-mix zaraz po
+   dwukropku nie ma czego dopasować, a pod zdjęciem leży ten sam wash. */
+.coverTile {
+  background: url('/img/lp/hero.avif') center / cover no-repeat
+    color-mix(in oklch, var(--color-primary) 12%, transparent);
+}

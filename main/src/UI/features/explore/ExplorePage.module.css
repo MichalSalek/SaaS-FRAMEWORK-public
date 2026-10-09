@@ -1,0 +1,423 @@
+/* UI/features/explore/ExplorePage.module.css
+ * Editorial discovery feed — curated mood board.
+ *
+ * Vibe: kuratorska kolekcja inspiracji. Not Pinterest mass browse, not
+ * Instagram chronological. Premium, branded discovery — like flipping
+ * through a high-end portfolio book where every page has its own rhythm.
+ *
+ * Anti-AI-Slop: depth via solid color-block + tonal steps + full hairline
+ * borders. ZERO gradient/shadow/glow/blur/hover-na-statycznym.
+ *  - Masonry CSS columns (variable heights, natural rhythm)
+ *  - Wejście przy montażu ekranu (scroll-reveal wycięty w S116)
+ */
+
+/* ─── Motion keyframes ─── */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Puls szkieletu — solidne wypełnienie + zmiana krycia. Dawny @keyframes
+   shimmer animował background-position, a tło szkieletu było jednolitym
+   kolorem, więc animacja od początku nic nie robiła (martwy kod). */
+@keyframes skeletonPulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: slideUp 320ms var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}
+
+/* ─── Page shell ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  overscroll-behavior: none;
+  /* Full-bleed hero — compensate AppLayout content padding. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) calc(var(--space-32) + 80px);
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+ * Wejście tab-panelu animuje WYŁĄCZNIE opacity — bez transform. Panel zawiera
+ * potomków `position: fixed` (FAB filtrów), a `animation ... both` z transform
+ * utrwala transform po animacji (nawet translateY(0) ≠ none) → element staje
+ * się containing block dla fixed i FAB/overlay jadą ze scrollem zamiast
+ * kotwiczyć do viewportu. NIE przywracać translateY do tej animacji. */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tabContent {
+  animation: fadeIn 200ms var(--ease-entrance) both;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* DECISION (nie usuwaj tego komentarza) — kontener zapytań rozmiarowych tego
+   ekranu. Na desktopie trasy produktowe renderują się w sztywnej ramie 390px,
+   a `@media (min-width: …)` mierzy VIEWPORT, nie ramę: przy 1440 masonry szło
+   w PIĘĆ kolumn (`min-width: 1400px`) wewnątrz kadru 350px, czyli kafle po
+   ~62px. Reguły szerokościowe niżej pytają `@container app-view`, o progach
+   niższych o 40px od dawnych viewportowych (mierzą content-box strony), więc
+   na realnym telefonie zachowanie jest 1:1 z poprzednim.
+
+   Kontener siedzi na `.pageTrack`, NIE na `.page` ani `.tabContent`:
+   `container-type` włącza layout containment, a to robi z elementu blok
+   zawierający dla potomków `position: fixed` — czyli dokładnie ta klasa buga,
+   przed którą ostrzega DECISION o animacji tab-panelu wyżej. FAB filtrów
+   (GalleryFilterSection) jest rodzeństwem `.pageTrack`, nie jego potomkiem. */
+.pageTrack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* ============================================================
+ * KARTA-INTRO — kanon <AppHero> (components/AppHero, S25/1 wariant D):
+ * tint tła, rama i typografia żyją w komponencie.
+ * Tu zostaje wyłącznie wejście .staggerIn nadawane przez className.
+ * ============================================================ */
+
+/* ============================================================
+ * SEARCH ROW
+ * ============================================================ */
+
+.searchRow {
+  /* allow input to relax inside flow */
+}
+
+/* ============================================================
+ * QUICK FILTER WRAP — scrolls away with the page (not sticky, see DECISION)
+ * Anti-AI-Slop: solid bg step + full-width border, no backdrop-filter/blur.
+ * ============================================================ */
+
+/* DECISION (nie usuwaj tego komentarza) — S115, 2026-09-15: blok filtrów NIE jest
+ * przyklejony. Trzy podpisane rzędy chipów (kolory, cechy, długości) mają ~330 px,
+ * więc przyklejone zabierały na telefonie ~40% ekranu i zdjęcia przewijały się
+ * w wąskim pasku. Filtry zostają pod ręką przez przyklejony przycisk
+ * `GalleryFilterSection .filterFab`, który otwiera pełną nakładkę. */
+.quickFilterWrap {
+  padding: var(--space-12) 0;
+  background: var(--color-bg-main);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  margin: 0 calc(var(--space-20) * -1);
+  padding-left: var(--space-20);
+  padding-right: var(--space-20);
+}
+
+/* ============================================================
+ * ACTIVE FILTERS — horizontally-scrollable chip row
+ * ============================================================ */
+
+.activeFilters {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.activeFilters::-webkit-scrollbar {
+  display: none;
+}
+
+.activeChip {
+  background: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* ============================================================
+ * LAYOUT TOGGLE ROW
+ * ============================================================ */
+
+.layoutToggleRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-8) 0 0;
+}
+
+/* ============================================================
+ * MASONRY GRID — true CSS columns for variable-height rhythm
+ *
+ * DECISION (nie usuwaj tego komentarza):
+ * CSS columns over CSS grid (auto-flow: dense) because true masonry needs
+ * variable child heights without aspect-ratio coupling. The Pinterest-
+ * style flow happens automatically; cards fill columns top-to-bottom.
+ * break-inside: avoid keeps each card intact across column breaks.
+ *
+ * 2 cols on mobile, 3 on tablet, 4 on desktop, 5 on wide desktop —
+ * matching Gallery for cross-page consistency.
+ * ============================================================ */
+
+.galleryGrid {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .galleryGrid {
+    column-count: 3;
+    column-gap: var(--space-12);
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGrid {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+@container app-view (min-width: 1360px) {
+  .galleryGrid {
+    column-count: 5;
+  }
+}
+
+/* Wrap each card in the masonry flow; gives a `break-inside: avoid`
+ * anchor without forcing it on the card itself (cards stay reusable). */
+.galleryGrid > * {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+  display: block;
+  animation: slideUp 380ms var(--ease-entrance) both;
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGrid > * {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* Full-width layout (single column, vertical rhythm) for editorial mode */
+.galleryGridFullWidth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ─── Stylist Attribution (footer on photo card) ─── */
+
+.stylistAttribution {
+  /* W karcie dwukolumnowej przy 390 px imię i miasto nie mieszczą się w jednym
+     wierszu: imię łamało się w dwie linie, a miasto ucinało w pół słowa
+     („Warszaw”). Miasto stoi zawsze pod imieniem, więc nie ma kropki, która przy
+     zawinięciu wisiałaby na początku linii. */
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-4);
+  min-width: 0;
+}
+
+.stylistName {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stylistCity {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ─── Infinite Scroll Sentinel & loading-more ─── */
+
+.loadingMore {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-12) 0;
+}
+
+/* ============================================================
+ * SKELETON MASONRY — varied heights to hint at the real feed
+ * Anti-AI-Slop: solidne wypełnienie + puls krycia, zero gradientu.
+ * ============================================================ */
+
+.skeletonMasonry {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .skeletonMasonry {
+    column-count: 3;
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonMasonry {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+.skeletonMasonryCard {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+  border-radius: var(--style-radius-surface);
+  width: 100%;
+  /* Motyw „Jeden krem": szkielet ładowania to POWIERZCHNIA zastępcza —
+     neutralny krok tonalny zamiast złotej płyty udającej treść; ruch niesie
+     puls krycia (ten sam wzorzec co szkielety kart stylistek). */
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonMasonryCard {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* ============================================================
+ * EDITORIAL EMPTY STATE — branded, actionable, not a sad icon
+ * ============================================================ */
+
+/* Powierzchnia, rama i typografia = kanon <EmptyState size="page">.
+   Tu zostaje wyłącznie odstęp od feedu nad nim. NIE dopisuj tu padding/gap/
+   background — te same własności w module komponentu mają równą specyficzność
+   i o wyniku decydowałaby kolejność w bundlu, nie intencja. Nadpisania robi
+   się przez custom property `--empty-*`. */
+.editorialEmpty {
+  margin-top: var(--space-12);
+}
+
+.editorialEmptyTips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+.editorialEmptyTipChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-12);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  /* Motyw „Jeden krem": chip podpowiedzi = ZNAK; treść pełnym kolorem tekstu
+     (R5) — po zdjęciu tintu wyszarzenie było jedyną różnicą. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-text-primary);
+}
+
+.editorialEmptyTipChipIcon {
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+}
+/* ============================================================
+ * EDITORIAL ERROR STATE — warn-tinted variant of empty
+ * ============================================================ */
+
+.editorialError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-32) var(--space-20);
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 5%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    color-mix(in srgb, var(--color-warning) 30%, transparent);
+  margin-top: var(--space-12);
+}
+
+.editorialErrorIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--style-radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 14%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) solid
+    color-mix(in srgb, var(--color-warning) 28%, transparent);
+  color: var(--color-warning);
+}
+
+.editorialErrorTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: 26ch;
+  text-wrap: balance;
+}
+
+.editorialErrorHint {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 38ch;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+ * END OF FEED — closing note (graceful close to infinite scroll)
+ * ============================================================ */
+
+.endOfFeed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  padding: var(--space-32) var(--space-12);
+  text-align: center;
+}
+
+.endOfFeedText {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 42ch;
+  text-wrap: pretty;
+}

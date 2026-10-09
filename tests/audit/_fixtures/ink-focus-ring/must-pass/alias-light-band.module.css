@@ -1,0 +1,8 @@
+:root {
+  --lightBand: oklch(0.97 0.01 90);
+}
+
+.lightBandOk {
+  background: var(--lightBand);
+  color: #1c1c20;
+}

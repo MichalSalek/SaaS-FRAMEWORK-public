@@ -1,0 +1,12 @@
+/* Drabina kremu zarejestrowana przez @property: nazwa zmiennej stoi
+   w GŁÓWCE reguły, a wartość niesie `initial-value`, więc test „deklaracja
+   zaczyna się od --" jej nie widział i cały wash przechodził bezgłośnie. */
+@property --page-wash {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: color-mix(in oklch, var(--color-primary) 12%, transparent);
+}
+
+.washed {
+  background: var(--page-wash);
+}

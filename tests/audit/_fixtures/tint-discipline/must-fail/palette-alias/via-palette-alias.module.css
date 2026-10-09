@@ -1,0 +1,6 @@
+/* Tint przez alias, który istnieje WYŁĄCZNIE w palecie: seed strażnika go nie
+   zna, więc bez rozwiązywania aliasów z palettes.css ta deklaracja jest
+   niewidzialna, choć renderuje 12% złota marki. */
+.viaPaletteAlias {
+  background: color-mix(in oklch, var(--brand-wash) 12%, transparent);
+}

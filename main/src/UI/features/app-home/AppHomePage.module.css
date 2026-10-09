@@ -1,0 +1,58 @@
+/* ─── AppHomePage — web-home strefy /app (desktop ≥1280).
+ * Renderuje się w kolumnie AccountWebLayout (--account-content-max), więc hero
+ * musi wyjść z full-bleedu LP: robi to przez PUBLICZNE pokrętła --lp-hero-*
+ * (DESIGN.md §Style Policy pkt 13 — nadpisujemy zmienną, nie deklarację,
+ * bo `.hero[data-has-media]` ma wyższą specyficzność niż klasa gospodarza).
+ * ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-48);
+}
+
+.hero {
+  --lp-hero-width: 100%;
+  --lp-hero-bleed: 0;
+  --lp-hero-pad-inline: 0;
+  --lp-hero-pad-top: 0;
+  --lp-hero-pad-bottom: var(--space-8);
+  /* Baner jest wstępem do ekranu, nie samodzielną stroną — 72vh kanonu LP
+   * spychałoby listę „co dalej" pod krawędź. */
+  --lp-hero-min-height: 0;
+  /* Kolumna tekstu hero ma tu ~440px (7fr siatki w kolumnie konta), a skala
+   * płynna liczy się od SZEROKOŚCI OKNA: stopień 3xl (do 72px) jest policzony
+   * dla całego 1440 i rozbijał nagłówek na pięć linii. Schodzimy DWA stopnie
+   * skali (3xl → xl, z pominięciem 2xl) — to poprawka SKALI i tyle. */
+  --lp-hero-headline-size: var(--text-fluid-xl);
+  /* DECISION (nie usuwaj tego komentarza) — pomiar 2026-09-09:
+   * poprzednia wersja tego komentarza twierdziła, że samo zejście skalą „trzyma
+   * głos w dwóch, trzech liniach". Nieprawda: h1 mierzył 368x144px przy
+   * font-size 36px i line-height 36px, czyli CZTERY linie, a kolumna ma 440px,
+   * więc 72px (16%) miary stało puste, kiedy tekst już się łamał. Winna była
+   * miara `max-width: 16ch` z kanonu LP — jest zapisana w emach nagłówka, więc
+   * schodzi razem z fontem i żadne zejście stopniem nie odzyskuje linii.
+   * Tutaj miarę wyznacza siatka kolumny, nie typografia LP, więc znosimy
+   * pokrętło miary do `none`. Na stronach statycznych 16ch zostaje. */
+  --lp-hero-headline-measure: none;
+}
+
+.heroNote {
+  margin: 0;
+  max-width: 36ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.nextHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}

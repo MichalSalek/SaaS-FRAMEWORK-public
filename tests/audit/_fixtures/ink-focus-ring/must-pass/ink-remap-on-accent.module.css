@@ -1,0 +1,7 @@
+/* Poprawny remap na rolę akcentu na negatywie — ta próbka pilnuje, żeby nowa
+   gałąź nie zaczęła zgłaszać KAŻDEGO remapu na powierzchni atramentowej. */
+.inkRemapOnAccent {
+  background: var(--color-ink);
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+}

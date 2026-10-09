@@ -1,0 +1,11 @@
+/* Ten SAM pas kremu opisany dwa razy: raz w trybie jasnym, raz w nadpisaniu
+   dla ciemnego. To jedna powierzchnia, nie dwie — klucz zliczania musi
+   normalizować prefiks trybu, inaczej każde nadpisanie dark liczyłoby się
+   jako drugi krem. */
+.heroBand {
+  background: var(--color-bg-subtle);
+}
+
+:root[data-mode='dark'] .heroBand {
+  background: var(--color-bg-subtle);
+}

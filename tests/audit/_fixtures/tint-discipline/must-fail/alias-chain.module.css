@@ -1,0 +1,6 @@
+/* Alias lokalny wskazujący na złoto: skan po nazwie --color-primary go nie
+   widzi, bo w deklaracji tła stoi nazwa aliasu. */
+.aliased {
+  --sekcja-akcent: var(--color-primary);
+  background: color-mix(in oklch, var(--sekcja-akcent) 12%, transparent);
+}

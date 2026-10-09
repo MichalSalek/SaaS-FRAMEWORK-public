@@ -1,0 +1,26 @@
+/* ─── Decorative numeral ─── */
+/* WCAG 1.4.3: choć marker jest aria-hidden (znaczenie niesie sąsiedni nagłówek),
+ * axe nadal mierzy widoczny tekst. Numeral bierze --color-primary z palety.
+ * BYŁO: dociemniany warm-gold oklch(0.62 0.105 82) na sztywno, bo jasne złoto
+ * wycofanej palety charcoal-gold miało 1.96:1 na bieli (FAIL <3:1 large-text).
+ * Czerwień rouge-papier jest CIEMNIEJSZA od tamtej obejściowej wartości
+ * (L 0.565 wobec 0.62), więc powód hardkodu zniknął razem z paletą — a hue 82
+ * zostawiał złoty numeral na stronie, która nigdzie indziej złota nie ma. */
+.marker {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  line-height: 0.85;
+  letter-spacing: var(--ls-tight-40);
+  color: var(--color-primary);
+  user-select: none;
+}
+
+/* ─── Sizes ─── */
+.lg {
+  font-size: var(--text-fluid-3xl);
+}
+
+.sm {
+  font-size: var(--text-fluid-2xl);
+}

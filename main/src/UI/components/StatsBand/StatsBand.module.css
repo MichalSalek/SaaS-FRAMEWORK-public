@@ -1,0 +1,131 @@
+/* ─── StatsBand — kanoniczna sekcja liczb-dowodów ───
+ * DECISION (nie usuwaj tego komentarza): ink-card = zamknięty prostokąt
+ * (taste 14 / głos ownera S21 „2C") — panel --color-ink/--color-on-ink
+ * z radiusem NA jasnym tle, nie dodawać full-bleed. Karta jest STATYCZNA
+ * (nieinteraktywna) — zero hover (floor §4). */
+
+.band {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 40px);
+}
+
+.heading {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-3xl);
+  line-height: 1.15;
+  letter-spacing: var(--ls-tight-15);
+  margin: 0;
+  max-width: 24ch;
+  text-wrap: balance;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 3.5vw, 48px);
+}
+
+@media (min-width: 768px) {
+  .list {
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 12px);
+}
+
+.figure {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  line-height: 0.92;
+  letter-spacing: var(--ls-tight-20);
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  max-width: 26ch;
+  text-wrap: pretty;
+}
+
+.footnote {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  max-width: 30ch;
+}
+
+/* ─── Wariant: ink-card — zamknięta ink-karta (kanon home `.trustCard`) ───
+ * Mode-invariant negatyw (--color-ink/--color-on-ink), PEŁNY hairline
+ * border z color-mix na on-ink, radius-md. Heading i lista żyją WEWNĄTRZ
+ * panelu — panel = root komponentu. */
+.inkCard {
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Zloto zamiast bieli,
+     bo w DARK ring i tak JEST zloty — jedna wartosc daje ten sam jezyk
+     wskaznika w obu trybach, zamiast bieli w jednym i zlota w drugim. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 16%, var(--color-ink));
+  border-radius: var(--style-radius-surface);
+  padding: clamp(28px, 4vw, 56px);
+}
+
+.inkCard .heading {
+  color: var(--color-on-ink);
+}
+
+/* Świadomy fluid-display clamp (Style Policy §3 wyjątek): figury-dowody
+ * skalują się jak w kanonie home `.trustStatFigure`. */
+.inkCard .figure {
+  /* fluid-allow: figura metryki hero (glos S24/3A) celowo wychodzi ponad `display` na desktopie */
+  font-size: clamp(48px, 6vw, 84px);
+  color: var(--color-on-ink);
+}
+
+/* Accent-on-ink: the light-mode primary is a DARK red (3.6:1 on ink).
+ * Paper uses --color-accent-fg; negative surfaces use this token. */
+.inkCard .label {
+  color: var(--color-accent-on-ink);
+}
+
+.inkCard .footnote {
+  color: color-mix(in oklch, var(--color-on-ink) 92%, transparent);
+}
+
+/* ─── Wariant: plain-row — cichy rząd liczb bez panelu (kanon about
+ * `.statsList`). Figury = meaningful text → AA gold --color-accent-fg
+ * (NIE --color-primary: 2.2:1 na białym = FAIL). ─── */
+.plainRow .list {
+  gap: clamp(20px, 3vw, 40px);
+}
+
+.plainRow .heading {
+  color: var(--color-text-primary);
+}
+
+/* Świadomy fluid-display clamp (Style Policy §3 wyjątek): skala kanonu
+ * about `.statFigure` — cichszy rząd niż ink-card. */
+.plainRow .figure {
+  /* fluid-allow: wariant weższy figury; 2xl obcialby maksimum o 8px */
+  font-size: clamp(36px, 4.4vw, 56px);
+  color: var(--color-accent-fg);
+}
+
+.plainRow .label {
+  color: var(--color-text-secondary);
+}
+
+.plainRow .footnote {
+  color: var(--color-text-secondary);
+}

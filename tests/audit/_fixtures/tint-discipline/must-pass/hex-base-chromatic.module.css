@@ -1,0 +1,6 @@
+/* Hex CHROMATYCZNY jako baza to drugi AKCENT, nie papier — mieszanina dwóch
+   akcentów daje pełnokolorowy odcień roli, nie wash pod treścią. Ten sam
+   zapis co --client-rose w ActivateRolePage, tylko bez pośrednictwa tokenu. */
+.roleOrbLiteral {
+  background: color-mix(in oklch, #e16a8c 55%, var(--color-primary));
+}

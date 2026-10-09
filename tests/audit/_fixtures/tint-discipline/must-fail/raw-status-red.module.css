@@ -1,0 +1,8 @@
+/* R7 („tint kodujący STAN zostaje”) działa na NAZWACH tokenów, więc zapis
+   surowy z niej nie korzysta: równoważne color-mix z var(--color-error)
+   przechodzi, a trójka liczb nie. Rozjazd jest świadomy (DECISION przy
+   rawColorTint) i ma stać w KOMUNIKACIE, żeby nikt nie odkrywał go po raz
+   drugi w review. */
+.errorTint {
+  background: rgba(192, 57, 43, 0.1);
+}

@@ -1,0 +1,110 @@
+/* ─── InteractivePhoneStage — tryptyk screenów na ink-stage z focal-swap ───
+ * Głos ownera S35 (B+C kombinacja): pełnoszerokościowy ciemny negatyw przełamuje
+ * „nudną kolumnę", 1 duży ekran + 2 małe, hover/tap przenosi powiększenie
+ * (najechany rośnie, poprzedni-duży maleje robiąc miejsce) z mikroanimacją.
+ * --color-ink = MODE-INVARIANT (identyczny w obu blokach trybu) → ink zostaje ciemny w obu
+ * motywach, jasne screeny czytelne w obu (zero podmiany). Floor 7×ZERO:
+ * solid fill, hairline na ramkach (z PhoneMockup), zero cienia/gradientu. */
+
+.stage {
+  /* Full-bleed breakout z kolumny (wymaga overflow-x:clip na PublicLayout .content). */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Bierze role
+     --color-accent-on-ink (DECISION S106): czerwony --color-primary jest w
+     LIGHT ciemny i daje na atramencie 3,6:1, czyli ponizej AA, a ta rola jest
+     mode-invariant — jedna wartosc daje ten sam jezyk wskaznika w obu trybach.
+     Poprzednia wartosc (--color-primary) byla poprawna dla wycofanej palety
+     charcoal-gold, gdzie primary bylo jasnym zlotem. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  --eyebrow-color: var(--color-on-ink);
+  color: var(--color-on-ink);
+  padding-block: clamp(56px, 7vw, 104px);
+  padding-inline: clamp(20px, 5vw, 56px);
+}
+
+.inner {
+  max-width: 1320px;
+  margin-inline: auto;
+}
+
+/* ZD-3 kicker-kotwica — EyebrowAtom chip; kolor z --eyebrow-color na .stage. */
+.kickerWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(28px, 4vw, 52px);
+}
+
+.row {
+  display: flex;
+  align-items: flex-end; /* wspólna linia dolna — fokal rośnie w górę */
+  justify-content: center;
+  gap: clamp(20px, 3vw, 48px);
+  /* Dokładnie zagłosowany wariant B (hero 480 / boki 320, ratio 1.5×). */
+  --focal-w: 480px;
+  --side-w: 320px;
+  /* DECISION (nie usuwaj): min-height liczymy z REALNEJ szerokości ramki
+   * fokala, NIE ze slotu (--focal-w). Slot jest celowo szerszy niż telefon
+   * (oddech wokół), a ramka PhoneMockup `.hero` ma stałe width:400px (capped
+   * przez frame max-width:90% slotu → dla slotu 480px i tak 400px wygrywa).
+   * Liczenie min-height z --focal-w (480) rezerwowało wysokość dla telefonu
+   * 480px (1040px), a realny fokal to 400px→867px → ~173px phantom pustej
+   * przestrzeni, którą align-items:flex-end pchał NAD telefony (gap
+   * nagłówek→screeny puchł do ~225px). --focal-frame-w = mirror PhoneMockup
+   * `.hero .frame` width; przy zmianie tam — zmień tu. Stała wysokość nadal
+   * chroni przed dipem wysokości mid-swap. */
+  --focal-frame-w: 400px; /* = PhoneMockup `.hero .frame` width */
+  min-height: calc(var(--focal-frame-w) * 19.5 / 9);
+}
+
+/* Slot = <button> (focal-swap, a11y); reset stylów buttona. cursor:default —
+ * to czysty zoom powiększenia, NIE nawigacja (brak akcji poza powiększeniem),
+ * więc pointer wprowadzałby w błąd (głos ownera). */
+.slot {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+  display: block;
+  width: var(--side-w);
+  border-radius: var(--style-radius-surface);
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.slot[data-focal='true'] {
+  width: var(--focal-w);
+}
+.slot:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 6px;
+}
+
+/* Mobile (user 2026-06-25): 3 ekrany PIONOWO pod sobą, każdy ~85vh (duże,
+ * czytelne, prawie pełny ekran), BEZ focal-swap/animacji — kolumna zamiast
+ * rzędu, slot szerokość pochodna od wysokości (frame aspect-ratio 9/19.5),
+ * transition width wyłączona → data-focal nic nie zmienia (martwy tap, zero
+ * animacji powiększenia). PhoneMockup .frame ma max-width:100% → respektuje
+ * szerokość slotu. */
+@media (max-width: 767px) {
+  .row {
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(28px, 7vw, 48px);
+    min-height: 0;
+  }
+  .slot,
+  .slot[data-focal='true'] {
+    width: min(90vw, calc(85vh * 9 / 19.5));
+    transition: none;
+    /* Mobile = czysto prezentacyjny stos (focal-swap wyłączony). Blokujemy
+     * pointer, by tap NIE flipował martwego focal/`aria-pressed` bez żadnego
+     * efektu wizualnego (a11y: misleading ARIA state). Treść każdego ekranu
+     * niesie aria-label PhoneMockup. */
+    pointer-events: none;
+  }
+}

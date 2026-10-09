@@ -1,0 +1,14 @@
+/* Rama z atramentu NA atramentowej powierzchni = wycięcie, nie wyróżnienie:
+   powierzchnia jest mode-invariant, więc rama też ma być.
+   ink-border-allow: kropka osi czasu leży na sekcji w atramencie */
+.timelineDot {
+  background: var(--color-primary);
+  border: 2px solid var(--color-ink);
+}
+
+/* Mieszanina NA atramencie (jaśniejszy odcień do ramowania karty-negatywu) —
+   to nie jest „ink jako uniwersalna linia”. */
+.negativeCard {
+  background: var(--color-ink);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, var(--color-ink));
+}

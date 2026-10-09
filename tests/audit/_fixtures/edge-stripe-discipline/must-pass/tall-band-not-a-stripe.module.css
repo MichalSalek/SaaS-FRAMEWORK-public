@@ -1,0 +1,8 @@
+/* To samo na osi poziomej: 9px to pas nagłówka, nie hairline akcentu. */
+.headerBand::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 9px;
+  background: var(--color-primary);
+}

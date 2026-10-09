@@ -1,0 +1,14 @@
+/* Krem za lokalnym aliasem: R2 wymagała literalnego var(--color-bg-subtle),
+   więc jedno przemianowanie rozbrajało limit „jeden pas na stronę”. Tu są
+   dwa pasy kremu, tyle że pod nazwą --band. */
+.page {
+  --band: var(--color-bg-subtle);
+}
+
+.heroBand {
+  background: var(--band);
+}
+
+.footerBand {
+  background: var(--band);
+}

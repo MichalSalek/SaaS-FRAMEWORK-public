@@ -1,0 +1,10 @@
+/* Złoto jako TEKST i jako PEŁNY blok koloru (R1 dopuszcza pełny negatyw)
+   — motyw zakazuje tintu POD TREŚCIĄ, nie koloru marki jako takiego. */
+.accentWord {
+  color: var(--color-accent-fg);
+}
+
+.goldBlock {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}

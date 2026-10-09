@@ -1,0 +1,49 @@
+# Trendy w paznokciach: jak pracować z nimi, zamiast gonić je za darmo
+
+> Każdy sezon przynosi nowe wzory, a klientki przychodzą z ekranem telefonu w dłoni. Zobacz, jak wpleść trend w swoje portfolio, żeby przynosił zamówienia, a nie tylko godziny ćwiczeń.
+
+Wersja HTML tej strony: https://nailfolio.app/blog/jak-pracowac-z-trendami-w-portfolio/ | Data publikacji: 2026-09-21 | Kategoria: Porady dla stylistek
+
+## Trend, którego nie masz na zdjęciach, nie istnieje
+
+Klientka przychodzi z otwartym telefonem. Pokazuje zdjęcie z internetu i pyta, czy zrobisz. Robisz, bo umiesz. Praca wychodzi dobrze, klientka jest zadowolona i wychodzi.
+
+Dwa tygodnie później inna klientka pyta o to samo. Odpowiadasz, że oczywiście, robiłaś ostatnio. Ona kiwa głową, ale wybiera coś innego, bo nie zobaczyła.
+
+Na tym polega cała różnica między umieniem a zamówieniami. Nie na technice, tylko na tym, czy dowód istnieje w miejscu, do którego klientka zagląda przed wizytą.
+
+## Dlaczego gonienie trendów bywa nieopłacalne
+
+Sezonowe zestawienia kolorów starzeją się szybciej, niż zdążysz je przećwiczyć. Kolor, który w marcu był wszędzie, w listopadzie nie wywołuje już reakcji. Jeśli Twoim planem na trendy jest nadążanie, zawsze będziesz o pół kroku za, a ćwiczenia zostaną kosztem.
+
+Opłacalne jest coś innego: **z każdego trendu, który i tak wykonujesz na życzenie, zostawić ślad, który pracuje potem miesiącami.**
+
+Trend jest pretekstem do wizyty. Zdjęcie tej wizyty w Twojej galerii jest powodem następnej.
+
+## Trzy rzeczy, które warto zrobić przy każdej modnej pracy
+
+**Zrób zdjęcie zanim klientka wstanie z fotela.** Nie „później z pamięci", bo później nie będzie. Dwa ujęcia: zbliżenie na fakturę i cała dłoń na proporcje. To samo światło i to samo tło, co zwykle, żeby galeria trzymała się kupy.
+
+**Opisz pracę słowami, których używa klientka.** Nie nazwą techniczną, tylko tym, co ktoś wpisze albo wybierze z filtra: kolor, długość, charakter zdobienia. Praca bez opisu nie wyjdzie w filtrowaniu, więc dla klientki jej nie ma.
+
+**Sprawdź po miesiącu, czy ktoś ją zamawia.** Jeśli zdjęcie leży bez echa, trend nie był Twój i nie warto w niego wchodzić głębiej. Jeśli wraca w rozmowach, przypnij je na górze galerii i zrób z niego swoją wizytówkę.
+
+## Jak z tego zrobić rozmowę zamiast zgadywania
+
+Najgorszy moment na ustalanie wzoru to fotel. Klientka pokazuje zdjęcie z zupełnie innej długości płytki, ty tłumaczysz, dlaczego u niej wyjdzie inaczej, i obie zaczynacie od kompromisu.
+
+Lepiej przenieść ten moment przed wizytę. Jeśli klientka ma dostęp do Twoich prac z filtrami, wybiera z **tego, co naprawdę robisz**, a nie z przypadkowego zdjęcia z sieci. Przychodzi z gotowym wyborem, a ty wiesz, ile czasu zarezerwować.
+
+W Nailfolio klientka zbiera wybrane wzory w sesję inspiracji i udostępnia Ci ją przed wizytą. Sesja jest ważna przez 7 dni, więc zdąży przemyśleć, a ty widzisz jej wybory w karcie klientki razem z historią ostatnich spotkań.
+
+## Trend, który warto mieć w galerii zawsze
+
+Niezależnie od sezonu jedno się nie zmienia: klientki szukają po długości i kolorze, nie po nazwie techniki. Galeria, w której da się zaznaczyć „krótkie" i „nude", odpowiada na pytanie, które pada najczęściej.
+
+Zadbaj, żeby w Twoich przypiętych pracach był pełen rozstrzał: coś krótkiego i spokojnego, coś długiego i wyrazistego, coś pośrodku. To one odpowiadają na pytanie „co pani robi", zanim ktokolwiek zdąży je zadać.
+
+## Zacznij od dziesięciu zdjęć
+
+Nie potrzebujesz kompletu sezonowych zestawień. Potrzebujesz dziesięciu opisanych prac, które pokazują rozstrzał tego, co robisz, i jednego miejsca, do którego klientka trafia przed wizytą.
+
+Galerię z filtrami i sesje inspiracji ustawisz w [Nailfolio](/for-stylists). Plan Free jest dostępny od razu, bez karty. Jeśli chcesz galerię bez limitów i historię klientek, [wypróbuj Pro przez 30 dni](/pricing).

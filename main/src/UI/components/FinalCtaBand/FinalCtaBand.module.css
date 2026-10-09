@@ -1,0 +1,216 @@
+/* ─── FinalCtaBand — reużywalny final CTA band (głosy ownera S21 + S22/5) ───
+ * JEDYNY wzorzec końcowego CTA na pełnym bandzie (pricing, compare,
+ * for-stylists, for-studios, get-app, about, contact, for-clients).
+ * Kanon GOLD: linia 1 headline'u BIAŁA (mode-invariant on-ink), akcent italic
+ * w primary-contrast, label primary-buttona BIAŁY. Zmiana tutaj = zmiana
+ * wszędzie — nie buduj per-page final CTA na primary tle.
+ * Konwencja F3 (głos S22/5 = B): .bandInk = ink-ton dla stron INFORMACYJNYCH
+ * (band: primary→ink, tekst: primary-contrast→on-ink, akcent linii 2 gold
+ * italic, button gold fill + ink label — lustro kanonu home-finału). Gold
+ * zostaje sygnałem miejsca DECYZJI (pricing, compare, get-app).
+ * (Home finał = osobny kanon INK-banda; legal = tonal — poza tym molecule.) */
+
+.band {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-primary);
+  /* Pierścień fokusu NA BANDZIE AKCENTU: kolor bandu to --color-primary, a
+     bazowy ring (atrament w light, jasny w dark) na czerwonym bandzie
+     spada do 2,8:1 (zmierzone S106 na /pricing). Tekst bandu (on-primary,
+     biel) trzyma 4,9:1 na czerwieni i jest mode-invariant, więc jedna
+     wartość wystarcza w obu trybach. */
+  --color-focus-ring: var(--color-primary-contrast);
+  --eyebrow-color: var(--color-primary-contrast);
+  color: var(--color-primary-contrast);
+  padding: clamp(80px, 9vw, 144px) var(--section-gutter);
+  position: relative;
+  overflow: hidden;
+  border-top: var(--style-border-divider) solid
+    color-mix(in oklch, white 24%, var(--color-primary));
+}
+
+/* Dot grid motif — solid SVG tile (flat dots), not a radial gradient. */
+.pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1.2' fill='%23ffffff' opacity='0.12'/></svg>");
+  background-size: 32px 32px;
+  background-position: 0 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.inner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(20px, 2.5vw, 36px);
+  position: relative;
+  z-index: 1;
+}
+
+.headline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-3xl);
+  line-height: 1.04;
+  letter-spacing: var(--ls-tight-20);
+  /* Głos ownera: linia 1 na gold-bandzie BIAŁA (mode-invariant). */
+  /* DECISION (nie usuwaj tego komentarza):
+     `inherit`, NIE `--color-on-ink`. Ten band ma DWA tony (F3: ink na stronach
+     informacyjnych, złoty na konwersyjnych) i każdy ustawia własny `color` na
+     `.band`/`.bandInk`. Nagłówek brał na sztywno kolor tonu ATRAMENTOWEGO,
+     a wariant złoty nigdy nie dostał własnego override'u, więc na `/pricing`,
+     `/compare` i `/get-app` największy tekst strony (64px) renderował się
+     BIELĄ NA ZŁOCIE: 1,96:1, poniżej nawet progu 3:1 dla dużego tekstu.
+     Zmierzone w przeglądarce, bo w kodzie nie widać tego w żadnym pojedynczym
+     pliku: kolor jest tu, tło piętro wyżej, a tonów jest dwa. Siostrzane
+     `.headlineAccent` i `.body` mają override per ton od początku, ten jeden
+     go nie dostał. */
+  color: inherit;
+  margin: 0;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+
+.headlineAccent {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--ls-wide-5);
+  font-style: italic;
+  color: var(--color-primary-contrast);
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-primary-contrast);
+  margin: 0;
+  max-width: 56ch;
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(16px, 2vw, 28px);
+  margin-top: clamp(8px, 1vw, 16px);
+}
+
+/* Inverted CTA na bandzie akcentu: button w kolorze TEKSTU bandu
+ * (on-primary), label w kolorze bandu (primary). DECISION (S106, nie
+ * usuwaj): do S105 label brał --color-on-ink, bo on-primary był atramentem
+ * (złoto = jasny akcent); w rouge-papier on-primary to biel w light i
+ * atrament w dark, więc każda stała barwa labela psuje jeden z trybów
+ * (zmierzone: 1,06:1 light, 1,01:1 dark). Para on-primary / primary jest
+ * symetryczna z definicji: to ten sam kontrast, co tekst bandu na bandzie
+ * (4,9:1 light, 7,75:1 dark), tylko odwrócony.
+ * !important wygrywa z wariantem Buttona (precedens per-page .finalCtaButton).
+ * Hover-lift = interaktywny, dozwolony; depth flat (zero box-shadow). */
+.actions button {
+  background: var(--color-primary-contrast) !important;
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary-contrast) !important;
+  font-weight: 700;
+  transition: transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .actions button:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Secondary — podkreślony link na bandzie; strona przekazuje goły <Link>. */
+.secondaryWrap a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-primary-contrast);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-primary-contrast) 50%, transparent);
+  padding: var(--space-6) 0 var(--space-4);
+  transition:
+    gap var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color var(--transition-fast);
+}
+
+.secondaryWrap a:hover {
+  border-bottom-color: var(--color-primary-contrast);
+}
+
+.footnote {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-primary-contrast);
+  margin: 0;
+  max-width: 56ch;
+}
+
+/* ─── Ton INK (konwencja F3, forma 1:1 z playground-mocka S22/5) ─── */
+
+.bandInk {
+  background: var(--color-ink);
+  /* Pierścień fokusu na atramencie: bazowy ring to w LIGHT dokładnie
+     --color-ink, więc byłby tu niewidoczny (1,00:1). Akcent NA ATRAMENCIE ma
+     własną rolę (--color-accent-on-ink, S106): jasna czerwień, ta sama w obu
+     trybach, bo ciemna --color-primary z trybu jasnego daje na atramencie
+     ledwie 3,6:1. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  --eyebrow-color: var(--color-on-ink);
+  color: var(--color-on-ink);
+  border-top-color: color-mix(in oklch, white 24%, var(--color-ink));
+}
+
+/* Dot grid na inku: opacity 0.08 zamiast 0.12 — percepcyjna parytetowość
+ * bieli (kanon home-ink: 0.07); na goldzie biel 0.12 jest ledwo widoczna,
+ * na inku świeciłaby mocniej. */
+.bandInk .pattern {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='2' cy='2' r='1.2' fill='%23ffffff' opacity='0.08'/></svg>");
+}
+
+/* Biały na inku #1c1c20 = 16.99:1 (maks WCAG headroom) — .headline
+ * dziedziczy var(--color-on-ink) z kanonu, bez override. */
+
+.bandInk .headlineAccent {
+  /* Gold na inku = 8.65:1 (AAA), brand-signal — rola akcentu linii 2. */
+  color: var(--color-accent-on-ink);
+}
+
+.bandInk .body {
+  color: color-mix(in oklch, var(--color-on-ink) 88%, transparent);
+}
+
+/* Gold pill na inku — gold fill + ink label (8.65:1 na powierzchni pilla),
+ * lustro inverted-CTA tonu gold i kanonu home-finału. */
+.bandInk .actions button {
+  background: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.bandInk .secondaryWrap a {
+  color: var(--color-on-ink);
+  border-bottom-color: color-mix(
+    in oklch,
+    var(--color-on-ink) 50%,
+    transparent
+  );
+}
+
+.bandInk .secondaryWrap a:hover {
+  border-bottom-color: var(--color-on-ink);
+}
+
+.bandInk .footnote {
+  color: color-mix(in oklch, var(--color-on-ink) 72%, transparent);
+}

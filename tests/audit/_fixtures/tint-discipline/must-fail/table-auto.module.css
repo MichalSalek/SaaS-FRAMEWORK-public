@@ -1,0 +1,6 @@
+/* Tabela bez jawnej decyzji o table-layout: auto waży kolumny długością
+   nagłówka, więc porównanie rozjeżdża się przy każdej zmianie copy (R10). */
+.comparison {
+  width: 100%;
+  border-collapse: collapse;
+}

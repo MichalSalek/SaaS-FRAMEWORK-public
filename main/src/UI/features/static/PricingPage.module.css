@@ -1,0 +1,1472 @@
+/* ─── PricingPage — Wave 6 editorial, dl-w6 patterns propagated ─── */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 0. CLIENT BANNER — czysta biała karta (głos ownera S77 = B): biała
+ *    powierzchnia + pełny 4-bok hairline + okrągły medalion serca.
+ *    Zastąpił luźny inline one-liner (S28/2=C, „luźny dziwny tekst").
+ *    Chłodne domknięcie; serce = jedyny akcent, headroom kontrastu przy
+ *    CTA planów (taste 24). Wrap niesie oddech od navbara + gutters.
+ * ───────────────────────────────────────────────────────────────────── */
+.clientStripWrap {
+  max-width: var(--lp-content-width);
+  /* Odstęp górny = tyle co Scale nad tabelą (owner S81: banner siedzi teraz
+     bezpośrednio pod Scale, ten sam rytm). Wartość literalna clamp(28-48) jak
+     .scaleCta — powtórzony pattern odstępu sekcyjnego, NIE token (brak --sp-section).
+     BEZ padding-inline (owner S81): banner = pełna szerokość lp-content-width jak
+     boxy planów i Scale; page-padding niesie SectionComposition (dawny inset go
+     zwężał). */
+  margin: clamp(28px, 3.4vw, 48px) auto 0;
+}
+
+.clientBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+  flex-wrap: wrap;
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-20) var(--space-32);
+}
+
+/* Okrągły medalion — pigułka/avatar (radius-full legalny); gold serce =
+ * dekoracyjny FILL na tincie (--color-primary legalny). */
+.clientBannerMedallion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--style-radius-pill);
+  /* tint-allow: ZNAK (medalion serca) — zagłosowany kanon, głos S77 wariant B
+     („biała karta + hairline + medalion"). Motyw „Jeden krem" zdejmuje tinty
+     POWIERZCHNI; znak wielkości glifu zostaje złoty (token roli). */
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+}
+
+.clientBannerText {
+  margin: 0;
+  flex: 1 1 40ch;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.clientBannerStrong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.clientBannerLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: var(--text-base);
+  color: var(--color-accent-fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.clientBannerLink:hover {
+  text-decoration: underline;
+}
+
+.page {
+  --section-block: clamp(48px, 6vw, 96px);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 1. HERO — editorial split-font + billing toggle
+ * Jednolite tło (owner 2026-08-19): zero dzielonego szwu % szerokości.
+ * ───────────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  /* --hero-* : playground głos S94 (kontrast). Default = DZIŚ. */
+  background: var(--hero-bg, var(--color-bg-main));
+  padding: clamp(80px, 10vw, 144px) var(--section-gutter) clamp(44px, 5vw, 80px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 4.4vw, 56px);
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.heroInner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.2vw, 32px);
+  animation: hero-rise var(--duration-300) var(--ease-entrance) both;
+}
+
+/* Purposeful entrance (one-shot on mount), not scroll-reveal: a confident
+ * slide-up of the hero block. No blur/opacity-fade clichés. */
+@keyframes hero-rise {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.heroHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-3xl);
+  line-height: 1.02;
+  letter-spacing: var(--ls-tight-25);
+  color: var(--hero-fg, var(--color-text-primary));
+  margin: 0;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+
+.heroHeadlineAccent {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* --color-accent-fg, nie --color-primary: to ZLOTO JAKO TEKST na jasnym tle,
+     a jasne zloto daje tam 1,96:1, czyli ponizej progu 3:1 nawet dla duzego
+     tekstu (DESIGN.md, gold-as-text). Strony ForClients i MidPageCta mialy to
+     poprawnie od poczatku, te dwie byly outlierami. */
+  color: var(--color-accent-fg);
+  letter-spacing: var(--ls-wide-5);
+  font-style: italic;
+}
+
+.heroLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-md);
+  line-height: var(--leading-body);
+  color: var(--hero-muted, var(--color-text-secondary));
+  margin: 0;
+  max-width: 56ch;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* .heroProof — className on TrustSignalsMolecule variant='pills' w hero;
+   niesie tylko margin-top + gap (kanoniczne .list/.pills/.item robią
+   display/flex/font/color). Kanon współdzielony z for-stylists hero. */
+
+/* F1-10: Above-fold hero CTA row — visible without scroll */
+.heroCtaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+  flex-wrap: wrap;
+}
+
+.heroCtaLink {
+  text-decoration: none;
+  display: inline-block;
+}
+
+.heroCtaButton {
+  /* ensures the button is fully contained inside the link */
+}
+
+/* Hint na własnej linii pod CTA (flex-basis 100%), wąski (max-width) —
+ * trzymany w lewej kolumnie, NIE wchodzi na kolorowy pas hero (S28/3=A:
+ * tło zostaje, więc szerokość hintu pilnuje granicy). */
+.heroCtaHint {
+  flex-basis: 100%;
+  max-width: 48ch;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--hero-muted, var(--color-text-secondary));
+}
+
+/* ─── Scroll-down affordance (owner S82) — niewielka zachęta „Zobacz plany"
+ * między hero a listą planów. Strzałka pod-bija micro-motion (scroll-cue,
+ * NIE scroll-reveal). Link = interaktywny, więc hover dozwolony (floor §4). */
+.scrollToPlans {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  width: fit-content;
+  /* Symetryczny margin (owner S82): scroll-hint wyśrodkowany w pionie między
+   * linią-końcem hero a sekcją planów — wcześniej górny (4-12px) był dużo
+   * mniejszy od dolnego → „przyklejony do linii nad", nierówno. */
+  margin: clamp(28px, 3.5vw, 44px) auto;
+  padding: var(--space-8) var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-10);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.scrollToPlans:hover {
+  color: var(--color-accent-fg);
+}
+
+.scrollToPlans svg {
+  animation: scrollHintNudge 2.2s ease-in-out infinite;
+}
+
+.scrollToPlans:hover svg {
+  animation-play-state: paused;
+  transform: translateY(2px);
+}
+
+@keyframes scrollHintNudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* Kotwica scroll (login banner klikalny + hero scroll-hint, owner S82):
+ * offset od górnego navbara, żeby nagłówek sekcji planów nie chował się pod
+ * przyklejoną nawigacją po skoku do #pricing-plans. */
+.plansAnchor {
+  scroll-margin-top: 96px;
+}
+
+/* ─── Billing toggle (pill-style, flat: tonal track + full hairline) ─── */
+/* Głos ownera: przełącznik Miesięcznie/Rocznie BEZPOŚREDNIO nad pricing
+ * boxami (na górze tiers-sekcji, wycentrowany), nie w hero. */
+.tiersToggleRow {
+  max-width: var(--lp-content-width);
+  margin: 0 auto clamp(28px, 3.5vw, 44px);
+  display: flex;
+  justify-content: center;
+}
+
+/* Billing toggle → components/BillingToggle (W5.5 ekstrakcja, variant
+ * 'pricing'). Receptura przeniesiona 1:1; tu został tylko `.tiersToggleRow`
+ * (slot pozycjonujący toggle nad boxami planów). */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2. TIERS — 5A: grid 4 równych kolumn (forma 1:1 playground VariantColumnsA)
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band = Section (tone subtle: bg-subtle + pełna rama hairline z kanonu —
+ * głos ownera S24, DECISION w Section.tsx). Tu zostaje rytm strony
+ * (--section-block ma max 96px vs 88px defaultu Section). */
+.tiersSection {
+  position: relative;
+  --section-pad-block: var(--section-block);
+  overflow: hidden;
+}
+
+/* Tytuł sekcji W sekcji (głos ownera S24 — zastąpił zewnętrzny marker
+ * "Plany i ceny" nad bandem); skala 1:1 z .comparisonHeadline,
+ * wycentrowany nad przełącznikiem okresu rozliczenia. */
+.tiersHeadline {
+  max-width: var(--lp-content-width);
+  margin: 0 auto clamp(24px, 3vw, 40px);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.06;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--band-headline-fg, var(--color-text-primary));
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Inner Section (innerClassName): dzieci ponad tłem sekcji —
+ * per-dziecko, parytet 1:1 z dawnym `.tiersSection > *`. */
+.tiersInner > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Karty 5A (forma 1:1 z PlaygroundPricingVotes wariant A).
+ * Jedna rama hairline + radius-md na kartę, równe wysokości w wierszu
+ * siatki; Pro = pełny negatyw ink (data-pro). Floor 7×ZERO: zero
+ * gradientów/cieni; hairline-wiersze features = para border-top+bottom
+ * collapsed (-1px), NIE jednostronny border. ── */
+
+.tiersGrid {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(12px, 1.6vw, 20px);
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .tiersGrid {
+    /* Układ 2+2 (głos ownera 2026-07-11, hybryda PR-B+PR-C): KAŻDY grid to
+       PARA kart (Free+Pro jasna / Pro Marka+Studio w bandzie premium) —
+       repeat(2) jest docelowy na każdej szerokości ≥768, dawny skok do 4
+       kolumn @1024 usunięty.
+       12 torów per-element: 8 torów nad listą, JEDEN wspólny tor feature
+       (auto = max z pary; ul stretch → wiersze 1fr równe między kartami,
+       molekuła sizuje repeat(rowCount, minmax(min,1fr)) sama), potem
+       nota/CTA/stopka. Karty jako subgrid dzielą tory → wiersze wyrównane
+       poziomo (głos ownera S42). Tor 6 = yearly-meta (restore S44): pusty na
+       monthly auto-collapse do 0. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(8, auto) auto auto auto auto;
+    align-items: stretch;
+  }
+}
+
+/* Jedna rama hairline na kartę — wnętrze BEZ pod-boxów.
+ * Wspólne linie siatki (census S22 z. 2): karta = 3 sloty (body / CTA /
+ * footnotes). Fallback: flex column + body flex:1 (CTA+noty dociśnięte do
+ * dołu). Enhancement: subgrid — karty w jednym wierszu dzielą tory wierszy
+ * rodzica, więc CTA leżą na IDENTYCZNEJ linii, a footnote-tor trzyma siatkę
+ * także tam, gdzie karta ma krótszy stos not (Free bez trial-note, Studio
+ * bez loss-note). row-gap:0 nadpisuje odziedziczony gap — odstępy wewnątrz
+ * karty niosą istniejące marginesy elementów (parytet 1:1 z flex-wersją). */
+.tierCard {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 2.2vw, 28px);
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+/* Base (mobile/tablet stack): features rosną, stopka dociśnięta do dołu.
+ * Desktop 4-kol przełącza kartę na subgrid per-element (niżej) → każdy wiersz
+ * (oferta/cena-po/micro/pinned/features/nota/CTA/stopka) dzieli wspólny tor
+ * między planami = linie poziome wyrównane (głos ownera S42). */
+.tierFeatureRows {
+  flex-grow: 1;
+}
+
+/* Nota body — divider-fix (owner S42: osamotniony border-top nad notą, tuż
+ * pod hairline features, czytał się jak błąd). Nota wyróżnia się KURSYWĄ +
+ * marginesem, bez własnej linii. Zawsze renderowana (spacja gdy brak) —
+ * trzyma tor subgrid. */
+.tierBodyNote {
+  margin: clamp(14px, 1.8vw, 20px) 0 clamp(14px, 1.8vw, 20px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-style: italic;
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* Trial-framing (antipattern-cena, głos ownera S42): oferta wejścia bohaterem
+ * w miejscu ceny; kwota schowana małym drukiem. */
+.tierTrialLede {
+  margin: clamp(16px, 1.8vw, 22px) 0 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+}
+
+.tierTrialAfter {
+  margin: var(--space-6) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.tierFooterNote {
+  margin: var(--space-10) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* Para 2-kolumnowa (≥768): subgrid per-element — karta dzieli 12 torów rodzica
+ * (kicker/name/tagline/trialLede/trialAfter/yearlyMeta/micro/pinned/features/
+ * note/cta/footer). Mobile (<768) zostaje flex (naturalna wysokość). */
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 768px) {
+    .tierCard {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 12;
+      row-gap: 0;
+    }
+
+    /* EXPLICIT grid-row per-element (restore S44): placement odpięty od
+       KOLEJNOŚCI dzieci → element, który znika (`.tierYearlyMeta:empty` na
+       monthly/Free), NIE przesuwa rodzeństwa o tor (order-placement by to
+       zrobił → rozjazd Free na yearly). Mapowanie 1:1 z torami rodzica. */
+    .tierKickerRow {
+      grid-row: 1;
+    }
+    .tierName {
+      grid-row: 2;
+    }
+    .tierTagline {
+      grid-row: 3;
+    }
+    .tierTrialLede {
+      grid-row: 4;
+    }
+    .tierTrialAfter {
+      grid-row: 5;
+    }
+    .tierYearlyMeta {
+      grid-row: 6;
+    }
+    .tierMicroPrice {
+      grid-row: 7;
+    }
+    .tierPinnedInfo {
+      grid-row: 8;
+    }
+    .tierFeatureRows {
+      /* JEDEN wspólny tor auto (2+2, 2026-07-11): tor = max(ul pary), oba ul
+         stretchują do toru, wiersze wewnątrz = repeat(rowCount, minmax(min,1fr))
+         z molekuły → równe MIĘDZY kartami (ten sam rowCount + ta sama wysokość
+         toru), bez jaggy z S45, bez martwych slotów sztywnej 6-torowej siatki
+         (para solo ma krótsze listy niż dawne globalne max). */
+      grid-row: 9;
+    }
+    .tierBodyNote {
+      grid-row: 10;
+    }
+    .tierCtaSlot {
+      grid-row: 11;
+    }
+    .tierFooterNote {
+      grid-row: 12;
+    }
+  }
+}
+
+/* Yearly-meta wrapper (restore S44): JEDEN tor subgrid na oszczędność roczną +
+ * Omnibus cenę referencyjną. Marginesy niosą wewnętrzne <p> (.tierSaving 8px,
+ * .tierReferencePrice 2px) — wrapper bez własnego marginesu. */
+.tierYearlyMeta {
+  margin: 0;
+}
+
+/* Pusty wrapper (monthly = wszystkie karty, yearly = Free) znika z layoutu →
+ * jego tor 6 sizuje się WYŁĄCZNIE zawartością kart, które mają noty (paid na
+ * yearly); na monthly żadna → tor 6 = 0 (zero void). `:empty` bezpieczne dzięki
+ * explicit grid-row wyżej (brak przesunięcia rodzeństwa). */
+.tierYearlyMeta:empty {
+  display: none;
+}
+
+/* Pro (jasna para, 2+2) = PEŁNY NEGATYW — głos ownera S98/B: „polecany"
+ * ma mówić jednym językiem w całej ścieżce zakupowej, a wygrał najmocniejszy
+ * z trzech, które współistniały (zamknięta rama /pricing, negatyw
+ * /for-studios, złota rama onboardingu). Wcześniej: rama 2px text-primary.
+ * Tabela porównania ZOSTAJE na zamkniętej ramie — „kolumnę w tuszu" owner
+ * odrzucił wprost w głosie S94 (wariant B), a ten głos dotyczył KART. */
+.tierCard[data-pro] {
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Zloto zamiast bieli,
+     bo w DARK ring i tak JEST zloty — jedna wartosc daje ten sam jezyk
+     wskaznika w obu trybach, zamiast bieli w jednym i zlota w drugim. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, var(--color-ink));
+}
+
+/* Dark (ta sama pułapka co band premium, R8): --color-ink jest ciemny w OBU
+ * trybach, więc na ciemnej stronie negatyw przestaje być inwersją. Sygnał
+ * przejmuje krok tonalny w górę + gold-rama — receptura 1:1 z .premiumBand,
+ * żeby oba negatywy cennika zachowywały się w ciemności tak samo. */
+[data-mode='dark'] .tierCard[data-pro] {
+  background: color-mix(in oklch, var(--color-ink) 89%, var(--color-on-ink));
+  border-color: color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+/* Karty w bandzie premium (Pro Marka + Studio): tonal step NAD ink bandu —
+ * karta jaśniejsza od tła sekcji (parytet z krokiem 85% z dawnego dark-fixu
+ * Pro; kontrast on-ink AAA). */
+.tierCard[data-onink] {
+  background: color-mix(in oklch, var(--color-ink) 88%, var(--color-on-ink));
+  border-color: color-mix(in oklch, var(--color-on-ink) 20%, transparent);
+  color: var(--color-on-ink);
+}
+
+/* Dark: band podnosi sie do ink 89%, a karty stoja na 88% — krok tonalny,
+   ktory w light wynosi 1,35:1, w ciemnosci schodzil do 1,03:1, czyli karty
+   zlewaly sie z bandem w jedna plaszczyzne i zostawala sama rama. Karty
+   ida o wlasny stopien wyzej, zeby delta byla porownywalna z jasnym trybem
+   (zmierzone w oklch, bo tak miesza CSS: ink 78% wobec bandu = 1,40:1). Dlatego blok NIE jest juz
+   mode-invariant, mimo ze ink i on-ink same w sobie sa stale. */
+:root[data-mode='dark'] .tierCard[data-onink] {
+  background: color-mix(in oklch, var(--color-ink) 78%, var(--color-on-ink));
+  /* Rama musi isc ZA wypelnieniem: `on-ink 20%` bylo liczone na ink 88%,
+     a na jasniejszym 78% schodzi do 1,76:1, czyli obrys mial ratowac krok
+     tonalny i sam przestal byc widoczny. */
+  border-color: color-mix(in oklch, var(--color-on-ink) 34%, transparent);
+}
+
+/* Studio = target salonowy: gold rama na ink (dual-recommend — Pro niesie
+ * negatyw w jasnej parze, Studio ramę gold w bandzie premium; segmentacja
+ * solo↔zespół bez kanibalizacji). Tło zostaje krokiem onink (gold tint na
+ * ink jest nieczytelny — sam kolor ramy niesie akcent). */
+.tierCard[data-onink][data-target] {
+  border-color: var(--color-primary);
+}
+
+/* Kicker-slot: wspólna oś (pro-marker / badge Studio); min-height trzyma
+ * linię nazw planów także na kartach z pustym slotem (Free, Pro+) —
+ * numerale 01-04 usunięte (Style Policy §6, census S22 z. 1).
+ * Rezerwa 2-line (fresh-eyes S42): eyebrow Pro „POLECANY DLA STYLISTEK SOLO"
+ * łamie się na 2 linie w kolumnie 277px → bez rezerwy pchał tytuł Pro 20px
+ * niżej niż Free/Pro+/Studio (baseline nazw poszarpana). 2× line-height
+ * = wszystkie 4 tytuły na wspólnej bazie; karty 1-line dostają spójny oddech. */
+.tierKickerRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-12);
+  min-height: calc(var(--text-xs) * 1.4 * 2);
+}
+
+/* Layout-only: atom carries typography. Accent-fg on light cards (AA). */
+.tierKickerPro {
+  --eyebrow-color: var(--color-accent-fg);
+}
+
+/* margin-left:auto pinuje badge do prawej także, gdy jest jedynym
+ * dzieckiem kicker-rowu (Studio po usunięciu numerali). */
+.tierBadge {
+  --eyebrow-color: var(--color-accent-fg);
+  margin: 0 0 0 auto;
+  text-align: right;
+}
+
+.tierName {
+  margin: clamp(10px, 1.2vw, 14px) 0 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+}
+
+.tierTagline {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* Noty cenowe + pinned — czysta typografia (zakaz box-w-boxie). */
+.tierSaving {
+  margin: var(--space-8) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.tierReferencePrice {
+  /* Cyfry tabelaryczne: ceny sasiadujacych pakietow musza stac w kolumnie,
+     a przelacznik miesiac/rok nie moze przesuwac znakow (F3.2). */
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.tierMicroPrice {
+  /* Cyfry tabelaryczne: ceny sasiadujacych pakietow musza stac w kolumnie,
+     a przelacznik miesiac/rok nie moze przesuwac znakow (F3.2). */
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.tierPinnedInfo {
+  margin: var(--space-10) 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.tierPinnedInfo svg {
+  color: color-mix(in oklch, var(--color-text-primary) 45%, transparent);
+  flex-shrink: 0;
+}
+
+/* Features jako hairline-WIERSZE wewnątrz karty — bez ramek, bez ikon
+ * (typografia + linia); para top+bottom collapsed przez ujemny margines. */
+.tierFeatureRows {
+  --pricing-feature-row-min: 42px;
+  list-style: none;
+  margin: clamp(14px, 1.6vw, 20px) 0 clamp(16px, 1.8vw, 22px);
+  padding: 0;
+}
+
+.tierFeatureRows li {
+  /* Wysokość niesie stały tor subgrid (--pricing-feature-row-h); brak własnego
+     paddingu pionowego → 2-liniowa treść mieści się w slocie bez klipu, a
+     molekuła (.featureItem: flex + align-items:center) centruje treść. */
+  padding: 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.tierFeatureRows li + li {
+  margin-top: -1px;
+}
+
+/* Spacery wyrównania (krótsza lista niż najdłuższa kolumna) = pusty tor BEZ
+   hairline'ów (głos ownera S45: bordery na pustych slotach czytały się jak
+   „coś się nie doładowało" / drabina). Tor trzyma wysokość (CTA wyrównane),
+   ale wizualnie to czysty whitespace, nie broken-slot. */
+.tierFeatureRows li[data-pricing-feature-spacer] {
+  border: 0;
+}
+
+/* Mobile (<768): karty w kolumnie = zero wyrównania międzykolumnowego,
+   więc spacery to czysta pustka (Pro+ miałby ~215px void pod jedną cechą).
+   Collapse: zdejmij siatkę torową molekuły (auto-rows) + ukryj spacery →
+   lista naturalnej wysokości. Para (≥768) trzyma wspólny tor subgridu wyżej. */
+@media (max-width: 767.98px) {
+  .tierFeatureRows {
+    grid-template-rows: none;
+  }
+
+  .tierFeatureRows li[data-pricing-feature-spacer] {
+    display: none;
+  }
+}
+
+/* CTA — Button w Link (pattern F1-06), pełna szerokość, dociśnięty do dołu
+ * karty (stopka: margin-top:auto w flex-fallbacku; w subgridzie CTA ma
+ * własny współdzielony tor = identyczna linia na wszystkich kartach). */
+.tierCtaSlot {
+  display: block;
+  width: 100%;
+  margin-top: auto;
+  text-decoration: none;
+}
+
+.tierCtaButton {
+  width: 100%;
+}
+
+/* ── Karty na negatywie: on-ink tekst, noty w color-mix on-ink. Selektor
+ * [data-negative] zbiera Pro z jasnej pary ORAZ obie karty bandu premium
+ * (patrz PricingTierCard.organism). Wzmianka o „gold cenie" wypadla razem
+ * z .tierPrice/.tierPriceUnit/.tierPriceRow — te klasy juz nie istnieja. ── */
+.tierCard[data-negative] .tierName,
+.tierCard[data-negative] .tierTrialLede {
+  color: var(--color-on-ink);
+}
+
+.tierCard[data-negative] .tierTagline,
+.tierCard[data-negative] .tierTrialAfter,
+.tierCard[data-negative] .tierBodyNote {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+.tierCard[data-negative] .tierFooterNote {
+  color: color-mix(in oklch, var(--color-on-ink) 92%, transparent);
+}
+
+.tierCard[data-negative] .tierFeatureRows li {
+  border-color: color-mix(in oklch, var(--color-on-ink) 16%, transparent);
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+.tierCard[data-negative] .tierSaving {
+  color: var(--color-on-ink);
+}
+.tierCard[data-negative] .tierReferencePrice,
+.tierCard[data-negative] .tierMicroPrice {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+.tierCard[data-negative] .tierPinnedInfo {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+.tierCard[data-negative] .tierPinnedInfo svg {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+/* Karta on-ink: disabled currentPlan CTA to jedyny `outlined` tutaj —
+ * dziedziczył `--color-accent-fg` (ciemny gold pod JASNE tła), więc na ink w
+ * light mode „Twój obecny plan" był praktycznie nieczytelny (~2.2:1 z opacity
+ * disabled). Na ink CTA bierze on-ink (primary CTA jest self-sufficient, nie
+ * dotknięty). Fix a11y-review S44. */
+.tierCard[data-negative] .tierCtaButton:disabled {
+  color: color-mix(in oklch, var(--color-on-ink) 82%, transparent);
+  border-color: color-mix(in oklch, var(--color-on-ink) 34%, transparent);
+}
+
+/* Eyebrow „Polecany" Pro siedzi od głosu S98/B na ATRAMENCIE, więc wraca do
+ * czystego --color-primary: accent-fg to ciemny gold pod jasne tła (na ink
+ * schodził do ~2:1). Parytet z kickerem kart bandu premium. */
+.tierCard[data-pro] .tierKickerPro {
+  --eyebrow-color: var(--color-accent-on-ink);
+}
+
+/* Badge Studio siedzi na karcie bandu premium, czyli tez na atramencie —
+   ten sam mechanizm, ta sama naprawa. Zmierzone: accent-fg #8a6d18 na karcie bandu
+   (ink 88% w oklch = #333336) = 2,57:1 (FAIL AA dla 14px/700), --color-primary = 6,44:1.
+   Selektor [data-negative] zbiera obie rodziny kart atramentowych. */
+.tierCard[data-negative] .tierBadge {
+  --eyebrow-color: var(--color-accent-on-ink);
+}
+
+/* Dark onink cards step to ink 78% (L ~0.38). accent-on-ink on that
+ * surface is 4.34:1; accent-fg (the paper-accent, lighter in dark) is 5.13. */
+[data-mode='dark'] .tierCard[data-onink] .tierBadge {
+  --eyebrow-color: var(--color-accent-fg);
+}
+
+/* ── Band premium (2+2): atramentowy negatyw SEKCJI — Pro Marka + Studio jako
+ * „najlepsze pakiety" (głos ownera, hybryda PR-B+PR-C). Solid fill + radius,
+ * zero gradientu/cienia (floor). Mode-invariant ink → identyczny w dark. ── */
+.premiumBand {
+  max-width: var(--lp-content-width);
+  margin: clamp(20px, 2.6vw, 36px) auto 0;
+  padding: clamp(18px, 2.6vw, 32px);
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Zloto zamiast bieli,
+     bo w DARK ring i tak JEST zloty — jedna wartosc daje ten sam jezyk
+     wskaznika w obu trybach, zamiast bieli w jednym i zlota w drugim. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  border: 0 solid transparent;
+  border-radius: var(--style-radius-surface);
+}
+
+/* Dark mode (fresh-eyes 2026-07-11 MAJOR 1): bg strony i ink to bliskie
+ * czernidła — inwersja jasne→atrament, która niesie sekcję w light, znikała.
+ * Sygnał premium w dark przejmuje ZŁOTO: wyraźna gold-rama bandu (pełna,
+ * 4-bok) + tło o krok jaśniejsze od bg (tonal step, zero gradientu/cienia).
+ * Indirekcja `var(--premium-band-bg/-line, …)` USUNIĘTA: był to hook pod
+ * playground głosu S94, którego nikt nigdy nie zasilił (grep po całym
+ * main/src: zero przypisań), więc rządził wyłącznie fallback. Martwy poziom
+ * pośredni sugerował następnemu czytelnikowi konfigurowalność, której nie ma —
+ * wartości stoją teraz wprost. */
+[data-mode='dark'] .premiumBand {
+  background: color-mix(in oklch, var(--color-ink) 89%, var(--color-on-ink));
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+/* Dark mode: karty jasnej pary (Free/Pro) dostają krok jaśniejszy od
+ * bg-main (#0a0a0a) — „start" pozostaje najjaśniejszą powierzchnią kadru,
+ * a 4 tiery nie spłaszczają się do identycznych ciemnych kart. Border
+ * podbity o krok (fresh-eyes r2: hairline Free ginął obok gold-ramy Pro). */
+[data-mode='dark'] .tierCard:not([data-negative]) {
+  background: color-mix(in oklch, var(--color-ink) 90%, var(--color-bg-main));
+  border-color: color-mix(in oklch, var(--color-on-ink) 22%, transparent);
+}
+
+.premiumBandLabel {
+  margin: 0 0 clamp(14px, 1.8vw, 20px);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-accent-on-ink);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Scale CTA — enterprise tier extracted from main list. Lift 2026-07-11 (głos
+ * ownera: dyskretny moduł „zainteresowany i tak znajdzie", ale dopracowany):
+ * nazwa jako lead typograficzny w font-heading + treść pod spodem. */
+
+/* External anchor banner — osobny pas konkurencyjnego kontekstu.
+ * margin-top MUSI być > 0: hero kończy się hairline'em (.hero
+ * border-bottom), a banner sam ma ramę — przy margin-top:0 jego górna
+ * krawędź sklejała się z linią hero (dwie linie na styk = glitch
+ * "doklejki"). Oddech symetryczny z dolnym marginesem = rytm strony. */
+.anchorBanner {
+  max-width: var(--lp-content-width);
+  /* Góra = oddech od trust; dół = 0 (pad-block bandy zamyka sekcję). */
+  margin: clamp(24px, 3vw, 40px) auto 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1vw, 16px);
+  padding: clamp(14px, 2vw, 20px) clamp(20px, 3vw, 28px);
+  /* Motyw „Jeden krem" (S94/R2): banner siedzi na papierze — drugi krem na
+     tej samej stronie łamie regułę „jeden krem na stronę". Niesie go rama. */
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.anchorBanner strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+/* Czytelny gold-highlight (cena/liczba) w anchor bannerze — gold-ink wariant
+ * (WCAG 1.4.3). Było: --color-primary (#e0b341) na cream bg = 1.82:1 (FAIL).
+ * --color-accent-fg (#8a6d18) = 4.56:1 na cream — kanon dla małego gold-tekstu. */
+.anchorBannerHighlight {
+  color: var(--color-accent-fg);
+  font-weight: 700;
+}
+
+/* Trust + VAT na dole porównania (owner 2026-08-19). Oddech GÓRĄ od
+ * tabeli; dół zjada pad-block bandy planów (nie ink-stage — ten jest
+ * już następną sekcją). */
+.comparisonTrustFooter {
+  margin-top: clamp(40px, 5vw, 72px);
+}
+
+.tiersTrustWrap {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+}
+
+/* (S35: tryptyk → InteractivePhoneStage ink-stage z focal-swap;
+ * .plansTriptych usunięte jako martwe — stage niesie własny rytm. */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3. COMPARISON — editorial chapter-marker header, raised target column
+ *    (desktop semantic <table>), card-per-tier layout on mobile.
+ *    Anti-AI-Slop: solid color-mix fills, full hairlines, zero shadow.
+ * ───────────────────────────────────────────────────────────────────── */
+/* Porównanie w bandzie planów (owner 2026-08-19): dziedziczy bg-subtle,
+ * bez drugiej Section. Oddech od client-bannera / Scale, nie pełny
+ * pad-block. Zero ozdobnych gwiazdek. */
+.comparisonEmbed {
+  position: relative;
+  margin-top: clamp(48px, 6vw, 80px);
+
+  /* Motyw „Jeden krem" (S94/R8): rama wyróżnienia MUSI odwracać się razem
+     z motywem. --color-ink to kolor negatywu — ciemny w OBU trybach — więc
+     w dark rysował ciemną linię na ciemnym tle i wyróżnienie znikało,
+     zostawał sam bold. --color-text-primary flipuje z trybem, więc rama
+     trzyma i na papierze, i w ciemności. Jedno miejsce dla tabeli i kart. */
+  --compare-featured-line: var(--color-text-primary);
+}
+
+/* ── Chapter-marker header (scoped do sekcji porównania) ── */
+.comparisonHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 20px);
+  max-width: var(--lp-content-width);
+  margin: 0 auto clamp(36px, 4.5vw, 64px);
+}
+
+.comparisonHeadline {
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.06;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--band-headline-fg, var(--color-text-primary));
+  text-wrap: balance;
+}
+
+/* ── Desktop table (>=768px) ── */
+.tableWrapper {
+  position: relative;
+  z-index: 1;
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  background: var(--color-bg-main);
+  /* Anti-AI-Slop: framed by a full hairline border, not a drop shadow. */
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  /* DECISION (nie usuwaj tego komentarza) — owner 2026-09-14: rama kolumny
+     wyróżnionej (góra nagłówka, dół ostatniego wiersza) leżała piksel w piksel
+     na ramie tabeli i dwie linie sklejały się w jedną grubszą krawędź. Tabela
+     cofa się od ramy w pionie, więc rama kolumny zamyka się WEWNĄTRZ obrysu.
+     Tylko w pionie: kolumny wyróżnione nie stoją przy lewej ani prawej
+     krawędzi, a hairline wierszy ma dalej dochodzić do ramy po bokach. */
+  padding-block: var(--space-4);
+}
+
+/* `table-layout: fixed` — auto-layout ważył kolumny długością nagłówka, więc
+   plany dostawały 104 do 237px (Free ponad dwa razy węższy od Studio) i rząd
+   ptaszków szedł krzywo mimo poprawnego centrowania. Fixed daje równe kolumny
+   planów niezależnie od długości nazwy: równość to jakość, a przy zdjętych
+   tintach jest jedyną rzeczą, która trzyma rytm tabeli. */
+.comparisonTable {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+}
+
+/* Kolumna etykiet niesie pełne zdania funkcji, więc bierze stałą część
+   szerokości; resztę fixed-layout dzieli równo między plany. */
+.comparisonTable thead th:first-child {
+  width: 28%;
+}
+
+.comparisonTable th,
+.comparisonTable td {
+  padding: clamp(12px, 1.3vw, 16px) clamp(12px, 1.5vw, 18px);
+  text-align: center;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  /* Motyw „Jeden krem" (S94/R5): wartości idą PEŁNYM kolorem tekstu. Po
+     zdjęciu tintów wyszarzenie zostawało jedyną różnicą i trzy kolumny na
+     pięć czytały się jak wyłączone. Hierarchię niesie waga plus rama
+     wyróżnionej kolumny, nigdy przygaszanie treści. */
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+.comparisonTable tbody tr:last-child th,
+.comparisonTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Motyw „Jeden krem" (S94/R4): ZERO zebry. Skanowalność wiersza trzyma
+   pełny hairline (border-bottom komórek) plus rytm paddingu — pas co drugi
+   wiersz mnożył powierzchnie i walczył z ramą wyróżnionej kolumny. */
+
+/* Column headers (tier names) */
+.comparisonTable thead th {
+  /* vertical-align:top — nagłówki 1-liniowe (Free/Pro+/Scale) na tej samej
+     górnej bazie co Pro/Studio (nazwa + chip pod spodem); bez tego chip pcha
+     Pro/Studio niżej i baza nagłówków się szarpie (fresh-eyes S). */
+  vertical-align: top;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  /* Motyw „Jeden krem" (S94/R1): nagłówek to papier. Rolę nagłówka niosą
+     caps, waga i hairline pod spodem, nie złota banda. */
+  background: var(--color-bg-main);
+  font-size: var(--text-sm);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  padding-top: clamp(14px, 1.6vw, 20px);
+  padding-bottom: clamp(14px, 1.6vw, 20px);
+}
+
+.comparisonTable thead th:first-child {
+  background: var(--color-bg-main);
+}
+
+/* Row-label column (feature names) — rendered as scope='row' <th> for A11y */
+.comparisonTable tbody th,
+.comparisonTable thead th:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.comparisonTable tbody th {
+  font-size: var(--text-fluid-xs);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.colName {
+  display: block;
+}
+
+/* Znacznik przy nazwie tieru (nagłówek kolumny / head karty mobile) — GOŁY
+ * caps w złocie AA, bez wypełnienia i bez ramki. Linia decyzji: S23/1 zdjęło
+ * solidny złoty blok („ciężki”), S82 kropkę, a motyw „Jeden krem” (S94) resztę
+ * ozdobników — więc to już NIE jest wariant `chip` komponentu Eyebrow (tamten
+ * ma underline-hairline pod capsami), tylko sam znacznik tekstowy.
+ * Pro = „Polecany” (tierSection.popularBadge), Studio = „Dla zespołów”. */
+.colChip {
+  display: inline-block;
+  margin-top: var(--space-6);
+  padding: 3px var(--space-10);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  /* Motyw „Jeden krem" (S94): chip TEKSTOWY traci wypełnienie i ramkę —
+     „Polecany" niesie się capsami w złocie AA. Domknięcie linii S23/1 →
+     S82 → S88: kolejne głosy zdejmowały temu znacznikowi ozdobniki. */
+  color: var(--color-accent-fg);
+}
+
+/* ── Kolumna planu polecanego (Pro): frozen-tint fill + pełna akcentowa
+ * hairline-ramka — ten sam język wyróżnienia co Eyebrow chip i karty wyżej
+ * (Pro = plan polecany, spójnie z tierSection). Zero cieni — kolumna
+ * "unosi się" wagą fillu + realnymi borderami. */
+.highlightCol {
+  background: var(--color-bg-main);
+  color: var(--color-text-primary) !important;
+  font-weight: 600 !important;
+  border-left: var(--style-border-divider) solid var(--compare-featured-line);
+  border-right: var(--style-border-divider) solid var(--compare-featured-line);
+}
+
+/* DECISION (nie usuwaj tego komentarza):
+ * .highlightCol świadomie ma border-left I border-right (NIE jednostronny —
+ * to pełna pionowa ramka kolumny polecanej, oba boki obecne razem).
+ * Górę/dół ramki domykają border-top nagłówka + border-bottom ostatniego
+ * wiersza niżej. To NIE łamie anti-slop §"zero jednostronnych borderów"
+ * (tam chodzi o dekoracyjny pojedynczy bok); border-left+right = ramka. */
+
+/* Nagłówek kolumny Pro: tonal step ponad bazowe 22% pozostałych nagłówków
+ * (frozen-tint, NIE solidny złoty blok — głos ownera S23/1) + domknięcie
+ * ramki kolumny od góry. */
+.comparisonTable thead th.highlightCol {
+  background: var(--color-bg-main);
+  border-top: var(--style-border-divider) solid var(--compare-featured-line);
+}
+
+.comparisonTable tbody tr:last-child td.highlightCol {
+  border-bottom: var(--style-border-divider) solid var(--compare-featured-line);
+}
+
+/* Globalny reset nadaje `svg { display: block }`, więc `text-align: center`
+   komórki NIE centruje glifu: bez marginesu auto ptaszek przykleja się do lewej
+   krawędzi content-boxu (zmierzone odchyły od środka kolumny: 26 do 92px).
+   `margin-inline: auto` centruje go w KAŻDEJ kolumnie niezależnie od jej
+   szerokości. Owner 2026-08-19: ptaszki mają być wszędzie wycentrowane. */
+.tableCheck {
+  /* WCAG 1.4.11 (DESIGN.md §Gold-as-text): ptaszek NIESIE ZNACZENIE, więc
+     idzie przez --color-accent-fg (4.91:1 light / 9.9:1 dark). Jasny
+     --color-primary dawał 2.2:1 na papierze — po zdjęciu tintów tabela stoi
+     na czystej bieli i blady ptaszek gubił się zupełnie. */
+  color: var(--color-accent-fg);
+  margin-inline: auto;
+}
+
+.tableCross {
+  /* text-disabled-allow: semantyczny glif niedostepnej funkcji, dim celowy */
+  color: var(--color-text-disabled);
+  opacity: 0.6;
+  margin-inline: auto;
+}
+
+/* ── Mobile: card-per-tier (default), hidden from >=768px ── */
+.compareCards {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 3vw, 18px);
+}
+
+.compareCard {
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  padding: clamp(18px, 4.5vw, 22px);
+}
+
+/* Karta planu polecanego (Pro) — parytet 1:1 z desktopową .highlightCol:
+ * motyw „Jeden krem" (S94/R3) wyróżnia ZAMKNIĘTĄ ramą i wagą, nie fillem. */
+.compareCardRecommended {
+  background: var(--color-bg-main);
+  border-color: var(--compare-featured-line);
+  --compare-card-name: var(--color-text-primary);
+  --compare-card-price: var(--color-accent-fg);
+  --compare-row-fg: var(--color-text-primary);
+  --compare-row-muted: var(--color-text-primary);
+}
+
+.compareCardHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+}
+
+.compareCardName {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  letter-spacing: var(--ls-tight-10);
+  color: var(--compare-card-name, var(--color-text-primary));
+}
+
+.compareCardPrice {
+  /* Cyfry tabelaryczne: ceny sasiadujacych pakietow musza stac w kolumnie,
+     a przelacznik miesiac/rok nie moze przesuwac znakow (F3.2). */
+  margin-top: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--compare-card-price, var(--color-accent-fg));
+}
+
+.compareCardList {
+  margin: clamp(14px, 3.5vw, 18px) 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.compareRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  min-height: 44px;
+  padding: var(--space-8) 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+.compareRow:first-child {
+  border-top: none;
+}
+
+.compareRow dt {
+  color: var(--compare-row-muted, var(--color-text-primary));
+  text-align: left;
+  hyphens: auto;
+}
+
+.compareRow dd {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--compare-row-fg, var(--color-text-primary));
+}
+
+@media (min-width: 768px) {
+  .compareCards {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .tableWrapper {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 5. FAQ (na samym dole, tuż nad finalCta — głos ownera S24) — skórka żyje
+ *    we współdzielonym FaqSection (kanon = pricing W6); per-page zostaje
+ *    wyłącznie full-bleed band + szerokość kontenera.
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band = Section (tone subtle: bg-subtle + pełna rama hairline z kanonu —
+ * S24: tint bez ramy "rozlewa sie" na bieli, DECISION w Section.tsx);
+ * kontener lp-szerokości daje constrained inner Section (nagłówek wyrównany,
+ * lista Q&A centruje się sama, 72ch w molecule). Tu zostaje rytm strony. */
+.faqSection {
+  --section-pad-block: var(--section-block);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 4. TRUST — W6 card-style 3-column with icon badge (statyczne, bez hover)
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band = Section (plain + bordered: pełną ramę hairline niesie prop bordered).
+ * Motyw „Jeden krem” (S94/R1): banda idzie na PAPIER. Wcześniej miała własny
+ * wash fioletu 5% — trzecią powierzchnię na stronie, która ma już swój jeden
+ * krem i pełne negatywy; fiolet był przy tym odcieniem spoza palety
+ * charcoal-gold, obronionej w tym samym głosowaniu (wariant F odrzucony). */
+.trustSection {
+  --section-pad-block: var(--section-block);
+  --feature-card-bg: var(--color-surface-card);
+  --feature-card-pad: var(--space-24);
+  --feature-grid-gap: var(--space-24);
+  background: var(--color-bg-main);
+  /* Paper gutter before unframed reviews (bands were flush besides hairlines). */
+  margin-bottom: var(--space-24);
+}
+
+/* Section inner is the trio module. The band only has border-block, so without
+ * this closed 4-side frame the three cards share paper with testimonials. */
+.trustSection > * {
+  box-sizing: border-box;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-24);
+  background: var(--color-bg-main);
+}
+
+/* ─── 6. FINAL CTA — przeniesione do współdzielonego molecule
+ * components/FinalCtaBand (kanon gold-band; style i pattern żyją tam). ─── */
+
+/* Czytelny link „porównaj" w anchor bannerze — gold-ink wariant (WCAG 1.4.3).
+ * Było: --color-primary (#e0b341) na cream bg = 1.82:1 (FAIL).
+ * --color-accent-fg (#8a6d18) = 4.56:1 na cream — kanon dla małego gold-tekstu. */
+.anchorBannerCompareLink {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-accent-fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .anchorBannerCompareLink:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 5b. TRIAL ENDOWMENT — zamknięta ink-karta (statement, taste 39) między FAQ
+ * a final CTA. Endowment + loss-frame trialu. Split editorial: head (eyebrow +
+ * serif title + intro) | lista wierszy on-ink; footnote pełną szerokość pod
+ * spodem. Floor: solid ink fill, pełny 4-boczny hairline (InkPanel), wiersze =
+ * pełne linie (nie jednostronny accent), zero ikon/cieni/gradientów.
+ * ───────────────────────────────────────────────────────────────────── */
+.endowmentSection {
+  --section-pad-block: var(--section-block);
+  /* FAQ band is flush against this section (gap 0). Keep FAQ composition. */
+  margin-top: var(--space-24);
+}
+
+/* Inset the ink rectangle from the 1200px column so it reads as a closed
+ * card, not a full-width slab under FAQ. */
+.endowmentSection > * {
+  box-sizing: border-box;
+  padding: var(--space-24);
+}
+
+.endowmentPanel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 4vw, 44px);
+  /* InkPanel .ink is 0,2,0; pair with the section so light-mode rim wins. */
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+.endowmentSection .endowmentPanel {
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 28%, var(--color-ink));
+}
+
+/* Grupa head = jedna kolumna gridu; min-width:0 broni przed overflow długiego
+ * serif-tytułu w torze grid (grid child domyślnie min-width:auto). */
+.endowmentHead {
+  min-width: 0;
+}
+
+/* Eyebrow on-ink: recolor gold (--color-primary) — kreska chip::before idzie
+ * currentColor, więc jeden hook maluje napis i kreskę (kanon on-ink). */
+.endowmentEyebrow {
+  --eyebrow-color: var(--color-accent-on-ink);
+  margin-bottom: clamp(14px, 1.8vw, 20px);
+}
+
+.endowmentTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.14;
+  letter-spacing: var(--ls-tight-10);
+  color: var(--color-on-ink);
+  text-wrap: balance;
+}
+
+.endowmentIntro {
+  margin: clamp(14px, 1.8vw, 20px) 0 0;
+  max-width: 46ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+  color: color-mix(in oklch, var(--color-on-ink) 90%, var(--color-ink));
+}
+
+.endowmentList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.endowmentItem {
+  padding-block: clamp(12px, 1.5vw, 16px);
+  border-block-start: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-on-ink) 15%, transparent);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: color-mix(in oklch, var(--color-on-ink) 92%, var(--color-ink));
+}
+
+.endowmentItem:last-child {
+  border-block-end: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-on-ink) 15%, transparent);
+}
+
+.endowmentFootnote {
+  margin: clamp(20px, 2.4vw, 28px) 0 0;
+  grid-column: 1 / -1;
+  max-width: 60ch;
+  font-size: var(--text-xs);
+  line-height: 1.55;
+  text-wrap: pretty;
+  color: color-mix(in oklch, var(--color-on-ink) 92%, var(--color-ink));
+}
+
+/* Dark: bg strony i --color-ink to bliskie czernidła (lekcja premiumBand) —
+ * ink-karta rozmywała się z tłem. Tonal step o krok jaśniejszy + mocniejszy
+ * pełny hairline (4-bok) przywraca „zamknięty prostokąt". Zero gold (to nie
+ * sygnał premium jak band planów) — neutralne odcięcie. */
+[data-mode='dark'] .endowmentPanel {
+  background: color-mix(in oklch, var(--color-ink) 90%, var(--color-on-ink));
+  border-color: color-mix(in oklch, var(--color-on-ink) 34%, var(--color-ink));
+}
+
+/* Split editorial ≥768px (fresh-eyes r1): grid-areas head/lista/footnote —
+ * footnote ląduje POD head w lewej kolumnie (koniec z osieroconą pustką w
+ * prawym-dolnym kwadrancie), lista rozpięta na obie rzędy w prawej. DOM
+ * order head→lista→footnote (stack mobile + a11y) zachowany. */
+@media (min-width: 768px) {
+  .endowmentPanel {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'head list'
+      'foot list';
+    column-gap: clamp(40px, 5vw, 72px);
+    row-gap: 0;
+  }
+
+  .endowmentHead {
+    grid-area: head;
+  }
+
+  .endowmentList {
+    grid-area: list;
+  }
+
+  .endowmentFootnote {
+    grid-area: foot;
+    align-self: end;
+    margin-top: clamp(28px, 3.4vw, 44px);
+  }
+}
+
+/* S108, głos 5 (desktop 1500): hero C zwarty rejestr, trio A jedna płyta,
+   panel trialu A jedno pole. Tylko ≥1280, mobile bez zmian. */
+@media (min-width: 1280px) {
+  .hero {
+    padding-block: var(--space-32);
+    gap: var(--space-24);
+  }
+
+  .hero .heroInner {
+    gap: var(--space-16);
+    max-width: 68ch;
+    min-width: 0;
+  }
+
+  .hero .heroHeadline {
+    font-size: var(--text-fluid-2xl);
+    line-height: 1.06;
+    max-width: 18ch;
+  }
+
+  .hero .heroLede {
+    font-size: var(--text-fluid-sm);
+    max-width: 52ch;
+  }
+
+  .hero .heroCtaRow {
+    margin-top: 0;
+    padding-block: var(--space-24) 0;
+  }
+
+  /* 0-2-0 bije TrustSignals .list { padding: 0 } na tym samym elemencie. */
+
+  .trustSection {
+    --section-pad-block: var(--space-32);
+    --feature-grid-gap: var(--space-32);
+    --feature-card-border: none;
+    --feature-card-bg: transparent;
+    --feature-card-pad: 0;
+    --feature-card-gap: var(--space-16);
+    --feature-card-icon-size: var(--space-32);
+    --feature-card-title-size: var(--text-fluid-lg);
+    --feature-card-body-size: var(--text-md);
+    --feature-card-body-lh: var(--leading-body);
+  }
+
+  /* S107 ramowała inner przez > *; na desktopie ramę niesie trustInner. */
+  .trustSection > * {
+    border: none;
+    padding: 0;
+    background: transparent;
+  }
+
+  .trustSection > .trustInner {
+    border: var(--style-border-surface) solid var(--color-border-surface);
+    padding: var(--space-32);
+    min-width: 0;
+  }
+
+  .trustGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .endowmentPanel {
+    column-gap: var(--space-32);
+    align-items: start;
+  }
+
+  .endowmentHead,
+  .endowmentList {
+    min-width: 0;
+  }
+
+  .endowmentTitle {
+    font-size: var(--text-fluid-xl);
+  }
+
+  .endowmentItem {
+    padding-block: var(--space-16);
+  }
+}
+
+.contextualIllustration {
+  --illustration-frame: var(--color-on-ink);
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  height: auto;
+}
