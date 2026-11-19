@@ -1,0 +1,123 @@
+/* UI/features/shared/profile/ProfileShareCard.module.css
+ * The stylist's own profile link: one sentence, the full address with a
+ * trailing copy glyph, then „Udostępnij” and „Zobacz profil” in one row.
+ * White box on paper; the address is plain text in it (no box in a box). */
+
+.card {
+  /* Quiet buttons in a white box: the fill comes from the primitive, the box adds only a stronger
+     hover step (same as .cardStack in AccountPage.module.css). */
+  --btn-quiet-hover-bg: var(--color-mark-bg-strong);
+  background: var(--color-surface-card);
+  /* The card sits in a phone column, a 280px aside and a 900px page: its
+     rows read ITS width, never the viewport. */
+  container-type: inline-size;
+  /* Inside a centred success scene the card still reads left to right. */
+  text-align: start;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.title {
+  margin: 0;
+}
+
+.body {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* --- Address + copy --- */
+
+/* The primitive owns focus and press feedback; the full URL wraps in its label. */
+.address.address {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  text-align: start;
+  white-space: normal;
+  color: var(--color-text-primary);
+}
+
+.address > span {
+  width: 100%;
+  min-width: 0;
+}
+
+.urlContent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  width: 100%;
+  min-width: 0;
+}
+
+.url {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* Both glyphs reserve the same box, aligned to the address's first line. */
+.copyGlyph {
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
+  flex: none;
+  width: var(--space-20);
+  height: 1lh;
+  font-size: var(--text-base);
+  line-height: 1.4;
+}
+
+.copyGlyph > svg {
+  grid-area: 1 / 1;
+  width: var(--space-20);
+  height: var(--space-20);
+  opacity: 0;
+  transition: opacity var(--outcome-change-duration) ease;
+}
+
+.copyGlyph > [data-shown] {
+  opacity: 1;
+}
+
+.copyGlyph > svg:last-child {
+  color: var(--color-success);
+}
+
+/* --- Actions: one row, whole buttons wrap when it is too narrow --- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.action {
+  flex: 1 1 auto;
+}
+
+/* On a wide card a button takes its own width instead of half of 900px. */
+@container (min-width: 480px) {
+  .action {
+    flex: 0 0 auto;
+  }
+}
+
+/* The link card at the top of the profile screens: the same white box as
+   the screen's sections, without the Card primitive's padding wrapper. */
+.linkCard {
+  display: grid;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}

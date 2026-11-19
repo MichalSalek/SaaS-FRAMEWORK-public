@@ -1,0 +1,234 @@
+/* ─── LpHero: the canonical hero of static pages (LP) ───
+ * The ONLY LP hero pattern; a change here changes every page. Typography
+ * matches the ForStylistsPage .heroHeadline canon; the entire title has one
+ * foreground, and the lede follows the pricing/get-app sources. Floor: no gradients
+ * or shadows; the entrance is one-shot on mount, NOT scroll-reveal. */
+
+/* Full-bleed section (FinalCtaBand pattern); --section-gutter is defined per
+ * page on .page, and the fallback holds the canon value when a page omits it. */
+/* Public knobs (DESIGN.md Style Policy 13): the host overrides the VARIABLE,
+ * not the declaration. `.hero[data-has-media]` has specificity 0-2-0, so a page
+ * class (0-1-0) would never beat min-height, and bundle order follows imports,
+ * not intent. Canon values live in the fallbacks. A non-LP consumer (e.g. the
+ * hero in the /app/home column) zeroes bleed and height with one set of vars. */
+.hero {
+  width: var(--lp-hero-width, 100vw);
+  margin-left: var(--lp-hero-bleed, calc(50% - 50vw));
+  background: var(--color-bg-main);
+  /* Low top spacing on a phone (40 px): the page's mark (`media`) must be
+     visible on the first screen, not below the fold. */
+  padding: var(--lp-hero-pad-top, clamp(40px, 10vw, 144px))
+    var(--lp-hero-pad-inline, var(--section-gutter, clamp(20px, 5vw, 56px)))
+    var(--lp-hero-pad-bottom, clamp(52px, 7vw, 112px));
+  display: flex;
+  align-items: center;
+}
+
+.hero[data-tone='white'] {
+  background: var(--color-surface-card);
+}
+
+/* min-height only when there is media, so a text-only hero (pricing pattern)
+ * does not inflate to 72vh. */
+.hero[data-has-media] {
+  min-height: var(--lp-hero-min-height, clamp(480px, 72vh, 840px));
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: var(--lp-hero-columns, minmax(0, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  animation: lp-hero-rise var(--duration-300) var(--ease-entrance) both;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: var(--lp-hero-content-align, flex-start);
+  text-align: var(--lp-hero-text-align, inherit);
+  gap: clamp(18px, 2.4vw, 30px);
+  min-width: 0;
+}
+
+/* Media (PhoneMockup / collage / photo): below 768px it drops UNDER the text
+ * (one column, DOM order content then media); a page may hide it via className
+ * for a text-only mobile hero (for-stylists pattern). */
+.media {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Asymmetric split: text 7fr / media 5fr, only when media exists. */
+@media (min-width: 768px) {
+  .hero[data-has-media] .inner {
+    /* Public knob: a stage wider than a phone (two photo cards, a small
+       gallery) takes half the row via `--lp-hero-media-fr: 6fr` together
+       with `--lp-hero-text-fr: 6fr`. */
+    grid-template-columns: var(
+      --lp-hero-columns,
+      minmax(0, var(--lp-hero-text-fr, 7fr))
+        minmax(0, var(--lp-hero-media-fr, 5fr))
+    );
+    align-items: center;
+    gap: clamp(28px, 4vw, 64px);
+  }
+}
+
+/* Layout "center": text centred, media below it across the content width. */
+.hero[data-layout='center'] {
+  /* The text is short and centred: a lower top spacing leaves room for the
+     media below it on the first desktop screen. */
+  padding-top: var(--lp-hero-pad-top, clamp(40px, 6vw, 88px));
+  align-items: flex-start;
+}
+
+.hero[data-layout='center'] .inner {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+.hero[data-layout='center'][data-has-media] .inner {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hero[data-layout='center'] .content {
+  align-items: center;
+  text-align: center;
+}
+
+.hero[data-layout='center'] .headline {
+  max-width: var(--lp-hero-headline-measure, calc(20 * var(--ch-heading)));
+}
+
+.hero[data-layout='center'] .actions {
+  justify-content: center;
+}
+
+.hero[data-layout='center'] .meta {
+  align-items: center;
+}
+
+.hero[data-layout='center'] .media {
+  width: 100%;
+}
+
+/* DECISION: the entrance moves the block, it never fades it. The hero holds the page's largest text
+ * and image, and an element painted at `opacity: 0` is not a Largest Contentful Paint candidate:
+ * Chrome skipped the headline and the phone shot and reported the header wordmark (Lighthouse
+ * mobile, every LP), and in a real browser the headline counted only after the fade (+200 ms on a
+ * 4x CPU). Transform-only matches the house rule for hero entrances (LegalDocLayout, About). */
+@keyframes lp-hero-rise {
+  from {
+    transform: translateY(16px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Canon: heroHeadline from ForStylistsPage, 1:1. */
+.headline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* Public knob (like --lp-hero-* above): the fluid scale is computed from the
+   * VIEWPORT width, so the same hero in a narrow column (web-home in /app, 940px
+   * beside the rail) got a size meant for 1440 and broke into five lines. The
+   * host swaps the scale STEP, not the declaration. */
+  font-size: var(--lp-hero-headline-size, var(--text-fluid-3xl));
+  line-height: 1;
+  letter-spacing: var(--ls-tight-25);
+  color: var(--color-text-primary);
+  margin: 0;
+  /* Second public knob: the MEASURE, separate from the scale step. 16 x
+   * --ch-heading is in the heading's EMS, so it scales WITH the font: a smaller
+   * step narrows the block proportionally and wins back no line. On a full-width
+   * LP the measure is a typographic limit and stays; a host in a narrow column
+   * (web-home /app/home: 440px of text) sets it to `none`, as the grid already
+   * sets the measure there. */
+  max-width: var(--lp-hero-headline-measure, calc(16 * var(--ch-heading)));
+  text-wrap: balance;
+  hyphens: none;
+  /* Safety net: a word wider than the column breaks instead of overflowing
+     the screen. `anywhere`, because only that value also lowers the box's
+     minimum width. */
+  overflow-wrap: anywhere;
+}
+
+/* DECISION: German compounds ("Kundinnenhistorie", "Inspirationssitzung") are wider than the 360px
+   phone column and the headline overflowed the screen on three pages (right edge 369 to 377px in a
+   360px window). Headlines stay unhyphenated, with one exception: in German on a phone a long
+   compound breaks at the seam ("Kundinnen-historie"), as in German typography. On wider windows
+   the column fits the words whole. */
+@media (max-width: 479px) {
+  .headline:lang(de) {
+    hyphens: auto;
+    hyphenate-limit-chars: 14 6 6;
+  }
+}
+
+/* DECISION: two-color heading fragments are AI slop. Trailing text inherits the heading.
+ * This supersedes the former colored/italic accent canon. (owner) */
+
+/* Lede, per the pricing/get-app sources: 16-19px, measure 56ch. */
+.lede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: calc(56 * var(--ch-body));
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* The page's key phrase run into the description: the `<h1>` and the rest of
+   the paragraph flow in one line of text. The heading inherits the description's
+   face and size, set apart only by ink and weight, so it reads as the start of a
+   sentence. */
+.lead,
+.ledeRest {
+  display: inline;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.lead {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.actions {
+  display: flex;
+  justify-content: var(--lp-hero-actions-align, flex-start);
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  flex-wrap: wrap;
+  margin-top: clamp(8px, 1vw, 16px);
+}
+
+.aside {
+  display: flex;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+.hero[data-layout='center'] .aside {
+  justify-content: center;
+}
+
+/* ONE line under the actions (what it costs and what the click risks). */
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(6px, 1vw, 12px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}

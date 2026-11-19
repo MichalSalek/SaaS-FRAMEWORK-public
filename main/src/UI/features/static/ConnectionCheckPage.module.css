@@ -1,0 +1,92 @@
+/* ConnectionCheckPage — diagnostics.
+ * The intro is the shared SystemNoticeOrganism (same idiom as 404 and 500);
+ * this file holds the result sentence and the read-only list of checks.
+ *
+ * DECISION: the list is read-only: ONE white frame, rows split by a line, each row a name,
+ * one sentence and a status pill. No leading icons, no per-row cards, no green band on top
+ * (state lives in the pill and the sentence under the title). Time, version and language are
+ * one quiet line under the list, never beside the list header (it broke at 390px).
+ * (owner) */
+
+.overall {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.checks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.checksHeading {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.checksList {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  /* Two text lines reserved: a row does not grow when the result replaces
+   * the description. */
+  min-height: 76px;
+  padding: var(--space-12) 0;
+}
+
+.checkRow:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.checkBody {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.checkLabel {
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.checkDescription {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.checkPill {
+  flex: none;
+}
+
+.diagnosticLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-20);
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.diagnosticItem {
+  white-space: nowrap;
+}

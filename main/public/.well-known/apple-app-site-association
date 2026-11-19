@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAMID.com.nailfolio.app",
+        "paths": [
+          "/api/auth/magic-link/verify*",
+          "/app",
+          "/app/*",
+          "/en/app",
+          "/en/app/*",
+          "/de/app",
+          "/de/app/*"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+/* ─── TrustProse — canonical trust prose (owner vote).
+ * One editorial sentence in a single foreground instead of an
+ * icon+bullet trust list. No icons, no shadows/gradients (floor 7×ZERO).
+ * Static, so no hover. */
+
+.wrap {
+  margin: 0 auto;
+}
+
+.prose {
+  max-width: calc(62 * var(--ch-heading));
+  margin: 0 auto;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-xl);
+  line-height: 1.5;
+  letter-spacing: var(--ls-tight-5);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* DECISION: see ../LpHero/LpHero.module.css (single-color statements). */
+.prose em {
+  font-style: inherit;
+  color: inherit;
+}
+
+.note {
+  max-width: calc(56 * var(--ch-body));
+  margin: var(--space-14) auto 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* Left alignment (e.g. in splits / columns) */
+.start .prose,
+.start .note {
+  text-align: left;
+  margin-inline: 0;
+}
+
+/* ─── tone='ink' — on a closed ink card / negative surface ─── */
+.ink .prose {
+  color: var(--color-on-ink);
+}
+.ink .note {
+  color: color-mix(in oklch, var(--color-on-ink) 70%, transparent);
+}

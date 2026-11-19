@@ -1,0 +1,598 @@
+/* ─── PublicLayout ───
+ * Marketing-site layout: header (sticky, scroll-aware compact) + main + footer.
+ * Mobile-first. Breakpoints: 480 / 768 / 1024 / 1280.
+ */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--color-bg-main);
+}
+
+/* ─── Skip link (WCAG 2.4.1) ─── */
+.skipLink {
+  position: absolute;
+  top: -100%;
+  left: var(--space-12);
+  z-index: var(--z-skip-link);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: var(--style-radius-control);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: top var(--transition-fast);
+}
+
+.skipLink:focus-visible {
+  top: var(--space-12);
+}
+
+/* ─── AppBar wrapper — owns sticky + scroll-aware compact state ─── */
+.appBarWrapper {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-app-bar);
+  /* Capacitor WebView: protect logo/nav from notch / status bar */
+  padding-top: env(safe-area-inset-top, 0px);
+  /* tint-allow: same plane as the AppBar so the strip under the notch does not cut off from the bar */
+  background: var(--color-bg-subtle);
+}
+
+/* AppBar override — let the wrapper own stickiness. The AppBar itself carries
+ * the background and the bottom line (see the DECISION at `.appBar` in
+ * AppBar.module.css); the separator after scrolling is that same full line,
+ * NOT a shadow (anti-slop §2). */
+.appBar {
+  position: static !important;
+  background: transparent;
+}
+
+.appBarWrapper[data-compact] .logoLink {
+  font-size: var(--text-base);
+}
+
+/* Phone: the compact bar is 45 px instead of 57 (owner: save those 12 px of height on mobile
+   while browsing). The bar gives 12 px to the view but takes the same space in the page
+   layout: a margin carries the missing 12 px. Without it every toggle would shift the whole
+   content by 12 px (iOS browsers do not anchor scrolling, so the page would jump). */
+@media (max-width: 767.98px) {
+  .appBarWrapper {
+    transition: margin-bottom var(--duration-200) var(--ease-entrance);
+  }
+
+  /* The height is carried by the token that also drives the menu's top edge.
+     The margin sits on the WRAPPER, outside its background: on the bar it stayed inside
+     the wrapper and the freed 12 px was painted with the bar background. */
+  .appBarWrapper[data-compact] {
+    --app-bar-height: 45px;
+    margin-bottom: var(--space-12);
+  }
+}
+
+/* Logo link — overrides default <a> color reset */
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: var(--space-8);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  /* shape-allow: owner requested a 2px current-page underline, distinct from frame widths */
+  border-bottom: 2px solid transparent;
+  padding-inline: var(--space-12);
+  transition:
+    font-size var(--duration-200) var(--ease-entrance),
+    background var(--transition-fast),
+    transform var(--duration-100) var(--spring-snappy);
+}
+
+.logoLink[aria-current='page'] {
+  border-bottom-color: var(--color-accent-fg);
+}
+
+@media (hover: hover) {
+  .logoLink:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+.logoLink:active {
+  background: var(--color-surface-pressed);
+  transform: scale(0.97);
+}
+
+/* The nf mark scales with the logoLink font-size: compact mode (44px bar) shrinks wordmark and
+ * mark together, with no separate rule. The mark is deliberately larger than the wordmark
+ * (owner): a stronger brand anchor. */
+.logoMark {
+  height: 1.9em;
+  width: auto;
+}
+
+/* ─── Content ─── */
+.content {
+  flex: 1 1 auto;
+  width: 100%;
+  background: var(--color-bg-main);
+  /* Pages own their padding/max-width */
+  /* Full-bleed breakouts (width:100vw + margin-left:calc(50% - 50vw)) count the width WITH the
+   * scrollbar; on classic scrollbars (Windows) every page with a band got ~15px of horizontal
+   * scroll. clip (NOT hidden: no scroll container, position:sticky keeps working) cuts the
+   * invisible overflow; pattern from HomePage.module.css. */
+  overflow-x: clip;
+}
+
+/* ─── Footer ─── */
+/* The footer is ALWAYS dark (owner): in light and dark theme alike it sits on mode-invariant ink,
+ * clearly signalling the end of the page (a light footer blended with the content).
+ * Mechanism: a local re-scope of the semantic tokens onto the ink palette, so the whole tree
+ * (Typography, links, badges, the newsletter Input) inherits the inversion with no per-component
+ * overrides. --color-primary stays (gold button, gold icon hover = ink-block canon; the pale-gold
+ * disabled DECISION is untouched). */
+.footer {
+  /* Deepened ink (a tonal step BELOW the pages' ink bands): informational pages end with an ink
+   * finale, and a footer in pure --color-ink would merge with it into one black wall. A step down
+   * plus a hairline keep a readable „this is the last layer" boundary. */
+  --footer-bg: color-mix(in oklch, black 22%, var(--color-ink));
+
+  --color-text-primary: var(--color-on-ink);
+  --color-text-secondary: color-mix(
+    in oklch,
+    var(--color-on-ink) 72%,
+    transparent
+  );
+  --color-text-disabled: color-mix(
+    in oklch,
+    var(--color-on-ink) 40%,
+    transparent
+  );
+  --color-divider: color-mix(in oklch, white 16%, transparent);
+  --color-border: color-mix(in oklch, white 28%, transparent);
+  /* Frameless surfaces on ink too. The role is an alias computed on <html>, so the local
+   * palette must supply it itself. */
+  --color-border-surface: transparent;
+  /* The whole surface ladder must be remapped COMPLETELY: the footer is a local ink palette,
+   * so any token skipped here falls back to its light-theme value and flashes a light patch
+   * on the dark background. Today the footer holds only a `primary` button, so a missing
+   * pressed token would stay latent (a quiet button's `:active` uses pressed). */
+  --color-surface-interactive: color-mix(in oklch, white 8%, var(--footer-bg));
+  /* On ink the surface alone is not enough as a field boundary, so footer controls keep
+     a quiet line. */
+  --color-control-border: color-mix(in oklch, white 28%, transparent);
+  --color-surface-input: var(--color-surface-interactive);
+  --color-surface-hover: color-mix(in oklch, white 10%, var(--footer-bg));
+  --color-surface-pressed: color-mix(in oklch, white 14%, var(--footer-bg));
+  --color-bg-subtle: color-mix(in oklch, white 5%, var(--footer-bg));
+  --color-icon-muted: color-mix(in oklch, var(--color-on-ink) 60%, transparent);
+  /* The active field's placeholder uses --color-text-muted (Input canon), calibrated for a
+     LIGHT background: in the footer it gave 3.21:1, below AA. The newsletter is the only
+     footer field but renders on EVERY public page. Same gap as pressed: remap the ladder
+     COMPLETELY. */
+  --color-text-muted: color-mix(in oklch, var(--color-on-ink) 68%, transparent);
+
+  margin-top: auto;
+  background: var(--footer-bg);
+  /* DECISION: focus ring on ink uses --color-accent-on-ink. The base ring in LIGHT is exactly
+     --color-ink (invisible here, 1.00:1) and the red --color-primary is dark in LIGHT (3.6:1 on
+     ink, below AA). The role is mode-invariant, so both modes share one indicator. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border-top: var(--style-border-divider) solid
+    color-mix(in oklch, white 16%, var(--footer-bg));
+  /* Native controls (consent checkbox) render dark. */
+  color-scheme: dark;
+  padding: var(--space-48) 0 var(--space-20);
+  /* Capacitor WebView: respect bottom safe area on devices without bottom nav */
+  padding-bottom: calc(var(--space-20) + env(safe-area-inset-bottom, 0px));
+}
+
+/* SupportFloatingButton (fixed bottom-right 48px + --sp-4, on nearly all public pages except
+ * /contact and /help-center): without a buffer the copyright/social/last footer row hides
+ * under the FAB at scroll end (mostly on mobile, which has no gutter; on desktop the FAB sits
+ * in the column margin). Buffer = FAB height + gap. Rule BEFORE sticky-CTA: when a page has
+ * BOTH, the taller sticky buffer (later in source, equal specificity) wins. */
+.layout:has([data-support-fab]) .footer {
+  padding-bottom: calc(
+    var(--space-20) + 64px + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* The FAB rises ABOVE StickyCtaBar while the bar is visible (mobile: full-width bar docked at
+ * bottom:0, z-index 100 > FAB 50; without the raise the bar covered the FAB, leaving a
+ * sliver). ~80px = bar height (~69px) + gap. Desktop: the bar is a centred card (max 600px)
+ * and the FAB sits in the right gutter, so no collision and no raise. */
+@media (max-width: 767.98px) {
+  .layout:has([data-sticky-cta][data-visible]) [data-support-fab] {
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* DECISION: on a phone the first screen of a sales page belongs to its one CTA;
+ * the support bubble covered the price text there, so it appears with the first
+ * scroll (`data-scrolled` on the header). Only pages with a sticky CTA bar: short
+ * pages without one (login) keep the bubble at once. Desktop is unaffected, the
+ * bubble sits in the column margin. (owner) */
+@media (max-width: 767.98px) {
+  .layout:has([data-sticky-cta]):not(:has([data-scrolled])) [data-support-fab] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/* Pages with StickyCtaBar (floating CTA, [data-sticky-cta] in main): the bar floats over the
+ * footer and covered the copyright, so the footer gets extra padding-bottom of the bar's
+ * height (owner). Mobile: docked bar ~60px; desktop: card ~58px + bottom gap var(--space-20). */
+.content:has([data-sticky-cta]) ~ .footer {
+  padding-bottom: calc(
+    var(--space-20) + 64px + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* Pages with BOTH (StickyCtaBar + FAB = all public LPs): at scroll end the bar is visible, so
+ * the FAB stands raised above it (~80px, top ~128px). The footer must clear the raised FAB,
+ * not only the bar (mobile). */
+@media (max-width: 767.98px) {
+  .layout:has([data-support-fab]) .content:has([data-sticky-cta]) ~ .footer {
+    padding-bottom: calc(
+      var(--space-20) + 120px + env(safe-area-inset-bottom, 0px)
+    );
+  }
+}
+
+@media (min-width: 768px) {
+  .content:has([data-sticky-cta]) ~ .footer {
+    padding-bottom: calc(var(--space-20) + 88px);
+  }
+}
+
+.footerInner {
+  width: 100%;
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  padding: 0 var(--space-20);
+}
+
+/* ─── Footer: Links (3 columns) ─── */
+.footerLinks {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-32);
+  margin-bottom: var(--space-32);
+}
+
+@media (min-width: 480px) {
+  .footerLinks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-20) var(--space-48);
+  }
+}
+
+.footerColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.footerTitle {
+  text-transform: var(--style-label-case);
+  font-weight: 700;
+  margin-bottom: var(--space-8);
+  color: var(--color-text-secondary);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+}
+
+.footerLink {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  /* Min 44px touch target (WCAG 2.5.5) */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.footerLink:active {
+  opacity: 0.7;
+}
+
+@media (hover: hover) {
+  .footerLink:hover {
+    color: var(--color-text-primary);
+  }
+}
+
+/* ─── Footer: Newsletter ─── */
+.newsletter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  max-width: 360px;
+  margin: 0 auto;
+  padding: var(--space-32) 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  text-align: center;
+}
+
+.newsletterForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+}
+
+.newsletterFormRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-12);
+  width: 100%;
+}
+
+.newsletterInput {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Success/error lightened by mixing with white: the footer is ALWAYS dark, and the light-theme
+ * --color-success/--color-error (#15803d/#dc2626) give ~3:1 on it, below AA for small text. */
+.newsletterSuccess {
+  color: color-mix(in oklch, var(--color-success) 55%, white);
+  padding: var(--space-12) 0;
+}
+
+.newsletterError {
+  color: color-mix(in oklch, var(--color-error) 55%, white);
+  padding: var(--space-8) 0 0;
+}
+
+.newsletterConsent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  width: 100%;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+
+.newsletterConsentText {
+  flex: 1 1 auto;
+  line-height: 1.4;
+}
+
+.newsletterConsentLink {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+.newsletterConsentLink:hover {
+  opacity: 0.8;
+}
+
+/* ─── Footer: Trust badges ─── */
+.trustBadges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-12) var(--space-32);
+  padding: var(--space-20) 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  /* Reset list defaults */
+  list-style: none;
+  margin: 0;
+}
+
+.trustBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+/* ─── Footer: Social links ─── */
+.socialLinks {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-32);
+  padding: var(--space-12) 0 var(--space-20);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--style-radius-pill);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .socialLink:hover {
+    color: var(--color-primary);
+    background: var(--color-surface-hover);
+  }
+}
+
+.socialLink:active {
+  opacity: 0.7;
+}
+
+/* ─── Footer: Bottom (company info + copyright) ─── */
+.footerBottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  padding-top: var(--space-20);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.companyInfo {
+  color: var(--color-text-secondary);
+}
+
+/* The nf mark in the footer: brand sign-off above the company line. */
+.footerBrandMark {
+  height: 28px;
+  width: auto;
+}
+
+.buildVersion {
+  color: color-mix(in oklch, var(--color-on-ink) 58%, transparent);
+}
+
+/* ─── Language switcher ─── */
+.langSwitcher {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-12);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+  white-space: nowrap;
+  /* 44px touch target (WCAG 2.5.5) */
+  min-height: 44px;
+}
+
+.langSwitcher:active {
+  opacity: 0.7;
+}
+
+@media (hover: hover) {
+  .langSwitcher:hover {
+    border-color: var(--color-text-secondary);
+    background: var(--color-surface-hover);
+  }
+}
+
+.langIcon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* ─── Scroll-reveal: disabled ───
+ * DECISION: fade-in on scroll is a banned anti-slop tell, so sections render at
+ * full opacity with no transform. The `[data-scroll-reveal]` attributes and the
+ * observer in PublicLayout stay and set `data-revealed` with no visual effect;
+ * neutralised once here instead of stripping the attribute from every page. */
+.layout :global([data-scroll-reveal]),
+.layout :global([data-scroll-reveal][data-revealed]) {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Responsive ───
+ * Mobile-first. Breakpoints: 480 / 768 / 1024 / 1280.
+ * AppBar handles its own desktop nav vs mobile hamburger split (>=1280px).
+ */
+
+/* SM (>=480px): newsletter inline */
+@media (max-width: 479px) {
+  .newsletterFormRow {
+    flex-direction: column;
+  }
+}
+
+/* MD (>=768px): wider footer padding */
+@media (min-width: 768px) {
+  .footerInner {
+    padding: 0 var(--space-32);
+  }
+
+  .newsletter {
+    max-width: 480px;
+  }
+}
+
+/* LG (>=1024px): footer links justify wider */
+@media (min-width: 1024px) {
+  .footerLinks {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-20) var(--space-48);
+  }
+}
+
+/* XL (>=1280px): cap content width */
+@media (min-width: 1280px) {
+  .footerInner {
+    padding: 0 var(--space-48);
+  }
+}
+
+/* ─── AppReturnBar: exit from a public surface back to the app
+ * (when it shows: see the DECISION in PublicLayout.returnBar.molecule.tsx).
+ * Same plane as the menu bar under it (owner: a grey bar does not match the white menu), so
+ * the two read as one bar with two rows. ─── */
+.returnBar {
+  /* No `sticky` of its own: `.appBarWrapper`, which contains this bar, owns the pinning (see the
+   * comment at AppReturnBarMolecule in PublicLayout.composition.tsx). */
+  display: flex;
+  /* tint-allow: same plane as the menu bar (AppBar) */
+  background: var(--color-bg-subtle);
+  border-bottom: var(--style-border-divider) solid var(--color-divider); /* edge-stripe-allow: line between two rows of one bar, not an accent stripe */
+}
+
+.returnBarLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--style-control-min-h);
+  padding: var(--space-8) var(--space-16);
+  /* Can also be a button (history back): strip the browser look. */
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.returnBarLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .returnBarLink:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+/* Mobile keeps its original height and scroll animation. The desktop active-logo
+ * underline is intentionally restricted to desktop. (owner) */
+@media (max-width: 1279.98px) {
+  .logoLink[aria-current='page'] {
+    border-bottom-color: transparent;
+  }
+}

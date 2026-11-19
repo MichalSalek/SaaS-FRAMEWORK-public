@@ -1,0 +1,15 @@
+/* The entry price under the CTA. Reading-text size, not a footnote: it is a
+   sales argument, so we do not hide it under the smallest type step.
+   Inherited colour: the same molecule stands on a light hero and on a dark
+   final band, so its own colour would break contrast on one of them. */
+.note {
+  display: block;
+  margin-top: var(--space-12);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: inherit;
+}
+
+.yearly {
+  opacity: 0.8;
+}

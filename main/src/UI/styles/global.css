@@ -1,0 +1,472 @@
+/**
+ * Global CSS -- CSS foundation for the application.
+ *
+ * Cascade layer order (lowest to highest specificity):
+ *   reset < tokens < base < components < utilities
+ *
+ */
+
+/* --- Layer declaration (order matters) --- */
+@layer reset, tokens, base, components, utilities;
+
+/* --- Structural tokens + palette tokens --- */
+@import './tokens.css';
+@import './themes/palettes.css';
+@import './app-sections.css';
+/* Fallback faces for Schibsted until the web font arrives (generated). */
+@import './schibsted-fallback.css';
+
+/* --- CSS Reset --- */
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    /* The UA sheet resets form controls to `auto`, and `font` does not carry
+       it: without this, button labels missed the root's geometricPrecision. */
+    text-rendering: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ul,
+  ol {
+    list-style: none;
+  }
+}
+
+/* --- Base styles --- */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* DECISION: geometricPrecision, not optimizeLegibility. Both keep kerning
+       and ligatures, but Chrome on Linux (every headless lab: Lighthouse,
+       PageSpeed, Playwright) otherwise snaps glyph advances to whole pixels,
+       setting Schibsted up to 3.7% wider than phones and Macs. The lab page
+       then differed from the real one and no metric-matched fallback could
+       match it (false font-swap CLS). Phones and Macs already use linear
+       advances, so for them nothing visible changes. */
+    text-rendering: geometricPrecision;
+    /* Reserve the scrollbar gutter ALWAYS. A scroll-lock that toggles
+       `overflow:hidden` on <body> (Base UI menu/dialog, drawer) otherwise
+       removes the viewport scrollbar and shifts the whole layout sideways
+       (user 2026-06-25: the logged-in account dropdown made the LP jump as the
+       scrollbar appeared/disappeared). With a stable gutter the space is held
+       whether or not the scrollbar is painted, so opening/closing any overlay
+       is shift-free. */
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    font-family: var(--font-body, sans-serif);
+    font-weight: var(--font-weight-body, 400);
+    letter-spacing: var(--letter-spacing-body, 0);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    background-color: var(--color-bg-main);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    transition:
+      background-color var(--transition-normal),
+      color var(--transition-normal);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading, sans-serif);
+    font-weight: var(--font-weight-heading, 400);
+    letter-spacing: var(--letter-spacing-heading, 0);
+    line-height: 1.2;
+    overflow-wrap: break-word;
+  }
+
+  /* DECISION: see main/src/application/fonts.ts (font variable classes on <html>). */
+
+  /* --- Mobile-native feel --- */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    overscroll-behavior: none;
+    /* Scroll animation EVERYWHERE (owner): a jump without transition is an antipattern. Smooth
+     * scroll for anchor jumps (#anchors) and programmatic scrollTo/scrollIntoView without an
+     * explicit behavior. A targeted `behavior:'auto'` override where instant is CORRECT
+     * (restoring a saved scroll position, jump to the top of a new page on route change). */
+    scroll-behavior: smooth;
+  }
+
+  /* App-shell scroll container (AppLayout `main`): scrolls on its own, so it gets the same
+   * smoothness as the window scroll on the LP. */
+  main {
+    scroll-behavior: smooth;
+  }
+
+  button,
+  a,
+  [role='button'],
+  input,
+  select,
+  textarea,
+  label {
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection on UI chrome -- content areas opt back in */
+  button,
+  [role='button'],
+  nav,
+  [role='navigation'],
+  [role='tablist'] {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* --- Focus-visible: global accessibility --- */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [role='button']:focus-visible,
+  [tabindex]:focus-visible:not([tabindex='-1']) {
+    /* DECISION: the ring is --color-focus-ring (ink in light, light grey in dark),
+     * never --color-primary, to keep >=3:1 against the page (WCAG 1.4.11). */
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--style-radius-control);
+  }
+
+  /* The NON-keyboard focus ring is removed GLOBALLY (owner). A mouse click or PROGRAMMATIC focus
+   * (a route change lands on the scroll container or a heading; Chrome 125+ makes
+   * overflow-scroll focusable) painted an outline on the whole inner window / heading: visual
+   * noise on elements that are not controls. Only the non-keyboard ring is suppressed: a real
+   * Tab still matches :focus-visible and keeps the indicator, so WCAG 2.4.7 holds. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* The content landmark taking PROGRAMMATIC focus after a route change
+   * (NavigationTransitionController.focusAfterSettle adds tabindex=-1, focuses,
+   * drops the tabindex on blur) paints no ring either. After a redirect with no
+   * pointer input in between (/app/stylists → /app/explore, /app →
+   * /app/onboarding) Chrome counts that script focus as :focus-visible, so the
+   * rule above does not catch it and the UA outline frames the whole screen.
+   * The focus itself stays: it is what moves a screen reader to the new
+   * page. The landmark is not a control and Tab never lands on it, so no
+   * keyboard indicator (WCAG 2.4.7) is lost. */
+  #main-content[tabindex='-1']:focus {
+    outline: none;
+  }
+
+  #__next {
+    min-height: 100vh;
+  }
+}
+
+/**
+ * DD3-F11: .fontAccent utility class — accent font (Caveat) for hero/decorative
+ * headings. Previously used inline in 10+ files (StylistPairing, GalleryPage,
+ * ExploreStylistsTab, FavoritesPage, etc.) without a CSS rule — browsers fell
+ * back to body font, defeating the accent-font intent. Defining here centrally
+ * keeps the class portable (no module scoping) and consistent with how
+ * --font-caveat is exposed by _app.tsx's next/font config.
+ *
+ * The class reads the ROLE `--font-accent` from the palette (owner), not the loader directly,
+ * so swapping the accent face is one line in `palettes.css`, as for headings and text.
+ */
+@layer base {
+  .fontAccent {
+    font-family: var(--font-accent);
+  }
+}
+
+/* --- Animation Keyframes --- */
+@layer base {
+  /* Modern entrance: scale resolve (blur removed — Anti-AI-Slop §2 no filter:blur) */
+  @keyframes reveal-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Clip-path reveal: content uncovered from center */
+  @keyframes clip-reveal {
+    from {
+      clip-path: inset(8% 8% 8% 8%);
+      transform: scale(0.98);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+      transform: scale(1);
+    }
+  }
+
+  /* Stagger entrance for card grids (blur removed — Anti-AI-Slop §2) */
+  @keyframes card-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Scroll progress bar fill */
+  @keyframes scroll-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* --- Utility classes --- */
+@layer utilities {
+  /* Visually hidden, but kept in DOM for assistive tech (accessible name for
+   * icon-only controls, off-screen labels). Standard clip-rect pattern — no
+   * visual effects. Prefer aria-label on <button>; use .sr-only for inline
+   * text that must read to screen readers without rendering on screen. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .reveal-in {
+    animation: reveal-in var(--duration-200) var(--spring-snappy) both;
+  }
+
+  .clip-reveal {
+    animation: clip-reveal var(--duration-300) var(--spring-bounce) both;
+  }
+
+  .card-pop {
+    animation: card-pop var(--duration-200) var(--spring-snappy) both;
+    animation-delay: calc(var(--stagger-index, 0) * var(--stagger-offset));
+  }
+
+  /* Visual press feedback: the control gives a little under the finger. The
+     class used to be `haptic-press` and also vibrated on pointerdown; the
+     vibration is gone (owner), the press scale stays. */
+  .press-feedback {
+    transition: transform var(--duration-100) var(--spring-snappy);
+  }
+  .press-feedback:active {
+    transform: scale(0.97);
+  }
+
+  /* One entrance for a result that appears after the screen settled (quota
+     notice, a new link row, a plan badge, the insights card). Small and
+     short: confirmation, not decoration. */
+  @keyframes micro-enter {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .micro-enter {
+    animation: micro-enter var(--duration-200) var(--spring-snappy) both;
+  }
+
+  /* A DATA counter inside a serif heading (e.g. „Galeria · 10", „(10/10)", „MAJ 2026"): the
+   * display serif (Marcellus) renders 0 like the letter O and 1 like I, so data numbers go in
+   * sans. Wrap ONLY the counter in a span with this class; the heading stays serif.
+   *
+   * DECISION: `tabular-nums` is NOT the default number style. In our faces it
+   * widens period, comma, colon and semicolon to digit width and narrows `%`,
+   * so dates, times, prices and e-mails get spaced-out marks („14 : 32”), and
+   * the feature inherits. Use it only where the text is digits (plus letters,
+   * space, slash) AND the digits change in place (a counter, a price odometer)
+   * or stand in an integer column. Every use carries `tnum-allow: <reason>`;
+   * guard `css/tabular-nums`. */
+  .data-count {
+    font-family: var(--font-body);
+  }
+}
+
+/* --- NVT page transitions: motion overflow guard --- */
+/* Keyframes/phases live in navigation-transition.module.css (content shell);
+ * html[data-nav-*] attrs are written by NavigationTransitionController.
+ * While content translates horizontally it may momentarily overflow its
+ * scroll owner — clip BOTH owners (inner #main-content and the window/body)
+ * only during an active phase, so no permanent layout change. `clip` (unlike
+ * `hidden`) creates no scroll container, so position:sticky keeps working. */
+@layer base {
+  html[data-nav-phase] body {
+    overflow-x: clip;
+  }
+
+  html[data-nav-phase] #main-content {
+    overflow-x: clip;
+  }
+}
+
+/* Sonner injects unlayered CSS. Match it here with higher specificity.
+ * DECISION: feedback inverts the page theme so it stays visible over app content. (owner) */
+[data-sonner-toaster] {
+  --border-radius: var(--style-radius-surface);
+  --toast-surface: var(--color-text-primary);
+  --toast-foreground: var(--color-bg-main);
+}
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] {
+  background: var(--toast-surface);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--toast-foreground) 25%, transparent);
+  color: var(--toast-foreground);
+  box-shadow: none;
+}
+[data-sonner-toaster] [data-sonner-toast] [data-title] {
+  font-weight: 600;
+  color: var(--toast-foreground);
+}
+[data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: var(--toast-foreground);
+}
+
+/* ─── CTA effect: „color-work" on converting CTAs (owner) ─── */
+/* DECISION: the converting CTA „works with colour” in place: a warmer tone of
+ * the primary rises from below and fades, a cooler one from above, with a soft
+ * glow pulse; no positional motion. Rejected for good: a passing sweep, a
+ * wandering tone, a breathing halo. A sanctioned override of the gradient and
+ * glow floor (DESIGN.md): the button background stays solid, colour lives on
+ * ::before/::after under the label (isolation keeps contrast), only opacity
+ * animates. These are the ONLY amplitude and tempo knobs; call sites set just
+ * data-cta-shimmer='on', never copy the keyframes. (owner) */
+[data-cta-shimmer='on'] {
+  --cta-satin-peak: 0.45;
+  --cta-satin-duration: 8s;
+  --cta-glow-duration: 7.5s;
+  --cta-glow-idle: 0 0 3px 0
+    color-mix(in oklch, var(--color-primary) 9%, transparent);
+  --cta-glow-peak: 0 0 12px 1.5px
+    color-mix(in oklch, var(--color-primary) 26%, transparent);
+  /* Temperature poles. Not brand colours (they have no palette token and will not get one):
+   * they are the mix targets the gold brushes against at the bottom and top of the button.
+   * Kept here as knobs so the whole effect can be retuned from one place, as the comment
+   * above promises. */
+  --cta-anchor-warm: #7a3d08;
+  --cta-anchor-cool: white;
+}
+
+@layer base {
+  /* Temperature: the tint enters and fades (::before warm bottom / ::after cool top). */
+  @keyframes cta-warm {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: var(--cta-satin-peak, 0.45);
+    }
+  }
+  @keyframes cta-glow-pulse {
+    0%,
+    100% {
+      box-shadow: var(--cta-glow-idle);
+    }
+    50% {
+      box-shadow: var(--cta-glow-peak);
+    }
+  }
+}
+
+/* Stacking context + clip + glow puls. */
+[data-cta-shimmer='on'] > a:first-child,
+[data-cta-shimmer='on'] > button:first-child {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: cta-glow-pulse var(--cta-glow-duration) ease-in-out infinite;
+}
+
+/* Two colour layers under the text, shared shape. */
+[data-cta-shimmer='on'] > :first-child::before,
+[data-cta-shimmer='on'] > :first-child::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* The warm pole from below and the cool one from above appear and fade together: the button
+ * develops a colour-temperature polarity and returns to flat gold. */
+[data-cta-shimmer='on'] > :first-child::before {
+  background: radial-gradient(
+    150% 150% at 50% 128%,
+    color-mix(in oklch, var(--color-primary-dark) 72%, var(--cta-anchor-warm)),
+    transparent 62%
+  );
+  animation: cta-warm var(--cta-satin-duration) ease-in-out infinite;
+}
+[data-cta-shimmer='on'] > :first-child::after {
+  background: radial-gradient(
+    150% 150% at 50% -28%,
+    color-mix(in oklch, var(--color-primary-light) 55%, var(--cta-anchor-cool)),
+    transparent 62%
+  );
+  animation: cta-warm var(--cta-satin-duration) ease-in-out infinite reverse;
+}
+
+/* ─── Phone frame as the containing block for overlays (desktop, product route) ───
+ *
+ * DECISION: `contain: layout` makes the phone frame (`[data-app-frame]`, set by
+ * AppLayout) the containing block for `position: fixed` descendants. Portalling
+ * dialogs into it (overlayContainer.context.ts) is not enough: without it the
+ * sheet still sizes to the window. Layout containment, not paint, so the
+ * frame's outline still draws outside; do not swap for transform/filter. Global
+ * because CSS Modules reject a selector without a local class; the media query
+ * repeats the frame's XL condition so a phone is never affected. */
+@media (min-width: 1280px) {
+  [data-app-frame='true'] {
+    contain: layout;
+  }
+}

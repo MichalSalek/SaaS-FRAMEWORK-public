@@ -1,0 +1,105 @@
+/* ─── StepsSection: canonical sequence of steps ───
+ * DECISION: see StepsSection.organism.tsx (numbering only for real sequences, small numeral
+ * scale). Steps are STATIC: zero hover. */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.marker {
+  /* Aligns the numeral column in the list variant (home canon). */
+  min-width: calc(2 * var(--ch-heading));
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-xl);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  max-width: calc(56 * var(--ch-body));
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.media {
+  margin-top: var(--space-12);
+}
+
+/* ─── Variant: list, a vertical list with the marker on the left (get-app /
+ * home canon). A top+bottom hairline pair (FULL edges, collapsed by
+ * margin -1px) is deliberately NOT a single-sided accent border. ─── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.list .step {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: clamp(16px, 2.4vw, 36px);
+  align-items: baseline;
+  padding-block: clamp(20px, 3vw, 36px);
+  border-block: var(--style-border-divider) solid var(--color-divider);
+}
+
+.list .step + .step {
+  margin-top: -1px;
+}
+
+/* ─── Surface „card”: steps in one white box on the page paper (reading
+ * text stands on white, DESIGN.md §Style Policy 30). The box is the frame,
+ * so the first step has no line above and the last none below: only the
+ * lines BETWEEN steps remain. ─── */
+.steps[data-surface='card'] {
+  padding-inline: clamp(16px, 3vw, 32px);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.list[data-surface='card'] .step:first-child {
+  border-top-color: transparent;
+}
+
+.list[data-surface='card'] .step:last-child {
+  border-bottom-color: transparent;
+}
+
+/* ─── Variant: columns, equal columns with the marker above the content ─── */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 48px);
+}
+
+@media (min-width: 768px) {
+  .columns {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  }
+}
+
+.columns .step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  align-items: flex-start;
+}

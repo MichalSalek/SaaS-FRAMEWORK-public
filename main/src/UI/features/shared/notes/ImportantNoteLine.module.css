@@ -1,0 +1,58 @@
+/* „Ważne przed wizytą”, read-only (ImportantNoteLine.molecule.tsx).
+ * White surface like every section; the warning ink is on the icon and the
+ * label only. The icon sits on the text's FIRST line (a holder 1lh tall). */
+
+.block {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  padding: var(--space-14) var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+.icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-warning-fg);
+}
+
+.icon svg {
+  display: block;
+}
+
+.text {
+  margin: 0;
+  min-width: 0;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.label {
+  font-weight: 600;
+  color: var(--color-warning-fg);
+}
+
+.note {
+  font-weight: 600;
+}
+
+.inline {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  min-width: 0;
+  line-height: 1.5;
+}
+
+.inlineText {
+  min-width: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}

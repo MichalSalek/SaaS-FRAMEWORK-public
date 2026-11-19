@@ -1,0 +1,14 @@
+{
+  "static": {
+    "reviews": { "a": { "text": "Brałam pakiet za 50 zł." } },
+    "pricing": {
+      "anchorBanner": {
+        "text": "Booksy bierze 40 zł",
+        "textExtra": "też 15 zł"
+      },
+      "hero": "Nasz plan kosztuje 30 zł"
+    },
+    "compare": { "faq": { "a4": "Fresha 20 EUR" } }
+  },
+  "ok": "Zwykłe zdanie."
+}

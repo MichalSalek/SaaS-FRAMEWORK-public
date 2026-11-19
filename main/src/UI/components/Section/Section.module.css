@@ -1,0 +1,51 @@
+/* ─── Section — LP section composition (band + container) ─── */
+
+.band {
+  width: 100%;
+  margin-left: 0;
+  /* Default rhythm, overridable via --section-pad-block in className. */
+  padding-block: var(--section-pad-block, var(--lp-rhythm));
+  padding-inline: var(--section-pad-inline, clamp(20px, 5vw, 56px));
+}
+
+.fullBleed {
+  /* Full-bleed breakout from the layout container (LP page pattern).
+   * Requires overflow-x: clip on PublicLayout's .content. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+
+.toneSubtle {
+  background: var(--color-bg-subtle);
+}
+
+/* Edge-to-edge white band (owner): a section that must stand apart from
+   the page paper without a frame or an inner card. The white itself is the
+   boundary, so this tone gets no `bordered` lines. */
+.toneWhite {
+  background: var(--color-surface-card);
+}
+
+/* Full hairline frame (top+bottom): a tint without a frame bleeds into the
+ * white (owner). Never a single border (floor bans single-sided borders as an
+ * effect); this is the band's FRAME, always a pair. */
+.bordered {
+  border-block: var(--style-border-divider) solid var(--color-divider);
+  /* DECISION: two frames touching at an edge draw a double-thickness line. Adjacent bands of static
+   * pages (a second `bordered`, the divider under a section, the top line of
+   * FinalCtaBand/PhotoFinaleCta) would draw 1px + 1px one under the other. A framed band therefore
+   * overlaps both neighbours by the line thickness so the
+   * lines land on the same pixels. `position: relative` lifts the band above a neighbour without
+   * position in paint order, otherwise the next section's background would paint over its bottom
+   * line. */
+  position: relative;
+  margin-block: calc(var(--style-border-divider) * -1);
+}
+
+.inner {
+  margin-inline: auto;
+}
+
+.constrained {
+  max-width: var(--lp-content-width);
+}

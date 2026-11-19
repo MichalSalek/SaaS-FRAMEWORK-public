@@ -1,0 +1,408 @@
+/* UI/features/explore/ExplorePage.module.css
+ * Editorial discovery feed — curated mood board.
+ *
+ * Vibe: a curated collection of inspiration. Not Pinterest mass browse, not
+ * Instagram chronological. Premium, branded discovery — like flipping
+ * through a high-end portfolio book where every page has its own rhythm.
+ *
+ * Anti-AI-Slop: depth via solid color-block + tonal steps + full hairline
+ * borders. ZERO gradient/shadow/glow/blur/hover-on-static.
+ *  - Masonry CSS columns (variable heights, natural rhythm)
+ *  - Entrance on screen mount (scroll-reveal is banned)
+ */
+
+/* ─── Motion keyframes ─── */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Skeleton pulse: solid fill plus an opacity change. A background-position
+   shimmer would do nothing on a solid-colour skeleton. */
+@keyframes skeletonPulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: slideUp 320ms var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}
+
+/* ─── Page shell ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  overscroll-behavior: none;
+  /* Full-bleed hero — compensate AppLayout content padding. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: var(--space-20) var(--space-20) calc(var(--space-32) + 80px);
+}
+
+/* DECISION: the tab panel entry animates ONLY opacity, no transform. The panel contains
+   `position: fixed` descendants (the filter FAB), and an `animation ... both` with transform
+   keeps the transform after the animation (even translateY(0) is not none), which makes the
+   element a containing block for fixed, so the FAB/overlay scroll with the page instead of
+   anchoring to the viewport. Do not bring translateY back. */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tabContent {
+  animation: fadeIn 200ms var(--ease-entrance) both;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* DECISION: container queries for this screen, for the reason given in
+   gallery/GalleryPage.module.css (the desktop phone frame makes viewport @media wrong; thresholds
+   are 40px lower because they measure the page content-box). The container sits on `.pageTrack`,
+   NOT on `.page` or `.tabContent`: `container-type` makes the element a containing block for
+   `position: fixed` descendants (see the tab-panel animation DECISION above), so the filter FAB
+   (GalleryFilterSection) is a sibling of `.pageTrack`. */
+.pageTrack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* ============================================================
+ * INTRO CARD: <AppHero> canon (components/AppHero); background tint, frame
+ * and typography live in the component.
+ * Only the .staggerIn entrance given through className stays here.
+ * ============================================================ */
+
+/* ============================================================
+ * SEARCH ROW
+ * ============================================================ */
+
+.searchRow {
+  /* allow input to relax inside flow */
+}
+
+/* ============================================================
+ * QUICK FILTER WRAP — scrolls away with the page (not sticky, see DECISION)
+ * Anti-AI-Slop: solid bg step + full-width border, no backdrop-filter/blur.
+ * ============================================================ */
+
+/* DECISION: the filter block is NOT sticky. Three captioned chip rows (colours, traits, lengths)
+   are ~330px, so stuck they took ~40% of a phone screen and photos scrolled in a narrow strip.
+   Filters stay at hand through the sticky `GalleryFilterSection .filterFab` button, which opens
+   the full overlay. */
+.quickFilterWrap {
+  padding: var(--space-12) 0;
+  background: var(--color-bg-main);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  margin: 0 calc(var(--space-20) * -1);
+  padding-left: var(--space-20);
+  padding-right: var(--space-20);
+}
+
+/* ============================================================
+ * ACTIVE FILTERS — horizontally-scrollable chip row
+ * ============================================================ */
+
+.activeFilters {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.activeFilters::-webkit-scrollbar {
+  display: none;
+}
+
+.activeChip {
+  background: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* ============================================================
+ * LAYOUT TOGGLE ROW
+ * ============================================================ */
+
+.layoutToggleRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-8) 0 0;
+}
+
+/* ============================================================
+ * MASONRY GRID — true CSS columns for variable-height rhythm
+ *
+ * DECISION: CSS columns over CSS grid (auto-flow: dense) because true masonry needs variable child
+ * heights without aspect-ratio coupling. The Pinterest-style flow happens automatically (cards fill
+ * columns top-to-bottom) and break-inside: avoid keeps each card intact across column breaks.
+ * Columns: 2 mobile, 3 tablet, 4 desktop, 5 wide desktop, matching Gallery.
+ * ============================================================ */
+
+.galleryGrid {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .galleryGrid {
+    column-count: 3;
+    column-gap: var(--space-12);
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGrid {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+@container app-view (min-width: 1360px) {
+  .galleryGrid {
+    column-count: 5;
+  }
+}
+
+/* Wrap each card in the masonry flow; gives a `break-inside: avoid`
+ * anchor without forcing it on the card itself (cards stay reusable). */
+.galleryGrid > * {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+  display: block;
+  animation: slideUp 380ms var(--ease-entrance) both;
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGrid > * {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* Full-width layout (single column, vertical rhythm) for editorial mode */
+.galleryGridFullWidth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ─── Stylist Attribution (footer on photo card) ─── */
+
+.stylistAttribution {
+  /* In a two-column card at 390 px the name and city do not fit on one row (the
+     name wrapped and the city was cut mid-word, „Warszaw”). The city always sits
+     under the name, so no separator dot can wrap to the start of a line. */
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-4);
+  min-width: 0;
+}
+
+.stylistName {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stylistCity {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ─── Infinite Scroll Sentinel & loading-more ─── */
+
+.loadingMore {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-12) 0;
+}
+
+/* ============================================================
+ * SKELETON MASONRY — varied heights to hint at the real feed
+ * Anti-AI-Slop: solid fill + opacity pulse, zero gradient.
+ * ============================================================ */
+
+.skeletonMasonry {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .skeletonMasonry {
+    column-count: 3;
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonMasonry {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+.skeletonMasonryCard {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+  border-radius: var(--style-radius-surface);
+  width: 100%;
+  /* The loading skeleton is a stand-in SURFACE: a neutral tonal step instead of
+     a gold slab pretending to be content; motion comes from an opacity pulse
+     (the same pattern as the stylist card skeletons). */
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonMasonryCard {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* ============================================================
+ * EDITORIAL EMPTY STATE — branded, actionable, not a sad icon
+ * ============================================================ */
+
+/* Surface, frame and typography come from the <EmptyState size="page"> canon.
+   Only the gap above (from the feed) stays here. Do NOT add padding/gap/
+   background: the component module sets the same properties at equal
+   specificity, so bundle order would decide. Override through the
+   `--empty-*` custom properties. */
+.editorialEmpty {
+  margin-top: var(--space-12);
+}
+
+.editorialEmptyTips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+.editorialEmptyTipChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-12);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  /* The hint chip is a MARK; its content takes the full text colour (without a
+     tint, greying out would be the only difference). */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-text-primary);
+}
+
+.editorialEmptyTipChipIcon {
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+}
+/* ============================================================
+ * EDITORIAL ERROR STATE — warn-tinted variant of empty
+ * ============================================================ */
+
+.editorialError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-32) var(--space-20);
+  text-align: center;
+  border-radius: var(--style-radius-surface);
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 5%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) var(--style-border-style-empty)
+    color-mix(in srgb, var(--color-warning) 30%, transparent);
+  margin-top: var(--space-12);
+}
+
+.editorialErrorIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--style-radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 14%,
+    var(--color-bg-paper)
+  );
+  border: var(--style-border-surface) solid
+    color-mix(in srgb, var(--color-warning) 28%, transparent);
+  color: var(--color-warning);
+}
+
+.editorialErrorTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: calc(26 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+.editorialErrorHint {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: calc(38 * var(--ch-body));
+  text-wrap: pretty;
+}
+
+/* ============================================================
+ * END OF FEED — closing note (graceful close to infinite scroll)
+ * ============================================================ */
+
+.endOfFeed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  padding: var(--space-32) var(--space-12);
+  text-align: center;
+}
+
+.endOfFeedText {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: calc(42 * var(--ch-body));
+  text-wrap: pretty;
+}

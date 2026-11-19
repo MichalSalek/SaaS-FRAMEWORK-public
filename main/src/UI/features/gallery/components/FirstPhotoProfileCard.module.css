@@ -1,0 +1,152 @@
+/* Profile card after the first photo (FirstPhotoProfileCard.organism.tsx).
+ * A white section box on the paper page (DESIGN.md §Style Policy 14): one
+ * radius and one hairline, no shadow; the preview is plain rows inside it. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  width: 100%;
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  text-align: start;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.body {
+  max-width: none;
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+}
+
+.saved {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+}
+
+.savedNotice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) 0;
+  text-align: center;
+}
+
+.savedIcon {
+  color: var(--color-success);
+}
+
+.savedTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.savedLine {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+}
+
+/* Live preview of the profile header: what clients will see. */
+.preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.previewAvatar {
+  /* focus-ring-allow: the disc is decoration inside an aria-hidden preview,
+     nothing in it takes focus; the name beside it carries the content. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: var(--style-radius-avatar);
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+}
+
+.previewAvatar[data-empty='true'] {
+  background: var(--color-mark-bg);
+}
+
+.previewLines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.previewName {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.previewCity {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.previewCity svg {
+  flex-shrink: 0;
+  color: var(--color-accent-fg);
+}
+
+.previewName[data-empty='true'],
+.previewCity[data-empty='true'] {
+  color: var(--color-text-muted);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+}

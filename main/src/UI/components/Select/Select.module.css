@@ -1,0 +1,129 @@
+/* ─── Wrapper ─── */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+}
+
+/* ─── Label ─── */
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.wrapper:focus-within .label {
+  color: var(--color-primary);
+}
+
+/* ─── Select container ─── */
+.selectContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Native select ─── */
+.select {
+  width: 100%;
+  padding: var(--style-input-pad) calc(var(--space-32) + var(--space-8))
+    var(--style-input-pad) var(--style-input-pad);
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface-input);
+  /* DECISION: see Input.module.css (the field keeps a quiet 1px --color-border line for WCAG
+     1.4.11 although other controls are frameless). */
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  /* outline:none on the base selector; :focus gives a border-color affordance for mouse users,
+   * :focus-visible adds a 2px primary ring for keyboard navigation (WCAG 2.4.7). */
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.select:focus {
+  border-color: var(--color-primary);
+}
+
+.select[data-empty] {
+  color: var(--color-text-muted);
+}
+
+/* The open list is the platform's: options keep full ink there. */
+.select[data-empty] option:not(:disabled) {
+  color: var(--color-text-primary);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Chevron icon ─── */
+.chevron {
+  position: absolute;
+  right: var(--space-12);
+  display: flex;
+  align-items: center;
+  color: var(--color-icon-muted);
+  pointer-events: none;
+  transition: transform var(--transition-fast);
+}
+
+/* ─── Compact: a control in a filter bar or an action row ───
+   As wide as its longest option (a native select sizes to it), never wider
+   than its line; the bar's small type and a 40px row. */
+.compact {
+  width: auto;
+  max-width: 100%;
+}
+
+.compact .select {
+  min-height: 2.5rem;
+  padding: var(--space-8) calc(var(--space-24) + var(--space-8)) var(--space-8)
+    var(--space-12);
+  font-size: var(--text-sm);
+}
+
+.compact .chevron {
+  right: var(--space-8);
+}
+
+/* ─── Error (the same voice as InputAtom) ─── */
+.hasError .label,
+.wrapper.hasError:focus-within .label {
+  color: var(--color-error);
+}
+
+.hasError .select,
+.hasError .select:focus {
+  border-color: var(--color-error);
+}
+
+.error {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  line-height: 1.3;
+}
+
+/* ─── Disabled ─── */
+/* The disabled state degrades through opacity, NOT a surface swap: a cream
+ * fill under a greyed select was a second cream on the screen (owner vote)
+ * and doubled the signal the transparency already carries. */
+.isDisabled .select {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.isDisabled .label {
+  opacity: 0.5;
+}

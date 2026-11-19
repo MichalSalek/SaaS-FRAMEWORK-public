@@ -1,0 +1,53 @@
+/* ─── AppHomePage — web-home of the /app zone (desktop ≥1280).
+ * Renders inside the AccountWebLayout column (--account-content-max), so the hero must leave the
+ * LP full-bleed: it does so through the PUBLIC knobs --lp-hero-* (DESIGN.md §Style Policy 13: we
+ * override the variable, not the declaration, because `.hero[data-has-media]` has higher
+ * specificity than the host class).
+ * ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-48);
+}
+
+.hero {
+  --lp-hero-width: 100%;
+  --lp-hero-bleed: 0;
+  --lp-hero-pad-inline: 0;
+  --lp-hero-pad-top: 0;
+  --lp-hero-pad-bottom: var(--space-8);
+  /* The banner is an introduction to the screen, not a page of its own: the LP canon of 72vh would
+   * push the "what next" list below the fold. */
+  --lp-hero-min-height: 0;
+  /* The hero text column is ~440px here (7fr of the grid in the account column), and the fluid scale
+   * counts from the WINDOW width: step 3xl (up to 72px) is computed for a full 1440 and broke the
+   * heading into five lines. We drop TWO steps of the scale (3xl → xl, skipping 2xl). */
+  --lp-hero-headline-size: var(--text-fluid-xl);
+  /* DECISION: --lp-hero-headline-measure is set to `none`. The LP canon's `max-width: 16ch` is
+     written in the headline's own ems, so it shrinks with the font and no step down recovers a
+     line (the h1 measured 368x144px at 36px/36px: four lines in a 440px column, 16% of the
+     measure standing empty). Here the column grid sets the measure, not LP typography; on static
+     pages 16ch stays. */
+  --lp-hero-headline-measure: none;
+}
+
+.heroNote {
+  margin: 0;
+  max-width: calc(36 * var(--ch-body));
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.nextHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}

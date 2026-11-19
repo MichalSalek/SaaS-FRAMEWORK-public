@@ -1,0 +1,866 @@
+/* ─── ForStylistsPage — Editorial anti-AI-slop pattern propagation ─── */
+
+.page {
+  --section-block: var(--lp-rhythm);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  padding: 0;
+  width: 100%;
+  margin-left: 0;
+  overflow-x: clip;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Section header
+ * ───────────────────────────────────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: calc(60 * var(--ch-body));
+  margin: 0 0 var(--lp-rhythm);
+}
+
+/* Per-page headline scale for <SectionHeader>, steered through the canon's
+ * var hooks (NOT a redefinition of .sectionHeadline). Values = the former local
+ * .sectionHeadline (clamp(28-48px) / 1.08 / -0.018em / 16ch), so section
+ * headlines stay pixel-identical.
+ * The lede comes from the canonical SectionHeader, which exposes no lede hooks,
+ * so this class steers only the headline scale. */
+.sectionHeaderScaled {
+  --section-headline-size: clamp(28px, 4.4vw, 48px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: calc(16 * var(--ch-heading));
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2. SALON SCENES — solid INK-VIOLET identity band (B2B color-rola)
+ *    This is the "remove-the-logo" signature: charcoal-forward, not gold.
+ *    Text on ink is mode-stable white-mix; numerals are oversized ghost serif.
+ * ───────────────────────────────────────────────────────────────────── */
+/* The band (breakout + padding-inline) comes from the Section component; here only
+ * the ink-violet background (FROZEN, owner) plus its own vertical rhythm. */
+/* WCAG 1.4.3: the token that used to back this section was too light to carry AA
+ * for small light text; even pure white measured 3.88-4.37:1 (FAIL). A darker
+ * violet (L=0.42, hue 288) leaves the text room for AA without touching that
+ * token (zero blast radius on the pull-quote, borders and tints). The value is a
+ * palette ROLE (--color-ink-band-strong), not a local alias; the measurement above
+ * explains the choice, not today's --color-secondary, which is now bone (0.47 / 0.75, hue 75). */
+.problemsSection {
+  --section-pad-block: var(--lp-rhythm);
+  background: var(--color-ink-band-strong);
+  /* Focus ring on the violet band: the base ring in LIGHT is ink, which gives
+     ~2.3:1 on this field (same class as the measured newsletter band on home).
+     The --color-accent-on-ink role keeps contrast here and speaks the same
+     language as the other negative bands. The gap is invisible to the guard
+     while the band value sits in a local alias; see INK_BG in css/ink-focus-ring. */
+  --color-focus-ring: var(--color-accent-on-ink);
+}
+
+.problemsSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: var(--lp-rhythm);
+}
+
+/* Page-local heading for the dark problems band; keep its ink contrast and
+ * typography after removing the label above it. */
+.problemsHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  margin: 0;
+  text-wrap: balance;
+  color: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 96%,
+    var(--color-ink-band-strong)
+  );
+  max-width: calc(18 * var(--ch-heading));
+}
+
+.problemsList {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(18px, 2.5vw, 32px);
+}
+
+.problemPair {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 22px);
+  padding: clamp(24px, 2.6vw, 40px);
+  background: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 7%,
+    var(--color-ink-band-strong)
+  );
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, white 16%, transparent);
+}
+
+@media (min-width: 768px) {
+  .problemsList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+}
+
+.problemSide {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 14px);
+  max-width: calc(46 * var(--ch-body));
+}
+
+.problemTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-subhead);
+  line-height: 1.15;
+  letter-spacing: var(--ls-tight-12);
+  color: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 96%,
+    var(--color-ink-band-strong)
+  );
+  margin: 0;
+  text-wrap: balance;
+}
+
+.solutionText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.7;
+  /* White 82% on the light --color-secondary measured 3.1:1 (FAIL). On the darker
+   * --color-ink-band-strong bg the same mix bumped to 90% reads AA (>=4.5:1). */
+  color: color-mix(
+    in oklch,
+    var(--color-on-ink-band) 90%,
+    var(--color-ink-band-strong)
+  );
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2b. PULL-QUOTE — full-bleed typographic statement, rhythm breaker
+ *     Warm-cream ground (a breath after the ink band), oversized serif quote
+ *     mark in ink-violet, one gold anchor word. Breaks header→grid cadence.
+ * ───────────────────────────────────────────────────────────────────── */
+.pullQuoteSection {
+  --section-pad-block: var(--lp-rhythm);
+  /* white background (owner): the tint blended into the section below.
+     No own border-bottom: the line at the seam comes from the benefits band
+     frame below (border-block); a double hairline read as a patch. */
+  background: var(--color-bg-main);
+}
+
+/* innerClassName Section — max-width/centrowanie niesie .inner.constrained. */
+/* DECISION: the quote text sits on the container's left edge at every width, aligned
+   with the section heading below; the brush mark is decoration outside the layout,
+   never a grid column. From 1440px it hangs in the outer margin on the first line
+   (narrower margins cannot fit it plus a gap); below that it stands above the first
+   line. Do not return to an "icon | text" layout. (owner) */
+.pullQuoteInner {
+  --pull-quote-size: clamp(28px, 4vw, 56px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  font-size: var(--pull-quote-size);
+  line-height: 1.16;
+}
+
+.pullQuoteMark {
+  display: block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  color: var(--color-primary);
+  user-select: none;
+}
+
+/* breakpoint-allow: the threshold follows the brush geometry, not the page grid:
+   the outer margin fits 1em of brush plus a gap only from 1440 px. */
+@media (min-width: 1440px) {
+  .pullQuoteMark {
+    position: absolute;
+    top: calc((1lh - 1em) / 2);
+    right: 100%;
+    margin-right: var(--space-24);
+  }
+}
+
+.pullQuote {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* fluid-allow: 2xl with a wider range: 28 on a phone, 56 on desktop */
+  font-size: var(--pull-quote-size);
+  line-height: inherit;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: calc(22 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2c. PLAYBOOK — product story for SEO and conversion
+ * ───────────────────────────────────────────────────────────────────── */
+.playbookSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+}
+
+.playbookGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  background: var(--color-divider);
+  border: var(--style-border-surface) solid var(--color-divider);
+}
+
+@media (min-width: 768px) {
+  .playbookGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.playbookItem {
+  min-width: 0;
+  /* White step fields on paper: the step description is text to read
+     (DESIGN.md §Style Policy 30). */
+  background: var(--color-surface-card);
+  padding: clamp(24px, 3vw, 42px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.2vw, 18px);
+}
+
+.playbookTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.playbookIcon {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--style-radius-control);
+  /* Single-cream theme: the MARK (42px square under the step glyph) stays
+     gold through the role token; the glyph takes accent-fg instead of primary (2.2:1). */
+  color: var(--color-accent-fg);
+  background: var(--color-mark-bg);
+}
+
+/* Decorative step numeral (aria-hidden in TSX, duplicates the visual order).
+ * Colour = --color-primary from the palette, no opacity trick. It used to be a
+ * hard-coded darkened warm gold oklch(0.62 0.105 82), because the retired
+ * palette's gold at opacity .75 gave 1.64:1 on white (FAIL <3:1 large text).
+ * The rouge-papier red is darker than that workaround, so the reason is gone. */
+.playbookNumber {
+  font-family: var(--font-heading);
+  /* fluid-allow: a level between 2xl and 3xl, fitted to the heading length */
+  font-size: clamp(36px, 4vw, 58px);
+  line-height: 0.9;
+  color: var(--color-primary);
+}
+
+/* Numeral as pseudo-content (not textContent): it does not glue together in
+ * copy-paste or SERP snippets; the value is carried by data-num on the span (markup). */
+.playbookNumber::before {
+  content: attr(data-num);
+}
+
+.playbookTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.18;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.playbookBody,
+.playbookMeta {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+.playbookBody {
+  color: var(--color-text-secondary);
+}
+
+.playbookMeta {
+  margin-top: auto;
+  color: var(--color-text-primary);
+  font-weight: 650;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3. BENEFITS — editorial numbered entries, variable rhythm
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band: tone='subtle' plus the full hairline frame come from the Section component. */
+.benefitsSection {
+  --section-pad-block: var(--section-block);
+  /* The dark „Podgląd aplikacji” stage ends this section and touches the next one
+     with no gap: the section's bottom padding showed from under the stage as a white strip
+     (owner: „biały pasek-glitch, powoduje go padding bottom”). */
+  padding-bottom: 0;
+}
+
+.benefitsSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: var(--lp-rhythm);
+}
+
+/* Bordered container wraps the editorial list */
+.benefitsBordered {
+  max-width: var(--lp-content-width);
+  /* margin-bottom = section-block: a breath (grey bg-subtle strip) between the
+   * closed list frame and the full-width ink stage, symmetric with the bottom of the
+   * stage (where the section padding-bottom plus the border at the Playbook seam do
+   * the same). Without it the „0% prowizji" highlight stuck to the stage. */
+  margin: 0 auto var(--section-block);
+  /* Visible list frame (not a hairline divider: the frame vanished). */
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+}
+
+/* Split list: text benefits in the left column plus real product proof
+ * (PhoneMockup, gallery screen with filters) in the right third, which
+ * used to be EMPTY. Hairline between columns via the gap-1px technique (like
+ * .playbookGrid), children carry the solid section background. The proof column
+ * only from 768px; on mobile InteractivePhoneStage below carries the proof. */
+.benefitsSplit {
+  display: block;
+}
+
+.benefitsProof {
+  display: none;
+}
+
+/* tint-allow: one cream band cut by a hairline, see below.
+   This is NOT two creams, it is ONE. `.benefitsSplit` is a grid with
+   `gap: 1px` on the line colour: both panels must have the same solid cream so
+   the gap reads as a hairline between them, not as background showing through.
+   The whole section is one `Section tone='subtle'` (ForStylistsPageSections.organism)
+   and the only cream band of this page. Do not collapse it into one declaration:
+   the hairline disappears. */
+@media (min-width: 768px) {
+  .benefitsSplit {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 1px;
+    background: var(--color-divider);
+  }
+
+  .benefitsSplit .benefitsList {
+    background: var(--color-bg-subtle);
+  }
+
+  .benefitsProof {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-subtle);
+    padding: clamp(28px, 3.5vw, 56px) clamp(24px, 3vw, 48px);
+  }
+}
+
+.benefitsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.benefit {
+  padding: clamp(24px, 3vw, 48px);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  position: relative;
+}
+
+/* Scoped to the text list: the highlight (gold band) lives OUTSIDE
+ * .benefitsList (directly in .benefitsBordered) and zeroes its own
+ * border-bottom explicitly in both media blocks. */
+.benefitsList .benefit:last-of-type {
+  border-bottom: none;
+}
+
+@media (min-width: 768px) {
+  .benefit {
+    padding: clamp(32px, 4vw, 64px) clamp(32px, 4vw, 56px);
+  }
+
+  /* Highlight benefit — full-bleed gold band */
+  .benefit[data-highlight] {
+    padding: clamp(40px, 5vw, 80px) clamp(32px, 4vw, 56px);
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-bottom: none;
+    border-top: var(--style-border-divider) solid var(--color-primary);
+  }
+  .benefit[data-highlight] .benefitTitle {
+    font-size: var(--text-fluid-xl);
+    line-height: 1.1;
+    color: var(--color-primary-contrast);
+    max-width: calc(22 * var(--ch-heading));
+  }
+  .benefit[data-highlight] .benefitText {
+    font-size: var(--text-fluid-md);
+    max-width: calc(60 * var(--ch-body));
+    color: var(--color-primary-contrast);
+  }
+}
+
+@media (max-width: 767px) {
+  .benefit[data-highlight] {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-bottom: none;
+  }
+  .benefit[data-highlight] .benefitTitle,
+  .benefit[data-highlight] .benefitText {
+    color: var(--color-primary-contrast);
+  }
+}
+
+.benefitContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1vw, 16px);
+  max-width: calc(60 * var(--ch-body));
+  min-width: 0;
+}
+
+.benefitTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.22;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  text-wrap: balance;
+}
+
+.benefitDetail {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: inherit;
+  padding: var(--space-4) var(--space-10);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-pill);
+}
+
+.benefitText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.benefitHighlightAnchor {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(12px, 1.5vw, 20px);
+  margin-top: clamp(12px, 2vw, 24px);
+  padding-top: clamp(12px, 2vw, 20px);
+  border-top: var(--style-border-divider) solid
+    color-mix(in srgb, var(--color-primary-contrast) 22%, transparent);
+}
+
+.benefitHighlightFigure {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-display);
+  line-height: 0.9;
+  letter-spacing: var(--ls-tight-40);
+  color: var(--color-primary-contrast);
+}
+
+.benefitHighlightLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide-10);
+  color: var(--color-primary-contrast);
+}
+
+/* The old static phone triptych became the InteractivePhoneStage ink
+ * stage. The 0% value and its label remain in the benefit card above it. */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 4. PRICING PREVIEW — editorial numbered list
+ * ───────────────────────────────────────────────────────────────────── */
+/* Single-cream theme: the band sits on PAPER. Its own 4% violet wash
+ * was a third surface on the page and a shade outside the charcoal-gold palette. */
+.pricingSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+  /* With the wash gone the band neighbours the reviews section on the same paper
+     and the seam vanished (measured with a DOM probe: two sections, same
+     background, zero boundary). A hairline takes over the boundary the tint made. */
+  border-block: var(--style-border-divider) solid var(--color-divider);
+}
+
+.pricingSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: clamp(20px, 2.4vw, 32px);
+}
+
+/* Discreet micro-trust line under the lede, before the tier list.
+ * Caption register (secondary text, xs) + solid gold rule lead-in (caption +
+ * rule, floor #7 no dash glyph, no gradient/shadow, flat).
+ * Tokens are mode-aware, so this reads correctly in light + dark. */
+.pricingTrustline {
+  max-width: var(--lp-content-width);
+  margin: 0 auto clamp(40px, 5vw, 72px);
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-10);
+  color: var(--color-text-secondary);
+}
+
+.pricingTrustline::before {
+  content: '';
+  flex-shrink: 0;
+  width: clamp(20px, 3vw, 32px);
+  height: 2px;
+  background: var(--color-primary);
+}
+
+/* Plan preview, language 5A „4 equal columns" (owner):
+ * equal hairline cards radius-md, the highlighted plan (Pro) = closed
+ * ink negative, features as hairline rows without icons. Full detail: /pricing. */
+.pricingList {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .pricingList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .pricingList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Scale (contact): a quiet full-width row UNDER the grid of 4 cards
+ * (the .scaleCta pattern from /pricing): it closes the composition instead of an
+ * orphan card in the 2nd row. No numbering: tiers are not a sequence (Style Policy §6). */
+
+/* Scale contact = Link to /contact: a heading-scale prompt with a gold arrow
+ * and hover underline = clear actionability (it used to be a dead <span>). */
+
+.pricingTier {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 12px);
+  padding: clamp(20px, 2.4vw, 32px);
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  min-width: 0;
+}
+
+/* Highlighted plan (Pro) = ink negative (canon 5A; frame from on-ink: in dark
+ * the page background is dark too and a frame in the fill colour would be invisible). */
+.pricingTier[data-highlight] {
+  background: var(--color-ink);
+  /* Focus ring on ink: the base ring in LIGHT is exactly
+     --color-ink, so it would be invisible here (1.00:1). Gold instead of white,
+     because in DARK the ring is gold anyway: one value gives the same indicator
+     language in both modes, instead of white in one and gold in the other. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, var(--color-ink));
+}
+
+/* Dark: the base card sits on --color-bg-main (#0a0a0a), and ink is #1c1c20,
+   a measured contrast of 1.17:1, so in the dark the negative stopped being a
+   negative. Worse, the highlighted frame (on-ink 18% on ink, in oklch =
+   #3e3e42) was WEAKER than the neighbours' --color-border (#7a7a7a), so the
+   recommended plan had a quieter outline than the ordinary ones. Same recipe as
+   the four other surfaces of the „recommended" language: a tonal step up
+   plus a gold frame. */
+:root[data-mode='dark'] .pricingTier[data-highlight] {
+  background: color-mix(in oklch, var(--color-ink) 89%, var(--color-on-ink));
+  border-color: color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+.pricingTier[data-highlight] .pricingName {
+  color: var(--color-on-ink);
+}
+
+.pricingTier[data-highlight] .pricingTrialLede {
+  color: var(--color-on-ink);
+}
+
+.pricingTier[data-highlight] .pricingTrialAfter {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+.pricingTier[data-highlight] .pricingFeatureItem {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, transparent);
+}
+
+.pricingContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 12px);
+  min-width: 0;
+  flex: 1;
+}
+
+.pricingHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pricingName {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.2;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Trial framing (price anti-pattern): the offer is the hero
+ * in the price's place; the amount sits in small print. Parity with /pricing. */
+.pricingTrialBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pricingTrialLede {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+}
+
+.pricingTrialAfter {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+}
+
+/* Features = hairline rows (top+bottom pair collapsed), no icons. */
+.pricingFeatures {
+  --pricing-feature-row-min: 40px;
+  list-style: none;
+  padding: 0;
+  margin: auto 0 0;
+  display: grid;
+  grid-template-rows: repeat(
+    var(--pricing-feature-row-count),
+    minmax(var(--pricing-feature-row-min), 1fr)
+  );
+  flex: 1;
+}
+
+.pricingFeatureItem {
+  min-height: var(--pricing-feature-row-min);
+  display: flex;
+  align-items: center;
+  padding-block: var(--space-8);
+  margin-top: -1px;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Per-plan primary CTA: full width, pushed to the bottom of the card
+ * (features have margin:auto 0 0, so the CTA lands under them on a shared line
+ * thanks to the equal card heights from align-items:stretch). */
+.pricingTierCta {
+  display: block;
+  width: 100%;
+  margin-top: clamp(14px, 1.6vw, 20px);
+  text-decoration: none;
+}
+
+.pricingTierCtaButton {
+  width: 100%;
+}
+
+.pricingCta {
+  max-width: var(--lp-content-width);
+  margin: clamp(40px, 5vw, 72px) auto 0;
+}
+
+/* „Zobacz pełny cennik": the outlined Button inherits gold --color-primary,
+ * too little text contrast on the light section background (WCAG AA): text + frame
+ * on the AA-gold --color-accent-fg (specificity 0,2,0 > .outlined 0,1,0). */
+.pricingCta .pricingCtaButton {
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent-fg);
+}
+
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 1024px) {
+    .pricingList {
+      grid-template-rows: auto repeat(4, minmax(40px, auto)) auto;
+      column-gap: clamp(16px, 2vw, 24px);
+      row-gap: 0;
+    }
+
+    .pricingTier {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 6;
+      row-gap: 0;
+    }
+
+    .pricingContent {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: 1 / span 5;
+      row-gap: 0;
+    }
+
+    .pricingHeader {
+      grid-row: 1;
+    }
+
+    .pricingFeatures {
+      grid-row: 2 / span 4;
+      grid-template-rows: subgrid;
+      margin: clamp(8px, 1vw, 12px) 0 0;
+    }
+
+    .pricingTierCta {
+      grid-row: 6;
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 5. FAQ — clean accordion
+ * ───────────────────────────────────────────────────────────────────── */
+.faqSection {
+  --section-pad-block: var(--section-block);
+  /* Single-cream theme: the FAQ band drops to paper. This page's cream
+     is already spent on the benefits section (Section tone='subtle'); a second
+     cream here broke "one cream per page". The full hairline frame takes over the
+     boundary: the reviews section on bg-main stands above the FAQ, so without the
+     frame the seam vanished. border-block = a frame as a pair, never one-sided (floor §3). */
+  background: var(--color-bg-main);
+  border-block: var(--style-border-divider) solid var(--color-divider);
+}
+
+.faqSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+/* The FAQ list and accordion skin live in the canonical molecule
+ * (components/FaqSection); the page keeps only the full-bleed band (background,
+ * --section-block padding) and the section header. */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 6. TRUST: the canonical TrustStatsSection molecule
+ * (src/UI/components/TrustStatsSection/, the same as home), zero
+ * per-page styles.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 7. FINAL CTA: the shared FinalCtaBand molecule
+ * (src/UI/components/FinalCtaBand/), zero per-page styles.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Inline link in an FAQ answer (a05 to /compare): hairline underline, accent. */
+.faqInlineLink {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.faqInlineLink:hover {
+  color: var(--color-primary-dark);
+}
+
+.processIllustration {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.contextualIllustration {
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  height: auto;
+}
+
+.playbookHeading {
+  margin-bottom: var(--lp-rhythm);
+}
+
+.playbookHeading .sectionHeader {
+  margin-bottom: 0;
+}
+
+.problemsSection .sectionHeader {
+  margin-bottom: 0;
+}
+
+/* A hero scene wider than a phone takes half of the row. */
+.heroWideMedia {
+  --lp-hero-text-fr: 6fr;
+  --lp-hero-media-fr: 6fr;
+}

@@ -1,0 +1,14 @@
+-- SC-2 (DOMAIN_SSOT §3.2): at most one non-terminal session per client/stylist pair (formerly
+-- created at boot by ensure-db-indexes.ts). Prisma cannot express a partial unique index and
+-- `migrate diff` ignores it, so this file is its only source; the P2002 'active_pair' catches in
+-- session create/add-photo depend on it.
+-- DECISION: this file holds exactly ONE statement and no BEGIN/COMMIT. Measured on Prisma 7.10.0
+-- (PG16 and PG17): migrate deploy sends each statement of a file separately in autocommit, so
+-- CONCURRENTLY is accepted; writes to SessionContainer are not blocked during the build. Do not add
+-- statements here and do not assume this for another Prisma version without re-measuring.
+-- IF NOT EXISTS keeps an existing VALID index (production) untouched. An INVALID leftover that
+-- predates this deploy is dropped by 20261023100200 first. If THIS build fails (connection loss,
+-- duplicate rows), the deploy stops with P3018 and leaves an INVALID index that 20261023100200 will
+-- NOT remove (it is already recorded as applied): before re-running, drop it by hand with
+-- DROP INDEX CONCURRENTLY, then resolve --rolled-back this migration (docs/DEPLOYMENT.md §5.2).
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS "session_container_active_pair_uq" ON "SessionContainer" ("client_account_id", "stylist_account_id") WHERE "lifecycle_state" NOT IN ('CLOSED', 'EXPIRED') AND "stylist_account_id" IS NOT NULL;

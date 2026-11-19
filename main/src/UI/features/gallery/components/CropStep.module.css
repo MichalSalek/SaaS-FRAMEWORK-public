@@ -1,0 +1,83 @@
+/* CropStep.module.css */
+
+@keyframes cropFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cropStep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  /* The step takes the page column's free height (the page fills the content
+   * shell through `data-fill-shell`), so the action bar's `margin-top: auto`
+   * has room to push it onto the screen edge when the photo is shorter than
+   * the screen. The bar is the last child of THIS element, not of the page. */
+  flex: 1 0 auto;
+}
+
+.cropHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-12);
+}
+
+.cropStepEnter {
+  animation: cropFadeIn 200ms var(--ease-entrance) both;
+}
+
+.cropHint {
+  color: var(--color-text-secondary);
+}
+
+.cropWrapper {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--style-radius-surface);
+}
+
+.reactCrop {
+  max-width: 100%;
+  /* The height limit MUST sit on the ReactCrop root: the library sheet sets
+   * `.ReactCrop__child-wrapper > img { max-height: inherit }` (higher specificity
+   * than a module class), so a `max-height` declared below on .cropImage never
+   * applied. The child-wrapper inherits from here, and the image from it. */
+  /* The frame takes the SCREEN height, not a fixed 400px. 58dvh leaves room for
+   * the step header and the bar even at 640px height; the upper cap keeps the
+   * frame in check on a tablet. */
+  max-height: min(58dvh, 640px);
+  border-radius: var(--style-radius-surface);
+}
+
+.cropImage {
+  display: block;
+  max-width: 100%;
+  max-height: min(58dvh, 640px);
+  border-radius: var(--style-radius-surface);
+  object-fit: contain;
+}
+
+/* The crop editor's action bar is STUCK to the bottom of the screen (the
+ * .stickyActionBar canon), not placed under the photo: a tall screenshot would
+ * push „Zatwierdź kadr" far below the edge, and the ReactCrop image has
+ * touch-action:none, so dragging on the photo does not scroll the page. */
+.cropActions {
+  composes: stickyActionBar from '../UploadAssetPage.module.css';
+  flex-wrap: nowrap;
+}
+
+/* Główna akcja bierze resztę rzędu; poboczna ma szerokość własnej etykiety. */
+.cropConfirm {
+  flex: 1 1 auto;
+  min-width: 0;
+}

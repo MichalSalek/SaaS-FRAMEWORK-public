@@ -1,0 +1,19 @@
+.widget {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows var(--duration-200) var(--ease-entrance),
+    opacity var(--duration-200) var(--ease-entrance);
+}
+
+.widget[data-solved='true'] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.content {
+  min-height: 0;
+  overflow: hidden;
+}

@@ -1,0 +1,20 @@
+export {};
+type Translator = {
+  (key: string, values?: Record<string, unknown>): string;
+  has(key: string): boolean;
+  rich(key: string, values?: Record<string, unknown>): unknown;
+  markup(key: string, values?: Record<string, unknown>): string;
+  raw(key: string): unknown;
+};
+declare function useTranslations<N extends string = never>(namespace?: N): Translator;
+declare function getTranslations<N extends string = never>(
+  options: N | { locale: string; namespace?: N }
+): Promise<Translator>;
+
+type DemoT = ReturnType<typeof useTranslations<"demo">>;
+function label(t: DemoT): string {
+  return t("notThere");
+}
+export function Sample() {
+  return label(useTranslations("demo"));
+}

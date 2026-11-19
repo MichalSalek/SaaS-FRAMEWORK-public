@@ -1,0 +1,616 @@
+/* ─── ComparePage — hero/FAQ/finalCta = shared molecules (LpHero,
+ * FaqSection, FinalCtaBand); only these live locally: the comparison table
+ * (the PricingComparisonTable pattern), sectionHeader (the ForStylists pattern),
+ * the contrast sections and the ink social statement (the painInner canon on
+ * the InkPanel molecule). Otherwise zero new craft. ─── */
+
+.page {
+  --section-block: var(--lp-rhythm);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 1. HERO — canon: the LpHero molecule (components/LpHero). Typography,
+ *    single-color heading and entrance live in LpHero.module.css.
+ *    Here only a per-page extension (the className mechanism of the canon).
+ * ───────────────────────────────────────────────────────────────────── */
+/* The question headline is long ("Czym Nailfolio różni się od Booksy, Fresha i Instagrama?").
+ * The canon 16ch would break it into 5 lines. The 22ch measure carries over from the
+ * earlier per-page hero (display scale as on the sibling LPs). `lead` makes the headline
+ * render as <h2> (an element selector: the .headline class is hashed in the LpHero
+ * module, so per-page CSS cannot reach it). */
+.compareHero h2 {
+  max-width: calc(22 * var(--ch-heading));
+}
+
+/* A secondary text link next to the primary CTA — the secondary pattern from FinalCtaBand
+ * in the page's tonality (hairline underline, no hover craft beyond the existing) */
+.heroSecondaryLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  padding: var(--space-6) 0 var(--space-4);
+  transition:
+    gap var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .heroSecondaryLink:hover {
+    gap: var(--space-12);
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Section header (the ForStylists pattern)
+ * ───────────────────────────────────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: calc(60 * var(--ch-body));
+  margin: 0 0 clamp(40px, 5vw, 72px);
+}
+
+/* Per-page headline scale for <SectionHeader>, set through the canon's var hooks (never
+ * redefine .sectionHeadline). The lede is the canon's own; the ink social section reuses
+ * the same scale with --section-headline-color on-ink. */
+.sectionHeaderScaled {
+  --section-headline-size: clamp(28px, 4.4vw, 48px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: calc(20 * var(--ch-heading));
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2. COMPARISON TABLE — a semantic <table> (the PricingComparisonTable pattern,
+ *    simplified: text cells, mobile = horizontal scroll in the wrapper)
+ * ───────────────────────────────────────────────────────────────────── */
+/* The band via <Section> (plain) — breakout + lp container (constrained inner)
+ * live in Section; here stay the page rhythm + its own background tint (color-mix,
+ * NOT bg-subtle — hence not tone='subtle'). */
+.tableSection {
+  --section-pad-block: var(--section-block);
+
+  /* Theme „one cream": the featured frame MUST flip with the theme. --color-ink is
+     dark in BOTH modes, so in dark it would draw a dark line on a dark background and
+     the emphasis would vanish. --color-text-primary flips with the mode — one place
+     for the table and for the mobile cards.
+     1:1 parity with --compare-featured-line in PricingPage. */
+  --compare-featured-line: var(--color-text-primary);
+
+  /* Theme „one cream": the table band goes down to paper. It was a wash on
+     --color-secondary (oklch 288 = violet), an alien hue outside the charcoal-gold
+     palette the owner defended in the vote — and at the same time a third surface
+     on the page, which already spends its contrast on the ink panel of the 'social'
+     section. We lose no boundary: it is carried by the full .tableWrapper frame
+     (4-side hairline + radius), not by the section background. The ratchet did
+     not catch it because it scans mixes on --color-primary. */
+  background: var(--color-bg-main);
+}
+
+.tableSection .sectionHeader {
+  padding: var(--space-24);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.tableWrapper {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  background: var(--color-bg-main);
+  /* Anti-AI-Slop: framed by a full hairline border, not a drop shadow. */
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  overflow-x: auto;
+  /* DECISION: the table insets from its frame vertically only, so the featured column's
+     top and bottom lines close INSIDE the frame instead of merging with it into one thick
+     edge. Not horizontally: row hairlines must still reach the frame. (owner) */
+  padding-block: var(--space-4);
+}
+
+/* Theme „one cream" — 1:1 parity with the table on /pricing:
+   auto-layout weighed columns by the tool-name length, so the three comparison
+   columns got different widths and a row read crooked. Fixed gives equal columns
+   whatever the header length: equality is quality, and with the zebra and the header
+   tint gone it is the only thing that holds the table's rhythm. */
+.compareTable {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+}
+
+/* The label column carries the full sentences of each feature, so it takes a fixed share
+   of the width; the fixed layout splits the rest equally between the three tools.
+   The first header cell is the empty corner <td>, not a <th>. */
+.compareTable thead td:first-child {
+  width: 34%;
+}
+
+.compareTable th,
+.compareTable td {
+  padding: clamp(12px, 1.3vw, 16px) clamp(12px, 1.5vw, 18px);
+  text-align: left;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  /* Theme „one cream": values go in the FULL text colour. With the tints
+     gone, greying out was the only difference left and the competitor columns
+     read as disabled. Hierarchy is carried by weight and the featured column's frame. */
+  color: var(--color-text-primary);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.compareTable tbody tr:last-child th,
+.compareTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Theme „one cream": ZERO zebra. Row scannability is held by the full
+ * hairline (cell border-bottom) plus the padding rhythm — a band on every other row
+ * multiplied surfaces and fought the featured column's frame. 1:1 parity
+ * with the table on /pricing. */
+
+/* Column headers (tool names) */
+.compareTable thead th,
+.compareTable thead td {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  /* Theme „one cream": the header is paper. The header role is carried by caps,
+     weight and the hairline underneath, not by a gold band. */
+  background: var(--color-bg-main);
+  font-size: var(--text-sm);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  padding-top: clamp(14px, 1.6vw, 20px);
+  padding-bottom: clamp(14px, 1.6vw, 20px);
+  vertical-align: middle;
+}
+
+.compareTable thead td {
+  /* Pusty narożnik siedzi na tym samym papierze co reszta nagłówka. */
+  background: var(--color-bg-main);
+}
+
+/* Row-label column — rendered as scope='row' <th> for A11y */
+.compareTable tbody th {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* DECISION: .highlightCol has border-left AND border-right on purpose: with the header's
+ * top and the last row's bottom they form a CLOSED frame, not a one-sided stripe (same as
+ * PricingPage.module.css). The featured column is carried by that frame and weight, no fill. */
+.highlightCol {
+  background: var(--color-bg-main);
+  color: var(--color-text-primary) !important;
+  font-weight: 600 !important;
+  border-left: var(--style-border-divider) solid var(--compare-featured-line);
+  border-right: var(--style-border-divider) solid var(--compare-featured-line);
+}
+
+.compareTable thead th.highlightCol {
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  border-top: var(--style-border-divider) solid var(--compare-featured-line);
+}
+
+.compareTable tbody tr:last-child td.highlightCol {
+  border-bottom: var(--style-border-divider) solid var(--compare-featured-line);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Mobile: card-per-tool (<768px). Pattern 1:1 with PricingComparisonTable
+ * mobile cards (PricingPage.module.css .compareCards / .compareCard).
+ * Desktop table hides; cards hide above 768px.
+ * ───────────────────────────────────────────────────────────────────── */
+.compareCards {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 3vw, 18px);
+}
+
+.compareCard {
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  padding: clamp(18px, 4.5vw, 22px);
+}
+
+/* Featured product card, mobile mirror of .highlightCol: a full 4-sided frame and weight,
+ * no fill. */
+.compareCardTarget {
+  background: var(--color-bg-main);
+  border-color: var(--compare-featured-line);
+}
+
+.compareCardHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+}
+
+.compareCardName {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  letter-spacing: var(--ls-tight-10);
+  color: var(--color-text-primary);
+}
+
+.compareCardList {
+  margin: clamp(14px, 3.5vw, 18px) 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Row: label (dt) left, value (dd) right. min-height 44px = touch target.
+ * baseline (not center): with a multi-line value the label keeps the first
+ * line of the value instead of drifting to the vertical middle. */
+.compareRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-16);
+  min-height: 44px;
+  padding: var(--space-8) 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+.compareRow:first-child {
+  border-top: none;
+}
+
+/* The label does not shrink — the value wraps, not the label. */
+.compareRow dt {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  text-align: left;
+  hyphens: auto;
+}
+
+/* The value MUST be able to shrink and wrap: the earlier flex-shrink: 0 pushed
+ * long values ("…filtrami koloru, stylu i długości") out of the card and
+ * .page { overflow-x: clip } cut them at the viewport edge. min-width: 0 + normal
+ * white-space + overflow-wrap = no clipping at 390px whatever the copy length. */
+.compareRow dd {
+  margin: 0;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: right;
+}
+
+/* Responsive visibility toggle */
+@media (min-width: 768px) {
+  .compareCards {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .tableWrapper {
+    display: none;
+  }
+}
+
+/* Summary line under the table — the benefitsFootnote pattern (solid gold rule lead-in) */
+.tableSummary {
+  max-width: var(--lp-content-width);
+  margin: clamp(28px, 3.5vw, 48px) auto 0;
+  padding: var(--space-20) var(--space-24);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: var(--ls-tight-5);
+  line-height: var(--leading-body);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-14);
+}
+
+.tableSummary::before {
+  content: '';
+  flex-shrink: 0;
+  width: clamp(28px, 4vw, 48px);
+  height: 2px;
+  background: var(--color-primary);
+  transform: translateY(-0.22em);
+}
+
+/* Link to the comparison on the blog (a post in the page's language), under the summary line. */
+.tableBlogLink {
+  max-width: var(--lp-content-width);
+  margin: var(--space-16) auto 0;
+  padding: var(--space-20) var(--space-24);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.tableBlogLink a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* Desktop 1500 (owner): the table plate with 32px breathing room. */
+@media (min-width: 1280px) {
+  .tableSection .sectionHeader {
+    margin-bottom: var(--space-32);
+  }
+
+  .tableWrapper {
+    border: var(--style-border-surface) solid var(--color-border-surface);
+    padding: var(--space-32);
+  }
+
+  .tableSection .compareTable th,
+  .tableSection .compareTable td {
+    padding: var(--space-16) var(--space-20);
+  }
+
+  .tableSummary {
+    margin-top: var(--space-24);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3-5. CONTRAST SECTIONS — Booksy / Instagram / Pinterest next to Nailfolio
+ *      (header + two paragraphs; alternating background for rhythm)
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band through Section keeps the full-bleed breakout and padding.
+ * Booking and Pinterest use white reading bands per the owner rule.
+ * Social keeps a paper ground around its ink panel and artwork. */
+.contrastSection {
+  --section-pad-block: var(--section-block);
+}
+
+.contrastInner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 40px);
+}
+
+@media (min-width: 768px) {
+  .contrastInner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: clamp(32px, 5vw, 80px);
+  }
+}
+
+.contrastInner .sectionHeader {
+  margin-bottom: 0;
+}
+
+.contrastBody {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 22px);
+  max-width: calc(56 * var(--ch-body));
+}
+
+.contrastBody p {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* Proof line — the benefitsFootnote pattern (solid gold rule, no dash glyph) */
+.contrastProof {
+  grid-column: 1 / -1;
+  margin: clamp(8px, 1.2vw, 16px) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: var(--ls-tight-5);
+  line-height: var(--leading-body);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-14);
+}
+
+.contrastProof::before {
+  content: '';
+  flex-shrink: 0;
+  width: clamp(28px, 4vw, 48px);
+  height: 2px;
+  background: var(--color-primary);
+  transform: translateY(-0.22em);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 4a. SOCIAL STATEMENT IN AN INK PANEL — the statement and the gallery screen
+ *     enclosed together in an ink rectangle (InkPanel molecule) on a subtle
+ *     section band. The negative makes a caesura in the page rhythm — the only
+ *     dark section on /compare. Inner colours = the painInner canon (HomePage).
+ * ───────────────────────────────────────────────────────────────────── */
+.inkInner {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+}
+
+.inkSplit {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4vw, 48px);
+}
+
+.inkContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vw, 36px);
+}
+
+/* Colour var-hook on the ink panel for SectionHeaderMolecule:
+ * the scale = .sectionHeaderScaled
+ * (clamp(28-48px) / 1.08 / -0.018em / 20ch) passed through the same hooks. */
+.inkHeader {
+  --section-headline-color: var(--color-on-ink);
+  --section-headline-size: clamp(28px, 4.4vw, 48px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: calc(20 * var(--ch-heading));
+  margin-bottom: 0;
+}
+
+/* Legacy keyword slot inherits the complete heading's foreground. */
+.inkAccent {
+  color: inherit;
+}
+
+.inkBody {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 22px);
+  max-width: calc(52 * var(--ch-body));
+}
+
+.inkBody p {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: color-mix(in oklch, var(--color-on-ink) 78%, transparent);
+  margin: 0;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.inkProof {
+  margin: clamp(8px, 1.2vw, 16px) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-on-ink);
+  letter-spacing: var(--ls-tight-5);
+  line-height: var(--leading-body);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-14);
+}
+
+.inkProof::before {
+  content: '';
+  flex-shrink: 0;
+  width: clamp(28px, 4vw, 48px);
+  height: 2px;
+  background: var(--color-primary);
+  transform: translateY(-0.22em);
+}
+
+.socialIllustration {
+  --illustration-frame: var(--color-on-ink);
+  margin-block: 0;
+}
+
+.inkContent {
+  max-width: calc(64 * var(--ch-body));
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 6. FAQ — canon: the FaqSection molecule (components/FaqSection); the accordion
+ *    skin lives in FaqSection.module.css. Band = <Section as='div'> (breakout +
+ *    lp container via the constrained inner; the Q&A list narrows to the canonical
+ *    72ch inside the molecule anyway). Here stay the page rhythm + its own
+ *    primary 5% tint (NOT bg-subtle, a band without a frame).
+ * ───────────────────────────────────────────────────────────────────── */
+.faqSection {
+  --section-pad-block: var(--section-block);
+  /* Theme „one cream": the FAQ band stands on paper. With the zebra of the
+     contrast section gone (see .contrastSection), /compare spends no cream at
+     all — its contrast surface is the full ink-panel negative, not a background
+     wash; a cream here would be the page's only wash and would draw attention to
+     the FAQ instead of the statement. The band's edge comes from the section's
+     `bordered` prop (a pair of lines that does not double with FinalCtaBand's top
+     line; see the DECISION in Section.module.css). */
+  background: var(--color-bg-main);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 7. FINAL CTA — the shared FinalCtaBand molecule
+ * (src/UI/components/FinalCtaBand/) — zero per-page styles.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* ─── Hero mark: three tools, what each is for (owner: every hero
+   carries its own detail). Flat rows in one white box; the chosen row is
+   inverted ink, like every selection in the product. ─── */
+.heroVerdict {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  margin: 0;
+  padding: var(--space-8);
+  list-style: none;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.heroVerdictRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--style-radius-control);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.heroVerdictName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.heroVerdictRow[data-chosen='true'] {
+  /* focus-ring-allow: a static list row with text only; it is never
+     focusable and holds nothing focusable. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+}
+
+.heroVerdictRow[data-chosen='true'] .heroVerdictName {
+  color: var(--color-bg-main);
+}

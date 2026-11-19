@@ -1,0 +1,1502 @@
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │ 📖 SCHEMA DECISION RATIONALE
+// │ Inline below = ONLY one-line pointers `// DECISION [id] -> ...`.             │
+// │ Full rationale lives in the file above. Do not remove the decisions.         │
+// └─────────────────────────────────────────────────────────────────────────────┘
+
+generator client {
+  output        = "./js-client"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Better Auth Models
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String    @map("user_id")
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token") @db.Text
+  refreshToken          String?   @map("refresh_token") @db.Text
+  idToken               String?   @map("id_token") @db.Text
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  token       String   @unique @map("session_token")
+  userId      String   @map("user_id")
+  expires     DateTime
+  ip_address  String?
+  user_agent  String?
+  device_type String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expires])
+  @@index([userId, expires])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([identifier, value])
+}
+
+// D23 (run 25): admin impersonation backup token storage. Plaintext admin
+// session token never crosses the wire — only an opaque `ref_id` (DB lookup
+// key) signed with HMAC rides in the `become-user` header. Single active
+// impersonation per admin enforced via @unique on admin_user_id (a new
+// `become-user` deletes any prior row for that admin).
+// DECISION [throttle-counter]: fixed-window abuse counters keyed by an opaque hash, shared by every process
+model ThrottleCounter {
+  key          String   @id
+  count        Int
+  window_start DateTime
+  expires_at   DateTime
+
+  @@index([expires_at])
+}
+
+// DECISION [job-lease]: one row per periodic job; due_at + fenced lease (owner token, expiry) replace per-process throttles and session advisory locks
+model JobLease {
+  job_name             String    @id
+  due_at               DateTime  @db.Timestamptz(3)
+  lease_owner          String?
+  lease_expires_at     DateTime? @db.Timestamptz(3)
+  last_started_at      DateTime? @db.Timestamptz(3)
+  last_completed_at    DateTime? @db.Timestamptz(3)
+  last_duration_ms     Int?
+  last_error           String?   @db.Text
+  last_instance        String?
+  consecutive_failures Int       @default(0)
+  run_count            Int       @default(0)
+  updated_at           DateTime  @default(now()) @db.Timestamptz(3)
+}
+
+model ImpersonationBackup {
+  ref_id                     String   @id
+  admin_user_id              String   @unique
+  backup_session_token       String   @db.Text
+  original_session_id        String
+  // DECISION [impersonationbackup-caller-binding]: positive DB binding of switch-back; ephemeral NOT NULL, truncate-first migration
+  impersonated_user_id       String   @db.Text
+  impersonated_session_token String   @db.Text
+  expires_at                 DateTime
+  created_at                 DateTime @default(now())
+
+  @@index([expires_at])
+}
+
+// Business Domain Models
+
+model AdminNote {
+  id         String   @id @default(cuid())
+  notes      String   @db.Text
+  created_at DateTime @default(now())
+}
+
+model Policy {
+  id         String   @id @default(cuid())
+  title      String
+  content    String   @db.Text
+  is_main    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([is_main])
+}
+
+// Dynamic Permissions System
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  is_system   Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  permissions RolePermission[]
+  users       User[]
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  event_name  String   @unique
+  description String?
+  category    String
+  is_system   Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  roles RolePermission[]
+
+  @@index([category])
+}
+
+model RolePermission {
+  id            String   @id @default(cuid())
+  role_id       String
+  permission_id String
+  created_at    DateTime @default(now())
+
+  role       Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_id, permission_id])
+  @@index([permission_id])
+}
+
+model EventLog {
+  event_log_id       String       @id @default(cuid())
+  created_at         DateTime     @default(now())
+  event              String
+  // DECISION [eventlog-soft-fk]: soft FK: the audit row survives user deletion with a dangling user_id
+  created_by_user_id String
+  language           String?
+  location           String?
+  user_agent         String?
+  client_ip          String?
+  event_payload      Json?
+  event_type         EventLogType
+
+  // User activity/timeline pagination. The first index covers an optional type
+  // filter; the second covers the common all-types view. Both match total-order
+  // created_at DESC + event_log_id DESC instead of forcing a per-user sort.
+  @@index([created_by_user_id, event_type, created_at(sort: Desc), event_log_id(sort: Desc)])
+  @@index([created_by_user_id, created_at(sort: Desc), event_log_id(sort: Desc)])
+  // DD3-F3 (2026-05-26, pre-launch baseline regen):
+  // Hot query patterns: `WHERE event=X AND created_at >= ?` (dunning, lifecycle sweeps)
+  // and `WHERE event_type=Y AND created_at >= ?` (admin log filters, retention cleanup).
+  // Composite indexes with created_at DESC for "recent events of type" pagination.
+  @@index([event, created_at(sort: Desc)])
+  @@index([event_type, created_at(sort: Desc)])
+}
+
+// AI Crawler Analytics — tracking who crawls /llms.txt, /robots.txt, /sitemap*.xml
+// DECISION [aicrawler-varchar-indexes]: VarChar = defense in depth, plus composite (date, bot) indexes for stats
+model AiCrawlerEvent {
+  id           String   @id @default(cuid())
+  created_at   DateTime @default(now())
+  user_agent   String   @db.VarChar(2000)
+  path         String   @db.VarChar(500) // /llms.txt, /llms-pl.txt, /robots.txt, /sitemap.xml, etc.
+  ip_address   String?  @db.VarChar(100) // pełny adres IP crawlera, cap 100 znaków
+  country      String?  @db.VarChar(10) // CF-IPCountry header (Cloudflare) lub null
+  bot_name     String?  @db.VarChar(100) // parsed: GPTBot, ClaudeBot, PerplexityBot, Googlebot, etc.
+  bot_category String?  @db.VarChar(50) // ai-training, ai-search, search-engine, seo-tool, social, unknown
+
+  @@index([bot_name])
+  @@index([bot_category])
+  @@index([path])
+  @@index([created_at, bot_name])
+  @@index([created_at, bot_category])
+}
+
+// Stripe Webhook Idempotency
+model StripeEvent {
+  id              String    @id @default(cuid())
+  event_id        String    @unique @map("eventId")
+  event_type      String    @map("eventType")
+  processed       Boolean   @default(false)
+  processed_at    DateTime? @map("processedAt")
+  created_at      DateTime  @default(now()) @map("createdAt")
+  // D1 (run 25): janitor sweeper retry tracking + dead-letter handling.
+  // DECISION [stripeevent-last-attempt-default]: @default(now()) so the janitor does not sweep by age during a DB outage
+  retry_count     Int       @default(0) @map("retryCount")
+  last_attempt_at DateTime  @default(now()) @map("lastAttemptAt")
+  last_error      String?   @map("lastError") @db.Text
+  dead_lettered   Boolean   @default(false) @map("deadLettered")
+
+  // DD3-D8 (run 24): janitorial sweeper for unprocessed events ordered by age.
+  // WHERE processed = false AND dead_lettered = false ORDER BY created_at.
+  @@index([processed, dead_lettered, created_at])
+  // Admin/diagnostics: list dead-lettered rows for manual triage.
+  @@index([dead_lettered, created_at])
+}
+
+model StylistAccount {
+  account_id                    String              @id @default(cuid())
+  created_at                    DateTime            @default(now())
+  created_by_user_id            String              @unique
+  // DECISION [stylistaccount-display-name-nullable]: nullable w DB, app-required (walidator); odczyty z fallbackiem
+  display_name                  String?
+  pricing_plan                  PricingPlan
+  payment_status                PaymentStatus
+  account_status                AccountStatus
+  // DECISION: the column stays, but per-seat pricing is gone (Model B): Studio includes the whole
+  // team up to 10 accounts (max_staff_members=9, fair-use cap) and paid_staff_seats is not a surcharge
+  // (default 0). The salon-staff guard still adds it to max_staff_members, so it can serve as a manual
+  // limit bump. SSOT: pricing.policy.ts (Model B) + PRICING_PACKAGING §2.4. (owner)
+  paid_staff_seats              Int                 @default(0)
+  checkout_attempt              CheckoutAttempt?
+  account_expiration_date       DateTime?
+  upcoming_payment_date         DateTime?
+  business_name                 String?
+  address_street                String?
+  address_city                  String?
+  address_postal_code           String?
+  address_country               String?
+  latitude                      Float?
+  longitude                     Float?
+  phone                         String?
+  website                       String?
+  // Up to three external profile links (booksy/fresha/instagram/etc.).
+  // The public read validates https and caps at EXTERNAL_LINK_LIMIT.
+  external_links                Json?
+  description                   String?             @db.Text
+  dashboard_note                String?             @db.Text
+  vanity_url                    String?             @unique
+  // Public profile fields
+  instagram_handle              String?
+  // DECISION [stylistaccount-avatar]: wlasny upload zdjecia profilowego (account/set-avatar), null = fallback OAuth image -> inicjaly
+  avatar_url                    String?
+  // DECISION [asset-public-id]: cloud file id derived from the URL on write; the index replaces a full
+  // URL-column scan in the ownership gate. NULL = URL not parseable, the row stays on the slower
+  // in-code comparison path (cloudinary-asset.guard.ts). No @unique on purpose: the gate asks
+  // "exists", and a historical row may legitimately point at the same file.
+  avatar_public_id              String?
+  // Branding-light krok 1 (BRANDING_VALUE_LADDER, 2026-07-11): kolor akcentu
+  // publicznego profilu — hex z kuratorowanej palety kernela (walidacja
+  // po stronie API), gate planu can_brand_profile (Pro Marka+).
+  brand_accent_color            String?             @db.VarChar(7)
+  salon_vanity_url              String?             @unique
+  salon_profile_name            String?
+  salon_brand_accent_color      String?             @db.VarChar(7)
+  salon_show_team               Boolean             @default(true)
+  // Salon-owned links; separate from the person's external_links.
+  salon_external_links          Json?
+  // DECISION [salon-logo]: independent salon identity
+  salon_logo_url                String?
+  salon_logo_public_id          String?
+  // Stripe subscription fields
+  stripe_customer_id            String?             @unique
+  subscription_id               String?
+  subscription_status           SubscriptionStatus?
+  cancel_at_period_end          Boolean?            @default(false)
+  cancel_at                     DateTime?
+  current_period_end            DateTime?
+  // Out-of-order webhook guard: created-time of the most recent Stripe EVENT applied
+  // to this account. Webhook plan-writes are gated on it (skip if event.created is
+  // older) so a delayed/retried stale event cannot resurrect a canceled subscription.
+  // Null = no Stripe event applied yet (first event always wins). Non-webhook callers
+  // (login-sync / dunning) are authoritative and do NOT set/check it.
+  last_stripe_event_at          DateTime?
+  // Trial fields
+  trial_started_at              DateTime?
+  trial_ends_at                 DateTime?
+  trial_reminder_sent           Boolean?            @default(false)
+  // DECISION [stylistaccount-plan-selected-at]: plan-choice gate marker, separate from trial_started_at.
+  // Set on an explicit choice (Free at once, paid when the checkout session is created); an abandoned
+  // paid checkout leaves it set with pricing_plan FREE, so the user is not locked out. Nullable, no
+  // index (read per account by PK). Not the trial lock.
+  plan_selected_at              DateTime?
+  // Email lifecycle preferences
+  // DECISION [stylistaccount-marketing-by-design]: domyślny JSON ma marketing:true; faktyczną wartość zapisuje onboarding (kolumna email_marketing)
+  email_preferences             Json?               @default("{\"trial_sequence\":true,\"marketing\":true}")
+  // DECISION [stylistaccount-email-bool-authoritative]: the Boolean is the authoritative path; the JSON is a shadow kept for rollback
+  email_marketing               Boolean             @default(true)
+  email_trial_sequence          Boolean             @default(true)
+  admin_plan_override           Boolean             @default(false)
+  // DECISION [stylistaccount-gallery-strength-dismissed-at]: the stylist closed the "gallery strength" card at 100%; NULL = card visible. Never cleared on a drop below 100%: render decides by SCORE (score < 100 shows the card despite the marker), so one dismissal does not silence future hints
+  gallery_strength_dismissed_at DateTime?
+  // Profile metrics
+  view_count                    Int                 @default(0)
+  // DECISION [stylistaccount-cached-bookmark-count]: denormalized count anty-N+1; SoT = FavoriteStylist, drift recovery skryptem
+  cached_bookmark_count         Int                 @default(0)
+  // DECISION [stylistaccount-cached-gallery-count]: denormalized anti-N+1 count of VISIBLE records (is_hidden=false), same as the write path (gallery-count.helper) and the backfill; an ALL-count drifted the public photo_count
+  cached_gallery_count          Int                 @default(0)
+  // DECISION [stylistaccount-cached-likes-count]: denormalized anti-N+1 count; SoT = FavoriteGalleryRecord JOIN GalleryRecord WHERE is_hidden=false (likes of VISIBLE records); single writer favorite-count.helper.ts; drift recovery via cached-counts-backfill
+  cached_likes_count            Int                 @default(0)
+  created_by_user               User                @relation("StylistAccountRelation", fields: [created_by_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  salon_showcase_works          SalonShowcaseWork[]
+  gallery_record                GalleryRecord[]     @relation("GalleryRecordRelation")
+  favorited_by                  FavoriteStylist[]   @relation("StylistBookmarks")
+  stylist_pairings              ClientStylistPair[] @relation("StylistPairings")
+  pairing_sessions              PairingSession[]    @relation("StylistPairingSessions")
+  salon_invitations             SalonInvitation[]
+  staff_members                 StaffMember[]       @relation("SalonStaff")
+  session_containers            SessionContainer[]
+  stylist_visits                VisitRecord[]       @relation("StylistVisits")
+  profile_link_aliases          ProfileLinkAlias[]
+
+  @@index([account_status, address_city, latitude, longitude])
+  @@index([subscription_status])
+  // DECISION [stylistaccount-subscription-id-index]: Stripe lookups by subscription id (orphan-subscription
+  // scan OR leg, cancel-reconcile paid-owner guard). Plain, NOT @unique
+  @@index([subscription_id])
+  // Explore query: filter ACTIVE accounts then join via account_id — covering index for the subquery plan
+  @@index([account_status, account_id])
+  // DECISION [stylistaccount-explore-orderby-index]: covering index for the getStylistsWithLocation ORDER BY
+  @@index([account_status, cached_gallery_count(sort: Desc)])
+  @@index([avatar_public_id])
+  @@index([salon_logo_public_id])
+  // Email sweep query: WHERE trial_started_at IS NOT NULL — avoids full table scan
+  @@index([trial_started_at]) // redundant-index-allow: retained for trial_started_at-only email-sweep scans (documented retention; technically covered by [trial_started_at, payment_status])
+  // PRMA C1-F2 (2026-05-27, HIGH): hot dunning + lifecycle sweeps filter on
+  // trial_started_at AND payment_status (e.g., trials still UNPAID after N days). Composite
+  // accelerates the AND clause; single-column index above retained for trial_started_at-only scans.
+  @@index([trial_started_at, payment_status])
+  // DECISION [stylistaccount-billing-cron-index]: paid-lifecycle crons (renewal-reminder: payment_status=PAID
+  // + current_period_end BETWEEN range ORDER BY current_period_end ASC; dunning-downgrade: payment_status=IN_PROGRESS
+  // ORDER BY current_period_end ASC). Composite serves the equality partition + range/seek AND eliminates the sort
+  // (current_period_end was in zero indexes).
+  @@index([payment_status, current_period_end])
+  // City filter (Explore + public stylists list) — equality lookup without lat/lng dependency
+  @@index([address_city])
+  // DECISION [stylistaccount-gin-trigram]: per-column GIN trgm for fuzzy search (ILIKE); pg_trgm created by hand in the migration
+  @@index([display_name(ops: raw("gin_trgm_ops"))], type: Gin, map: "stylist_account_display_name_trgm_idx")
+  @@index([business_name(ops: raw("gin_trgm_ops"))], type: Gin, map: "stylist_account_business_name_trgm_idx")
+  @@index([address_city(ops: raw("gin_trgm_ops"))], type: Gin, map: "stylist_account_address_city_trgm_idx")
+}
+
+// DECISION [checkout-attempt]: one fenced purchase attempt per account, no client secret
+model CheckoutAttempt {
+  account_id             String    @id
+  attempt_id             String?   @unique @db.Uuid
+  intent_fingerprint     String?
+  intent                 Json?
+  stripe_params          Json?
+  response_meta          Json?
+  stripe_session_id      String?   @unique
+  stripe_subscription_id String?
+  customer_id            String?
+  phase                  String    @default("empty")
+  lease_owner            String?   @db.Uuid
+  lease_expires_at       DateTime? @db.Timestamptz(3)
+  expires_at             DateTime? @db.Timestamptz(3)
+  created_at             DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at             DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  account StylistAccount @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
+}
+
+model ClientAccount {
+  client_account_id  String   @id @default(cuid())
+  created_at         DateTime @default(now())
+  created_by_user_id String   @unique
+
+  // Contact information (visible only to paired stylists)
+  contact_phone String?
+  contact_email String?
+
+  dashboard_note String? @db.Text
+
+  created_by_user    User               @relation("ClientAccountRelation", fields: [created_by_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  session_containers SessionContainer[]
+
+  @@index([contact_phone])
+  @@index([contact_email])
+}
+
+model Color {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  hex_code      String
+  display_order Int      @default(0)
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+
+  gallery_records GalleryRecordColor[]
+
+  @@index([is_active, display_order])
+}
+
+model Trait {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  category      String // 'technique', 'finish', 'decoration', 'style'
+  icon_url      String?
+  display_order Int      @default(0)
+  is_active     Boolean  @default(true)
+  is_featured   Boolean  @default(false)
+  created_at    DateTime @default(now())
+
+  gallery_records GalleryRecordTrait[]
+
+  @@index([is_active, is_featured(sort: Desc), category, display_order])
+  @@index([category])
+}
+
+model GalleryRecordColor {
+  id                String   @id @default(cuid())
+  gallery_record_id String
+  color_id          String
+  created_at        DateTime @default(now())
+
+  gallery_record GalleryRecord @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade)
+  color          Color         @relation(fields: [color_id], references: [id], onDelete: Cascade)
+
+  @@unique([gallery_record_id, color_id])
+  // Explore query: EXISTS subquery seeks color_id then needs gallery_record_id for join — covering index
+  @@index([color_id, gallery_record_id])
+}
+
+model GalleryRecordTrait {
+  id                String   @id @default(cuid())
+  gallery_record_id String
+  trait_id          String
+  created_at        DateTime @default(now())
+
+  gallery_record GalleryRecord @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade)
+  trait          Trait         @relation(fields: [trait_id], references: [id], onDelete: Cascade)
+
+  @@unique([gallery_record_id, trait_id])
+  // Explore query: EXISTS subquery seeks trait_id then needs gallery_record_id for join — covering index
+  @@index([trait_id, gallery_record_id])
+}
+
+model GalleryRecord {
+  gallery_record_id        String                  @id @default(cuid())
+  created_at               DateTime                @default(now())
+  created_by_account_id    String
+  asset_url                String
+  // DECISION [asset-public-id]: cloud file id derived from the URL on write; the index replaces a full
+  // URL-column scan in the ownership gate. NULL = URL not parseable, the row stays on the slower
+  // in-code comparison path (cloudinary-asset.guard.ts). No @unique on purpose: the gate asks
+  // "exists", and a historical row may legitimately point at the same file.
+  public_id                String?
+  nail_length              NailLength
+  is_pinned                Boolean                 @default(false)
+  // DECISION [gallery-pinned-position]: order of pinned works on the profile, set by the stylist
+  // (GALLERY_REORDER_PINNED_RECORDS). Pin appends, unpin clears to NULL. NULL on a pinned row means
+  // pre-column or demo-seed data: reads sort NULL last, then created_at DESC. No index: the pinned set
+  // is capped by the plan (<= 50).
+  pinned_position          Int?
+  is_salon_pinned          Boolean                 @default(false)
+  is_hidden                Boolean                 @default(false)
+  created_by_account       StylistAccount          @relation("GalleryRecordRelation", fields: [created_by_account_id], references: [account_id], onDelete: Cascade, onUpdate: Cascade)
+  favorited_by             FavoriteGalleryRecord[] @relation("FavoriteRecords")
+  colors                   GalleryRecordColor[]
+  traits                   GalleryRecordTrait[]
+  content_reports          ContentReport[]
+  salon_showcase_works     SalonShowcaseWork[]
+  session_container_photos SessionContainerPhoto[]
+
+  @@index([is_pinned, created_at(sort: Desc)])
+  @@index([created_by_account_id, nail_length])
+  // Explore query: filter by nail_length + ORDER BY created_at DESC — avoids sort step
+  @@index([nail_length, created_at(sort: Desc)])
+  // Explore query: cursor pagination seeks (created_at, gallery_record_id) for stable ordering
+  @@index([created_at(sort: Desc), gallery_record_id])
+  // PRMA C1-F1 (2026-05-27, CRITICAL): public profile + Explore feed dominant queries always
+  // include is_hidden filter (= false) and order by created_at DESC. Composite indexes below cover
+  // both per-account profile pagination and global Explore pagination with a single seek.
+  @@index([created_by_account_id, is_hidden, created_at(sort: Desc)])
+  @@index([is_hidden, created_at(sort: Desc)])
+  // Public profile gallery (publicGetGalleryRecordsByAccount_IO): WHERE created_by_account_id
+  // + is_pinned=true + is_hidden=false ORDER BY created_at DESC (+ gallery_record_id tiebreaker).
+  // Covers equality prefix + sort in one seek; existing [..,is_pinned] / [..,is_hidden,created_at]
+  // indexes each miss one predicate so the planner falls back to a sort.
+  @@index([created_by_account_id, is_pinned, is_hidden, created_at(sort: Desc)])
+  // Paired-client gallery (getGalleryForPairedClient_IO): WHERE created_by_account_id + is_hidden
+  // ORDER BY is_pinned DESC, created_at DESC, gallery_record_id DESC. Covers the multi-key sort
+  // (is_pinned → created_at → cuid tiebreaker) so pinned-first pagination is a single index walk.
+  @@index([created_by_account_id, is_pinned, created_at(sort: Desc), gallery_record_id])
+  @@index([public_id])
+}
+
+model User {
+  id                     String      @id @default(cuid())
+  email                  String      @unique
+  emailVerified          Boolean     @default(false) @map("email_verified")
+  image                  String?
+  // DECISION [user-avatar]: custom person photo, OAuth image remains the fallback
+  avatar_url             String?
+  avatar_public_id       String?
+  name                   String      @default("") @db.VarChar(200)
+  role_id                String
+  createdAt              DateTime    @default(now()) @map("created_at")
+  updatedAt              DateTime    @updatedAt @map("updated_at")
+  is_active              Boolean     @default(true)
+  disabled_at            DateTime?   @map("disabled_at")
+  // DECISION [user-soft-delete-model-a]: Model A soft-delete §13.1; deleted_at=self vs disabled_at=ban
+  deleted_at             DateTime?   @map("deleted_at")
+  recovery_available     Boolean     @default(false) @map("recovery_available")
+  account_type           AccountType @default(CLIENT)
+  notifications_enabled  Boolean     @default(true)
+  // DECISION [user-terms-accepted-at]: first acceptance of terms + 16+ declaration, stamped by onboarding
+  terms_accepted_at      DateTime?   @map("terms_accepted_at")
+  // DECISION [user-last-login-at]: stamped by the Better Auth session.create.after hook (real sign-ins only; impersonation and dev-login sessions bypass it), best-effort, never blocks login
+  last_login_at          DateTime?   @map("last_login_at")
+  moderation_strikes     Int         @default(0)
+  // DECISION [user-delete-confirm-version]: monotonic counter that invalidates the single-use delete token (anti-replay)
+  delete_confirm_version Int         @default(0)
+
+  // Relations
+  role                      Role                    @relation(fields: [role_id], references: [id])
+  stylist_account           StylistAccount?         @relation("StylistAccountRelation")
+  client_account            ClientAccount?          @relation("ClientAccountRelation")
+  favorite_stylists         FavoriteStylist[]       @relation("ClientBookmarks")
+  favorite_records          FavoriteGalleryRecord[] @relation("ClientFavoriteRecords")
+  client_pairings           ClientStylistPair[]     @relation("ClientPairings")
+  client_visits             VisitRecord[]           @relation("ClientVisits")
+  staff_memberships         StaffMember[]           @relation("StaffMemberships")
+  announcements             Announcement[]          @relation("AnnouncementRelation")
+  runtime_config_updates    RuntimeConfig[]         @relation("RuntimeConfigUpdater")
+  moderation_strike_records ModerationStrike[]      @relation("ModerationStrikeRelation")
+  notifications             Notification[]          @relation("UserNotifications")
+  push_subscriptions        PushSubscription[]      @relation("UserPushSubscriptions")
+
+  emailLifecycleMessages EmailLifecycleMessage[]
+  freeEmailEnrollments   FreeEmailEnrollment[]
+  emailLifecycleEntries  EmailLifecycleEntry[]
+  emailLifecycleActions  EmailLifecycleAction[]
+
+  // Better Auth relations
+  accounts Account[]
+  sessions Session[]
+
+  @@index([role_id])
+  @@index([avatar_public_id])
+  @@index([name])
+  @@index([is_active])
+  @@index([createdAt])
+  // Recovery cron: WHERE recovery_available=true AND deleted_at < (now-90d) (DOMAIN_SSOT §13.1)
+  @@index([recovery_available, deleted_at])
+  // PLQS C1-5D (2026-05-28): admin metrics GROUP BY account_type + admin user-list
+  // filter by type ordered by date. Composite avoids full table scan + sort step.
+  @@index([account_type, createdAt(sort: Desc)])
+  // DECISION [user-gin-trigram]: per-column GIN trgm for fuzzy admin user search (ILIKE %term% on
+  // email + name; a leading wildcard skips btree). Same pattern as StylistAccount; pg_trgm by hand in
+  // the migration.
+  @@index([email(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_email_trgm_idx")
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_name_trgm_idx")
+  @@map("users") // REQUIRED by Better Auth adapter mapping - users table name.
+}
+
+model DeletedUser {
+  user_id              String    @id @default(cuid())
+  created_at           DateTime  @default(now())
+  body                 Json
+  // Denormalized copy of body.email (lookup key for recovery). Nullable: rows written
+  // before the column existed have NULL — findMatchingBackup falls back to the legacy
+  // JSON scan for those (recovery.operations.ts). Writers (deleteUser_IO backup upsert
+  // + moveExpiredUserToArchive_IO) fill it from the snapshot.
+  email                String?
+  recovery_offered     Boolean   @default(false)
+  recovered_at         DateTime?
+  recovered_as_user_id String?
+  is_gdpr_erased       Boolean   @default(false)
+  // DECISION [deleteduser-is-move-archive]: true=archiwum z 90d MOVE, pełne body, NIE-restorable; recovery filtruje not:true
+  is_move_archive      Boolean   @default(false)
+
+  @@index([created_at])
+  @@index([email])
+}
+
+model FavoriteStylist {
+  id                 String   @id @default(cuid())
+  client_user_id     String
+  stylist_account_id String
+  created_at         DateTime @default(now())
+
+  client  User           @relation("ClientBookmarks", fields: [client_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stylist StylistAccount @relation("StylistBookmarks", fields: [stylist_account_id], references: [account_id], onDelete: Cascade, onUpdate: Cascade)
+  // FAZA A (2026-06-03, owner): fizyczny rename FollowedStylist -> FavoriteStylist (usunięte @@map).
+  // PPC „avoid ALTER TABLE" nadpisane — pre-launch 0 rows, czysty baseline na końcu sesji.
+
+  @@unique([client_user_id, stylist_account_id])
+  @@index([client_user_id, created_at(sort: Desc)])
+  @@index([stylist_account_id])
+}
+
+model FavoriteGalleryRecord {
+  id                String   @id @default(cuid())
+  client_user_id    String
+  gallery_record_id String
+  note              String?  @db.VarChar(500)
+  created_at        DateTime @default(now())
+
+  client User          @relation("ClientFavoriteRecords", fields: [client_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  record GalleryRecord @relation("FavoriteRecords", fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([client_user_id, gallery_record_id])
+  @@index([client_user_id, created_at(sort: Desc)])
+  // Public profile total_likes aggregate: COUNT joined via record.created_by_account_id
+  @@index([gallery_record_id])
+}
+
+enum EventLogType {
+  ACCOUNT
+  LOGIN
+  GALLERY
+  ADMIN
+  DOMAIN
+  EMAIL
+}
+
+enum AccountType {
+  STYLIST
+  CLIENT
+}
+
+enum NailLength {
+  SHORT
+  MEDIUM
+  LONG
+  XL
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  TRIALING
+  UNPAID
+  PAUSED
+}
+
+enum PricingPlan {
+  FREE
+  PRO
+  PRO_PLUS
+  STUDIO
+  SCALE
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  IN_PROGRESS
+  // DECISION [paymentstatus-rejected-scaffold]: scaffold for charge.dispute; disputes go through UNPAID today, kept for later
+  REJECTED
+}
+
+enum AccountStatus {
+  ACTIVE
+  NOT_ACTIVE
+  EXPIRING
+  EXPIRED
+}
+
+// Staff Accounts (Studio plan feature)
+enum StaffRole {
+  OWNER
+  MANAGER
+  EMPLOYEE
+}
+
+model SalonInvitation {
+  id               String         @id @default(cuid())
+  salon_account_id String
+  email            String
+  role             StaffRole      @default(EMPLOYEE)
+  token_hash       String         @unique @db.VarChar(64)
+  expires_at       DateTime
+  accepted_at      DateTime?
+  declined_at      DateTime?
+  attached_user_id String?
+  created_at       DateTime       @default(now())
+  salon            StylistAccount @relation(fields: [salon_account_id], references: [account_id], onDelete: Cascade)
+
+  @@index([salon_account_id, email])
+  @@index([email, accepted_at])
+}
+
+model StaffMember {
+  id                     String    @id @default(cuid())
+  stylist_account_id     String
+  user_id                String
+  role                   StaffRole @default(EMPLOYEE)
+  permissions            String[] // ['GALLERY_VIEW', 'GALLERY_EDIT', 'PAIRING_MANAGE', 'SESSION_SHARE_RECEIVE']
+  invited_at             DateTime  @default(now())
+  // DECISION [staffmember-accepted-at]: zgoda zaproszonej na pokazanie imienia i zdjecia w zespole (pisze ja WYLACZNIE respondToStaffInvitation_IO), null = zaproszenie czeka
+  accepted_at            DateTime?
+  public_profile_visible Boolean   @default(true)
+  is_active              Boolean   @default(true)
+
+  stylist_account StylistAccount @relation("SalonStaff", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+  user            User           @relation("StaffMemberships", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([stylist_account_id, user_id])
+  @@index([user_id, is_active])
+  @@index([stylist_account_id, is_active])
+}
+
+model PairingSession {
+  id                        String    @id @default(cuid())
+  token                     String    @unique @db.VarChar(32)
+  stylist_account_id        String
+  issued_by_user_id         String
+  created_at                DateTime  @default(now())
+  expires_at                DateTime
+  claimed_by_client_user_id String?
+  claimed_at                DateTime?
+  revoked_at                DateTime?
+
+  stylist_account StylistAccount @relation("StylistPairingSessions", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+
+  @@index([stylist_account_id, created_at(sort: Desc)])
+  @@index([expires_at])
+}
+
+model ClientStylistPair {
+  id                            String        @id @default(cuid())
+  client_user_id                String
+  stylist_account_id            String
+  paired_at                     DateTime      @default(now())
+  // DECISION [pair-request-notification-anchor]: CONTACT keeps the original request window after withdrawal
+  last_pair_request_at          DateTime?
+  // DECISION [clientstylistpair-soft-ref]: audit-only soft reference to PairingSession.id, guaranteed at app level
+  paired_via_pairing_session_id String?
+  status                        PairingStatus @default(ACTIVE)
+  revoked_at                    DateTime?
+  // DECISION [pair-revoked-by]: who ended the relation. Without it REVOKED could not tell a client leaving from a stylist removing her, so a removed person could unilaterally undo the only "remove this person" control (a new request lifted the row to PENDING, and PENDING opens messaging). NULL = rows from before the column, counted as ended by the client
+  revoked_by                    AccountType?
+  salon_origin_account_id       String?
+  // DECISION [pair-request-context]: optional decision context, cleared when a request ends;
+  // it is not part of the client's CRM record
+  request_place                 String?       @db.VarChar(100)
+  request_note                  String?       @db.VarChar(140)
+  crm_note                      String?       @db.Text
+  crm_note_updated_at           DateTime?
+  // DECISION [pair-important-note]: the ONE thing the stylist must not miss before a visit (an allergy, a sensitivity). Written and read only by the stylist of the pair, never in a client-facing DTO; NOT plan-gated (safety information on every plan, Free included), unlike crm_note. Survives a disconnect like crm_note, cleared by its own empty write, erased with the pair by the account-deletion cascade
+  important_note                String?       @db.VarChar(200)
+  important_note_updated_at     DateTime?
+
+  // One stylist-client thread per pair. last_message_at is denormalized so the
+  // inbox can sort and detect "has messages" without an aggregate.
+  // *_last_read_at is the per-side read mark (unread = the other side's
+  // messages with created_at > my last_read_at).
+  last_message_at      DateTime?
+  client_last_read_at  DateTime?
+  stylist_last_read_at DateTime?
+  // DECISION [pair-hidden-at]: hiding a conversation is a MUTE on one side of the pair. The hiding side
+  // loses the thread from inbox and counters, the pending request from its list, and gets no
+  // notifications; the other side learns NOTHING (send succeeds and messages are stored, so there is no
+  // oracle). A new message does not unhide; restore = null. Nullable, no backfill, no index (hidden
+  // sets are small; the inbox runs on (owner, last_message_at DESC, id DESC) with IS NULL). (owner)
+  stylist_hidden_at    DateTime?
+  client_hidden_at     DateTime?
+
+  client_user     User                   @relation("ClientPairings", fields: [client_user_id], references: [id], onDelete: Cascade)
+  stylist_account StylistAccount         @relation("StylistPairings", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+  messages        StylistClientMessage[]
+
+  @@unique([client_user_id, stylist_account_id], name: "client_user_id_stylist_account_id")
+  @@index([salon_origin_account_id, status])
+  @@index([client_user_id, status, paired_at(sort: Desc)])
+  @@index([stylist_account_id, status, paired_at(sort: Desc)])
+  // Lista rozmów (per strona, najnowsza wiadomość pierwsza): pokrywa
+  // getConversations_IO WHERE <owner> AND last_message_at IS NOT NULL ORDER BY last_message_at DESC.
+  @@index([client_user_id, last_message_at(sort: Desc), id(sort: Desc)])
+  @@index([stylist_account_id, last_message_at(sort: Desc), id(sort: Desc)])
+}
+
+enum PairingStatus {
+  ACTIVE
+  REVOKED
+  CONTACT
+  // PENDING from a permanent QR or a public profile grants no protected access
+  // (gallery, client card and sessions filter status=ACTIVE). Messaging allows
+  // PENDING on purpose (canSendToPair): the client may write before acceptance
+  // ("anuluj prosbe + napisz"). Spam surface: 60/h per user, a 15-minute mail
+  // throttle per pair, and decline sets REVOKED (read-only). Accept lifts
+  // PENDING to ACTIVE. A 15-minute code claim upserts PENDING to ACTIVE.
+  PENDING
+}
+
+enum StylistClientMessageSender {
+  STYLIST
+  CLIENT
+}
+
+enum SessionActivityKind {
+  TEXT
+  SESSION_SUBMITTED
+  SESSION_ACCEPTED
+  SESSION_CHANGED
+}
+
+enum SessionChangeScope {
+  PHOTOS
+  NOTE
+  PHOTOS_AND_NOTE
+}
+
+// Komunikator stylistka<->klientka: jeden ciągły strumień wiadomości per para
+// (ClientStylistPair). Wysyłka dozwolona gdy para PENDING/ACTIVE (klientka może
+// pisać czekając na akceptację prośby); REVOKED = historia read-only.
+model StylistClientMessage {
+  id          String                     @id @default(cuid())
+  pair_id     String
+  sender_type StylistClientMessageSender
+  // @db.Text marks long-form free text (same intent as SupportMessage). On Postgres
+  // a bare String is already unbounded TEXT, so the annotation states intent and
+  // does not change the type (VARCHAR(191) is MySQL behavior, not Postgres).
+  content     String                     @db.Text
+  created_at  DateTime                   @default(now())
+
+  kind         SessionActivityKind @default(TEXT)
+  session_id   String?
+  change_scope SessionChangeScope?
+  event_key    String?             @unique
+  activity_at  DateTime            @default(now())
+  revision     Int                 @default(1)
+
+  pair ClientStylistPair @relation(fields: [pair_id], references: [id], onDelete: Cascade)
+
+  // Thread + latest preview: Postgres reverse-scan obsługuje ASC listy wątku,
+  // a DESC + id domyka deterministyczny latest-message lookup.
+  @@index([pair_id, created_at(sort: Desc), id(sort: Desc)])
+  // Conversation unread aggregate: pair + other-side + read timestamp cutoff.
+  @@index([pair_id, sender_type, created_at(sort: Desc)])
+  @@index([pair_id, activity_at(sort: Desc), id(sort: Desc)])
+  @@index([pair_id, sender_type, activity_at(sort: Desc)])
+}
+
+// Delivery references are soft: a deleted conversation cancels its pending delivery.
+model SessionActivityOutbox {
+  event_key         String              @id
+  pair_id           String
+  session_id        String
+  message_id        String
+  notification_id   String?
+  recipient_user_id String
+  kind              SessionActivityKind
+  status            String              @default("PENDING")
+  lease_token       String?
+  leased_until      DateTime?
+  attempts          Int                 @default(0)
+  next_attempt_at   DateTime            @default(now())
+  last_error        String?             @db.VarChar(1000)
+  created_at        DateTime            @default(now())
+  delivered_at      DateTime?
+
+  @@index([status, next_attempt_at])
+}
+
+enum VisitRecordSource {
+  SESSION
+  MANUAL
+}
+
+model ContactAccessLog {
+  id              String   @id @default(cuid())
+  client_user_id  String
+  stylist_user_id String
+  accessed_at     DateTime @default(now())
+  // DECISION [contactaccesslog-access-type]: DTO ContactAccessType override, kolumna String; EXPORT_CONTACT=SCAFFOLD
+  access_type     String
+  ip_address      String?
+  user_agent      String?
+
+  // DECISION [contactaccesslog-soft-fk]: client_user_id + stylist_user_id = soft-FK, append-only; wiersz przeżywa delete usera
+
+  @@index([client_user_id, accessed_at])
+  @@index([stylist_user_id, accessed_at])
+  @@index([client_user_id, stylist_user_id, accessed_at])
+  // Existing composite indexes are user-scoped — they cannot cover this global range scan.
+  @@index([accessed_at])
+}
+
+model FeatureFlag {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  description String?
+  is_enabled  Boolean   @default(false)
+  // DECISION [featureflag-expires-nullable]: nullable for legacy flags; new flags require expires_at in the admin UI
+  expires_at  DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@index([expires_at])
+}
+
+model Announcement {
+  id                   String         @id @default(cuid())
+  title                String         @db.VarChar(200)
+  message              String         @db.Text
+  type                 String         @default("info")
+  is_active            Boolean        @default(true)
+  // DECISION [announcement-audience-translations]: legacy rows keep all audiences and Polish text;
+  // sends use one transaction and one row per person
+  audience_anonymous   Boolean        @default(true)
+  audience_client      Boolean        @default(true)
+  audience_stylist     Boolean        @default(true)
+  translations         Json           @default("{}")
+  notification_sent_at DateTime?
+  notifications        Notification[]
+  starts_at            DateTime?
+  ends_at              DateTime?
+  // DECISION [announcement-author-setnull]: NULLABLE + SetNull: a global broadcast does not vanish with its author
+  created_by_user_id   String?
+  created_at           DateTime       @default(now())
+
+  created_by_user User? @relation("AnnouncementRelation", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([is_active, starts_at, ends_at])
+  @@index([created_at])
+  // DECISION [announcement-author-index]: @@index([created_by_user_id]) — FK scan na User-delete (SetNull)
+  @@index([created_by_user_id])
+}
+
+model RuntimeConfig {
+  id                 String   @id @default(cuid())
+  key                String   @unique
+  value              String
+  value_type         String
+  description        String?
+  is_predefined      Boolean  @default(false)
+  updated_by_user_id String?
+  updated_at         DateTime @updatedAt
+  created_at         DateTime @default(now())
+
+  updated_by_user User? @relation("RuntimeConfigUpdater", fields: [updated_by_user_id], references: [id], onDelete: SetNull)
+
+  // PRMA C1-F4 (2026-05-27, HIGH): unindexed FK forces sequential scan on every cascade check
+  // when User updates/deletes happen. Index needed for ON DELETE SetNull enforcement perf
+  // and for admin audit queries (configs touched by user X).
+  @@index([updated_by_user_id])
+  @@map("runtime_configs")
+}
+
+// Content Moderation
+enum ContentReportReason {
+  INAPPROPRIATE
+  FACE
+  SPAM
+  OTHER
+}
+
+enum ContentReportStatus {
+  PENDING
+  APPROVED // Report accepted — action taken
+  REJECTED // Report dismissed — no action
+}
+
+model ContentReport {
+  id                String              @id @default(cuid())
+  gallery_record_id String?
+  reporter_id       String
+  reason            ContentReportReason
+  description       String?             @db.VarChar(1000)
+  status            ContentReportStatus @default(PENDING)
+  admin_note        String?             @db.Text
+  // DECISION [contentreport-resolved-soft-fk]: resolved_by_id = soft-FK audit trail (who resolved it), append-only over integrity
+  resolved_by_id    String?
+  created_at        DateTime            @default(now())
+  resolved_at       DateTime?
+
+  // DECISION [contentreport-reporter-soft-fk]: reporter_id = soft-FK; a report survives deletion of the reporter (a cascade deleted PENDING reports on content that stayed live); same as resolved_by_id here and eventlog-soft-fk
+  gallery_record GalleryRecord? @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: SetNull)
+
+  // DECISION [contentreport-no-broad-unique]: brak broad @@unique — re-report po resolve; PENDING-only guard app-level
+  @@index([gallery_record_id])
+  @@index([status, created_at(sort: Desc)])
+  @@index([reporter_id, created_at])
+  // DECISION [contentreport-global-list-index]: composite [created_at DESC, id DESC] for the global moderation list (where={} cursor)
+  @@index([created_at(sort: Desc), id(sort: Desc)])
+}
+
+// Newsletter Subscribers (public form, no auth required)
+model NewsletterSubscriber {
+  id                 String                   @id @default(cuid())
+  email              String                   @unique
+  created_at         DateTime                 @default(now())
+  is_active          Boolean                  @default(false)
+  confirmation_token String?                  @unique
+  confirmed_at       DateTime?
+  consent_timestamp  DateTime?
+  ip_address         String?
+  consent_source     String?
+  consent_events     NewsletterConsentEvent[]
+
+  @@index([email]) // redundant-index-allow: duplicates email @unique; dropping it is a non-additive migration waiting for the owner (PLAN-AUDIT-DIET-2)
+  @@index([is_active, created_at])
+  @@index([confirmation_token]) // redundant-index-allow: duplicates confirmation_token @unique; same pending DROP INDEX migration
+}
+
+// Every subscribe (double opt-in confirmed) and unsubscribe creates a new row.
+// NEVER update or delete records from this table.
+model NewsletterConsentEvent {
+  id                Int                  @id @default(autoincrement())
+  newsletter_id     String
+  newsletter        NewsletterSubscriber @relation(fields: [newsletter_id], references: [id])
+  action            String // NEWSLETTER_CONSENT_ACTION: "SUBSCRIBE" | "UNSUBSCRIBE"
+  consent_timestamp DateTime             @default(now())
+  ip_address        String?
+  user_agent        String?
+
+  @@index([newsletter_id, consent_timestamp(sort: Desc)])
+}
+
+// Session Container — multi-photo session inspiration container
+// Lifecycle: DRAFT → READY → SHARED → ACTIVE → EXPIRED/CLOSED
+enum SessionContainerLifecycleState {
+  DRAFT
+  READY
+  SHARED
+  ACTIVE
+  EXPIRED
+  CLOSED
+}
+
+model SessionContainer {
+  id                    String                         @id @default(cuid())
+  client_account_id     String
+  stylist_account_id    String?
+  name                  String?                        @db.VarChar(100)
+  lifecycle_state       SessionContainerLifecycleState @default(DRAFT)
+  stylist_note          String?                        @db.VarChar(500)
+  client_note           String?                        @db.VarChar(500)
+  shared_at             DateTime?
+  accepted_at           DateTime?
+  viewed_at             DateTime?
+  // One 3-days-before reminder per session; set after both notifications are written.
+  expiry_reminder_sent_at DateTime?
+  last_client_change_at DateTime?
+  expires_at            DateTime?
+  closed_at             DateTime?
+  created_at            DateTime                       @default(now())
+  updated_at            DateTime                       @updatedAt
+
+  client_account  ClientAccount           @relation(fields: [client_account_id], references: [client_account_id], onDelete: Cascade)
+  stylist_account StylistAccount?         @relation(fields: [stylist_account_id], references: [account_id], onDelete: SetNull)
+  photos          SessionContainerPhoto[]
+  visit_record    VisitRecord?            @relation("SessionVisit")
+
+  // DECISION [db-invariants-in-migrations]: the partial unique index 'session_container_active_pair_uq' (Prisma cannot express it; db push and migrate diff ignore it) lives ONLY in migration 20261023100300 and is verified read-only at boot; the P2002 'active_pair' catch in create and add-photo relies on it
+
+  @@index([client_account_id, lifecycle_state])
+  @@index([client_account_id, shared_at])
+  @@index([stylist_account_id, lifecycle_state])
+  @@index([expires_at])
+}
+
+model SessionContainerPhoto {
+  id                String   @id @default(cuid())
+  session_id        String
+  gallery_record_id String
+  position          Int      @default(0)
+  created_at        DateTime @default(now())
+
+  session        SessionContainer @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  gallery_record GalleryRecord    @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade)
+
+  @@unique([session_id, gallery_record_id])
+  // DD2-D2 (run 24): enforce dense ordering within a session — race-condition guard.
+  // `addPhotoToSessionContainer_IO` reads max(position) then inserts; two concurrent inserts
+  // could pick the same nextPosition. Unique forces P2002 → retry with incremented position
+  // (max 5 retries, see session-container-commands.operations.ts).
+  // Implicitly covers @@index([session_id, position]) — Postgres uses the unique B-tree
+  // for both ORDER BY position queries and uniqueness checks. No separate index needed.
+  @@unique([session_id, position])
+  @@index([gallery_record_id])
+}
+
+model VisitRecord {
+  id                 String            @id @default(cuid())
+  client_user_id     String
+  stylist_account_id String
+  visit_date         DateTime          @default(now())
+  service_note       String?           @db.VarChar(1000)
+  source             VisitRecordSource @default(MANUAL)
+  session_id         String?           @unique
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @updatedAt
+
+  client_user     User               @relation("ClientVisits", fields: [client_user_id], references: [id], onDelete: Cascade)
+  stylist_account StylistAccount     @relation("StylistVisits", fields: [stylist_account_id], references: [account_id], onDelete: Cascade)
+  session         SessionContainer?  @relation("SessionVisit", fields: [session_id], references: [id], onDelete: SetNull)
+  result_photos   VisitResultPhoto[]
+
+  @@index([stylist_account_id, client_user_id, visit_date(sort: Desc)])
+  @@index([client_user_id, visit_date(sort: Desc)])
+}
+
+model VisitResultPhoto {
+  id                 String   @id @default(cuid())
+  visit_record_id    String
+  stylist_account_id String
+  asset_url          String
+  // DECISION [asset-public-id]: cloud file id derived from the URL on write; the index replaces a full
+  // URL-column scan in the ownership gate. NULL = URL not parseable, the row stays on the slower
+  // in-code comparison path (cloudinary-asset.guard.ts). No @unique on purpose: the gate asks
+  // "exists", and a historical row may legitimately point at the same file.
+  public_id          String?
+  position           Int      @default(0)
+  created_at         DateTime @default(now())
+
+  visit_record VisitRecord @relation(fields: [visit_record_id], references: [id], onDelete: Cascade)
+
+  @@unique([visit_record_id, position])
+  @@index([public_id])
+}
+
+// ─��� Email Dead Letter ──────────────────────────────────────────────────────────
+
+model FailedEmail {
+  id          String    @id @default(cuid())
+  recipient   String
+  template    String
+  subject     String
+  payload     Json
+  error       String
+  attempts    Int       @default(3)
+  created_at  DateTime  @default(now())
+  resolved_at DateTime?
+  // DECISION [failedemail-resolved-soft-fk]: resolved_by = soft-FK audit trail (the closing admin), append-only over integrity
+  resolved_by String?
+
+  @@index([created_at])
+  @@index([resolved_at])
+  // PLQS C1-5D (2026-05-28): admin lookup / dedup by recipient email address.
+  @@index([recipient])
+}
+
+// ── Support Messaging ──────────────────────────────────────────────────────────
+
+enum SupportThreadStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
+
+enum SupportSenderType {
+  USER
+  SUPPORT
+}
+
+// What the request is about, picked by the user instead of typing a subject.
+enum SupportThreadCategory {
+  QUESTION
+  BILLING
+  BUG
+  IDEA
+  ACCOUNT
+  OTHER
+}
+
+model SupportThread {
+  id                String                 @id @default(cuid())
+  user_id           String
+  // Derived by the server from the first line of the first message
+  // (support-subject.resolver.ts); still NOT NULL and still the title everywhere.
+  subject           String
+  // DECISION [supportthread-category]: nullable; null = a thread created before categories existed, never backfilled
+  category          SupportThreadCategory?
+  status            SupportThreadStatus    @default(OPEN)
+  created_at        DateTime               @default(now())
+  updated_at        DateTime               @updatedAt
+  // DECISION [supportthread-user-last-read-at]: the moment the OWNER of the thread last opened it. A thread has an unread
+  // reply when a SUPPORT message exists with created_at > user_last_read_at.
+  // The default makes every existing and every new thread start as "read", so
+  // shipping the marker lights no badge for history. Written ONLY by raw SQL
+  // (support-read-marker.operations.ts): a Prisma update would bump
+  // @updatedAt, which is the admin's optimistic-concurrency token.
+  user_last_read_at DateTime               @default(now())
+
+  // DECISION [supportthread-soft-fk]: user_id = soft-FK; support history survives a hard delete or MOVE of the user
+  messages SupportMessage[]
+
+  @@index([user_id])
+  // PRMA C1-F3 (2026-05-27, HIGH): admin support queue paginates threads filtered by status
+  // ordered by id DESC (cuid lexicographic ~= insertion order). Composite removes sort step
+  // for the dominant "list OPEN threads, newest first" admin query.
+  // DECISION [supportthread-status-index]: no standalone [status]: the composite [status, id DESC] covers it as a left prefix
+  @@index([status, id(sort: Desc)])
+}
+
+model SupportMessage {
+  id          String            @id @default(cuid())
+  thread_id   String
+  sender_type SupportSenderType
+  // @db.Text marks unbounded long-form (paragraphs, stack traces). On Postgres a
+  // bare String is already TEXT, so the annotation states intent and does not
+  // change the type (VARCHAR(191) is MySQL, not Postgres). CONTENT_MAX=2000 fits.
+  content     String            @db.Text
+  created_at  DateTime          @default(now())
+
+  thread SupportThread @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+
+  // PLQS C1-5D (2026-05-28): message listing always orders by created_at ASC within a thread.
+  // Composite eliminates the sort step for getSupportThreadMessages_IO + adminGetThreadMessages_IO.
+  @@index([thread_id, created_at(sort: Asc)])
+}
+
+// Moderation Strikes — rolling window (365 days).
+// Each strike is a time-bounded record. Active = expires_at > now().
+// User.moderation_strikes kept for backwards compat (monotonic counter).
+model ModerationStrike {
+  id         String   @id @default(cuid())
+  user_id    String
+  // DECISION [moderationstrike-reason-varchar]: VarChar(2000) MUST equal STRIKE_REASON_MAX; narrower => 22001 truncation rollback
+  reason     String   @db.VarChar(2000)
+  issued_at  DateTime @default(now())
+  expires_at DateTime
+  // DECISION [moderationstrike-issued-by-soft-fk]: issued_by = soft-FK audit trail (the issuing admin), append-only over integrity
+  issued_by  String
+
+  user User @relation("ModerationStrikeRelation", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, expires_at(sort: Desc)])
+}
+
+// DECISION: showcase selection belongs to a salon, never to the author.
+// Membership and contribution are checked on every read, so leaving cannot expose works.
+model SalonShowcaseWork {
+  salon_account_id  String
+  gallery_record_id String
+  salon             StylistAccount @relation(fields: [salon_account_id], references: [account_id], onDelete: Cascade)
+  work              GalleryRecord  @relation(fields: [gallery_record_id], references: [gallery_record_id], onDelete: Cascade)
+
+  @@id([salon_account_id, gallery_record_id])
+  @@index([gallery_record_id])
+}
+
+// Notification centre: one row per event worth telling the recipient, rendered
+// by the reader from `type` and `actor_name`
+// (domain/notifications/notification-copy.config.ts).
+
+enum NotificationType {
+  SYSTEM_ANNOUNCEMENT
+  PAIR_REQUEST_RECEIVED
+  PAIR_REQUEST_ACCEPTED
+  PAIR_CONNECTED_BY_QR
+  SESSION_SHARED
+  SESSION_CLOSED_BY_STYLIST
+  SESSION_EXPIRING_SOON
+  MESSAGE_RECEIVED
+  SALON_INVITATION_RECEIVED
+  SALON_INVITATION_ACCEPTED
+  SUPPORT_REPLY_RECEIVED
+}
+
+enum PushPlatform {
+  WEBPUSH
+  FCM
+}
+
+model Notification {
+  id              String           @id @default(cuid())
+  user_id         String
+  // null = adresowane do osoby, nie do roli (zaproszenie do salonu); STYLIST/CLIENT =
+  // widoczne tylko w tym trybie konta („konto idzie za aktywną rolą", owner).
+  recipient_role  AccountType?
+  type            NotificationType
+  // DECISION [notification-dedup-key]: `TYPE:eventId`, unique per recipient. A repeat emit inserts no second row because @@unique([user_id, dedup_key]); a message is one row per conversation and an upsert re-arms it
+  dedup_key       String           @db.VarChar(200)
+  actor_user_id   String?
+  actor_name      String?          @db.VarChar(200)
+  // DECISION [announcement-notification-cascade]: deleting a broadcast withdraws its bells;
+  // a push already delivered cannot be withdrawn
+  announcement_id String?
+  announcement    Announcement?    @relation(fields: [announcement_id], references: [id], onDelete: Cascade)
+  target_path     String           @db.VarChar(300)
+  created_at      DateTime         @default(now())
+  read_at         DateTime?
+
+  activity_kind SessionActivityKind?
+  session_id    String?
+  change_scope  SessionChangeScope?
+
+  user User @relation("UserNotifications", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, dedup_key])
+  @@index([announcement_id])
+  // Lista: najnowsze pierwsze, deterministyczny tiebreaker po id.
+  @@index([user_id, created_at(sort: Desc), id(sort: Desc)])
+  // Licznik nieprzeczytanych: WHERE user_id = ? AND read_at IS NULL.
+  @@index([user_id, read_at])
+  // Sweep retencji (notification-cleanup): WHERE created_at < now - 90d.
+  @@index([created_at])
+}
+
+model PushSubscription {
+  id           String       @id @default(cuid())
+  user_id      String
+  platform     PushPlatform
+  // DECISION [pushsubscription-endpoint-unique]: the push-service address (web) or the FCM token, unique globally. One device belongs to one person; registering again reassigns the owner (a shared phone) instead of inserting a second row
+  endpoint     String       @unique @db.VarChar(1000)
+  p256dh       String?      @db.VarChar(200)
+  auth         String?      @db.VarChar(100)
+  user_agent   String?      @db.VarChar(300)
+  created_at   DateTime     @default(now())
+  last_seen_at DateTime     @default(now())
+  failed_at    DateTime?
+
+  user User @relation("UserPushSubscriptions", fields: [user_id], references: [id], onDelete: Cascade)
+
+  // Wysyłka: WHERE user_id = ? AND failed_at IS NULL.
+  @@index([user_id, failed_at])
+  // Sweep: WHERE last_seen_at < now - 180d.
+  @@index([last_seen_at])
+}
+
+// Minimal completion records survive detailed lifecycle retention.
+model FreeEmailEnrollment {
+  id           String    @id @default(uuid())
+  accountId    String    @unique
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cohort       String
+  version      String
+  startedAt    DateTime
+  status       String    @default("active")
+  finishedAt   DateTime?
+  finishReason String?
+
+  @@index([userId])
+  @@index([status, startedAt])
+}
+
+model EmailLifecycleCampaign {
+  id            String    @id
+  mode          String    @default("OFF")
+  startedAt     DateTime?
+  initializedAt DateTime?
+  updatedAt     DateTime  @updatedAt
+}
+
+model EmailLifecycleMessage {
+  id                   String                           @id @default(uuid())
+  userId               String
+  user                 User                             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId            String
+  family               String
+  ruleId               String
+  templateId           String
+  occurrence           String
+  contentVersion       String
+  sweepId              String?
+  opportunityId        String?
+  nonTransactional     Boolean                          @default(true)
+  recipientAddressHash String?
+  locale               String
+  cohort               String
+  ctaIds               String[]
+  status               String                           @default("reserved")
+  provider             String?
+  providerMessageId    String?
+  scheduledAt          DateTime
+  createdAt            DateTime                         @default(now())
+  startedAt            DateTime?
+  acceptedAt           DateTime?
+  deliveryStatus       String?
+  deliveryAt           DateTime?
+  reason               String?
+  // DECISION [email-outbox]: durable send intent of important account/billing mail on THIS ledger (no parallel table)
+  outbox               Boolean                          @default(false)
+  outboxPayload        Json?
+  attempts             Int                              @default(0)
+  nextAttemptAt        DateTime?
+  deadLetteredAt       DateTime?
+  deliveryEvents       EmailDeliveryEvent[]
+  entries              EmailLifecycleEntry[]
+  operationalEvents    EmailLifecycleOperationalEvent[]
+
+  @@unique([accountId, occurrence, ruleId])
+  @@unique([accountId, occurrence, opportunityId])
+  @@unique([provider, providerMessageId])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([outbox, status, nextAttemptAt])
+}
+
+model EmailDeliveryEvent {
+  id              String                @id @default(uuid())
+  provider        String
+  providerEventId String
+  replayToken     String?
+  messageId       String
+  message         EmailLifecycleMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind            String
+  occurredAt      DateTime
+  createdAt       DateTime              @default(now())
+
+  @@unique([provider, providerEventId])
+  @@unique([provider, replayToken])
+  @@index([messageId])
+  @@index([createdAt])
+}
+
+model EmailDeliverySuppression {
+  addressHash String   @id
+  reason      String
+  createdAt   DateTime @default(now())
+}
+
+model EmailLifecycleEntry {
+  id        String                @id
+  messageId String
+  message   EmailLifecycleMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ctaId     String
+  createdAt DateTime              @default(now())
+
+  @@index([messageId])
+  @@index([userId, createdAt])
+}
+
+model EmailLifecycleOperationalEvent {
+  id         String                 @id @default(uuid())
+  messageId  String?
+  message    EmailLifecycleMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind       String
+  state      String?
+  reason     String?
+  dimensions Json
+  occurredAt DateTime               @default(now())
+  exportedAt DateTime?
+
+  @@index([messageId])
+  @@index([exportedAt, occurredAt])
+}
+
+model EmailLifecycleAction {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId  String
+  kind       String
+  occurredAt DateTime @default(now())
+
+  @@index([userId, occurredAt])
+}
+
+// ─── Retired profile links (owner) ───────────────────────────────
+// A stylist's personal link (vanity_url) or a salon link (salon_vanity_url) that
+// was replaced stays reserved for its owner and 301-redirects to the current one.
+
+enum ProfileLinkKind {
+  STYLIST
+  SALON
+}
+
+model ProfileLinkAlias {
+  kind       ProfileLinkKind
+  // DECISION [profile-link-alias]: a retired link is reserved for its account FOREVER and resolves to the account's CURRENT link (no chains); unique per kind, same lowercase namespace as the live column; changing back to her own old link deletes the alias
+  slug       String          @db.VarChar(100)
+  account_id String
+  created_at DateTime        @default(now())
+
+  account StylistAccount @relation(fields: [account_id], references: [account_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([kind, slug])
+  @@index([account_id])
+}

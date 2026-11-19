@@ -1,0 +1,111 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-40) var(--space-64);
+  align-items: start;
+}
+
+.intro {
+  display: grid;
+  gap: var(--space-24);
+}
+
+.useTime,
+.roi p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+.calculator {
+  background: var(--color-surface-card);
+  padding: var(--space-32);
+  border: var(--style-border-divider) solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.example {
+  margin: 0 0 var(--space-24);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-16);
+}
+
+.fields > div {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
+}
+
+.result {
+  margin-top: var(--space-32);
+  min-height: var(--space-96);
+}
+
+.result p {
+  margin: 0;
+}
+
+.total {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-3xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.totalLabel,
+.duration {
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+}
+
+.duration {
+  font-weight: var(--font-weight-heading);
+}
+
+.roi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-16);
+  max-width: 42rem;
+}
+
+.roi h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.2;
+}
+
+/* Reuse the client-page phone's native sticky behavior. Spanning both rows
+ * lets the calculator follow the preparation and pricing explanation. */
+@media (min-width: 1024px) {
+  .calculator {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: calc(
+      var(--public-header-height, var(--app-bar-height)) + var(--space-32)
+    );
+  }
+}
+
+@media (max-width: 767px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-32);
+  }
+
+  .calculator {
+    padding: var(--space-20);
+  }
+}

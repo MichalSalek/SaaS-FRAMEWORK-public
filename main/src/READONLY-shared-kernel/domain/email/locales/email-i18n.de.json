@@ -1,0 +1,380 @@
+{
+  "stats": {
+    "worksOne": "{{n}} Arbeit",
+    "worksFew": "{{n}} Arbeiten",
+    "worksMany": "{{n}} Arbeiten",
+    "clientsOne": "{{n}} Kundin",
+    "clientsFew": "{{n}} Kundinnen",
+    "clientsMany": "{{n}} Kundinnen",
+    "joiner": ", "
+  },
+  "bodies": {
+    "welcome": {
+      "preheader": "Ihr Konto ist bereit. Wählen Sie, wie Sie Nailfolio nutzen möchten.",
+      "heading": "Willkommen bei Nailfolio",
+      "headingWithName": "Willkommen bei Nailfolio, {{addressName}}",
+      "body": "Hallo! Ihr Konto ist bereit. Wählen Sie „Stylistin“, um Ihre Arbeiten zu zeigen und sich mit Kundinnen zu verbinden, oder „Kundin“, um Ideen für Termine zu sammeln.",
+      "cta": "Kontotyp wählen"
+    },
+    "onboarding-incomplete": {
+      "preheader": "Für Stylistinnen: ein Portfolio Ihrer Arbeiten. Für Kundinnen: Ideen für den nächsten Termin.",
+      "heading": "Wie möchten Sie Nailfolio nutzen?",
+      "body": "Ihr Konto ist fast bereit. Wählen Sie, wie Sie Nailfolio nutzen möchten.\n\nWählen Sie „Stylistin“, wenn Sie Nägel gestalten, oder „Kundin“, wenn Sie Ideen für Termine sammeln. Bei Fragen können Sie auf diese E-Mail antworten.",
+      "cta": "Kontotyp wählen"
+    },
+    "trial-nudge-upload": {
+      "preheader": "Wählen Sie ein Foto vom Handy und zeigen Sie Kundinnen Ihre Arbeit.",
+      "heading": "Beginnen Sie mit einer Nagelgestaltung",
+      "body": "Wählen Sie ein Foto einer Nagelgestaltung, die Sie Kundinnen zeigen möchten. In Nailfolio können Sie es zuschneiden und Farbe, Länge und Merkmale ergänzen, damit es später leichter zu finden ist.\n\nVerbundene Kundinnen sehen die gesamte Galerie. Ausgewählte Fotos können Sie auch an Ihr öffentliches Profil heften, das ohne Konto sichtbar ist.",
+      "cta": "Foto hinzufügen"
+    },
+    "trial-empty-portfolio": {
+      "preheader": "Ein Foto genügt, um Ihr Portfolio zu beginnen.",
+      "heading": "Zeigen Sie Ihre erste Nagelgestaltung",
+      "body": "Beginnen Sie mit einem Foto. Ergänzen Sie Farbe, Länge und Merkmale und fügen Sie anschließend weitere Arbeiten hinzu. Ausgewählte Fotos können Sie an Ihr öffentliches Profil heften.\n\nIhre Testphase für {{planName}} läuft noch {{trialDaysLeft#Tag|Tage}}. Wenn Sie beim Einstieg Hilfe brauchen, antworten Sie auf diese E-Mail.",
+      "cta": "Galeriefotos hinzufügen"
+    },
+    "trial-celebration": {
+      "preheader": "Zeigen Sie einer Kundin Ihren QR-Code. Nach Ihrer Bestätigung sieht sie die gesamte Galerie.",
+      "heading": "Zeigen Sie Kundinnen Ihre Galerie",
+      "headingWithName": "{{addressName}}, zeigen Sie Kundinnen Ihre Galerie",
+      "body": "Ihre Galerie enthält jetzt Fotos zum Teilen. Zeigen Sie Ihrer Kundin beim nächsten Termin Ihren dauerhaften QR-Code. Nach dem Scannen und Anmelden kann sie eine Verbindungsanfrage senden. Erst wenn Sie diese annehmen, sieht sie die gesamte Galerie.\n\nDen Code finden Sie in der App. Sie können ihn herunterladen und für Ihren Salon ausdrucken.",
+      "cta": "QR-Code zeigen"
+    },
+    "trial-progress": {
+      "preheader": "Heften Sie ausgewählte Fotos an und ergänzen Sie Ihre Instagram-Bio um den Profillink.",
+      "heading": "Ihr Portfolio unter einem Link",
+      "body": "Wählen Sie Arbeiten aus, die Ihren Stil zeigen, und heften Sie diese an Ihr öffentliches Profil. Kundinnen sehen sie ohne Konto, zusammen mit Ihren ergänzten Profilangaben.\n\nTeilen Sie anschließend den Link mit Kundinnen oder ergänzen Sie Ihre Instagram-Bio damit.",
+      "cta": "Arbeiten ans Profil heften"
+    },
+    "trial-social-proof": {
+      "preheader": "Ergänzen Sie Farbe und Länge, damit Kundinnen passende Inspirationen finden.",
+      "heading": "Erleichtern Sie Kundinnen die Auswahl",
+      "body": "Eine Kundin sucht kurze, rote Nägel? Mit Angaben zu Farbe, Länge und Merkmalen helfen die Filter ihr, passende Arbeiten in Ihrer Galerie zu finden.\n\nIhre Testphase für {{planName}} läuft noch {{trialDaysLeft#Tag|Tage}}. Fügen Sie einige Arbeiten hinzu und probieren Sie die Filter aus.",
+      "cta": "Galeriefotos hinzufügen"
+    },
+    "trial-milestone": {
+      "preheader": "Vervollständigen Sie Ihr Profil und zeigen Sie den QR-Code beim nächsten Termin.",
+      "heading": "Bereiten Sie Ihr Profil für die nächste Kundin vor",
+      "body": "Zwei Wochen Ihrer Testphase sind vergangen. Der Plan {{planName}} ist noch {{trialDaysLeft#Tag|Tage}} verfügbar.\n\nIhr öffentliches Profil zeigt Beschreibung, Telefonnummer und angeheftete Arbeiten. Über Ihren dauerhaften QR-Code kann eine Kundin nach der Anmeldung eine Verbindungsanfrage senden. Sobald Sie diese annehmen, sieht die Kundin Ihre gesamte Galerie.",
+      "cta": "Öffentliches Profil vervollständigen",
+      "secondaryCta": "QR-Code zeigen"
+    },
+    "trial-fomo": {
+      "preheader": "Fügen Sie Fotos hinzu und sehen Sie Ihr Profil aus Sicht einer Kundin an.",
+      "heading": "Bereiten Sie Ihr Portfolio zum Teilen vor",
+      "body": "Ihre Testphase für {{planName}} läuft noch {{trialDaysLeft#Tag|Tage}}. Fügen Sie Fotos hinzu, heften Sie ausgewählte Arbeiten an und öffnen Sie Ihr öffentliches Profil aus Sicht einer Kundin.\n\nWenn Sie bei den ersten Schritten Hilfe brauchen, antworten Sie einfach.",
+      "cta": "Erste Fotos hinzufügen"
+    },
+    "trial-warning": {
+      "preheader": "Die erste Zahlung erfolgt am {{trialEndDate}}. Vorher können Sie Ihren Plan ändern oder kündigen.",
+      "heading": "Ihre Testphase endet in einer Woche",
+      "body": "Ihre Testphase endet am {{trialEndDate}}. Ab diesem Datum wird {{planName}} kostenpflichtig und die erste Zahlung wird von der zu Beginn der Testphase hinterlegten Karte abgebucht.\n\nUm Ihr Abonnement vor der ersten Zahlung zu ändern oder zu kündigen, öffnen Sie Ihre Kontoeinstellungen vor diesem Datum.",
+      "bodyInactive": "Ihre Testphase endet am {{trialEndDate}}. Ab diesem Datum wird {{planName}} kostenpflichtig und die erste Zahlung wird von der zu Beginn der Testphase hinterlegten Karte abgebucht.\n\nUm Ihr Abonnement vor der ersten Zahlung zu ändern oder zu kündigen, öffnen Sie Ihre Kontoeinstellungen vor diesem Datum.",
+      "cta": "Ihren Tarif ansehen",
+      "ctaInactive": "Ihren Tarif ansehen",
+      "secondaryCta": "Öffentliches Profil öffnen",
+      "ps": "Eine Frage zur Zahlung oder zum Plan? Antworten Sie auf diese E-Mail."
+    },
+    "trial-last-day": {
+      "preheader": "Morgen wird Ihre hinterlegte Karte belastet. Heute können Sie Ihren Plan noch ändern.",
+      "heading": "Ihr kostenpflichtiger Plan beginnt morgen",
+      "body": "Ab morgen wird {{planName}} kostenpflichtig. Sie können weiterhin Fotos und Kundinnen ohne Limit hinzufügen und mehr Arbeiten an Ihr öffentliches Profil heften. Verbundene Kundinnen haben Zugriff auf Ihre gesamte Galerie.",
+      "bodyInactive": "Ab morgen wird {{planName}} kostenpflichtig. Um die erste Zahlung zu vermeiden, ändern oder kündigen Sie Ihr Abonnement noch heute in den Kontoeinstellungen.\n\nNach dem Wechsel zu Free Demo bleiben gespeicherte Fotos und Verbindungen in Ihrem Konto. Für das Hinzufügen weiterer Fotos und Kundinnen gelten die Limits des Free-Demo-Plans.",
+      "offerApplied": "Für Ihren ersten kostenpflichtigen Monat gilt ein Rabatt von 20 %. Der Rabatt ist bereits in Ihrem Konto hinterlegt.",
+      "cta": "Ihren Plan ansehen",
+      "secondaryCta": "Galerie öffnen",
+      "ps": "Für den Wechsel zu Free Demo vor der ersten Zahlung müssen Sie Ihr Abonnement noch heute ändern oder kündigen. Gespeicherte Fotos und Verbindungen bleiben erhalten, und verbundene Kundinnen sehen weiterhin Ihre gesamte Galerie. Free Demo erlaubt das Hinzufügen von bis zu 5 Arbeiten und Verbindungen mit bis zu 2 Kundinnen."
+    },
+    "trial-ended": {
+      "preheader": "Ihre Fotos und Verbindungen bleiben erhalten. Sie können Free Demo weiter nutzen.",
+      "heading": "Ihr Portfolio bleibt erhalten",
+      "body": "Ihre Testphase für {{planName}} ist beendet, ohne dass ein kostenpflichtiges Abonnement begonnen hat. Ihr Konto nutzt jetzt Free Demo. Gespeicherte Fotos und Verbindungen bleiben erhalten, und verbundene Kundinnen sehen weiterhin Ihre gesamte Galerie.\n\nFree Demo erlaubt das Hinzufügen von bis zu 5 Arbeiten und Verbindungen mit bis zu 2 Kundinnen. Ihr öffentliches Profil zeigt 3 angeheftete Arbeiten. Sie können {{planName}} in den Kontoeinstellungen erneut aktivieren.",
+      "bodyZero": "Ihre Testphase für {{planName}} ist beendet, ohne dass ein kostenpflichtiges Abonnement begonnen hat. Ihr Konto nutzt jetzt Free Demo.\n\nFree Demo erlaubt das Hinzufügen von 5 Arbeiten und Verbindungen mit 2 Kundinnen. Wenn Sie Hilfe mit Ihrem Konto oder Ihrer Galerie benötigen, antworten Sie auf diese E-Mail.",
+      "cta": "Pläne vergleichen",
+      "secondaryCta": "Galerie öffnen"
+    },
+    "trial-winback": {
+      "preheader": "20 % Rabatt auf den ersten Monat. Der Code kann einmal verwendet werden und ist 72 Stunden gültig.",
+      "preheaderNoOffer": "Ihr Konto nutzt Free Demo. Gespeicherte Fotos und Verbindungen bleiben verfügbar.",
+      "heading": "Bauen Sie Ihr Portfolio weiter aus",
+      "body": "Ihre Testphase ist beendet. Ihre Fotos und Verbindungen bleiben erhalten. Verbundene Kundinnen sehen weiterhin die gesamte Galerie. Mit Free Demo können Sie bis zu 5 Arbeiten hinzufügen, sich mit bis zu 2 Kundinnen verbinden und 3 angeheftete Arbeiten auf Ihrem öffentlichen Profil zeigen.\n\nMöchten Sie Ihr Portfolio weiter ausbauen? Kehren Sie mit 20 % Rabatt im ersten Monat zu {{planName}} zurück. Der Code unten ist Ihrem Konto zugeordnet und kann einmal genutzt werden.",
+      "bodyNoOffer": "Ihre Testphase ist beendet. Ihre Fotos und Verbindungen bleiben erhalten. Verbundene Kundinnen sehen weiterhin die gesamte Galerie. Mit Free Demo können Sie bis zu 5 Arbeiten hinzufügen, sich mit bis zu 2 Kundinnen verbinden und 3 angeheftete Arbeiten auf Ihrem öffentlichen Profil zeigen.\n\nWenn Sie mehr Platz in Ihrer Galerie brauchen, können Sie {{planName}} in den Kontoeinstellungen erneut aktivieren.",
+      "offerLabel": "Ihr Code",
+      "offerHeadline": "20 % günstiger im ersten Monat",
+      "offerExpiry": "Gültig bis {{offerExpiresAt}}",
+      "offerFinePrint": "Der Rabatt gilt für die erste Zahlung eines Monatsplans und kann einmal genutzt werden. Verwenden Sie die Schaltfläche unten, damit der Rabatt beim Bezahlen angewendet wird.",
+      "cta": "Mit 20 % Rabatt zu {{planName}} zurück",
+      "ctaNoOffer": "Zurück zu {{planName}}",
+      "ps": "Free Demo bleibt ohne Karte aktiv. Wenn Sie eine unbegrenzte Galerie und eine Besuchshistorie benötigen, können Sie zu Pro wechseln."
+    },
+    "cancel-d1": {
+      "preheader": "Ihre Fotos und Verbindungen bleiben erhalten. Wenn Sie möchten, schreiben Sie uns, was wir verbessern könnten.",
+      "heading": "Ihr Konto bleibt mit Free Demo nutzbar",
+      "body": "Ihr Abonnement ist beendet und Ihr Konto nutzt jetzt Free Demo. Ihre Fotos und Verbindungen bleiben erhalten.\n\nDanke, dass Sie Nailfolio ausprobiert haben. Hat Ihnen etwas gefehlt oder die Arbeit erschwert? Schreiben Sie uns gern, was wir verbessern könnten.",
+      "cta": "Pläne ansehen"
+    },
+    "cancel-d7-winback": {
+      "preheader": "20 % Rabatt auf den ersten Monat. Der Code kann einmal verwendet werden und ist 72 Stunden gültig.",
+      "preheaderNoOffer": "Ihr Konto nutzt Free Demo. Gespeicherte Fotos und Verbindungen bleiben verfügbar.",
+      "heading": "Kehren Sie zurück, wenn Sie mehr Platz brauchen",
+      "body": "Ihr Abonnement ist vor einer Woche ausgelaufen. Ihre Fotos und Verbindungen bleiben erhalten. Verbundene Kundinnen sehen weiterhin die gesamte Galerie. Mit Free Demo können Sie bis zu 5 Arbeiten hinzufügen, sich mit bis zu 2 Kundinnen verbinden und 3 angeheftete Arbeiten auf Ihrem öffentlichen Profil zeigen.\n\nMöchten Sie Ihr Portfolio weiter ausbauen? Kehren Sie mit 20 % Rabatt im ersten Monat zu {{planName}} zurück. Der Code unten ist Ihrem Konto zugeordnet und kann einmal genutzt werden.",
+      "bodyNoOffer": "Ihr Abonnement ist vor einer Woche ausgelaufen. Ihre Fotos und Verbindungen bleiben erhalten. Verbundene Kundinnen sehen weiterhin die gesamte Galerie. Mit Free Demo können Sie bis zu 5 Arbeiten hinzufügen, sich mit bis zu 2 Kundinnen verbinden und 3 angeheftete Arbeiten auf Ihrem öffentlichen Profil zeigen.\n\nWenn Sie mehr Platz in Ihrer Galerie brauchen, können Sie {{planName}} in den Kontoeinstellungen erneut aktivieren.",
+      "offerLabel": "Ihr Code",
+      "offerHeadline": "20 % günstiger im ersten Monat",
+      "offerExpiry": "Gültig bis {{offerExpiresAt}}",
+      "offerFinePrint": "Der Rabatt gilt für die erste Zahlung eines Monatsplans und kann einmal genutzt werden. Verwenden Sie die Schaltfläche unten, damit der Rabatt beim Bezahlen angewendet wird.",
+      "cta": "Mit 20 % Rabatt zu {{planName}} zurück",
+      "ctaNoOffer": "Zurück zu {{planName}}",
+      "ps": "Free Demo bleibt ohne Karte aktiv. Wenn Sie eine unbegrenzte Galerie und eine Besuchshistorie benötigen, können Sie zu Pro wechseln."
+    },
+    "cancel-d30-final": {
+      "preheader": "Prüfen Sie die 3 angehefteten Arbeiten auf Ihrem öffentlichen Profil.",
+      "heading": "Halten Sie Ihr öffentliches Profil aktuell",
+      "body": "Ihr öffentliches Profil ist mit Free Demo weiterhin verfügbar und zeigt 3 angeheftete Arbeiten. Prüfen Sie, ob dies die Fotos sind, die Sie Kundinnen zeigen möchten. Die Auswahl ändern Sie in der Galerie.\n\nDies ist die letzte Erinnerung nach dem Ende Ihres Abonnements. In den Kontoeinstellungen können Sie jederzeit einen kostenpflichtigen Plan aktivieren.",
+      "cta": "Kostenpflichtige Pläne vergleichen"
+    },
+    "upgrade-confirmation": {
+      "preheader": "Fügen Sie Arbeiten und Kundinnen ohne Limit hinzu. Wählen Sie auch Fotos für Ihr öffentliches Profil.",
+      "heading": "{{planName}} ist jetzt für Sie aktiv",
+      "body": "Ihr Plan {{planName}} ist aktiv. Sie können Fotos und Kundinnen ohne Limit hinzufügen und mehr Arbeiten an Ihr öffentliches Profil heften.\n\nWählen Sie die Fotos aus, die auch ohne Konto sichtbar sein sollen. Bei Fragen zum Plan oder zur Galerie können Sie auf diese E-Mail antworten.",
+      "cta": "Arbeiten ans Profil heften"
+    },
+    "downgrade-notification": {
+      "preheader": "Gespeicherte Fotos und Verbindungen bleiben erhalten. Hier finden Sie die Limits von Free Demo.",
+      "heading": "Sie sind jetzt auf Free Demo",
+      "body": "Ihr Konto nutzt jetzt Free Demo. Gespeicherte Fotos und Verbindungen bleiben erhalten. Free Demo erlaubt das Hinzufügen von bis zu 5 Arbeiten, Verbindungen mit bis zu 2 Kundinnen und 3 angeheftete Arbeiten auf Ihrem öffentlichen Profil. Einen kostenpflichtigen Plan können Sie in den Kontoeinstellungen erneut aktivieren.",
+      "cta": "Pläne vergleichen"
+    },
+    "payment-failed": {
+      "preheader": "Aktualisieren Sie Ihre Karte in den Einstellungen. Die Zahlung wird automatisch erneut versucht.",
+      "heading": "Zahlung fehlgeschlagen",
+      "body": "Ihre Zahlung für {{planName}} ist fehlgeschlagen. Prüfen Sie Gültigkeit, Limit und Freigabe Ihrer Karte für Onlinezahlungen. In den Kontoeinstellungen können Sie die Karte ändern.\n\nDie Zahlung wird automatisch erneut versucht. Wenn Sie Hilfe brauchen, antworten Sie auf diese E-Mail.",
+      "cta": "Zahlungskarte prüfen"
+    },
+    "dunning-info": {
+      "preheader": "Ihr Plan bleibt aktiv. Prüfen Sie Ihre Karte für den nächsten Zahlungsversuch.",
+      "heading": "Zahlung fehlgeschlagen",
+      "body": "Ihre Zahlung für {{planName}} ist fehlgeschlagen, aber Ihr Plan ist weiterhin aktiv. Prüfen Sie Gültigkeit, Limit und Freigabe der hinterlegten Karte für Onlinezahlungen. Ändern Sie die Karte bei Bedarf in den Kontoeinstellungen.",
+      "cta": "Zahlungskarte prüfen"
+    },
+    "dunning-urgent": {
+      "preheader": "Prüfen Sie Ihre Karte. Ohne Zahlung wechselt Ihr Konto zu Free Demo.",
+      "heading": "Erneute Zahlung fehlgeschlagen",
+      "body": "Ein erneuter Zahlungsversuch für {{planName}} ist fehlgeschlagen. Wenn Ihr Abonnement unbezahlt bleibt, wechselt Ihr Konto zu Free Demo. Gespeicherte Fotos und Verbindungen bleiben in Ihrem Konto. Verbundene Kundinnen sehen weiterhin Ihre gesamte Galerie. Free Demo erlaubt das Hinzufügen von bis zu 5 Arbeiten, Verbindungen mit bis zu 2 Kundinnen und 3 angeheftete Arbeiten auf Ihrem öffentlichen Profil.\n\nPrüfen oder aktualisieren Sie Ihre Karte in den Kontoeinstellungen. Wenn Sie Hilfe benötigen, antworten Sie auf diese E-Mail.",
+      "bodyZero": "Ein erneuter Zahlungsversuch für {{planName}} ist fehlgeschlagen. Wenn Ihr Abonnement unbezahlt bleibt, wechselt Ihr Konto zu Free Demo. Prüfen oder aktualisieren Sie Ihre Karte in den Kontoeinstellungen. Wenn Sie Hilfe benötigen, antworten Sie auf diese E-Mail.",
+      "cta": "Zahlungskarte prüfen"
+    },
+    "dunning-final": {
+      "preheader": "Wenn Sie Ihren kostenpflichtigen Plan behalten möchten, prüfen Sie heute Ihre Karte. Fotos und Verbindungen bleiben erhalten.",
+      "heading": "Letzter Zahlungsversuch fehlgeschlagen",
+      "body": "Der letzte Zahlungsversuch für {{planName}} ist fehlgeschlagen. Wenn Ihr Abonnement unbezahlt bleibt, wechselt Ihr Konto zu Free Demo. Gespeicherte Fotos und Verbindungen bleiben in Ihrem Konto. Verbundene Kundinnen sehen weiterhin Ihre gesamte Galerie. Free Demo erlaubt das Hinzufügen von bis zu 5 Arbeiten, Verbindungen mit bis zu 2 Kundinnen und 3 angeheftete Arbeiten auf Ihrem öffentlichen Profil.\n\nUm bei einem kostenpflichtigen Plan zu bleiben, prüfen Sie Ihre Karte noch heute in den Kontoeinstellungen. Wenn Sie Free Demo wählen, müssen Sie nichts tun.",
+      "bodyZero": "Der letzte Zahlungsversuch für {{planName}} ist fehlgeschlagen. Wenn Ihr Abonnement unbezahlt bleibt, wechselt Ihr Konto zu Free Demo. Um bei einem kostenpflichtigen Plan zu bleiben, prüfen Sie Ihre Karte noch heute in den Kontoeinstellungen. Wenn Sie Free Demo wählen, müssen Sie nichts tun.",
+      "cta": "Zahlungskarte prüfen"
+    },
+    "pairing-notification": {
+      "preheader": "Ihre Kundin sieht jetzt die gesamte Galerie und kann Inspirationen für den Termin auswählen.",
+      "heading": "Sie haben eine neue Kundin",
+      "body": "Die Verbindung mit {{clientName}} ist hergestellt. Die Kundin hat jetzt Zugriff auf Ihre gesamte Galerie und erscheint in Ihrer Verbindungsliste.",
+      "cta": "Verbindungen ansehen"
+    },
+    "pair-request-notification": {
+      "preheader": "Entscheiden Sie in der App, ob Sie Ihre gesamte Galerie für diese Kundin freigeben möchten.",
+      "heading": "Eine neue Verbindungsanfrage",
+      "body": "{{clientName}} hat eine Verbindungsanfrage gesendet. Wenn Sie sie annehmen, erhält die Kundin Zugriff auf Ihre gesamte Galerie. Sie können die Anfrage auch ablehnen.",
+      "placeLine": "Ort: {{place}}",
+      "noteLine": "Nachricht: {{note}}",
+      "cta": "Anfrage ansehen"
+    },
+    "session-shared-notification": {
+      "preheader": "Sehen Sie sich die ausgewählten Fotos vor dem Termin an. Die Sitzung ist __NF_SESSION_EXPIRY_DAYS__ Tage verfügbar.",
+      "heading": "Geteilte Inspirationssitzung",
+      "body": "{{clientName}} hat eine Inspirationssitzung mit ausgewählten Fotos mit Ihnen geteilt. Sie können die Sitzung ab dem Zeitpunkt der Freigabe __NF_SESSION_EXPIRY_DAYS__ Tage lang in der App ansehen.",
+      "cta": "Sitzung ansehen"
+    },
+    "messaging-notification": {
+      "preheader": "Lesen und antworten Sie in der App. E-Mail-Antworten gehen an den Nailfolio-Support.",
+      "heading": "Sie haben eine neue Nachricht",
+      "body": "{{senderName}} hat Ihnen eine Nachricht in Nailfolio gesendet. Öffnen Sie Nachrichten, um sie zu lesen und im Gespräch zu antworten.\n\nAntworten auf diese E-Mail gehen an den Nailfolio-Support, nicht an die Person, die die Nachricht gesendet hat.",
+      "cta": "Nachrichten öffnen"
+    },
+    "salon-staff-invitation": {
+      "preheader": "Erfahren Sie, was der Beitritt zum Team bedeutet, und nehmen Sie die Einladung an.",
+      "heading": "Eine Einladung in ein Salonteam",
+      "intro": "{{inviterName}} lädt Sie als Stylistin in das Team von {{salonName}} bei Nailfolio ein.",
+      "introNoName": "Eine Salonbesitzerin lädt Sie als Stylistin in ihr Team bei Nailfolio ein.",
+      "body": "Ihr eigenes Konto erhält die Funktionen des Salonplans, solange Sie zum Team gehören und der Salon einen aktiven Studio- oder Scale-Plan hat.\n\nIhre Arbeiten erscheinen in der Salongalerie mit Ihnen als Urheberin; Sie können dies in Ihrem Profil ausschalten. Eine mit einem beliebigen Salonmitglied verbundene Kundin kann Ihnen Inspirationen oder Nachrichten senden. Ihre Arbeiten bleiben Ihre, und nur Sie haben Zugriff auf Ihre privaten Notizen und Gespräche.\n\nMit einem Klick auf die Schaltfläche nehmen Sie die Einladung in der App an. Der Link meldet Sie nicht an. Anschließend können Sie sich anmelden oder ein Stylistinnenkonto erstellen.",
+      "cta": "Dem Team beitreten"
+    },
+    "renewal-reminder": {
+      "preheader": "Prüfen Sie die für den {{renewalDate}} vorgesehene Verlängerung Ihres Tarifs {{planName}}.",
+      "heading": "Ihre Tarifverlängerung",
+      "body": "Die Verlängerung Ihres Tarifs {{planName}} ist für den {{renewalDate}} vorgesehen. In Ihrem Konto können Sie die Zahlung prüfen, Ihre Karte ändern oder den Tarif kündigen.",
+      "cta": "Ihren Plan ansehen",
+      "supportNote": "Haben Sie eine Frage?",
+      "supportCta": "Frage zum Plan stellen",
+      "preheaderWithAmount": "{{renewalDate}}. Voraussichtlicher Zahlbetrag: {{renewalAmount}} brutto.",
+      "bodyWithAmount": "Die Verlängerung Ihres Tarifs {{planName}} ist für den {{renewalDate}} vorgesehen. Voraussichtlicher Zahlbetrag: {{renewalAmount}} brutto.\nSie können Ihre Karte ändern oder den Tarif vor dem Verlängerungstermin kündigen."
+    },
+    "magic-link": {
+      "preheader": "Melden Sie sich ohne Passwort an. Der Link gilt einmal und läuft nach einer Stunde ab.",
+      "heading": "Ihr Anmeldelink",
+      "body": "Mit der Schaltfläche melden Sie sich bei Nailfolio an oder schließen die Kontoerstellung ab. Der Link kann einmal verwendet werden und ist eine Stunde gültig.",
+      "cta": "Anmelden",
+      "copyLinkLabel": "Die Schaltfläche funktioniert nicht? Kopieren Sie diesen Link:",
+      "ignoreNote": "Wenn Sie keinen Anmeldelink angefordert haben, ignorieren Sie diese E-Mail. Geben Sie den Link nicht weiter."
+    },
+    "account-delete-confirm": {
+      "preheader": "Bestätigen Sie nur, wenn Sie Ihr Konto löschen möchten. Der Link ist 24 Stunden gültig.",
+      "heading": "Löschung des Kontos bestätigen",
+      "body": "Die Löschung Ihres Nailfolio-Kontos wurde angefordert. Wenn Sie das bestätigen möchten, nutzen Sie die Schaltfläche innerhalb von 24 Stunden.\n\nNach der Bestätigung haben Sie 90 Tage Zeit, Ihr Konto durch eine erneute Anmeldung mit derselben E-Mail-Adresse wiederherzustellen.",
+      "cta": "Löschung des Kontos bestätigen",
+      "ignoreNote": "Sie haben das nicht angefordert? Bestätigen Sie die Anfrage nicht und antworten Sie auf diese E-Mail. Ohne Bestätigung wird Ihr Konto nicht gelöscht."
+    },
+    "account-deleted-recovery": {
+      "preheader": "Sie können innerhalb von 90 Tagen zurückkehren. Melden Sie sich dazu mit derselben E-Mail-Adresse an.",
+      "heading": "Ihr Konto ist geschlossen. Eine Rückkehr ist noch möglich",
+      "body": "Ihr Nailfolio-Konto wurde wie angefordert geschlossen. Sie können es 90 Tage lang wiederherstellen, indem Sie sich mit derselben E-Mail-Adresse anmelden. Danach wird das Konto dauerhaft geschlossen.",
+      "cta": "Konto wiederherstellen",
+      "ignoreNote": "Wenn Sie das so wollten, müssen Sie nichts tun. Wenn die Daten sofort und endgültig verschwinden sollen, schreiben Sie an support@nailfolio.app."
+    },
+    "email-change-confirm": {
+      "preheader": "Noch ein Schritt zur neuen Anmeldeadresse. Der Link ist 24 Stunden gültig.",
+      "heading": "Änderung der E-Mail-Adresse bestätigen",
+      "body": "Diese Adresse wurde als neue Anmeldeadresse für ein Nailfolio-Konto angegeben. Wenn Sie die Änderung angefordert haben, bestätigen Sie sie innerhalb von 24 Stunden über die Schaltfläche unten.",
+      "cta": "Neue Adresse bestätigen",
+      "ignoreNote": "Wenn Sie das nicht waren, ignorieren Sie diese E-Mail. Ohne Bestätigung ändert sich nichts."
+    },
+    "email-change-notify": {
+      "preheader": "Sie haben das nicht angefordert? Antworten Sie auf diese E-Mail, um Hilfe zu erhalten.",
+      "heading": "Änderung der E-Mail-Adresse",
+      "body": "Eine Änderung Ihrer Nailfolio-Anmeldeadresse auf {{newEmail}} wurde angefordert.\n\nWenn Sie das angefordert haben, müssen Sie auf diese E-Mail nicht reagieren. Andernfalls antworten Sie hier oder schreiben Sie an support@nailfolio.app."
+    },
+    "newsletter-confirm": {
+      "preheader": "Bestätigen Sie Ihre Adresse für den Nailfolio-Newsletter. Der Link gilt 7 Tage.",
+      "heading": "Newsletter-Anmeldung bestätigen",
+      "body": "Ein Klick fehlt noch zur Anmeldung für den Nailfolio-Newsletter. Bestätigen Sie Ihre E-Mail-Adresse über die Schaltfläche unten. Der Link gilt 7 Tage.",
+      "cta": "Anmeldung bestätigen",
+      "ignoreNote": "Sie haben sich nicht angemeldet? Ignorieren Sie diese E-Mail. Ohne Bestätigung erhalten Sie keinen Newsletter."
+    },
+    "winback-deletion-d60": {
+      "preheader": "Zur Kontowiederherstellung bleibt etwa ein Monat. Ihr 20-%-Rabattcode gilt 72 Stunden.",
+      "preheaderNoOffer": "Das Konto lässt sich noch etwa einen Monat lang mit derselben E-Mail-Adresse wiederherstellen.",
+      "heading": "Möchten Sie zu Ihrem Konto zurückkehren?",
+      "body": "Ihr Nailfolio-Konto wurde vor zwei Monaten geschlossen. Sie können es noch etwa einen Monat lang wiederherstellen, indem Sie sich mit derselben E-Mail-Adresse anmelden. Danach wird das Konto dauerhaft geschlossen.\n\nFür den ersten Monat des Plans {{planName}} ist ein Rabatt von 20 % verfügbar. Der Code unten ist Ihrem Konto zugeordnet und kann einmal verwendet werden.",
+      "bodyNoOffer": "Ihr Nailfolio-Konto wurde vor zwei Monaten geschlossen. Sie können es noch etwa einen Monat lang wiederherstellen, indem Sie sich mit derselben E-Mail-Adresse anmelden. Danach wird das Konto dauerhaft geschlossen. Wenn Sie es nicht wiederherstellen möchten, müssen Sie nichts tun.",
+      "offerLabel": "Ihr Code",
+      "offerHeadline": "20 % günstiger im ersten Monat",
+      "offerExpiry": "Gültig bis {{offerExpiresAt}}",
+      "offerFinePrint": "Der Rabatt gilt für die erste Zahlung eines Monatsplans und kann einmal genutzt werden. Verwenden Sie die Schaltfläche unten, damit der Rabatt beim Bezahlen angewendet wird.",
+      "cta": "Mit 20 % Rabatt zurückkommen",
+      "ctaNoOffer": "Konto wiederherstellen",
+      "ps": "Dies ist die einzige Erinnerung an die Frist zur Kontowiederherstellung."
+    },
+    "support-reply-notification": {
+      "preheader": "Lesen Sie die Antwort unten. Das vollständige Gespräch finden Sie in der App.",
+      "heading": "Eine Antwort auf Ihre Frage",
+      "body": "Zu „{{threadSubject}}“ liegt eine Antwort vor. Lesen Sie diese unten oder öffnen Sie das vollständige Gespräch in der App.\n\n{{replyPreview}}",
+      "cta": "Gespräch öffnen"
+    },
+    "moderation-owner-notification": {
+      "preheader": "Lesen Sie die Begründung. Sie können antworten, wenn Sie Widerspruch einlegen möchten.",
+      "preheaderBan": "Lesen Sie die Begründung der Sperre. Zum Widerspruch können Sie auf diese E-Mail antworten.",
+      "heading": "Eine Entscheidung zu einem Foto",
+      "headingBan": "Ihr Konto wurde gesperrt",
+      "introHide": "Nach Prüfung einer Meldung wurde eines Ihrer Fotos ausgeblendet. Das Foto wurde nicht gelöscht, ist aber für andere Personen nicht sichtbar.",
+      "introDelete": "Nach Prüfung einer Meldung wurde eines Ihrer Fotos entfernt, weil es gegen die Nutzungsbedingungen verstieß.",
+      "introWarn": "Eine Meldung zu einem Ihrer Fotos wurde geprüft. Das Foto bleibt sichtbar. Dies ist eine Ermahnung wegen eines Verstoßes gegen die Nutzungsbedingungen. Ein weiterer Verstoß führt zum Ausblenden des Fotos oder zur Kontosperre.",
+      "introBan": "Nach Prüfung einer Meldung wurde Ihr Konto gesperrt. Ihre Fotos sind ausgeblendet und der Kontozugriff ist gesperrt.",
+      "adminNoteLabel": "Begründung der Entscheidung:",
+      "cta": "Galerie öffnen",
+      "ctaPhoto": "Dieses Foto ansehen",
+      "ps": "Sie können gegen die Entscheidung Einspruch einlegen, indem Sie auf diese E-Mail antworten oder an support@nailfolio.app schreiben."
+    },
+    "free-first-photo": {
+      "preheader": "Wählen Sie ein Foto vom Handy. Ein Bild reicht für den Anfang.",
+      "heading": "Beginnen Sie mit einem Foto",
+      "body": "Laden Sie ein Foto Ihrer eigenen Nagelgestaltung vom Handy hoch. Sie können es zuschneiden und beschreiben, damit Kundinnen es in Ihrer Galerie leichter finden.\n\nWählen Sie danach aus, welche Arbeiten Sie im öffentlichen Profil zeigen möchten. Kundinnen können diese ohne Konto ansehen.",
+      "cta": "Erstes Foto hinzufügen"
+    },
+    "free-public-profile": {
+      "preheader": "Zeigen Sie ausgewählte Nagelgestaltungen über einen Link.",
+      "heading": "Zeigen Sie Kundinnen Ihre Arbeiten",
+      "body": "Sie haben bereits Fotos in Ihrer Galerie. Heften Sie ausgewählte Arbeiten an Ihr öffentliches Profil an, damit Kundinnen sie ohne Konto ansehen können.\n\nPrüfen Sie auch Ihren Profilnamen und die Beschreibung. Den fertigen Link können Sie in Ihre Instagram-Bio einfügen oder einer Kundin schicken.",
+      "cta": "Arbeiten fürs Profil wählen"
+    },
+    "free-first-client": {
+      "preheader": "Zeigen Sie Ihren QR-Code beim nächsten Termin.",
+      "heading": "Zeigen Sie Ihrer Kundin Ihren QR-Code",
+      "body": "Öffnen Sie beim nächsten Termin Ihren QR-Code und zeigen Sie ihn Ihrer Kundin. Nach dem Scannen und Anmelden kann sie Ihnen eine Verbindungsanfrage senden.\n\nSobald Sie die Anfrage annehmen, sieht Ihre Kundin Ihre gesamte Galerie. Sie können den Code auch herunterladen und ausdrucken.",
+      "cta": "QR-Code anzeigen",
+      "preheaderInactive": "Sie haben eine Verbindungsanfrage. Prüfen Sie sie in Nailfolio.",
+      "bodyInactive": "Eine Kundin möchte sich mit Ihnen verbinden. Öffnen Sie Ihre Anfragen und prüfen Sie, von wem sie stammt.\n\nNehmen Sie die Anfrage an, wenn Sie die Kundin kennen und Ihre gesamte Galerie mit ihr teilen möchten.",
+      "ctaInactive": "Anfrage prüfen",
+      "headingInactive": "Prüfen Sie Ihre Verbindungsanfrage"
+    }
+  },
+  "subjects": {
+    "email.magicLink.subject": "Bei Nailfolio anmelden",
+    "email.welcome.subject": "Willkommen bei Nailfolio",
+    "email.trial.d1Nudge.subject": "Zeigen Sie Ihre erste Nagelgestaltung",
+    "email.trial.d3Inactive.subject": "Beginnen Sie Ihr Portfolio mit einem Foto",
+    "email.trial.d3Active.subject": "Schon {{galleryCount#Arbeit|Arbeiten}}. Zeigen Sie Ihre Galerie",
+    "email.trial.d7Active.subject": "Eine Woche mit {{planName}}, {{galleryCount#Arbeit|Arbeiten}} zum Teilen",
+    "email.trial.d7Inactive.subject": "Helfen Sie Kundinnen, passende Nagelideen zu finden",
+    "email.trial.d14Active.subject": "Teilen Sie Ihr Profil und den QR-Code mit Kundinnen",
+    "email.trial.d14Inactive.subject": "Noch {{trialDaysLeft#Tag|Tage}} zum Testen von Nailfolio",
+    "email.trial.d23Warning.subject": "Die erste Planzahlung erfolgt in einer Woche",
+    "email.trial.d29LastDay.subject": "Morgen erste Zahlung für {{planName}} mit 20 % Rabatt, {{addressName}}",
+    "email.trial.d29LastDay.subjectNoOffer": "Morgen erste Zahlung für {{planName}}, {{addressName}}",
+    "email.trial.d30Ended.subject": "Ihre Testphase ist vorbei. Ihr Portfolio bleibt",
+    "email.trial.d37Winback.subject": "20 % Rabatt auf Ihren ersten Monat, {{addressName}}",
+    "email.trial.d37Winback.subjectNoOffer": "{{addressName}}, zurück zu {{planName}}, wenn Sie mehr brauchen",
+    "email.upgrade.subject": "Ihr Plan {{planName}} ist jetzt aktiv",
+    "email.downgrade.subject": "Ihr Konto nutzt jetzt Free Demo",
+    "email.pairingNotification.subject": "{{clientName}} hat jetzt Zugriff auf Ihre Galerie",
+    "email.pairRequestNotification.subject": "Verbindungsanfrage von {{clientName}}",
+    "email.sessionSharedNotification.subject": "{{clientName}} hat eine Inspirationssitzung geteilt",
+    "email.messagingNotification.subject": "Neue Nachricht von {{senderName}} in Nailfolio",
+    "email.messagingNotification.subjectFromStylist": "Ihre Stylistin hat Ihnen in Nailfolio geschrieben",
+    "email.salonStaffInvitation.subject": "Einladung in ein Salonteam von {{inviterName}}",
+    "email.salonStaffInvitation.subjectNoName": "Sie sind in ein Salonteam eingeladen",
+    "email.paymentFailed.subject": "Ihre Zahlung für {{planName}} ist fehlgeschlagen",
+    "email.cancel.d1.subject": "Abonnement beendet. Fotos und Verbindungen bleiben",
+    "email.cancel.d7.subject": "{{addressName}}, kehren Sie mit 20 % Rabatt im ersten Monat zurück",
+    "email.cancel.d7.subjectNoOffer": "{{addressName}}, Ihr Portfolio bleibt in Ihrem Konto",
+    "email.cancel.d30.subject": "Welche 3 Arbeiten zeigt Ihr öffentliches Profil?",
+    "email.dunning.d1Info.subject": "Prüfen Sie Ihre Karte für {{planName}}",
+    "email.dunning.d7Urgent.subject": "Ihre Zahlung für {{planName}} ist erneut fehlgeschlagen",
+    "email.dunning.d14Final.subject": "{{planName}}: Der letzte Zahlungsversuch ist fehlgeschlagen",
+    "email.onboarding.incomplete24h.subject": "{{addressName}}, wählen Sie, wie Sie Nailfolio nutzen",
+    "email.renewal.reminder7d.subject": "Ihr Tarif {{planName}}: Verlängerung am {{renewalDate}}",
+    "email.newsletter.confirm.subject": "Bestätigen Sie Ihre Anmeldung zum Nailfolio-Newsletter",
+    "email.accountDeleteConfirm.subject": "Bestätigen Sie die Löschung Ihres Nailfolio-Kontos",
+    "email.accountDeletedRecovery.subject": "Konto geschlossen. Sie haben 90 Tage für eine Rückkehr",
+    "email.winback.deletionD60.subject": "{{addressName}}, Konto wiederherstellen und 20 % im ersten Monat sparen",
+    "email.winback.deletionD60.subjectNoOffer": "{{addressName}}, noch etwa ein Monat zur Kontowiederherstellung",
+    "email.changeEmail.confirm.subject": "Bestätigen Sie Ihre neue Nailfolio-Anmeldeadresse",
+    "email.changeEmail.notify.subject": "Angeforderte Änderung Ihrer Nailfolio-E-Mail-Adresse",
+    "email.support.reply.subject": "Eine Antwort auf Ihre Frage: {{threadSubject}}",
+    "email.moderation.owner.subject": "Entscheidung zu Ihrem Foto",
+    "email.moderation.hide.subject": "Ihr Foto ist ausgeblendet. Lesen Sie die Begründung",
+    "email.moderation.delete.subject": "Ihr Foto wurde entfernt. Lesen Sie die Begründung",
+    "email.moderation.warn.subject": "Eine Ermahnung zu Ihrem Foto",
+    "email.moderation.ban.subject": "Ihr Konto ist gesperrt. Lesen Sie die Begründung",
+    "email.free.firstPhoto.subject": "Fügen Sie Ihre erste Nagelgestaltung hinzu",
+    "email.free.publicProfile.subject": "Wählen Sie Arbeiten für Ihr öffentliches Profil",
+    "email.free.firstClient.subject": "Verbinden Sie sich mit Ihrer ersten Kundin"
+  },
+  "footer": {
+    "unsubscribe": "Legen Sie fest, ob Sie diese E-Mails erhalten möchten.",
+    "unsubscribeLink": "Abmelden",
+    "companyInfo": "Nailfolio | Krakau, Polen | support@nailfolio.app",
+    "replyHeading": "Haben Sie eine Frage?",
+    "replyBody": "Antworten Sie auf diese E-Mail. Ihre Nachricht erreicht unser Nailfolio-Team.",
+    "replyCta": "Schreiben Sie uns",
+    "appCta": "Nailfolio öffnen",
+    "helpCta": "Hilfe und Kontakt",
+    "participantReplyNote": "Antworten auf diese E-Mail gehen an den Nailfolio-Support. Ihrer Stylistin oder Kundin schreiben Sie in der App."
+  }
+}

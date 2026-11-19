@@ -1,0 +1,375 @@
+/* ─── GetAppPage ─── */
+
+.page {
+  --section-block: var(--lp-rhythm);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 1. HERO: the canonical <LpHero/> (components/LpHero); hero typography and
+ * layout live THERE, the phone collage and store column in GetAppHero
+ * (shared with /app/home). Only the h1 line-break fix for narrow screens stays here.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Hero headline (the h1 is rendered by the LpHero canon, the page's only h1, hence
+ * the .page h1 scope instead of a class from another module). The canon has
+ * text-wrap: balance, but at 390px the last word wrapped alone (balance in
+ * Chromium has a line limit and does not guarantee no orphan). `pretty` = dedicated
+ * orphan prevention without a line limit; mobile only, desktop keeps the
+ * canon's balance. */
+@media (max-width: 767.98px) {
+  .page h1 {
+    text-wrap: pretty;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2. FEATURES: variant B (1:1 with the playground
+ * S24Vote7GetAppFeatures.module.css, classes v7Inner/v7bGrid/v7bList/
+ * v7bRow/v7bRowIcon/v7bRowContent/v7bRowTitle/v7bRowBody/v7bPhoneCol):
+ * hairline list with a left icon rail + sticky screen.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Band via <Section tone='subtle'>: bg-subtle tint + FULL hairline frame
+ * top+bottom (a tint without a frame "bleeds" on white) + breakout +
+ * lp container live in Section; here only the page's vertical rhythm. */
+.featuresSection {
+  --section-pad-block: var(--section-block);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: calc(60 * var(--ch-body));
+  margin: 0 0 var(--lp-rhythm);
+}
+
+/* Per-page headline scale for <SectionHeader>, steered through the canon's var
+ * hooks (NOT a redefinition of .sectionHeadline). Values = the former local
+ * .sectionHeadline (clamp(28-48px) / 1.08 / -0.018em / 16ch), so the features
+ * section headline stays pixel-identical.
+ * The lede comes from the canonical SectionHeader, which exposes no lede hooks,
+ * so this class steers only the headline scale. */
+.sectionHeaderScaled {
+  --section-headline-size: clamp(28px, 4.4vw, 48px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: calc(16 * var(--ch-heading));
+}
+
+/* FAQ title scale: the FaqSection title is a <span> (FaqSection renders the
+ * heading element with headingId itself, so we do not wrap it in a canonical h2;
+ * see the DECISION in GetAppPage.composition.tsx). This class (standalone, NOT .sectionHeadline,
+ * per the eyebrow-headline-dup audit) mirrors the former local .sectionHeadline
+ * 1:1 so the FAQ title keeps the scale of the other section headings. */
+.faqTitleScale {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: calc(16 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+/* Split: list | phone (sticky from LG). */
+.featuresGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 4vw, 64px);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .featuresGrid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4vw, 48px);
+}
+
+.featureGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.featureGroupHeading {
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-subhead);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.16;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.featureGroupRows {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Row: icon in a fixed left rail (icons, NOT numbering: the features are
+ * parallel capabilities, not a sequence; Style Policy §6). Uniform rows on a
+ * shared left line, with no nth-child zig-zag and no full-bleed band
+ * mid-list (rationale: the DECISION in GetAppPageFeatures.tsx). */
+.feature {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: clamp(12px, 1.4vw, 20px);
+  padding-block: clamp(24px, 2.8vw, 40px);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.feature:last-of-type {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.featureIcon {
+  display: inline-flex;
+  color: var(--color-primary);
+  margin-top: var(--space-2);
+}
+
+.featureContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 14px);
+  max-width: calc(56 * var(--ch-body));
+  min-width: 0;
+}
+
+.featureTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.22;
+  letter-spacing: var(--ls-tight-12);
+  /* Display digits ("Dodaj zdjęcie w 30 sekund" → "3O sekund"). */
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.demoResponse {
+  max-width: calc(58 * var(--ch-body));
+  margin: 0 auto;
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.featureText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.featuresPhoneCol {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .featuresPhoneCol {
+    position: sticky;
+    top: calc(
+      var(--public-header-height, var(--app-bar-height)) + var(--space-96)
+    );
+    align-self: start;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2.5. HOW: 3-step onboarding
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Band via <Section> (plain): breakout + lp container in Section.
+ * bg-main explicit; border-top DELIBERATELY single (a separator closing the
+ * tint band of features above, not a band frame, hence no bordered prop). */
+.howSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* The lp container + centring come from the constrained inner of Section. */
+.howInner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 28px);
+}
+
+.howHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.08;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: calc(18 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+.howLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0 0 clamp(20px, 3vw, 40px);
+  max-width: calc(56 * var(--ch-body));
+}
+
+/* Steps 01-03 = the canonical <StepsSection variant='list'> (this page was the
+   numeral-scale canon); the skin lives in components/StepsSection. */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3. TRUST: variant B (1:1 with the playground
+ * S24Vote8GetAppTrust.module.css, classes v8bBand/v8Inner/v8bPanelWrap/
+ * v8bPanel/v8bGrid/v8bFact): a closed 2x2 ink card.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* Band without a tint (1:1 v8bBand: bg-main, no frame: a smooth background under
+   the closed ink card; neighbouring bands have their own hairlines).
+   Breakout + default rhythm (clamp 48/6vw/88 = canon) + lp container live
+   in <Section> (plain); the explicit bg-main stays here. */
+/* White band (Section tone='white'): the reviews above it and the questions below it
+   stand on paper, and two paper bands do not stand in a row. */
+.trustSection {
+  --section-pad-block: var(--section-block);
+}
+
+/* The lp container + centring come from the constrained inner of Section. */
+.trustInner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 28px);
+  align-items: center;
+}
+
+/* Narrowed negative (max 860px, to the left): a short card instead of a wall;
+ * the page already has a gold finalCta, so the ink stays light. */
+.trustPanelWrap {
+  width: 100%;
+  max-width: 50rem;
+  margin-inline: auto;
+}
+
+.trustPanel {
+  padding: clamp(28px, 3.4vw, 48px) clamp(24px, 3vw, 48px);
+}
+
+/* DECISION: the trust facts stay page-local, not TrustSignals variant='grid'. The
+ * canonical grid renders light cards that are unreadable on the ink panel, and an
+ * on-ink recolor via a page className loses specificity to `.grid li`. This is the
+ * only on-ink grid, so the canon gets no variant (rule of three). */
+.trustGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(18px, 2.4vw, 32px) clamp(24px, 3vw, 48px);
+}
+
+@media (min-width: 640px) {
+  .trustGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.trustFact {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-on-ink);
+  min-width: 0;
+}
+
+/* Gold on ink = a legitimate fill accent (dark background). */
+.trustFact svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 4. FINAL CTA: shared FinalCtaBand molecule
+ * (src/UI/components/FinalCtaBand/), zero per-page styles.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * FAQ: canonical <FaqSection> (skin lives in components/FaqSection);
+ * band = <Section tone='subtle' as='div'> (bg-subtle tint + full hairline
+ * frame + breakout + lp container from the canon). Only the page rhythm here.
+ * ───────────────────────────────────────────────────────────────────── */
+.faqSection {
+  --section-pad-block: var(--section-block);
+}
+
+/* Hero actions: on a computer the QR code above the button, on a phone just the
+   button. The block is the scroll target of the page's other buttons in
+   'get-app' mode, hence the margin for the sticky bar. */
+.heroActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-20);
+  scroll-margin-top: 96px;
+}
+
+/* ─── 1b. The click-through section: one centred column (heading,
+   photos, session card, button), as wide as the gallery itself. ─── */
+.demoColumn {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vw, 32px);
+  width: 100%;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+.demoHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  margin: 0;
+  --section-headline-size: clamp(28px, 4.4vw, 44px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+}
+
+.demoAction {
+  display: flex;
+  justify-content: center;
+}
+
+.contextualIllustration {
+  margin-top: max(0px, calc(var(--illustration-gap) - clamp(16px, 2vw, 28px)));
+  display: block;
+  width: 100%;
+  max-width: 50rem;
+  height: auto;
+}

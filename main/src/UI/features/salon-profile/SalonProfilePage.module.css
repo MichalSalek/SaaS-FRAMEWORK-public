@@ -1,0 +1,12 @@
+.content {
+  display: grid;
+  gap: var(--space-20);
+}
+.section {
+  display: grid;
+  gap: var(--space-16);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}

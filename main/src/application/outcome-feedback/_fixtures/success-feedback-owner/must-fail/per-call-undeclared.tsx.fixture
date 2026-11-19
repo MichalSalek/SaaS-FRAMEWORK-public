@@ -1,0 +1,20 @@
+// A screen adds a toast per call; the hook's IO call declares nothing.
+function useDeleteThing() {
+  return useMutation({
+    mutationFn: (req: unknown) => deleteThing_IO(req),
+  });
+}
+
+export function ThingScreen() {
+  const deleteThing = useDeleteThing();
+  const onDelete = () =>
+    deleteThing.mutate(
+      { id: '1' },
+      {
+        onSuccess: () => {
+          pushNewSnackbar(t('deleted'));
+        },
+      }
+    );
+  return onDelete;
+}

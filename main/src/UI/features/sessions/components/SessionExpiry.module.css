@@ -1,0 +1,45 @@
+.empty,
+.expired,
+.row {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.expired {
+  color: var(--color-text-muted);
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.remaining {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 1lh;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  /* tnum-allow: countdown changes in place; proportional digits would jitter */
+  font-variant-numeric: tabular-nums;
+}
+
+.remaining svg {
+  flex: none;
+  color: var(--color-accent-fg);
+}
+
+.deadline {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}

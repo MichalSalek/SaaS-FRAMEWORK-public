@@ -1,0 +1,43 @@
+/* „Ważne przed wizytą” on the client card: a white box like every section;
+ * the warning ink is on the icon only, which sits on the title's first line. */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  min-width: 0;
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  font-size: var(--text-lg);
+  line-height: 1.25;
+}
+
+.icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-warning-fg);
+}
+
+.icon svg {
+  display: block;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: inherit;
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: inherit;
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}

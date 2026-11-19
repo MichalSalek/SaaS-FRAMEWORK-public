@@ -1,0 +1,94 @@
+/* ═══════════════════════════════════
+   Linear Progress
+   ═══════════════════════════════════ */
+
+.linearTrack {
+  width: 100%;
+  background-color: var(--color-track);
+  border-radius: var(--style-radius-pill);
+  overflow: hidden;
+}
+
+/* ─── Linear sizes (track height) ─── */
+.linear-sm {
+  height: 2px;
+}
+
+.linear-md {
+  height: 4px;
+}
+
+.linear-lg {
+  height: 6px;
+}
+
+/* ─── Bar base ─── */
+/* Wypelnienie niesie WARTOSC, wiec granica wypelnienie/tor podlega progowi
+   3:1 (SC 1.4.11). Jasne zloto na jasnym torze dawalo 1,35:1; --color-accent-fg
+   to ten sam kolor marki przyciemniony wlasnie pod jasne tla. W DARK tor jest
+   ciemny i jasne zloto trzyma tam 5,79:1, wiec zostaje bez zmian. */
+:root[data-mode='light'] .linearBar {
+  background-color: var(--color-accent-fg);
+}
+
+.linearBar {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: var(--style-radius-pill);
+}
+
+/* ─── Determinate: width set via style ─── */
+.determinate {
+  transition: width var(--transition-normal);
+}
+
+/* ─── Indeterminate: sliding animation ─── */
+.indeterminate {
+  width: 40%;
+  animation: slideIndeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes slideIndeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(150%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+/* ═══════════════════════════════════
+   Spinner
+   ═══════════════════════════════════ */
+
+.spinner {
+  animation: spinRotate 1s linear infinite;
+  display: block;
+  flex-shrink: 0;
+}
+
+.spinnerTrack {
+  stroke: var(--color-track);
+}
+
+/* DECISION: the spinner arc stays on --color-primary in light too, unlike .linearBar and the gallery
+   strength ring. The 3:1 threshold of SC 1.4.11 applies to graphics that CARRY INFORMATION: bar
+   length and ring fill encode a value, whereas a spinning arc encodes only "in progress", read
+   from MOTION, not contrast. The .indeterminate bar variant is a borderline case on the same side
+   (no value to read), but it shares a class with .linearBar and is not worth a separate rule. */
+.spinnerArc {
+  stroke: var(--color-primary);
+  transform-origin: center;
+}
+
+@keyframes spinRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

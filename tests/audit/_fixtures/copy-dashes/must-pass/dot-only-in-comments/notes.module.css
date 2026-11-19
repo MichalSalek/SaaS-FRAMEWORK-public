@@ -1,0 +1,4 @@
+/* Do S126 stała tu kropka „·” jako pseudoelement. */
+.item:not(:last-child)::after {
+  content: ',';
+}

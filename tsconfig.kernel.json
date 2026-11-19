@@ -1,0 +1,29 @@
+{
+  // Projekt TypeScriptu WYŁĄCZNIE dla typowanego lintu wspólnego jądra
+  // (`eslint.config.mjs` w roocie wskazuje tu przez `parserOptions.project`).
+  //
+  // DECISION (nie usuwaj tego komentarza) — DLACZEGO TEN PLIK STOI W ROOCIE, A NIE
+  // W `.shared-kernel/` (2026-09-16):
+  // Wcześniej mieszkał jako `.shared-kernel/tsconfig.json` i był KOPIOWANY razem z
+  // jądrem do obu submodułów. Po skopiowaniu jego `extends: "../tsconfig.base.json"`
+  // wskazywał na `src/tsconfig.base.json`, czyli w próżnię — a każdy transformer, który
+  // przy kompilacji pliku jądra idzie w górę katalogów po tsconfig, na tym padał.
+  // Ten jeden kopiowany plik zrodził TRZY osobne obejścia w repo:
+  //   1. `main/src/tsconfig.base.json` — plik-most istniejący tylko po to, żeby
+  //      dowiązanie się rozwiązało,
+  //   2. `esbuild: { tsconfigRaw: '{}' }` w `web-1/vitest.config.ts`,
+  //   3. `vi.mock` całego modułu jądra w `session-fields.helpers.test.ts`, którego
+  //      jedynym uzasadnieniem było „żeby Vite nie musiał tego pliku transformować".
+  // Vite 8 zamienił esbuild na oxc, a `OxcOptions` JAWNIE pomija `tsconfig`, więc
+  // obejścia numer 2 nie dało się już przenieść — i dobrze, bo leczyło skutek.
+  // Trzymanie tego pliku poza `.shared-kernel/` usuwa przyczynę: jądro przestaje wozić
+  // ze sobą konfigurację builda, a liczba kopiowanych plików spada symetrycznie po obu
+  // stronach, więc asercja `cp-kernel` i audyt `kernel-sync` dalej się zgadzają bez
+  // żadnych list wyjątków.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": [".shared-kernel/**/*.ts"],
+  "exclude": [".shared-kernel/node_modules"]
+}

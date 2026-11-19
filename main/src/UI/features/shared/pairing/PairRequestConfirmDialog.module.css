@@ -1,0 +1,51 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.stylist {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.stylistName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* The one encouraging line in the form: what the request unlocks. A tonal
+   success block, flat and readable, not a second paragraph of instructions. */
+.benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: color-mix(
+    in oklch,
+    var(--color-success) 10%,
+    var(--color-bg-paper)
+  );
+}
+
+.benefitIcon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--color-success);
+}
+
+.benefitText {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+}

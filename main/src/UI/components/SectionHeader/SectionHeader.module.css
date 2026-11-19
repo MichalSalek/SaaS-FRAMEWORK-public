@@ -1,0 +1,60 @@
+/* ─── Section header stack ─── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+/* ─── Alignment ─── */
+.start {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.center {
+  align-items: center;
+  text-align: center;
+}
+
+/* ─── Headline ─── */
+/*
+ * Pages customize heading typography, color, and hyphenation through these hooks rather than
+ * redefining the shared heading structure. Override only the variables on the wrapper via
+ * `className`:
+ *   --section-headline-size      → font-size (clamp())
+ *   --section-headline-leading   → line-height
+ *   --section-headline-tracking  → letter-spacing
+ *   --section-headline-measure   → max-width (for example 18ch); omit for none
+ *   --section-headline-color     → color (for example --color-on-ink)
+ *   --section-headline-hyphens   → hyphens (for example auto)
+ *   --section-lede-color         → lede color
+ * Defaults preserve the canonical scale and color; every hook is optional.
+ */
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--section-headline-size, clamp(2rem, 5.2vw, 3.75rem));
+  line-height: var(--section-headline-leading, 1.15);
+  letter-spacing: var(
+    --section-headline-tracking,
+    var(--letter-spacing-heading)
+  );
+  max-width: var(--section-headline-measure, none);
+  color: var(--section-headline-color, var(--color-text-primary));
+  hyphens: var(--section-headline-hyphens, manual);
+  text-wrap: balance;
+}
+
+/* ─── Lede ─── */
+.lede {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+  color: var(--section-lede-color, var(--color-text-secondary));
+  text-wrap: pretty;
+}
+
+.header:has(+ [data-illustration]) {
+  margin-bottom: 0;
+}

@@ -1,0 +1,92 @@
+/** Accepted phase-four evidence IDs stay stable across implementation changes. */
+export type OutcomeLevel = 'none' | 'L1' | 'L2' | 'L3' | 'L4';
+export const OUTCOME_MOMENTS = {
+  loginLinkSent: { id: 1, level: 'L4' },
+  loginLinkResent: { id: 2, level: 'L1' },
+  onboardingRole: { id: 3, level: 'none' },
+  onboardingRequiredReady: { id: 4, level: 'L1' },
+  onboardingIdentity: { id: 5, level: 'none' },
+  onboardingPreferences: { id: 6, level: 'none' },
+  onboardingComplete: { id: 7, level: 'L4' },
+  photoSelected: { id: 8, level: 'none' },
+  photoCropped: { id: 9, level: 'none' },
+  photoColor: { id: 10, level: 'none' },
+  photoTrait: { id: 11, level: 'none' },
+  photoLength: { id: 12, level: 'none' },
+  photoTagsReady: { id: 13, level: 'L1' },
+  photoReview: { id: 14, level: 'none' },
+  photoPublished: { id: 15, level: 'L4' },
+  firstPhotoPublished: { id: 16, level: 'L4' },
+  thirdPhotoOffer: { id: 17, level: 'none' },
+  galleryPhotoMilestone: { id: 18, level: 'L2' },
+  firstPhotoPinned: { id: 19, level: 'L2' },
+  photoPinToggle: { id: 20, level: 'none' },
+  pinCapacity: { id: 21, level: 'L2' },
+  qrRecognized: { id: 22, level: 'L2' },
+  pairRequested: { id: 23, level: 'L2' },
+  pairAccepted: { id: 24, level: 'L2' },
+  qrExported: { id: 25, level: 'L3' },
+  pairCapacityUnlocked: { id: 26, level: 'L2' },
+  sessionCreated: { id: 27, level: 'L2' },
+  firstSessionPhoto: { id: 28, level: 'L2' },
+  sessionPhotoAdded: { id: 29, level: 'none' },
+  sessionNoteSaved: { id: 30, level: 'L1' },
+  sessionShared: { id: 31, level: 'L2' },
+  sessionReceived: { id: 32, level: 'L2' },
+  firstSessionReceived: { id: 33, level: 'L2' },
+  sessionClosed: { id: 34, level: 'none' },
+  firstMessageSent: { id: 35, level: 'L2' },
+  messageSent: { id: 36, level: 'none' },
+  messagesRead: { id: 37, level: 'none' },
+  crmNoteSaved: { id: 38, level: 'L1' },
+  visitCreated: { id: 39, level: 'L2' },
+  firstVisit: { id: 40, level: 'none' },
+  visitResultAdded: { id: 41, level: 'L2' },
+  visitNoteSaved: { id: 42, level: 'L1' },
+  profileBioSaved: { id: 43, level: 'L1' },
+  profilePhotoSaved: { id: 44, level: 'L2' },
+  profileSpecialization: { id: 45, level: 'none' },
+  galleryComplete: { id: 46, level: 'L2' },
+  activationComplete: { id: 47, level: 'L2' },
+  profileViews: { id: 48, level: 'none' },
+  planSelected: { id: 49, level: 'none' },
+  planChanged: { id: 50, level: 'L2' },
+  checkoutComplete: { id: 51, level: 'L4' },
+  planCapabilityUnlocked: { id: 52, level: 'L2' },
+  salonInvited: { id: 53, level: 'L2' },
+  salonAccepted: { id: 54, level: 'L2' },
+  salonLinkAccepted: { id: 55, level: 'L4' },
+  salonPermissionSaved: { id: 56, level: 'none' },
+  salonCapacity: { id: 57, level: 'none' },
+  accountNameSaved: { id: 58, level: 'L1' },
+  accountEmailChanged: { id: 59, level: 'L2' },
+  contactSaved: { id: 60, level: 'L1' },
+  photoEdited: { id: 61, level: 'L1' },
+  favoriteNoteSaved: { id: 62, level: 'L1' },
+  dashboardNoteSaved: { id: 63, level: 'L1' },
+  supportCreated: { id: 64, level: 'L2' },
+  supportReplySent: { id: 65, level: 'L2' },
+  dataExported: { id: 66, level: 'L1' },
+  extraRoleActivated: { id: 67, level: 'L3' },
+  accountRestored: { id: 68, level: 'L3' },
+  roleSwitched: { id: 69, level: 'none' },
+  preferencesSaved: { id: 70, level: 'L1' },
+  salonProfileSaved: { id: 71, level: 'L1' },
+  salonVisibilitySaved: { id: 72, level: 'L1' },
+  profileLinkCopied: { id: 73, level: 'L2' },
+  sessionPhotoRemoved: { id: 74, level: 'none' },
+} as const satisfies Record<string, { id: number; level: OutcomeLevel }>;
+export type OutcomeMoment = keyof typeof OUTCOME_MOMENTS;
+export interface OutcomeEvidence {
+  confirmed: boolean;
+  changed: boolean;
+  source: 'action' | 'read';
+}
+/** Reads and idempotent responses never replay a completion. */
+export const resolveOutcomeLevel = (
+  moment: OutcomeMoment,
+  evidence: OutcomeEvidence
+): OutcomeLevel =>
+  evidence.confirmed && evidence.changed && evidence.source === 'action'
+    ? OUTCOME_MOMENTS[moment].level
+    : 'none';

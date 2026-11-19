@@ -1,0 +1,7 @@
+/* AdminDashboardPage: the numbers are the shared StatTile band, the two lists
+   the shared DataTable inside AdminPanel. Nothing else is drawn here. */
+
+/* A number with its unit, a date with its time: one unbreakable piece. */
+.nowrap {
+  white-space: nowrap;
+}

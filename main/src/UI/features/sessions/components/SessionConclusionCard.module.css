@@ -1,0 +1,157 @@
+/* Finished-visit card: heading, every photo with its like toggle, one way
+   back. A white box on paper; no entry animation, nothing tinted. */
+
+@keyframes likeHeartPop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.headingRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.body {
+  color: var(--color-text-secondary);
+}
+
+/* ─── Photo grid ─── */
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-12);
+}
+
+.photoItem {
+  position: relative;
+  min-width: 0;
+}
+
+/* The tile owns its aspect box, so it is the final size before the image
+   arrives. */
+.photoThumb {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  background: var(--color-surface-hover);
+}
+
+.photoOpen {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.photoOpen:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.photoThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Empty photo cell (gallery record with no asset_url) — trwała dziura po
+ * zdjęciu, nie podkład ładowania; parytet z ClientSessionDetailPage. */
+.photoPlaceholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--color-surface-hover);
+}
+
+/* ─── Like toggle ─── */
+
+/* The tap target is 44px; the visible disc inside stays 28px so it does not
+   cover a 96px photo. */
+.likeBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.likeDisc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--style-radius-round);
+  /* Solid-ish translucent surface for legibility over imagery (no backdrop
+   * blur — Anti-AI-Slop floor; 88% opacity carries the contrast). */
+  background: color-mix(in oklch, var(--color-surface-card) 88%, transparent);
+  transition: color var(--transition-fast);
+}
+
+.likeDisc svg {
+  display: block;
+}
+
+@media (hover: hover) {
+  .likeBtn:hover {
+    color: var(--color-error);
+  }
+}
+
+.likeBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -4px;
+}
+
+/* Liked = the heart itself turns red and fills; the disc keeps its surface
+   (no pink tint under it). */
+.likeBtn.liked {
+  color: var(--color-error);
+}
+
+.likeBtn.liked .likeDisc svg {
+  animation: likeHeartPop var(--duration-200) var(--spring-curve);
+}
+
+/* ─── Like hint ─── */
+
+.likeHint {
+  color: var(--color-text-secondary);
+}
+
+/* ─── Way back ─── */
+
+.ctas {
+  display: flex;
+}

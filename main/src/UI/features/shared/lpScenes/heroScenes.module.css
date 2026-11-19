@@ -1,0 +1,194 @@
+/* heroScenes — media of public-page heroes. Flat: white surfaces on
+ * paper, hairlines, no shadows, no gradients, nothing reacts to hover (the
+ * scenes are pictures, not controls). */
+
+.cover {
+  object-fit: cover;
+}
+
+.sceneTitle {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.sceneMeta {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* ─── The phone and a client's session, for a centred hero ──────────── */
+
+.stage {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.stagePhone {
+  position: relative;
+  flex: none;
+}
+
+/* The band's lower edge cuts the phone: the hero stays one screen tall and
+   the phone invites the scroll (owner). */
+.stagePhoneClip {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  max-height: clamp(280px, 42vh, 400px);
+  overflow: hidden;
+}
+
+/* The phone keeps its own proportions (a flex item would be squeezed to the
+   clip's height and the screen inside cropped to its middle). From 768px it
+   is larger: under a centred text on a wide band the 260px phone read small. */
+.stage .stagePhoneClip > * {
+  flex: none;
+}
+
+@media (min-width: 768px) {
+  .stage .stagePhoneClip > * {
+    width: clamp(280px, 22vw, 340px);
+  }
+}
+
+/* The card a client's session arrives as: an OPENED NOTIFICATION. It hangs
+   right under the bell of the drawn app bar and leans out of the phone to the
+   right. DECISION: it leans to the right, like an expanded notification, and
+   stands at the TOP of the phone on every width: at the phone's foot a
+   640px-tall screen pushed it under the fold. (owner) */
+.sessionNote {
+  position: absolute;
+  top: var(--space-40);
+  /* Leans out to the right as far as the screen allows: the phone is 260px
+     wide and centred, the card keeps 12px to the screen edge. */
+  right: calc(-1 * min(var(--space-48), 50vw - 142px));
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: max-content;
+  max-width: min(94vw, 380px);
+  padding: var(--space-12) var(--space-16) var(--space-12) var(--space-12);
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-divider);
+  background: var(--color-surface-card);
+}
+
+/* Inside the card the thumbnails are a step smaller, so the line under the
+   title („Julia wybrała 3 zdjęcia”, and its longer German form) stays whole
+   on a 360px phone. */
+.sessionNote .thumb {
+  width: 36px;
+  height: 46px;
+}
+
+/* From 768px the phone is larger and has room beside it: the card starts
+   near the middle of the screen and leans further out. */
+@media (min-width: 768px) {
+  .sessionNote {
+    top: var(--space-48);
+    right: auto;
+    left: 46%;
+  }
+}
+
+.sessionNoteText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.thumbs {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-4);
+}
+
+.thumb {
+  position: relative;
+  width: 44px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: calc(var(--style-radius-control) / 2);
+  background: var(--color-surface-input);
+}
+
+/* ─── A conversation before the visit ───────────────────────────────── */
+
+.chatScene {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  overflow: hidden;
+}
+
+/* On a white band the scene is a paper panel and what was paper inside it
+   (the session and the client's lines) turns white. */
+.chatScene[data-surface='paper'] {
+  background: var(--color-bg-main);
+}
+
+.chatScene[data-surface='paper'] .chatSession,
+.chatScene[data-surface='paper'] .bubble[data-from='client'] {
+  background: var(--color-surface-card);
+}
+
+.chatHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border-bottom: var(--style-border-divider) solid var(--color-divider); /* edge-stripe-allow: a hairline between the head and the body of one card, not an accent bar */
+}
+
+.chatBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-16);
+}
+
+.chatSession {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8);
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-main);
+}
+
+.bubble {
+  max-width: 84%;
+  margin: 0;
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--style-radius-control);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* Paper, not the 7% control fill: on a white card that fill is too faint to
+   draw the bubble's shape. */
+.bubble[data-from='client'] {
+  align-self: flex-start;
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+}
+
+.bubble[data-from='stylist'] {
+  /* focus-ring-allow: a line of a picture (the scene is role='img'); it is
+     never focusable and holds nothing focusable. */
+  align-self: flex-end;
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+}

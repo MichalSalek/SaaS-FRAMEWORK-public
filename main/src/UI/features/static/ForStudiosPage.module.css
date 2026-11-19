@@ -1,0 +1,901 @@
+/* ForStudios page: flat editorial (DESIGN.md anti-slop), same language as
+ * HomePage and PricingPage. Depth is tonal steps and full hairlines.
+ * The operating model is an asymmetric bento. Marcellus is the counter-rhythm.
+ * Solid color blocks carry emphasis. Motion is a one-shot entrance and a
+ * spring lift on interactive elements. Every color is a token. */
+
+.page {
+  --section-block: var(--lp-rhythm);
+  --section-gutter: clamp(20px, 5vw, 56px);
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+.heroPhoneMockup {
+  --studio-hero-gap: clamp(var(--space-20), 3vw, var(--space-36));
+  display: grid;
+  gap: var(--studio-hero-gap);
+  width: 100%;
+  max-width: 44rem;
+  min-width: 0;
+}
+
+.benefitsIllustration {
+  --illustration-frame: var(--color-on-ink);
+  margin-top: var(--space-48);
+}
+
+.heroSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  padding: var(--space-6) 0 var(--space-4);
+  transition:
+    gap var(--transition-fast),
+    color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .heroSecondary:hover {
+    /* Link hover text on light hero → AA gold (--color-accent-fg). */
+    color: var(--color-accent-fg);
+  }
+}
+
+/* Trust strip just under the hero (same placement as the stylists page). */
+/* Band through <Section bordered>. Breakout, the full hairline and the
+ * content width live in Section.module.css. Here: elevated background and
+ * a tighter strip rhythm. */
+.trustStripSection {
+  --section-pad-block: clamp(20px, 2.6vw, 32px);
+  background: var(--color-bg-elevated);
+}
+
+/* Pills live in TrustSignals (canonical skin). Here: centering in the band. */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Section header
+ * ───────────────────────────────────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: calc(60 * var(--ch-body));
+  margin: 0 0 var(--lp-rhythm);
+}
+
+/* Per-page headline scale for <SectionHeader>, set through the canon's var hooks (never
+ * redefine .sectionHeadline). The lede is the canon's own and exposes no hooks. */
+.sectionHeaderScaled {
+  --section-headline-size: clamp(28px, 4.4vw, 48px);
+  --section-headline-leading: 1.08;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: calc(20 * var(--ch-heading));
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2. BENEFITS — editorial numbered entries (2-col desktop)
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band through <Section tone='subtle'>: tint plus a full top and bottom frame
+ * (a tint without a frame bleeds; never one edge). Breakout lives in Section.
+ * Here: page rhythm only. Full-width ink surface, the same in light and dark
+ * (--color-ink). The Section band is 100vw; this rule sets the surface. */
+.benefitsSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Zloto zamiast bieli,
+     bo w DARK ring i tak JEST zloty — jedna wartosc daje ten sam jezyk
+     wskaznika w obu trybach, zamiast bieli w jednym i zlota w drugim. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+}
+
+/* On-ink header via SectionHeader var-hooks (kanon already exposes color). */
+.benefitsInkHead {
+  --section-headline-color: var(--color-on-ink);
+  --section-headline-size: var(--text-fluid-2xl);
+  --section-headline-leading: 1.1;
+  --section-headline-tracking: var(--ls-tight-20);
+  --section-headline-measure: calc(24 * var(--ch-heading));
+  --section-lede-color: color-mix(
+    in oklch,
+    var(--color-on-ink) 90%,
+    transparent
+  );
+  max-width: var(--lp-content-width);
+  margin: 0 auto clamp(40px, 5vw, 72px);
+}
+
+.benefitsList {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+}
+
+@media (min-width: 768px) {
+  .benefitsList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 24px);
+  }
+}
+
+/* Entry without a number (Style Policy §6: parallel features, not steps).
+ * The icon tile above the title is the anchor, one layout for every entry.
+ * A title-line icon used to wrap at random, beside the title or above it.
+ * On ink the cards are closed light-on-ink boxes (full hairline, tonal fill). */
+.benefit {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.8vw, 22px);
+  padding: clamp(24px, 2.6vw, 36px);
+  background: color-mix(in oklch, var(--color-on-ink) 6%, transparent);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 16%, transparent);
+  border-radius: var(--style-radius-surface);
+}
+
+.benefitContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1vw, 16px);
+  max-width: calc(60 * var(--ch-body));
+  min-width: 0;
+}
+
+.benefitTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.22;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-on-ink);
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* Kafelek ikony — wspólny język z .operatingIcon / .useCaseIcon
+ * (tonal fill + pełny hairline, zero cienia). */
+.benefitIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-on-ink);
+  /* ZNAK w wariancie wyróżnionym (kafelek na negatywie ink) — token roli. */
+  background: var(--color-mark-bg-strong);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-accent-on-ink) 30%, transparent);
+  flex-shrink: 0;
+}
+
+.benefitText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+  margin: 0;
+}
+
+/* Operating model: owner, team, client. The featured owner card is a
+ * full-width solid primary block (the field is the elevation), with a
+ * hairline org-chart connector under it and team plus client as paired
+ * tonal cards. No gradient or shadow. The decorative section number was
+ * removed (Style Policy §6: page sections are not steps). Band through
+ * <Section> (plain, no frame). Background is explicit bg-main because the
+ * section separates two tint bands. */
+.operatingSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+}
+
+/* ─── Drzewo: featured + konektor + para kart ───
+ * Linie konektora = FUNKCJONALNY rysunek hierarchii (org-chart), nie
+ * jednostronne ramy kart — sama linia, bez kropek/strzałek. */
+.operatingStack {
+  --operating-gap: clamp(16px, 2.2vw, 28px);
+  display: flex;
+  flex-direction: column;
+}
+
+.operatingConnector {
+  position: relative;
+  height: clamp(36px, 5vw, 56px);
+}
+
+.operatingStem,
+.operatingRail,
+.operatingDropLeft,
+.operatingDropRight {
+  position: absolute;
+  background: var(--color-divider);
+}
+
+.operatingStem {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 50%;
+}
+
+/* Środki kolumn pary = 25% ∓ gap/4 (2 równe kolumny z gapem). */
+.operatingRail {
+  left: calc(25% - var(--operating-gap) / 4);
+  right: calc(25% - var(--operating-gap) / 4);
+  top: 50%;
+  height: 1px;
+}
+
+.operatingDropLeft {
+  left: calc(25% - var(--operating-gap) / 4);
+  top: 50%;
+  width: 1px;
+  height: 50%;
+}
+
+.operatingDropRight {
+  right: calc(25% - var(--operating-gap) / 4);
+  top: 50%;
+  width: 1px;
+  height: 50%;
+}
+
+.operatingPair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--operating-gap);
+}
+
+@media (max-width: 767px) {
+  /* Stack 1-kol: zostaje sam pionowy stem między kartami. */
+  .operatingRail,
+  .operatingDropLeft,
+  .operatingDropRight {
+    display: none;
+  }
+
+  .operatingStem {
+    height: 100%;
+  }
+
+  .operatingPair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.operatingItem {
+  min-width: 0;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  /* Cream belongs to one band on the page. This card repeats four times,
+     so a closed frame holds the surface, not a fill. */
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  padding: clamp(24px, 3vw, 42px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 22px);
+  position: relative;
+  overflow: hidden;
+}
+
+.operatingHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-14);
+  min-width: 0;
+}
+
+.operatingContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.1vw, 15px);
+  min-width: 0;
+}
+
+/* Featured = full SOLID primary color-block (color blocking = elevation).
+ * Wider padding + horizontal editorial split on desktop: head zone left,
+ * title+body right. */
+.operatingItem[data-featured='true'] {
+  background: var(--color-primary);
+  border-color: color-mix(in oklch, white 24%, var(--color-primary));
+  padding: clamp(28px, 3.4vw, 56px);
+}
+
+@media (min-width: 768px) {
+  .operatingItem[data-featured='true'] {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(24px, 4vw, 64px);
+    align-items: center;
+  }
+
+  /* Owner: featured .operatingHead uses the same layout as the two lower
+   * cards, a 44px icon beside the content. Column stacking and the enlarged
+   * tile are gone. The editorial split (head left, title and body right)
+   * carries the emphasis, not the icon size. (owner) */
+}
+
+.operatingIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Owner: --color-primary on a cream tile is about 2:1 (fails 1.4.11).
+   * The glyph is AA gold-as-text (--color-accent-fg: 4.9:1 in light,
+   * luminous in dark). The tile stays tonal. (owner) */
+  color: var(--color-accent-fg);
+  /* ZNAK: 44px kafelek pod glifem — token roli, zostaje złoty. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  flex-shrink: 0;
+}
+
+/* Featured (gold color-block): ink-tile + biały glif — czytelne na goldzie
+ * (tile vs karta ~7.6:1, glif vs tile ~18:1) i 1:1 z językiem featured
+ * karty useCases (ink-tile + white). Para ink/on-ink mode-invariant. */
+.operatingItem[data-featured='true'] .operatingIcon {
+  color: var(--color-on-ink);
+  /* focus-ring-allow: glif dekoracyjny (span z ikona/etykieta), zero
+     potomkow fokusowalnych — ring nigdy sie tu nie rysuje. */
+  background: var(--color-ink);
+  border-color: color-mix(in oklch, var(--color-on-ink) 22%, var(--color-ink));
+}
+
+.operatingTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-subhead);
+  line-height: 1.14;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+  position: relative;
+  z-index: 1;
+}
+
+/* Featured title scaled up for editorial hierarchy */
+.operatingItem[data-featured='true'] .operatingTitle {
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.06;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-primary-contrast);
+}
+
+.operatingBody {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-wrap: pretty;
+  hyphens: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.operatingItem[data-featured='true'] .operatingBody {
+  font-size: var(--text-fluid-sm);
+  color: var(--color-primary-contrast);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2c. USE CASES — Notion customer-stories pattern (Solo→Studio→Network)
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band through <Section tone='subtle'> (tint and a full frame on bg-subtle;
+ * see .benefitsSection). Here: page rhythm only. */
+.scenariosSection {
+  --section-pad-block: var(--section-block);
+}
+
+.scenariosSection .sectionHeader {
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 28px);
+}
+
+@media (min-width: 860px) {
+  .scenariosGrid {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.18fr) minmax(0, 0.92fr);
+    align-items: stretch;
+  }
+}
+
+/* The card is a link (owner: the row „Zacznij od planu Pro →" looked like a
+ * button and did nothing). The whole card, including the hover motion, must
+ * be clickable. The anchor owns the card layout. No underline. Colors stay
+ * inherited or set on children. Pointer cursor on the whole surface. (owner) */
+.useCase {
+  position: relative;
+  min-width: 0;
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  padding: clamp(24px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 20px);
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform var(--duration-200) var(--ease-entrance),
+    border-color var(--transition-fast);
+}
+
+/* Featured = full SOLID primary color-block (color blocking = elevation).
+ * Anti-AI-Slop: zero gradient, zero shadow. Full hairline (4 sides) + a solid
+ * solid gold-tint + hairline, no sparkle carry the emphasis. Permanent lift = editorial composition
+ * (not a hover/scroll effect), mirroring HomePage staggered offsets. */
+.useCase[data-featured='true'] {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-color: color-mix(in oklch, white 24%, var(--color-primary));
+}
+@media (min-width: 860px) {
+  .useCase[data-featured='true'] {
+    transform: translateY(-12px);
+  }
+}
+
+/* Hover lift on all three cards (they are links, so the floor allows it).
+ * Transform transitions 200ms ease-out on .useCase, not `all`, so nothing
+ * jumps. Featured keeps a permanent -12px lift from 860px, so a shared -4px
+ * hover would drop it. Featured hover is -16px: the base lift plus the
+ * same -4px delta. */
+@media (hover: hover) {
+  .useCase:hover {
+    transform: translateY(-4px);
+  }
+
+  .useCase:not([data-featured='true']):hover {
+    border-color: var(--color-divider);
+  }
+
+  .useCase[data-featured='true']:hover {
+    border-color: color-mix(in oklch, white 40%, var(--color-primary));
+  }
+}
+
+@media (hover: hover) and (min-width: 860px) {
+  .useCase[data-featured='true']:hover {
+    transform: translateY(-16px);
+  }
+}
+
+.useCaseTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  position: relative;
+  z-index: 1;
+}
+
+.useCaseTitle,
+.useCaseBody,
+.useCaseDetail {
+  position: relative;
+  z-index: 1;
+}
+
+.useCaseIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Glif na kremowym kafelku = accent-fg (blade primary to ~2:1, FAIL
+     1.4.11 — ta sama lekcja co przy .operatingIcon). Kafelek = ZNAK. */
+  color: var(--color-accent-fg);
+  background: var(--color-mark-bg);
+}
+
+/* Owner: white glyph on an ink tile. It contrasts better and matches the
+ * badge with white text. Ink and on-ink pair. (owner) */
+.useCase[data-featured='true'] .useCaseIcon {
+  color: var(--color-on-ink);
+  /* focus-ring-allow: glif dekoracyjny (span z ikona/etykieta), zero
+     potomkow fokusowalnych — ring nigdy sie tu nie rysuje. */
+  background: var(--color-ink);
+}
+
+.useCaseTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.18;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.useCase[data-featured='true'] .useCaseTitle {
+  color: var(--color-primary-contrast);
+}
+
+.useCaseBody {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  flex: 1;
+}
+
+.useCase[data-featured='true'] .useCaseBody {
+  color: var(--color-primary-contrast);
+}
+
+.useCaseDetail {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: auto;
+  padding-top: clamp(8px, 1vw, 12px);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-20);
+  /* Metric detail text on light (non-featured) card → AA gold (--color-accent-fg).
+   * Featured (dark) card overridden below — keeps own contrast. */
+  color: var(--color-accent-fg);
+}
+
+.useCase[data-featured='true'] .useCaseDetail {
+  color: var(--color-primary-contrast);
+  border-top-color: color-mix(
+    in oklch,
+    var(--color-primary-contrast) 30%,
+    transparent
+  );
+}
+
+.useCaseDetail svg {
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3. PRICING PREVIEW — Multi-tier (Pro+ / Studio[featured] / Scale)
+ *    Vercel/Linear pattern — 3 cards, middle elevated
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band through <Section bordered>. The frame comes from the bordered prop.
+ * „Jeden krem": the band sits on paper. A 4% violet wash was a third surface
+ * and a tint outside the charcoal-gold palette. */
+.pricingSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+}
+
+.pricingSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+.pricingTierGrid {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+  align-items: stretch;
+}
+
+@media (min-width: 860px) {
+  .pricingTierGrid {
+    /* Karty RÓWNE (5A) — wyróżnienie niesie ink, nie szersza kolumna. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+}
+
+.pricingTierCard {
+  position: relative;
+  min-width: 0;
+  background: var(--color-bg-elevated);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  padding: clamp(24px, 3vw, 36px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 24px);
+  transition:
+    transform var(--duration-200) var(--ease-entrance),
+    border-color var(--transition-fast);
+}
+
+/* Highlight tier (Studio) is a closed ink field. Cards stay equal. Color
+ * carries the emphasis, not geometry. The frame uses on-ink so it stays
+ * visible in dark mode. */
+.pricingTierCard[data-highlight='true'] {
+  background: var(--color-ink);
+  /* Pierscien fokusu na atramencie: bazowy ring to w LIGHT dokladnie
+     --color-ink, wiec bylby tu niewidoczny (1,00:1). Zloto zamiast bieli,
+     bo w DARK ring i tak JEST zloty — jedna wartosc daje ten sam jezyk
+     wskaznika w obu trybach, zamiast bieli w jednym i zlota w drugim. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, var(--color-ink));
+}
+
+/* Dark: the base card sits on --color-bg-elevated (#1e1e1e) and ink is
+   #1c1c20, so the featured card was indistinguishable from its neighbours
+   (measured). The signal is one tonal step up plus a gold frame, the same
+   recipe as the premium band on /pricing and the other „polecany" surfaces. */
+:root[data-mode='dark'] .pricingTierCard[data-highlight='true'] {
+  background: color-mix(in oklch, var(--color-ink) 89%, var(--color-on-ink));
+  border-color: color-mix(in oklch, var(--color-primary) 60%, transparent);
+}
+
+.pricingTierCard[data-highlight='true'] .pricingTierName {
+  color: var(--color-on-ink);
+}
+
+.pricingTierCard[data-highlight='true'] .pricingTierTrialLede {
+  color: var(--color-on-ink);
+}
+
+.pricingTierCard[data-highlight='true'] .pricingTierTrialAfter {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+}
+
+.pricingTierCard[data-highlight='true'] .pricingTierFeatureItem {
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+  border-color: color-mix(in oklch, var(--color-on-ink) 18%, transparent);
+}
+
+.pricingTierBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--ls-eyebrow);
+  padding: var(--space-6) var(--space-14);
+  border-radius: var(--style-radius-pill);
+}
+
+.pricingTierBadge svg {
+  flex-shrink: 0;
+}
+
+/* Numeracja 01-03 planów usunięta (Style Policy §6 — plany to równoległe
+ * opcje, nie kroki); kartę otwiera sama nazwa planu. */
+.pricingTierName {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Trial framing (owner): the offer leads where the price stood, and the
+ * amount is small print. Parity with /pricing. (owner) */
+.pricingTierTrialBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pricingTierTrialLede {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-subhead);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+}
+
+.pricingTierTrialAfter {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+}
+
+/* Features = hairline-wiersze (para top+bottom collapsed), bez ikon — 5A. */
+.pricingTierFeatures {
+  --pricing-feature-row-min: 40px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-rows: repeat(
+    var(--pricing-feature-row-count),
+    minmax(var(--pricing-feature-row-min), 1fr)
+  );
+  flex: 1;
+}
+
+.pricingTierFeatureItem {
+  min-height: var(--pricing-feature-row-min);
+  display: flex;
+  align-items: center;
+  padding-block: var(--space-8);
+  margin-top: -1px;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+/* Per-plan CTA: full width, pinned to the bottom of the card (features use
+ * flex:1, so the CTA lands under them). Equal card heights put the CTAs
+ * on one line. */
+.pricingTierCta {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.pricingTierCtaButton {
+  width: 100%;
+}
+
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 860px) {
+    .pricingTierGrid {
+      grid-template-rows: auto auto repeat(5, minmax(40px, auto)) auto;
+      column-gap: clamp(16px, 2vw, 24px);
+      row-gap: 0;
+    }
+
+    .pricingTierCard {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 8;
+      row-gap: 0;
+    }
+
+    .pricingTierName {
+      grid-row: 1;
+    }
+
+    .pricingTierTrialBlock {
+      grid-row: 2;
+      margin-top: clamp(16px, 2vw, 24px);
+    }
+
+    .pricingTierFeatures {
+      grid-row: 3 / span 5;
+      grid-template-rows: subgrid;
+      margin-top: clamp(16px, 2vw, 24px);
+    }
+
+    .pricingTierCta {
+      grid-row: 8;
+      margin-top: clamp(16px, 2vw, 24px);
+    }
+  }
+}
+
+.pricingActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2vw, 24px);
+  margin: clamp(40px, 5vw, 72px) auto 0;
+  max-width: var(--lp-content-width);
+}
+
+.pricingSecondaryLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  padding: var(--space-6) 0 var(--space-4);
+  transition:
+    gap var(--transition-fast),
+    color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .pricingSecondaryLink:hover {
+    /* Link hover text on light bg → AA gold (--color-accent-fg). */
+    color: var(--color-accent-fg);
+  }
+}
+
+/* FAQ skin and skeleton live in components/FaqSection (the LP canon).
+ * The page keeps only the full-bleed band (background and padding) and the
+ * container width (Style Policy §4: the band belongs to the page). */
+/* Band through <Section as='div' bordered>. FaqSection renders its own
+ * <section>, so this wrapper is a div. The tint band gets a full top and
+ * bottom frame from the bordered prop (see .benefitsSection). */
+.faqSection {
+  --section-pad-block: var(--section-block);
+  /* „Jeden krem": the FAQ band sits on paper. This page's cream is already
+     spent on the scenarios section (Section tone='subtle'). The seam is the
+     frame the band gets from the canon: the call site passes `bordered`. */
+  background: var(--color-bg-main);
+}
+
+.faqSection .sectionHeader {
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+/* Final CTA uses the shared FinalCtaBand molecule
+ * (src/UI/components/FinalCtaBand/). Only the page-specific scalePath
+ * (the link in the footnote slot) lives here. */
+.finalCtaScalePath {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: clamp(20px, 2.5vw, 32px);
+  /* `currentColor`, nie token tonu: ten link jest dzieckiem FinalCtaBand,
+     ktory ma DWA tony. Wpisany na sztywno --color-primary-contrast (ink) jest
+     poprawny na zlotym bandzie i daje 1,00:1 na atramentowym, a for-studios
+     uzywa wlasnie atramentowego. Dziedziczenie trzyma oba tony. */
+  color: currentColor;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: var(--ls-wide-10);
+  border-bottom: var(--style-border-divider) solid
+    color-mix(in srgb, var(--color-primary-contrast) 28%, transparent);
+  padding-bottom: var(--space-2);
+  transition:
+    gap var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+@supports (color: oklch(0% 0 0)) and (color: color-mix(in oklch, white, black)) {
+  .finalCtaScalePath {
+    color: color-mix(in srgb, currentColor 78%, transparent);
+  }
+}
+
+@media (hover: hover) {
+  .finalCtaScalePath:hover {
+    gap: var(--space-12);
+    color: var(--color-primary-contrast);
+    border-bottom-color: var(--color-primary-contrast);
+  }
+}
+
+.heroTeamPhoto {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: var(--style-border-ring) solid var(--color-text-primary);
+  border-radius: var(--style-radius-surface);
+}

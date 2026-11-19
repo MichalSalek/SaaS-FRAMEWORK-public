@@ -1,0 +1,541 @@
+/* UI/features/auth/OnboardingPage.module.css
+ *
+ * Guided studio session, not a flat form. Hierarchy:
+ *   WELCOME: intro card (title → one sentence); later steps: the shared ProcessHeader (title in
+ *   the top bar, compact step indicator)
+ *   step card (focused single-decision surface; tonal paper + full hairline)
+ *   sticky action bar (solid paper + top hairline, safe-area aware on mobile)
+ *
+ * Flat: depth via solid color-mix tonal blocks + full hairline borders. ZERO gradient washes /
+ * box-shadow elevation / glow. Mirrors ActivateRolePage.module.css. A spread-ring (0 0 0 Npx) is
+ * OK for focus/selection affordance (WCAG 2.4.7). Spring easing on press
+ * (cubic-bezier(0.34, 1.56, 0.64, 1)); dark mode parity via :root[data-mode='dark'].
+ */
+
+/* ============================================================
+ * MOTION
+ * ============================================================ */
+
+/* Directional shared-axis slide-X (native push/pop). Forward = the new step
+ * rides in from the RIGHT, back = from the LEFT. Transform-only travel (no
+ * translateY); the small opacity 0->1 only softens the entry edge — the motion
+ * is CARRIED by translateX. Triggered by an explicit user action (next/back),
+ * so this is functional motion, NOT a scroll-reveal. Direction is selected via
+ * the `data-step-dir` attribute on the step card (see .stepCard[data-step-dir]). */
+@keyframes onboardingStepEnterFwd {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes onboardingStepEnterBack {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes onboardingDotPop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+ * PAGE SHELL — full-bleed compensation for the hero slab
+ * ============================================================ */
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  /* Compensate AppLayout content padding so hero reads full-bleed. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  /* No extra bottom padding: the action bar is `position: sticky` (in normal
+   * flow), so it already reserves its own height + safe-area inset. The old
+   * `+ 80px` reservation (a spacer meant for a `fixed` bar) left the sticky CTA
+   * floating ~80px above the true bottom on the last scroll frame. */
+  padding: var(--space-20) var(--space-20) 0;
+  /* Steps after WELCOME start with the shared process header. Under an app bar
+   * it brings its own measured spacing (48px in all), so it cancels this
+   * column's top padding and the shell's gap under it. As a visible title row
+   * (desktop account layout) the header ignores both. */
+  --process-header-margin-top: calc(var(--space-20) * -1);
+  --process-header-margin-bottom: calc(var(--space-20) * -1);
+}
+
+/* The fill target (`data-fill-shell`, rule in navigation-transition). Its width
+   is the column the step actually has: the phone, the phone frame, or the
+   desktop funnel. Container queries read THAT width, not the window, so a
+   390px frame inside a 1440px window keeps the phone layout. */
+.frame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  container-type: inline-size;
+  container-name: onboarding;
+}
+
+/* Role and success are short. The frame fills the available height (the app
+   content area, or the desktop viewport) and centers the cluster. Checkout
+   stays in normal flow so a long chooser can scroll. */
+.frame[data-layout='center'] {
+  justify-content: center;
+}
+
+.frame[data-layout='center'] > .page {
+  flex: 0 1 auto;
+  margin-top: 0;
+}
+
+.frame[data-layout='flow'] > .page {
+  flex: 1 0 auto;
+}
+
+@container onboarding (min-width: 768px) {
+  .shell {
+    /* Wide: the action bar is inline (relative), so a normal bottom gutter
+     * keeps the flow from ending flush against the viewport edge. */
+    padding-bottom: var(--space-48);
+  }
+
+  .frame[data-layout='center'] .shell {
+    padding-bottom: 0;
+  }
+}
+
+/* Plain desktop onboarding (>=1280) is a full-viewport main with no content
+   padding. The -20px bleed exists to cancel AppLayout's padded scroller. On
+   this main it makes the page about 40px wider than the window (horizontal
+   bar) and sticks out of the 100dvh column (vertical bar). Phones stay under
+   this breakpoint and keep the bleed. The admin phone frame is also >=1280
+   and loses the bleed: its shell clips, so the document does not grow. */
+@media (min-width: 1280px) {
+  .page {
+    margin: 0;
+  }
+}
+
+/* Centered narrow column inside the page so long forms keep readable
+ * measure on desktop while hero still bleeds full-width. */
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  /* Takes the column's free height, so the bar's `margin-top: auto` has
+   * something to push against. */
+  flex: 1 0 auto;
+}
+
+/* ============================================================
+ * STEP CARD — focused single-decision surface
+ * ============================================================ */
+
+/* Frameless section — the outer "card" chrome was removed (box-in-box: it
+ * double-framed the role cards / inputs / toggle rows, which carry their own
+ * closed rectangles). Step content sits directly on the page canvas. */
+/* Focus target only when a step change dropped focus (useStepScrollReset):
+ * a landmark for the next Tab / screen reader, not an interactive control, so
+ * no ring. */
+.stepCard:focus,
+.focusTarget:focus {
+  outline: none;
+}
+
+.stepCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-8) 0 0;
+}
+
+/* Directional re-trigger: the step card carries `key={currentStep}` so it
+ * remounts on every step change, replaying the enter animation. `data-step-dir`
+ * (set in handleNext='forward' / handleBack='back') picks the slide direction.
+ * Forward is the default when the attribute is absent. */
+.stepCardEnter {
+  animation: onboardingStepEnterFwd 300ms var(--spring-snappy) both;
+}
+
+.stepCardEnter[data-step-dir='back'] {
+  animation-name: onboardingStepEnterBack;
+}
+
+/* Step header (illustrated icon orb + heading + subtitle). */
+
+.stepHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.stepHeaderTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.stepHeaderOrb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.stepTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+.stepSubtitle {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  hyphens: auto;
+  max-width: calc(48 * var(--ch-body));
+}
+
+.stepHint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+}
+
+/* ============================================================
+ * STEP 1 — role cards (radio cards with halo on selection)
+ * ============================================================ */
+
+.roleCards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+}
+
+.marketingConsent {
+  margin-top: var(--space-20);
+}
+
+@container onboarding (min-width: 520px) {
+  .roleCards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.roleCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-interactive);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition:
+    border-color var(--transition-normal),
+    background var(--transition-normal),
+    transform var(--duration-100) var(--spring-snappy);
+}
+
+@media (hover: hover) {
+  .roleCard:hover {
+    border-color: var(--color-divider);
+    background: var(--color-state-hover);
+    transform: translateY(-1px);
+  }
+}
+
+.roleCard:active {
+  transform: scale(0.98);
+}
+
+.roleCard:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+.roleCardSelected {
+  /* Full accent frame — selection must be unambiguous at a glance. */
+  border-color: var(--color-primary);
+  /* Spread-ring (0 0 0 3px) = selected affordance (OK). */
+  background: var(--color-state-selected);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklch, var(--color-text-primary) 14%, transparent);
+}
+
+.roleCardSelected::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-primary);
+}
+
+.roleCardCheck {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 12px;
+  height: 12px;
+  color: var(--color-accent-text);
+  z-index: 1;
+}
+
+.roleCardIconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--style-radius-surface);
+  background: var(--color-mark-bg);
+  color: var(--color-accent-fg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.roleCardTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+}
+
+.roleCardDescription {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.fieldError {
+  color: var(--color-error);
+  font-size: var(--text-xs);
+  margin-top: var(--space-4);
+}
+
+/* ============================================================
+ * STEP — CHECKOUT (embedded plan choice + payment, panel host)
+ * ============================================================ */
+
+/* Frame around the embedded PlanCheckoutPanel so the payment surface reads as a
+ * contained "card" inside the step. The panel renders its own summary +
+ * PaymentElement; this only provides the outer hairline + paper canvas. */
+.checkoutCard {
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+/* Quiet FREE-escape row under the checkout card — centered, low emphasis so it
+ * never competes with the panel's primary pay/trial CTA. */
+.checkoutFreeEscape {
+  display: flex;
+  justify-content: center;
+  margin-block-start: var(--space-12);
+}
+
+/* ============================================================
+ * SUCCESS — terminal "all set" view
+ * ============================================================ */
+
+/* The success scene fills the funnel's free height so its action dock can sit
+ * on the bottom edge also when the copy is short. */
+.successFocusTarget {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  min-height: 100%;
+}
+
+.successActions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-12);
+  width: 100%;
+  margin-top: var(--space-12);
+}
+
+/* Beats `.button { white-space: nowrap }` so a long label wraps inside the
+   column instead of widening the page. */
+.successActions .successCta {
+  width: 100%;
+  max-width: 100%;
+  min-width: min(220px, 100%);
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* ============================================================
+ * ACTION BAR — sticky on mobile, inline on desktop
+ * ============================================================ */
+
+.actionBar {
+  position: sticky;
+  /* Scroll container reserve: see the DECISION at `--sticky-flush-bottom` in AppLayout. */
+  bottom: var(--sticky-flush-bottom, 0px);
+  left: 0;
+  right: 0;
+  /* Pull into the page padding so the bar reads as a separate strip. The bottom margin is the same
+   * reserve: without it the bar on the last scroll frame returns to its in-flow position, 12px above
+   * the edge. */
+  /* `auto` on top: on a step shorter than the screen the bar still stands on
+   * the bottom edge (see `.page` min-height); the shell's gap keeps it off the
+   * content on long steps. */
+  margin: auto calc(var(--space-20) * -1) var(--sticky-flush-bottom, 0px);
+  padding: var(--space-12) var(--space-20)
+    calc(var(--space-12) + env(safe-area-inset-bottom, 0px));
+  /* Flex column wrapper — the Back/Next row pins to the bottom edge as one
+   * sticky footer strip. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  /* Flat: solid paper, no line above (a one-sided rule is outside the house
+   * style; the paper fill alone separates the bar from the content). */
+  background: var(--color-bg-paper);
+  z-index: 5;
+}
+
+/* Back + Next sit on one horizontal line inside the sticky footer. */
+.actionBarRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+@container onboarding (min-width: 768px) {
+  .actionBar {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+  }
+}
+
+/* Short screens keep the actions with the cards, not pinned to the viewport.
+   The paper slab is the sticky footer's separator; in the cluster it would
+   read as a second card. */
+.frame[data-layout='center'] .stepHeader {
+  align-items: center;
+  text-align: center;
+}
+
+.frame[data-layout='center'] .stepHeaderTop {
+  justify-content: center;
+}
+
+.frame[data-layout='center'] .actionBar {
+  position: static;
+  padding: 0;
+  margin: var(--space-20) 0 0;
+  background: transparent;
+}
+
+.actionBarBack {
+  flex: 0 0 auto;
+}
+
+.actionBarNext {
+  flex: 1 1 auto;
+}
+
+/* Checkout-step slot the plan chooser portals its CTA into: may shrink below
+ * the label's intrinsic width, so the CTA never overflows the bar. */
+.actionBarSlot {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
+/* The portaled CTA can carry a long German label: on a 360px phone it
+ * overflowed its own button. Inside
+ * the slot it may shrink, wrap to two lines and use a tighter inline padding. */
+.actionBarSlot > * {
+  min-width: 0;
+  padding-inline: var(--space-16);
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* Terms line under the start button (role step): accepting by continuing,
+ * owner. Quiet secondary text, links underlined so they read as
+ * links on paper and on the white bar. */
+.termsNotice {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.termsNoticeLink {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Free Demo is the active plan here, not a trial: state it once, quietly, so
+   “Kontynuuj na Free Demo” cannot read as an unexplained choice. */
+.successFreeStatus {
+  margin: 0 auto;
+  max-width: calc(34 * var(--ch-body));
+  padding: var(--space-12) var(--space-16);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  background: var(--color-state-selected);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  text-align: center;
+}

@@ -1,0 +1,17 @@
+.illustration {
+  display: block;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.sm {
+  width: var(--space-80);
+}
+
+.md {
+  width: var(--space-112);
+}
+
+.lg {
+  width: var(--space-128);
+}

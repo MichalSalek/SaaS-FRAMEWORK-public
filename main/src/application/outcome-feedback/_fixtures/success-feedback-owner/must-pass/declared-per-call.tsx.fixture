@@ -1,0 +1,20 @@
+// The hook's IO call declares that the screen owns the confirmation.
+function useReplyThing() {
+  return useMutation({
+    mutationFn: (req: unknown) =>
+      replyThing_IO(req, { successFeedback: 'screen' }),
+  });
+}
+
+export function ReplyScreen() {
+  const reply = useReplyThing();
+  return () =>
+    reply.mutate(
+      {},
+      {
+        onSuccess: () => {
+          pushNewSnackbar(t('replied'), 'success');
+        },
+      }
+    );
+}

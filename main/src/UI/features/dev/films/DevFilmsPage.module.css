@@ -1,0 +1,183 @@
+.page {
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  padding: var(--space-32) var(--space-20) var(--space-64);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+.wrap {
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+.heading {
+  padding-block: var(--space-24) var(--space-32);
+}
+
+.heading h1 {
+  font-family: var(--style-heading-font);
+  font-size: var(--text-fluid-xl);
+  font-weight: var(--style-heading-weight);
+  letter-spacing: var(--style-heading-tracking);
+  margin: 0 0 var(--space-12);
+}
+
+.heading p {
+  max-width: calc(64 * var(--ch-body));
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.films {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-24);
+  margin-bottom: var(--space-24);
+}
+
+.card {
+  min-width: 0;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-24);
+}
+
+.card h2,
+.card h3 {
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+  letter-spacing: var(--style-heading-tracking);
+  margin: 0 0 var(--space-12);
+}
+
+.card h2 {
+  font-size: var(--text-xl);
+}
+
+.card h3 {
+  font-size: var(--text-lg);
+  margin-top: var(--space-24);
+}
+
+.card p {
+  margin: 0 0 var(--space-16);
+}
+
+.filmHeader {
+  min-height: 172px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-12);
+}
+
+.meta span {
+  white-space: nowrap;
+}
+
+.video {
+  /* focus-ring-allow: the ring is outside the film, on the surrounding card. */
+  display: block;
+  width: min(100%, 304px);
+  aspect-ratio: 9 / 16;
+  margin: 0 auto var(--space-24);
+  border-radius: var(--style-radius-control);
+  background: var(--color-text-primary);
+  object-fit: contain;
+}
+
+.video:focus-visible {
+  outline: var(--style-border-control) solid var(--color-focus-ring);
+  outline-offset: var(--space-4);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-16);
+  margin-block: var(--space-16);
+}
+
+.link {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.link:focus-visible,
+.timings summary:focus-visible {
+  outline: var(--style-border-control) solid var(--color-text-primary);
+  outline-offset: var(--space-4);
+}
+
+.card .credit {
+  color: var(--color-text-secondary);
+  margin-bottom: 0;
+}
+
+.selected[aria-pressed='true'] {
+  /* focus-ring-allow: ButtonAtom draws its ring outside the fill, on the card. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  border-color: var(--color-text-primary);
+}
+
+.script {
+  max-width: calc(80 * var(--ch-body));
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+.card .copyStatus {
+  min-height: 1lh;
+  margin-bottom: 0;
+}
+
+.timings {
+  margin-top: var(--space-16);
+}
+
+.timings summary {
+  cursor: pointer;
+  padding-block: var(--space-12);
+  font-weight: var(--font-weight-heading);
+}
+
+.timings table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.timings td,
+.timings th {
+  padding: var(--space-12) var(--space-8);
+  vertical-align: top;
+}
+
+.timings td:first-child,
+.timings th:first-child {
+  padding-left: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .films {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filmHeader {
+    min-height: 0;
+  }
+}

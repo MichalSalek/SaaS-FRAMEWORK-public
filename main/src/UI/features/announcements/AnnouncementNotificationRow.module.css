@@ -1,0 +1,89 @@
+/* A notification-centre row for an announcement. It sits in the same list as
+ * NavRow cells and draws its own divider. The body is never clamped. */
+
+.item {
+  display: flex;
+  min-width: 0;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-12) var(--space-16);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  line-height: var(--leading-body);
+  text-align: start;
+  text-decoration: none;
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  a.row:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+.icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-text-secondary);
+}
+
+.row[data-unread='true'] .icon {
+  color: var(--color-text-primary);
+}
+
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title {
+  overflow-wrap: anywhere;
+  line-height: var(--leading-body);
+}
+
+.row[data-unread='true'] .title {
+  font-weight: 600;
+}
+
+.message {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-body);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+}
+
+.time {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.row[data-unread='true'] .time {
+  color: var(--color-text-primary);
+}

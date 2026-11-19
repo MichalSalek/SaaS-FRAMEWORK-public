@@ -1,0 +1,14 @@
+// Error and warning toasts are not success; a reasoned escape is accepted.
+export function useThing() {
+  return useMutation({
+    mutationFn: (req: unknown) => thing_IO(req),
+    onSuccess: () => {
+      pushNewSnackbar(t('partly'), 'warning');
+      // success-feedback-allow: the response event is in eventsDisallowedForUI
+      pushNewSnackbar(t('done'), 'success');
+    },
+    onError: () => {
+      pushNewSnackbar(t('failed'), 'error');
+    },
+  });
+}

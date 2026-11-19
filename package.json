@@ -1,0 +1,55 @@
+{
+  "name": "saas-framework-public",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lint:kernel": "eslint --max-warnings 0 .",
+    "lint:kernel:fix": "eslint --fix .",
+    "system:generate-dto": "node --require ./scripts/generate-dto/preload.cjs --import tsx/esm scripts/generate-dto/index.ts",
+    "system:contracts": "node --import tsx/esm scripts/contracts/generate-contract-registries.ts",
+    "system:kernel": "scripts/kernel/cp-kernel",
+    "system:kernel:full": "npm run system:generate-dto && npm run system:contracts && npm run system:kernel",
+    "audit": "bash tests/audit/run-all.sh",
+    "audit:all": "bash tests/audit/run-all.sh",
+    "audit:css-guards": "bash tests/audit/css-guards.sh",
+    "audit:stripe": "bash tests/audit/stripe.sh",
+    "audit:pagination": "bash tests/audit/pagination.sh",
+    "audit:schema": "bash tests/audit/schema.sh",
+    "audit:i18n": "bash tests/audit/i18n.sh",
+    "audit:generated-fresh": "bash tests/audit/generated-fresh.sh",
+    "audit:asset-ownership": "bash tests/audit/asset-ownership.sh",
+    "audit:auth-page-guard": "bash tests/audit/auth-page-guard.sh",
+    "audit:better-auth-contract": "bash tests/audit/better-auth-contract.sh",
+    "audit:kernel": "bash tests/audit/kernel-sync.sh",
+    "audit:kernel-lint-gate": "bash tests/audit/kernel-lint-gate.sh",
+    "test:smoke": "cd tests && npx tsx run-smoke-tests.ts",
+    "test:concurrency": "cd tests && npm run test:concurrency",
+    "test:dto-generator": "node --import tsx/esm tests/dto-generator.test.ts",
+    "test:lint-guards": "node --test 'eslint-rules/**/*.test.mjs'",
+    "test:contracts-generator": "node --import tsx/esm --test scripts/contracts/*.test.ts",
+    "test:e2e": "playwright test --config=tests/e2e/playwright.config.ts",
+    "test:audit-tools": "node --import tsx/esm --test 'tests/audit/tools/*.test.ts'",
+    "typecheck": "bash scripts/typecheck/check-all",
+    "audit:contracts": "bash tests/audit/contracts.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@mrleebo/prisma-ast": "^0.16.0",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^24.10.6",
+    "entities": "8.1.0",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "prettier": "^3.9.7",
+    "tsx": "^4.22.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  }
+}

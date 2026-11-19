@@ -1,0 +1,400 @@
+/* UI/features/explore/components/ExploreStylistsTab.module.css
+ * Stylists Directory — Curated Artisan Browse
+ *
+ * Mood: curated artisan directory. Each stylist is a creator with a portfolio,
+ * not a service provider with reviews.
+ *
+ * Hierarchy: intro card (<AppHero> canon) → search + city pills → creator
+ * card list → branded empty state.
+ *
+ * Anti-AI-Slop (HARD): zero gradient, box-shadow/glow, one-sided borders or
+ * hover-on-static. Depth = solid color-mix(in oklch) tonal surfaces + full 1px
+ * hairline borders. Spread-ring only for focus-visible. Spring easing on
+ * interactive hover; stagger entrance (--stagger-index).
+ */
+
+/* ─── Motion keyframes ─────────────────────────────────────── */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes skeletonPulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: slideUp 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}
+
+/* ─── Section shell ────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+}
+
+/* ─── INTRO CARD: <AppHero> canon (components/AppHero); tint, frame and
+ * typography live in the component. Only the .staggerIn entrance stays here. ─── */
+
+/* ─── TOOLBAR — search + city pill row ──────────────────────── */
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.searchWrap {
+  position: relative;
+}
+
+.cityRail {
+  position: relative;
+  display: flex;
+  gap: var(--space-8);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: var(--space-4) var(--space-2);
+  /* Scroll affordance = the last pill peeking half-cut at the edge +
+   * proximity snap. (Edge-fade gradient mask removed 2026-06-12 per
+   * Anti-AI-Slop de-slop recipe — no fades, the cut itself signals scroll.) */
+  scroll-snap-type: x proximity;
+}
+
+.cityRail::-webkit-scrollbar {
+  display: none;
+}
+
+.cityPill {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 7px var(--space-14);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .cityPill:hover {
+    border-color: var(--color-border-surface);
+    color: var(--color-text-primary);
+    transform: translateY(-1px);
+  }
+}
+
+.cityPill:active {
+  transform: scale(0.96);
+}
+
+.cityPillActive {
+  /* focus-ring-allow: the selection is ink, and the focus ring has
+     outline-offset 2px, so it sits on paper beside the element, not on ink. */
+  /* Selection is ink inverted from the text and background roles (works in both
+     modes), not red or a tint. Red stays for the one CTA. */
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.cityPillIcon {
+  flex-shrink: 0;
+}
+
+/* ─── RESULT COUNT BAR — soft caption with active filter chips ─── */
+
+.resultBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.resultCount {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.resultCount strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* ─── CARD LIST — always single column ────────────────────────
+ *
+ * DECISION: AppLayout forces a phone-frame container (~390px) on every viewport, so viewport media
+ * queries misfire here (they would read 1440px and fire a 3-column grid in a 390px slot). All
+ * production app/* views render in the phone frame: 1 column with rich typography at full card
+ * width is the right call. If columns are ever added, use `@container app-view` (see
+ * ExplorePage.module.css).
+ */
+.cardList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-20);
+}
+
+/* ─── CREATOR CARD: white box with the stylist's own works ───
+ * The list DTO carries up to three real pinned works (`sample_photo_urls`);
+ * there are no covers or placeholder thumbnails. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.cardIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.cardName {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.cardLocation {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.cardLocationIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.cardThumbStrip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cardThumb {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--style-radius-control);
+  overflow: hidden;
+  background: var(--color-surface-hover);
+}
+
+.cardThumbImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardEmpty {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.cardStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-12);
+}
+
+.cardStat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.cardStatIcon {
+  flex-shrink: 0;
+}
+
+.cardFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.cardIgHandle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.cardIgIcon {
+  /* DECISION: #c13584 is the Instagram brand colour, functional on an element that points to
+     Instagram: a deliberate literal outside the tokens. */
+  color: #c13584;
+  flex-shrink: 0;
+}
+
+/* ─── SKELETON — solid tonal surfaces + opacity pulse ─────────
+ *
+ * 2026-06-12: the previous shimmerSweep animated background-position over a
+ * SOLID color-mix fill — a visual no-op (skeletons sat static). Replaced
+ * with the project-standard loading affordance: solid surface + opacity
+ * pulse (no gradient shimmer, per Anti-AI-Slop floor).
+ */
+
+.skeletonList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-20);
+}
+
+.skeletonCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  overflow: hidden;
+}
+
+/* The loading skeleton is a stand-in SURFACE: a neutral tonal step (the same as
+   the stylist profile skeleton), with motion from an opacity pulse. A gold slab
+   would pretend to be content before it arrives. */
+.skeletonBody {
+  position: relative;
+  padding: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.skeletonAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonLine {
+  height: 12px;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeletonLineLg {
+  height: 18px;
+  width: 60%;
+}
+
+.skeletonLineSm {
+  height: 10px;
+  width: 40%;
+}
+
+.skeletonThumbRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.skeletonThumb {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+/* ─── EMPTY STATE — branded illustration + actionable CTA ──── */
+
+/* Surface and typography come from the <EmptyState> canon. This screen's own
+   knobs: a 72px medallion, a handwritten-face title (warmer tone for „nic tu
+   jeszcze nie ma") and bottom breathing room under the card. */
+.emptyState {
+  --empty-medal-size: 72px;
+  --empty-pad-block-end: calc(var(--space-48) + var(--space-20));
+  --empty-title-size: var(--text-xl);
+  --empty-title-font: var(--font-accent);
+  --empty-body-maxw: calc(38 * var(--ch-body));
+} /* ─── END-OF-LIST CAPTION + SENTINEL ───────────────────────── */
+
+.endOfList {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  padding: var(--space-20) 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.endOfList::before,
+.endOfList::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  /* The rule flanking the label is structural, so neutral: gold on 1px reads
+     as dirt. */
+  background: var(--color-divider);
+}

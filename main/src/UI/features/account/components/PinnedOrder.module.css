@@ -1,0 +1,77 @@
+/* ─── PinnedOrder — kolejność przypiętych prac na profilu publicznym. ─── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.body {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* List item: a divider only BETWEEN items, as in NavRowListMolecule, never
+   under the last one. */
+.item:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* Wiersz: numer miejsca, miniatura, para przycisków. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding-block: var(--space-8);
+}
+
+/* Zdanie nad pierwszym wierszem, którego profil publiczny nie pokazuje. */
+.beyondNote {
+  margin: 0;
+  padding-block: var(--space-12) var(--space-4);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* The position number is data: fixed width so thumbnails line up in one
+   column from 1 to 50. */
+.position {
+  flex: none;
+  min-width: calc(3 * var(--ch-heading));
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: end;
+}
+
+.thumb {
+  flex: none;
+  display: block;
+  width: 48px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-8);
+  margin-inline-start: auto;
+}

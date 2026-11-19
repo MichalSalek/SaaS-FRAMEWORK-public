@@ -1,0 +1,140 @@
+/* ─── AnnouncementBanner ───
+ * Full-width strips. Sticky pinning belongs to the public header wrapper
+ * (or the app shell, which does not scroll). This strip must not stick on
+ * its own: two sticky siblings both pin to top: 0 and the banner covers the nav.
+ * Types: info (default) / warning / critical — controlled via data-type attr.
+ * Dismissable per-announcement via localStorage.
+ */
+
+/* ─── Outer wrapper ─── */
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ─── Single announcement strip ─── */
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  /* DECISION: the horizontal padding is fluid and in PERCENT, not an @media. A percentage
+     resolves against the CONTAINING BLOCK's inline-size, not the element's width; it matches the
+     strip only because the strip is full parent width, so adding horizontal padding to the
+     parent or removing the stretch silently skews these 6%. An @media asked about the WINDOW
+     while the strip lives inside the phone frame (on desktop >=1280 the frame is a fixed 390px),
+     which gave 48px per side and 294px for text. Deliberately NOT a container query:
+     `container-type: inline-size` implies `contain: layout`, which makes the ancestor the
+     containing block for `position: fixed` (drawer, dialogs, snackbars, bottom bar). Measured:
+     390px -> ~23px, 768px -> ~46px, 1440px -> 48px (clamped). */
+  padding-block: var(--space-12);
+  padding-inline: clamp(var(--space-20), 6%, var(--space-48));
+  min-height: 44px;
+  /* info (default) */
+  /* Pierscien fokusu: domyslny pas stoi na --color-primary, ktore w trybie
+     jasnym jest CIEMNA czerwienia (L 0.565), a hostuje przycisk zamkniecia.
+     Dzis ring rysuje sie przez currentColor i jest widoczny, ale gdyby ten
+     override kiedys zniknal, kontrolka spadlaby na atramentowy
+     --color-focus-ring (~3,6:1, bez zapasu). Remap zamyka to na wlasnosc.
+     UWAGA: tej powierzchni NIE widzi ink-focus-ring.sh — galaz "zloty pas"
+     wymaga `width: 100vw` w tym samym bloku, a ten pas jest pelnej szerokosci
+     przez rodzica. Rozszerzenie regexa o --color-primary dawaloby falszywki
+     na kazdym wypelnionym przycisku, wiec zamiast tego stoi tu jawny remap. */
+  --color-focus-ring: var(--color-primary-contrast);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+/* Ostrzeżenie — rola pasa ostrzegawczego */
+.item[data-type='warning'] {
+  /* Wlasny ring: bez tego wariant dziedziczy biel z bloku domyslnego, a pas
+     ostrzegawczy jest JASNY (L 0.78) — biel na nim znika. */
+  --color-focus-ring: var(--color-on-banner-warning);
+  background: var(--color-banner-warning);
+  color: var(--color-on-banner-warning);
+}
+
+/* Krytyczne — rola pasa krytycznego */
+.item[data-type='critical'] {
+  /* Pierscien fokusu: pas krytyczny to ciemna czerwien (L 0.50), a bazowy ring
+     jest w trybie jasnym atramentem — przycisk zamkniecia zostawalby bez
+     widocznego wskaznika. Ring bierze kolor tekstu tego pasa. */
+  --color-focus-ring: var(--color-on-banner-critical);
+  background: var(--color-banner-critical);
+  color: var(--color-on-banner-critical);
+}
+
+/* ─── Icon ─── */
+
+.icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+/* ─── Text content ─── */
+
+.content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.message {
+  opacity: 0.92;
+}
+
+/* ─── Dismiss button ─── */
+
+.dismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-44);
+  height: var(--space-44);
+  margin-left: var(--space-8);
+  padding: 0;
+  border: none;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.dismiss:hover {
+  opacity: 1;
+  background: color-mix(in oklch, var(--color-scrim) 24%, transparent);
+}
+
+.dismiss:active {
+  opacity: 0.7;
+}
+
+.dismiss:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* ─── Separator between stacked announcements ─── */
+
+.item + .item {
+  border-top: var(--style-border-divider) solid
+    color-mix(in oklch, var(--color-scrim) 20%, transparent);
+}

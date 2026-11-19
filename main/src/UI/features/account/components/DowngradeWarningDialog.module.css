@@ -1,0 +1,90 @@
+/* DowngradeWarningDialog.module.css
+ * Loss-aversion modal before Pro→FREE downgrade.
+ * N10: concrete numbers, default focus on cancel.
+ * Tokens: UI/styles/tokens.css + themes/palettes.css
+ */
+
+/* ─── Subtitle ─── */
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  margin: 0 0 var(--space-20) 0;
+}
+
+/* ─── Loss list ─── */
+.lossList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-20) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  background: color-mix(in oklch, var(--color-warning) 8%, transparent);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-warning) 30%, transparent);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-20);
+}
+
+.lossItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+.lossBullet {
+  font-size: var(--text-sm);
+  color: var(--color-warning);
+  flex-shrink: 0;
+  /* Render as text symbol, not emoji */
+  font-variant-emoji: text;
+}
+
+.lossText {
+  color: var(--color-text-primary);
+}
+
+/* Bold inside loss items via rich text (dangerouslySetInnerHTML delivers <b> tags) */
+.lossText b,
+.lossText strong {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ─── FREE limits reminder ─── */
+.freeReminder {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-body);
+  margin: 0 0 var(--space-32) 0;
+  padding: var(--space-12);
+  background: var(--color-surface-input);
+  border-radius: var(--style-radius-control);
+}
+
+/* ─── Actions ─── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.cancelWrap {
+  display: contents;
+}
+
+.btn {
+  width: 100%;
+}
+
+.btnCancel {
+  /* Primary CTA = cancel = loss aversion default */
+}
+
+.btnConfirm {
+  /* Ghost / danger — visually demoted downgrade action */
+  color: var(--color-text-secondary);
+}

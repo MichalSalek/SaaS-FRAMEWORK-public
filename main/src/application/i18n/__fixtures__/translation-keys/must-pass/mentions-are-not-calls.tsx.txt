@@ -1,0 +1,21 @@
+export {};
+type Translator = {
+  (key: string, values?: Record<string, unknown>): string;
+  has(key: string): boolean;
+  rich(key: string, values?: Record<string, unknown>): unknown;
+  markup(key: string, values?: Record<string, unknown>): string;
+  raw(key: string): unknown;
+};
+declare function useTranslations<N extends string = never>(namespace?: N): Translator;
+declare function getTranslations<N extends string = never>(
+  options: N | { locale: string; namespace?: N }
+): Promise<Translator>;
+
+// t("fake.keyInComment") and useTranslations("fake") in a comment are prose.
+export function Sample() {
+  const t = useTranslations("demo");
+  const prose = "t(\"fake.keyInString\") is only text";
+  const unused = "fake.keyNeverPassed";
+  /* t.rich("fake.blockComment") */
+  return [t("title"), prose, unused];
+}

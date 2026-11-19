@@ -1,0 +1,4 @@
+/* DECISION — S126: the row keeps its arrow disc. */
+.row {
+  display: flex;
+}

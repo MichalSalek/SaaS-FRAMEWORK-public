@@ -1,0 +1,86 @@
+/* ─── Avatar base ─── */
+.avatar {
+  border-radius: var(--style-radius-avatar);
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+  background-color: var(--color-surface-input);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+/* ─── Sizes ─── */
+.sm {
+  width: 32px;
+  height: 32px;
+}
+
+.md {
+  width: 40px;
+  height: 40px;
+}
+
+.lg {
+  width: 56px;
+  height: 56px;
+}
+
+.xl {
+  width: 96px;
+  height: 96px;
+}
+
+/* ─── Initials (no photo, or the photo failed to load) ─── */
+/* DECISION: the initials size is set PER AVATAR SIZE, not relatively. A relative 0.85em resolves
+   against the INHERITED parent font-size, not the circle width, so 56px and 32px avatars got the
+   same ~12.8px initials, below the 14px token floor. --text-* tokens bound to the size class
+   scale for real and stay visible to the css/min-font-size guard. */
+.initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Four tones from the palette roles (background + text pairs, both mode-aware); a hash of the
+     name picks the tone, so the same person has the same colour everywhere. The default (no
+     attribute) is tone 0. */
+  background-color: var(--_avatar-bg, var(--color-text-primary));
+  color: var(--_avatar-fg, var(--color-bg-main));
+  border-color: transparent;
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+}
+
+.sm.initials {
+  font-size: var(--text-xs);
+}
+
+.md.initials {
+  font-size: var(--text-base);
+}
+
+.lg.initials {
+  font-size: var(--text-xl);
+}
+
+.xl.initials {
+  font-size: var(--text-2xl);
+}
+
+/* Tone 0: inverted ink (in dark mode a light disc with dark text). All tones are NEUTRAL: the
+ * brand accent is kept for the main action and the tappability sign, and a list of eight clients
+ * with raspberry discs beside raspberry arrows would dull both. */
+.initials[data-tone='1'] {
+  --_avatar-bg: var(--color-surface-pressed);
+  --_avatar-fg: var(--color-text-primary);
+}
+
+.initials[data-tone='2'] {
+  --_avatar-bg: var(--color-text-secondary);
+  --_avatar-fg: var(--color-bg-main);
+}
+
+.initials[data-tone='3'] {
+  --_avatar-bg: var(--color-mark-bg-strong);
+  --_avatar-fg: var(--color-text-primary);
+}

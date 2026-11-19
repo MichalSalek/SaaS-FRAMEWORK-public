@@ -1,0 +1,9 @@
+// The rule is only NAMED here: pushNewSnackbar(t('x'), 'success') inside an
+// onSuccess with no successFeedback would fail, but this is a comment.
+const HELP =
+  "onSuccess: () => { pushNewSnackbar(t('saved'), 'success'); setSavedFlash(true) }";
+
+export function copyLink(text: string) {
+  // Outside any onSuccess: not a response confirmation.
+  pushNewSnackbar(text ? t('copied') : HELP, 'success');
+}

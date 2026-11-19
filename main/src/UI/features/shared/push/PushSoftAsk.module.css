@@ -1,0 +1,42 @@
+/* UI/features/shared/push/PushSoftAsk.module.css
+ * One white card: an icon, the reason in two lines, two quiet actions. The
+ * button is outlined on purpose: the screen's one filled action stays its own
+ * (send the request, share the session). */
+
+.card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-8) var(--space-12);
+  padding: var(--space-16);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-primary);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.actions {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.line {
+  grid-column: 1 / -1;
+}
+
+.done {
+  padding-inline: var(--space-4);
+}

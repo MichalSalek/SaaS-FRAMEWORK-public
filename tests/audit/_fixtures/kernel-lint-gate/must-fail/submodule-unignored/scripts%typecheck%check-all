@@ -1,0 +1,2 @@
+PID_KERNEL_ESLINT=$!
+echo "  kernel eslint: OK"

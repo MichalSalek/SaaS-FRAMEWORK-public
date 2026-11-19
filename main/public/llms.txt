@@ -1,0 +1,48 @@
+# Nailfolio
+
+[English](https://nailfolio.app/llms.txt) | [Polski](https://nailfolio.app/llms-pl.txt) | [Deutsch](https://nailfolio.app/llms-de.txt)
+
+## Useful pages
+
+- [Home](https://nailfolio.app/en/): about Nailfolio
+- [For stylists](https://nailfolio.app/en/for-stylists/): portfolio, public profile and client cards
+- [For clients](https://nailfolio.app/en/for-clients/): browse styles, save favorites and share an Inspiration Session
+- [For salons](https://nailfolio.app/en/for-studios/): shared team portfolio and salon profile
+- [Pricing](https://nailfolio.app/en/pricing/): current plans and pricing
+- [Compare](https://nailfolio.app/en/compare/): compare Nailfolio with other tools
+- [About Nailfolio](https://nailfolio.app/en/about/): product information
+- [Contact](https://nailfolio.app/en/contact/): contact form
+- [Get the app](https://nailfolio.app/en/get-app/): phone browser use and Android app status
+- [Help center](https://nailfolio.app/en/help-center/): answers and instructions
+- [Blog](https://nailfolio.app/en/blog/): Nailfolio articles
+
+## Blog articles
+
+### English
+
+- [Best Nail Portfolio Apps for Nail Techs in 2026](https://nailfolio.app/en/blog/best-nail-portfolio-apps-2026/)
+- [Nail Consultation: Agree on the Design Before the Visit](https://nailfolio.app/en/blog/nail-consultation-before-the-appointment/)
+- [Booksy Alternatives for Nail Techs: What to Switch To](https://nailfolio.app/en/blog/booksy-alternative-for-nail-techs/)
+- [Fresha vs Booksy for Nail Techs: Which One Fits You](https://nailfolio.app/en/blog/fresha-vs-booksy-for-nail-techs/)
+- [Nail Shapes and Lengths: A Practical Guide](https://nailfolio.app/en/blog/nail-shapes-and-lengths/)
+
+### Polish (titles shown in Polish)
+
+- [Trendy w paznokciach: jak pracować z nimi, zamiast gonić je za darmo](https://nailfolio.app/blog/jak-pracowac-z-trendami-w-portfolio/) (in Polish)
+- [Jak stworzyć portfolio paznokci online, które klientka realnie przegląda](https://nailfolio.app/blog/jak-stworzyc-portfolio-paznokci/) (in Polish)
+- [Jak pokazać klientce portfolio, zanim usiądzie na fotelu](https://nailfolio.app/blog/jak-pokazac-klientce-portfolio-przed-wizyta/) (in Polish)
+- [QR na lustrze: jak stylistki zbierają stałe klientki](https://nailfolio.app/blog/qr-w-salonie-stale-klientki/) (in Polish)
+- [Kod QR w salonie paznokci: jak działa połączenie z klientką](https://nailfolio.app/blog/qr-parowanie-jak-to-dziala/) (in Polish)
+- [Aplikacje dla stylistek paznokci 2026: uczciwe porównanie](https://nailfolio.app/blog/aplikacje-dla-stylistek-paznokci-2026/) (in Polish)
+- [Zdjęcia paznokci do portfolio: jak je robić samodzielnie](https://nailfolio.app/blog/zdjecia-paznokci-do-portfolio/) (in Polish)
+- [Alternatywa dla Booksy: co wybrać i kiedy odejść?](https://nailfolio.app/blog/alternatywa-dla-booksy/) (in Polish)
+- [Jak przygotować się do manicure u stylistki paznokci](https://nailfolio.app/blog/jak-przygotowac-sie-do-wizyty-u-stylistki-paznokci/) (in Polish)
+- [Konsultacja przed stylizacją paznokci: pytania i karta](https://nailfolio.app/blog/konsultacja-przed-stylizacja-paznokci/) (in Polish)
+- [Kształty paznokci i długości: jak wybrać dla siebie](https://nailfolio.app/blog/ksztalty-i-dlugosci-paznokci/) (in Polish)
+- [Rodzaje stylizacji paznokci: hybryda, żel czy akryl?](https://nailfolio.app/blog/rodzaje-stylizacji-paznokci/) (in Polish)
+
+### German (titles shown in German)
+
+- [Apps für Nageldesignerinnen 2026: ein ehrlicher Vergleich](https://nailfolio.app/de/blog/nagelstudio-apps-vergleich-2026/) (in German)
+- [Beratung vor dem Nageltermin: Design vorher festlegen](https://nailfolio.app/de/blog/beratung-vor-dem-nageltermin/) (in German)
+- [Nagelformen und Nagellängen: Was passt zu Ihnen?](https://nailfolio.app/de/blog/nagelformen-und-laengen/) (in German)

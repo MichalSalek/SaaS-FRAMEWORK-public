@@ -1,0 +1,90 @@
+/* ─── InteractivePhoneStage: screen triptych on an ink stage with focal swap ───
+ * Owner vote: a full-width dark band breaks the monotonous column; one large
+ * screen and two small ones, hover or tap moves the enlargement (the hovered one
+ * grows, the previous large one shrinks) with a micro-animation.
+ * --color-ink is mode-invariant, so the band stays dark and the light screens
+ * stay readable in both themes. 7xZERO floor: solid fill, PhoneMockup hairline
+ * frames, no shadow or gradient. */
+
+.stage {
+  /* Full-bleed breakout from the column (needs overflow-x:clip on PublicLayout .content). */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-ink);
+  /* Focus ring on ink: the base ring is exactly --color-ink in LIGHT, so it would be invisible here
+     (1.00:1). It takes --color-accent-on-ink: the red --color-primary is dark in LIGHT and gives
+     only 3.6:1 on ink, below AA, whereas this role is mode-invariant. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  padding-block: clamp(56px, 7vw, 104px);
+  padding-inline: clamp(20px, 5vw, 56px);
+}
+
+.inner {
+  max-width: 1320px;
+  margin-inline: auto;
+}
+
+.row {
+  display: flex;
+  align-items: flex-end; /* shared bottom line: the focal screen grows upward */
+  justify-content: center;
+  gap: clamp(20px, 3vw, 48px);
+  /* The voted variant B exactly (hero 480 / sides 320, ratio 1.5x). */
+  --focal-w: 480px;
+  --side-w: 320px;
+  /* DECISION: min-height is computed from the REAL width of the focal frame, NOT from the slot
+   * (--focal-w). The slot is deliberately wider than the phone (breathing room) while PhoneMockup
+   * `.hero` has a fixed width:400px, so computing from --focal-w (480) reserved height for a 480px
+   * phone (1040px) while the real focal is 400px (867px): ~173px of phantom empty space that
+   * align-items:flex-end pushed ABOVE the phones. --focal-frame-w mirrors PhoneMockup `.hero
+   * .frame` width; change both together. A fixed height still guards against a height dip
+   * mid-swap. */
+  --focal-frame-w: 400px; /* = PhoneMockup `.hero .frame` width */
+  min-height: calc(var(--focal-frame-w) * 19.5 / 9);
+}
+
+/* Slot = <button> (focal swap, a11y) with button styles reset. cursor:default
+ * because it is a pure zoom, not navigation; a pointer would mislead (owner). */
+.slot {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+  display: block;
+  width: var(--side-w);
+  border-radius: var(--style-radius-surface);
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.slot[data-focal='true'] {
+  width: var(--focal-w);
+}
+.slot:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 6px;
+}
+
+/* The mobile stack keeps its geometry while the focal screen scales in place. */
+@media (max-width: 767px) {
+  .row {
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(28px, 7vw, 48px);
+    min-height: 0;
+  }
+  .slot,
+  .slot[data-focal='true'] {
+    width: min(90vw, calc(85vh * 9 / 19.5));
+    transition: transform var(--transition-normal);
+  }
+  .slot {
+    transform: scale(0.96);
+  }
+  .slot[data-focal='true'] {
+    transform: scale(1);
+  }
+}

@@ -1,0 +1,32 @@
+.featureList {
+  display: grid;
+  grid-template-rows: repeat(
+    var(--pricing-feature-row-count),
+    minmax(var(--pricing-feature-row-min, var(--space-40)), 1fr)
+  );
+  align-content: stretch;
+}
+
+.featureItem {
+  min-width: 0;
+  min-height: var(--pricing-feature-row-min, var(--space-40));
+  display: flex;
+  align-items: center;
+}
+
+/* DECISION: spacer rows align the lists BETWEEN cards standing side by side. Below 768px every
+ * page using this list stacks the cards in one column, so spacers are pure holes (a short Free
+ * list under an 11-feature Studio list got six empty rows). */
+@media (max-width: 767px) {
+  .featureList {
+    grid-template-rows: none;
+    grid-auto-rows: minmax(
+      var(--pricing-feature-row-min, var(--space-40)),
+      auto
+    );
+  }
+
+  .featureList > [data-pricing-feature-spacer] {
+    display: none;
+  }
+}

@@ -1,0 +1,97 @@
+/* DECISION: owner chose the raspberry field and light action area (B),
+ * 2026-10-30. The raspberry field stays identical in both themes; only the
+ * lower action area inverts. Short heights scroll naturally. */
+.heading {
+  position: relative;
+  margin: 0;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.wordmark {
+  font-family: var(--font-marcellus), serif;
+  font-size: var(--text-4xl);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: var(--ls-tight-10);
+  line-height: 1;
+  color: inherit;
+}
+.lede {
+  margin: 0;
+  max-width: 20rem;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--letter-spacing-body);
+  line-height: var(--leading-body);
+  text-wrap: balance;
+}
+.brandMark {
+  height: 4.5rem;
+  width: auto;
+}
+.actions {
+  width: min(100%, 20.5rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  text-align: center;
+}
+.demo {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-body);
+  line-height: var(--leading-body);
+}
+.cta {
+  width: 100%;
+}
+.login,
+.info a {
+  min-height: var(--style-control-min-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--space-8);
+  color: inherit;
+  font-family: var(--font-body);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+.login {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+}
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8) var(--space-20);
+}
+.info a {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-body);
+}
+.login:focus-visible,
+.info a:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+@media (max-height: 740px) {
+  .brandMark {
+    height: 3.25rem;
+  }
+  .wordmark {
+    font-size: var(--text-3xl);
+  }
+}

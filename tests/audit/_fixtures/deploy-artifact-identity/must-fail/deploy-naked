@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Deploy bez zadnej weryfikacji tozsamosci artefaktu: konczy sie na "cos zwraca 200".
+scp -r ./build "prod:/srv/app"
+curl -fsS "https://example.test/" >/dev/null || exit 1
+echo "deploy done"

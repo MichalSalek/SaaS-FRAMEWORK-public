@@ -1,0 +1,10 @@
+// The escape marker without a reason is not an escape.
+export function useSendThing() {
+  return useMutation({
+    mutationFn: (req: unknown) => sendThing_IO(req),
+    onSuccess: () => {
+      // success-feedback-allow:
+      pushNewSnackbar(t('sent'), 'success');
+    },
+  });
+}

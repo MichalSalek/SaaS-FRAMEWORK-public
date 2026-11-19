@@ -1,0 +1,186 @@
+/* MessagesListPage: conversation inbox. Floor-compliant: flat, full hairline
+   dividers between rows (not one-sided), zero gradient/shadow. */
+
+/* The shell (AppLayout, 20px) provides the page margins, as on every other
+ * screen, so the title and list share the app's edge. The width is held by
+ * PageColumnsMolecule: from 720px of own width the list gets a readable measure
+ * from the LEFT edge, and a row does not sprawl at 900px. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  width: 100%;
+  min-width: 0;
+}
+
+/* The filter track does not stretch to the column width. */
+.filter {
+  align-self: flex-start;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--style-radius-surface);
+  /* Every row is clickable, so the list stands on white. */
+  background: var(--color-surface-interactive);
+  overflow: hidden;
+}
+
+.list > li:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.rowShell {
+  display: flex;
+  align-items: flex-start;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-16) var(--space-4) var(--space-16) var(--space-16);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--duration-200) var(--ease-entrance);
+}
+
+/* A row without a menu (a conversation with no messages): the text keeps the right margin. */
+.rowShell > .row:last-child {
+  padding-right: var(--space-16);
+}
+
+.row:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.rowMain {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.nameLine {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+/* The name gets the whole line and up to two lines: the row grows, the name is not cut. */
+.name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.rowShell[data-unread] .name {
+  font-weight: 700;
+}
+
+/* The slot for the unread mark ALWAYS stands (the height of the first name
+ * line), so reading a conversation does not change how the name breaks. */
+.unreadSlot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--space-10);
+  height: 1.3em;
+  font-size: var(--text-base);
+}
+
+.unreadDot {
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: var(--style-radius-round);
+  background-color: var(--color-primary);
+}
+
+/* Quiet line: when, then what. Two preview lines instead of ~20 characters. */
+.meta {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.rowShell[data-unread] .meta {
+  color: var(--color-text-primary);
+}
+
+.when {
+  margin-right: var(--space-8);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* The only control at the end of the row. The button centre (44px) stands on the
+ * avatar axis (40px from the row's 16px padding). */
+.rowMenu {
+  margin: var(--space-14) var(--space-4) 0 0;
+}
+
+/* The surface is the <EmptyState> canon, with no card or frame of its own. */
+.empty {
+  --empty-surface: transparent;
+  --empty-border: none;
+  --empty-body-maxw: 360px;
+}
+
+/* Conversation list pagination. */
+.loadOlderRow {
+  display: flex;
+  justify-content: center;
+}
+
+/* Visually-hidden (SR-only) — wzorzec HelpCenterPage. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skeleton row: the same spacing as `.row`, so the list does not jump. */
+.skeletonRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16);
+}
+
+.skeletonLines {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}

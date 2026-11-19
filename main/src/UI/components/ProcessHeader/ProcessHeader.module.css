@@ -1,0 +1,49 @@
+/* ProcessHeader — title + step indicator of a linear flow.
+ *
+ * Two layers of knobs (DESIGN.md §Style Policy 13): this file writes only the
+ * private `--_*`, the page writes only the public
+ * `--process-header-margin-*`. Neither can silently beat the other. */
+
+.root {
+  /* Vertical budget under an app bar: 8 + bar 4 + 6 + line 20 + 10 = 48px. */
+  --_pad-top: var(--space-8);
+  --_pad-bottom: var(--space-10);
+  --_margin-top: var(--process-header-margin-top, 0);
+  --_margin-bottom: var(--process-header-margin-bottom, 0);
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-block: var(--_pad-top) var(--_pad-bottom);
+  margin-block: var(--_margin-top) var(--_margin-bottom);
+}
+
+/* ── Title on screen: no app bar above ─────────────────────
+ * A page title row like any other: the page's own padding and gap place it,
+ * so the under-the-bar knobs are switched off here. */
+
+.root[data-title='visible'] {
+  --_pad-top: 0;
+  --_pad-bottom: 0;
+  --_margin-top: 0;
+  --_margin-bottom: 0;
+
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8) var(--space-24);
+}
+
+.title {
+  flex: 0 1 auto;
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-2xl);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}

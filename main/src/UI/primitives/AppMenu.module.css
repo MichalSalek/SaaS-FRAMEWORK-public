@@ -1,0 +1,192 @@
+/* AppMenu — dropdown menu with keyboard nav and nested submenu support */
+
+.positioner {
+  z-index: var(--z-menu);
+  /* Non-visual portal anchor; focus goes to the menu items. */
+  outline: none;
+}
+
+.popup {
+  min-width: 10rem;
+  /* A long menu (a table's column choice) never runs off the screen: it ends
+     at the space the positioner measured and scrolls inside. */
+  max-height: var(--available-height, none);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4) 0;
+  border-radius: var(--style-radius-surface);
+  /* A floating layer stands above the page paper, so it takes the white of the tappable
+     surface; otherwise it has no edge against the content under it. */
+  background: var(--color-surface-interactive);
+  color: var(--color-text-primary);
+  /* A closed frame carries the elevation (NOT a shadow, anti-slop §2); the frame comes from the
+   * surface token, not an outline (an outline is not a frame). */
+  /* DECISION: a FLOATING layer's frame takes the divider colour, not
+   * `--color-border-surface`, which is transparent (surfaces on paper have no
+   * frame). A white menu opened over a white list then had no edge at all; a
+   * layer above content needs an edge on every background. */
+  border: var(--style-border-surface) solid var(--color-divider);
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.popup[data-starting-style],
+.popup[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* ---- Item ---- */
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  /* 44px: a menu item is a tap target like any other. */
+  min-height: 44px;
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  cursor: pointer;
+  /* Keyboard ring comes from :focus-visible below. */
+  outline: none;
+  user-select: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: start;
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.item[data-highlighted] {
+  background: var(--color-surface-hover);
+}
+
+.item[data-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Danger is carried by the colour of the label and its icon, not by a tinted
+ * surface. */
+.item[data-tone='danger'] {
+  color: var(--color-error-fg);
+}
+
+/* ---- Checkbox item: the checkbox primitive's box on a menu row ---- */
+
+.checkBox {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: calc(var(--style-radius-control) / 2);
+  background: var(--color-surface-input);
+}
+
+.checkBox[data-checked] {
+  /* focus-ring-allow: the box is drawn inside a menu item; focus and its ring belong to the item. */
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
+}
+
+/* ---- „More” trigger: a row's single trailing control, 44px target ---- */
+
+.moreTrigger {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--style-radius-round);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.moreTrigger > svg {
+  display: block;
+}
+
+.moreTrigger:active,
+.moreTrigger[data-popup-open] {
+  background-color: var(--color-surface-pressed);
+  color: var(--color-text-primary);
+}
+
+@media (hover: hover) {
+  .moreTrigger:hover:not(:disabled) {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+.moreTrigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.moreTrigger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Submenu trigger item ---- */
+
+.triggerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  min-height: 44px;
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  cursor: pointer;
+  /* Keyboard ring comes from :focus-visible below. */
+  outline: none;
+  user-select: none;
+  width: 100%;
+}
+
+.triggerItem:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.triggerItem[data-highlighted] {
+  background: var(--color-surface-hover);
+}
+
+.submenuChevron {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-secondary);
+  margin-inline-start: auto;
+}
+
+/* ---- Separator ---- */
+
+.separator {
+  height: 1px;
+  margin: var(--space-4) var(--space-12);
+  background: var(--color-border);
+  border: none;
+}

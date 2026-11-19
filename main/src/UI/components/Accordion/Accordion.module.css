@@ -1,0 +1,35 @@
+/* Shared expand mechanics of the FAQ accordion: grid-template-rows 0fr to 1fr animates the
+ * opening (150-300ms) without animating height or max-height hacks. The skin (padding, colors,
+ * type) stays per page through the `classNames` slots (see AccordionItem.molecule.tsx). */
+
+/* Heading wrapper of a FAQ question (h3, SEO + ARIA APG): resets the default <h3> margins and
+ * font so the button trigger keeps its look 1:1 as before the heading semantics (no visual
+ * change). Block, full width: the button (width:100%) fills it without changing layout. */
+.triggerHeading {
+  margin: 0;
+  font: inherit;
+}
+
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  /* A delayed visibility removes the collapsed content from the tab order and the a11y tree
+     only after the animation ends. */
+  visibility: hidden;
+  transition:
+    grid-template-rows 250ms var(--ease-entrance),
+    visibility 0s 250ms;
+}
+
+.panel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows 250ms var(--ease-entrance),
+    visibility 0s;
+}
+
+.panelClip {
+  overflow: hidden;
+  min-height: 0;
+}

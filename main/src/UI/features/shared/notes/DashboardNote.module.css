@@ -1,0 +1,70 @@
+/* DashboardNote (the general private note) — a section title on paper and one white field (no
+ * tint, no frame of its own; it is a text field like any other). */
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.field {
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-interactive);
+  cursor: text;
+}
+
+/* The ring is drawn by the FIELD box, not the bare textarea inside it: an
+   outline around the text alone would read as a frame around the words. */
+.field:focus-within {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--text-base) * 1.5 * 2);
+  padding: 0;
+  border: none;
+  /* outline: none: the .field box is the visual container of this auto-expanding textarea and
+     carries the focus ring (:focus-within above). */
+  outline: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  resize: none;
+  overflow: hidden;
+}
+
+.textarea::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* One quiet line under the field: who sees the notes and when they save. */
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}

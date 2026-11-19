@@ -1,0 +1,56 @@
+/* ─── ColorDot base ─── */
+/* Flat discs share one OKLCH display map (owner). White retains a hairline edge on white
+ * surfaces; a selected disc has no second ring. */
+.dot {
+  --polish-black: oklch(0.15 0 0);
+  --polish-white: oklch(1 0 0);
+  position: relative;
+  display: inline-block;
+  border-radius: var(--style-radius-round);
+  flex-shrink: 0;
+  vertical-align: middle;
+  overflow: hidden;
+  border: var(--style-border-surface) solid transparent;
+  background: var(--polish-fill);
+  box-shadow: none;
+}
+
+/* White color needs a visible border */
+.white {
+  border-color: var(--color-border);
+}
+
+/* ─── Sizes ─── */
+.sm {
+  width: 12px;
+  height: 12px;
+  border-width: var(--style-border-surface);
+}
+
+.md {
+  width: 16px;
+  height: 16px;
+  border-width: var(--style-border-surface);
+}
+
+.quick {
+  width: 24px;
+  height: 24px;
+  border-width: var(--style-border-surface);
+}
+
+.lg {
+  width: 40px;
+  height: 40px;
+  border-width: var(--style-border-surface);
+}
+
+/* gradient-allow: owner choice, metallic gold only. */
+.dot[data-polish-metallic] {
+  background: linear-gradient(
+    125deg,
+    color-mix(in oklch, var(--polish-fill) 80%, var(--polish-black)),
+    color-mix(in oklch, var(--polish-fill) 85%, var(--polish-white)) 45%,
+    var(--polish-fill) 80%
+  );
+}

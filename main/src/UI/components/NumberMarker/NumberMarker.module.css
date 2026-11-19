@@ -1,0 +1,23 @@
+/* ─── Decorative numeral ─── */
+/* WCAG 1.4.3: although the marker is aria-hidden (the adjacent heading carries
+ * the meaning), axe still measures visible text. The numeral takes
+ * --color-primary from the palette; no hardcoded colour is needed, since the
+ * palette red is dark enough on white. */
+.marker {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  line-height: 0.85;
+  letter-spacing: var(--ls-tight-40);
+  color: var(--color-primary);
+  user-select: none;
+}
+
+/* ─── Sizes ─── */
+.lg {
+  font-size: var(--text-fluid-3xl);
+}
+
+.sm {
+  font-size: var(--text-fluid-2xl);
+}

@@ -1,0 +1,91 @@
+/* ─── HeroCountPill — the count in a screen header ───
+ * The shared recipe for the admin screens (Users, Policies, Permissions,
+ * Notes, ColorsTraits, Support, SupportThread).
+ */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  /* optical: a tight count pill; 5/11 is tuned to the glyph height at
+     --text-xs, not a spacing-scale step. */
+  padding: 5px 11px;
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-20);
+  /* The chip is a MARK (role token); text is accent-fg (a hand color-mix on
+     primary fails WCAG on paper). Three properties are LIVE override points
+     (--hero-pill-*) for screens with domain tones (notes tint the pill with
+     the note palette). Override through the custom property, NOT a class at
+     the call site: a page-module class and `.pill` have equal specificity, so
+     CSS Modules bundle order would pick the winner by chance. */
+  background: var(--hero-pill-bg, var(--color-mark-bg));
+  color: var(--hero-pill-fg, var(--color-accent-fg));
+  border: var(--style-border-surface) solid
+    var(--hero-pill-border, var(--color-border-surface));
+}
+
+.emphasized {
+  /* Emphasized variant: mark-bg-strong + the strong accent text. */
+  background: var(--color-mark-bg-strong);
+  /* `accent-fg` is calibrated on WHITE and `mark-bg-strong` is one step
+     darker: 4.32:1 against the 4.5 threshold (14px/600), hence the -strong
+     variant (same pair as the support thread pill). */
+  color: var(--color-accent-fg-strong);
+  border-color: var(--color-border-surface);
+}
+
+.alert {
+  /* Status FILL is light in rouge-papier; mixing it into the label (78%)
+     read 2.87:1 on this tint. Text on a status tint uses the -fg token. */
+  background: color-mix(in oklch, var(--color-warning) 14%, transparent);
+  color: var(--color-warning-fg);
+  border-color: color-mix(in oklch, var(--color-warning) 36%, transparent);
+}
+
+/* The icon is wrapped in a `<span>` so the call site need not know the class
+ * name. `inline-flex` is required, not decoration: a bare inline `<span>`
+ * gives the `<svg>` room for a descender and the pill grows a few pixels. */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  /* The icon carries meaning, so it takes accent-fg. */
+  color: var(--hero-pill-icon, var(--color-accent-fg));
+  flex-shrink: 0;
+}
+
+.emphasized .icon {
+  color: var(--color-accent-fg-strong);
+}
+
+.alert .icon {
+  color: currentColor;
+}
+
+.pulseDot {
+  display: inline-block;
+  /* optical: a glyph-sized signal dot, not a spacing value. */
+  width: 6px;
+  height: 6px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-warning);
+  animation: heroPillPulse 2s ease-in-out infinite;
+}
+
+@keyframes heroPillPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}

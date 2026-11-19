@@ -1,0 +1,88 @@
+/* ─── PhoneQuoteStrip: the „proof + quote” strip ───
+ * Phone (0.9fr) + blockquote (1.4fr) on the section's WHITE band.
+ *
+ * DECISION: the whole section is white edge to edge (`Section tone='white'` at the caller) and the
+ * strip itself has no background other than white and no frame ("background: white; border:
+ * unset"); the earlier paper card in a thin frame on a paper page was "too bland". It applies to
+ * all three occurrences (for stylists, compare, about): one element, one look. (owner) */
+
+.strip {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  background: var(--color-surface-card);
+  padding-block: clamp(8px, 1.6vw, 24px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .strip {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  }
+}
+
+.phoneCol {
+  display: flex;
+  justify-content: center;
+}
+
+.quote {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 20px);
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.12;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: calc(18 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+/* Quoted headline fragments use the same foreground and emphasis as the whole title. */
+.title em {
+  color: inherit;
+  font-style: inherit;
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.note {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Highlighted set of specifics under the quote („co dokładnie”). A full top
+ * hairline (horizontal divider, floor §3, not a one-sided accent) separates it
+ * from the body prose; medium weight + text-primary so specifics beat the
+ * italic note. Pieces do not break inside (text-wrap: pretty). */
+.facts {
+  margin: 0;
+  padding-top: clamp(14px, 1.6vw, 20px);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  font-weight: 600;
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}

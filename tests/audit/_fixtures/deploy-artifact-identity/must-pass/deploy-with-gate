@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/_artifact-gate.sh"
+BUILD_ID="$(cat .next/BUILD_ID)"
+assert_artifact_served "$SSH_CONN" "$PORT" "$DOMAIN" "$BUILD_ID" || exit 14

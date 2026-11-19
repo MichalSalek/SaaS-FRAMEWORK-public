@@ -1,0 +1,160 @@
+/* ─── Chip base ─── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  border-radius: var(--style-radius-pill);
+  /* The same step as the quiet button; a white chip in a white box read as plain text (reason at
+   * the token). */
+  background: var(--color-control-fill);
+  color: var(--color-text-primary);
+  border: var(--style-border-control) solid var(--color-control-border);
+  white-space: nowrap;
+  font-family: var(--style-control-font);
+  text-transform: var(--style-control-case);
+  letter-spacing: var(--style-control-tracking);
+  word-spacing: var(--style-control-word-spacing);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--duration-200) var(--spring-curve);
+}
+
+.chip:active {
+  transform: scale(0.95);
+}
+
+/* Interactive chip (role=button via ChipAtom): tappability affordance + a focus ring for keyboard
+ * navigation (mode-aware token, WCAG 2.4.7). */
+.chip[role='button'] {
+  cursor: pointer;
+  position: relative;
+  min-width: 44px;
+  justify-content: center;
+}
+
+/* DECISION: the 44px touch target comes from enlarging the hit area, not the chip. Clickable chips
+ * are dense choice lists (22 tags on one step) and measured heights (`sm` 31.6px, `md` ~41px) are
+ * below 44x44 (WCAG 2.5.5); padding would add ~12px per row. A transparent `::after` stretches the
+ * hit area to 44px vertically (`top: 50%` + height + translate, independent of chip height) and
+ * `min-width` closes the horizontal axis for short labels. `pointer-events` stays on: the pseudo is
+ * part of the chip, so `onClick` on the chip receives the event. The row gap in `.group` had to
+ * grow to sp-14 so neighbouring hit areas do not overlap. */
+.chip[role='button']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
+.chip[role='button']:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* DECISION: a chip you can TAP (role=button) looks like the quiet button: white with a 1px line in
+ * the text color (DESIGN.md §Style Policy 20), the same on paper and in a white field. A label chip
+ * (no role) stays on the grey step: it is information, not a control. Selected stays inverted ink;
+ * a colored chip carries its own color. Negative surfaces steer it through the same hooks as the
+ * quiet button (`--btn-quiet-*`). Grey chips read as disabled on the gallery filters.
+ * (owner) */
+.chip[role='button']:not(.selected):not(.colored) {
+  background: var(--btn-quiet-bg, var(--color-surface-interactive));
+  border-color: var(--btn-quiet-border, var(--color-text-primary));
+  color: var(--btn-quiet-fg, var(--color-text-primary));
+}
+
+@media (hover: hover) {
+  .chip[role='button']:not(.selected):not(.colored):hover {
+    background: var(--btn-quiet-hover-bg, var(--color-surface-hover));
+  }
+}
+
+/* ─── Sizes ─── */
+.sm {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.md {
+  padding: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+/* ─── Label ─── */
+.label {
+  display: inline-block;
+}
+
+/* ─── Colored variant ─── */
+.colored {
+  background: var(--chip-bg);
+  border-color: var(--chip-border);
+  color: var(--chip-text);
+}
+
+/* ─── Selected (toggle chip that is ON) ───
+ * DECISION: selection is inverted ink from the roles ("A3" canon), one look product-wide. Two
+ * screens used to paint the selected chip brand red through their own `composes: chip`, which put
+ * a dozen red pills beside a red "Dalej" and buried the main action. */
+.selected,
+.selected.colored {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-bg-main);
+  /* focus-ring-allow: the ring is drawn OUTSIDE the fill (offset 2px), on
+     whatever stands behind, and the default ring is the colour that contrasts
+     with that. A remap to the on-ink accent gave a pink ring on paper, 1.78:1. */
+}
+
+/* ─── Delete button ─── */
+/* Inside a selected chip the button's ring is drawn ON the inverted fill, so
+   it takes the selection's own foreground (contrast in light and dark). */
+.selected .deleteButton {
+  --color-focus-ring: var(--color-bg-main);
+}
+
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--style-radius-pill);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.deleteButton:active {
+  opacity: 0.6;
+}
+
+/* Restored hover for desktop */
+@media (hover: hover) {
+  .deleteButton:hover {
+    opacity: 1;
+  }
+}
+
+/* ─── ChipGroup ─── */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  /* DECISION: ROW gap 14px, column gap 8px. A clickable chip stretches an invisible 44px hit area
+   * (see `.chip[role='button']::after`); at `sm` (31.6px high) it protrudes 6.2px above and below,
+   * so the old 8px gap gave 4.4px of overlap between rows and a tap could land on the neighbour.
+   * 14px > 2 x 6.2px makes row hit areas touch without overlapping. The horizontal axis stays 8px. */
+  row-gap: var(--space-14);
+  column-gap: var(--space-8);
+  align-items: center;
+}

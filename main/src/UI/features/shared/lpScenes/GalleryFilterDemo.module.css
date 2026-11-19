@@ -1,0 +1,87 @@
+/* GalleryFilterDemo — a playable gallery on public pages.
+ * Floor: no gradients, shadows or hover on static things; the only motion is
+ * the state change itself (tiles glide, the rest fade). */
+
+.demo {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  width: 100%;
+  min-width: 0;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12) var(--space-16);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+/* The count is one unbreakable piece („3 z 12 prac”). */
+.count {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.grid {
+  /* `position: relative`: the reorder hook reads each tile's offset from
+     this box. */
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@container (min-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-12);
+  }
+}
+
+@container (min-width: 900px) {
+  .demo[data-size='section'] .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* A hero's media slot is narrow: three columns at every width. */
+.demo[data-size='hero'] .grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tile {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity var(--duration-300) ease,
+    filter var(--duration-300) ease;
+}
+
+.tile[data-dim='true'] {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+
+.photo {
+  object-fit: cover;
+}

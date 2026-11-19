@@ -1,0 +1,144 @@
+/* ─── ColorSwatch — clickable color circle + label ─── */
+
+.swatch {
+  position: relative;
+  display: flex;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+  flex-direction: column;
+  /* The dot and its name start at the cell's left edge: centred on its
+     own name, each dot stood at a different x and the grid had no columns. */
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-8) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--style-radius-surface);
+  transition: transform var(--duration-100) var(--spring-snappy);
+}
+
+/* A disabled swatch does not pretend to be tappable: the cursor follows the `disabled`
+   semantics, otherwise the dimming says "unavailable" and the pointer says "try". */
+.swatch:disabled {
+  cursor: default;
+}
+
+.swatch:disabled:active {
+  transform: none;
+}
+
+/* DECISION: a colour name is NEVER cut. It was capped at 60px with an ellipsis, so on a phone the
+   picker read "Czerw…", "Pomara…" (measured in the label font, selected weight: Pomarańczowe
+   106px, Turkusowe 80, Niebieskie 75, Czerwone 72). The grid sizes its cells so those names fit on
+   one line; a longer name (the taxonomy is the admin's to extend) wraps inside the cell in two
+   even halves, hyphenated where the browser can. The selected name changes COLOUR only: a heavier
+   weight is 4px wider, enough to wrap "Pomarańczowe" at the moment of the tap. (owner) */
+.label {
+  margin-inline-start: var(--space-6);
+  max-width: calc(100% - var(--space-6));
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: start;
+  text-wrap: balance;
+  line-height: 1.2;
+  overflow-wrap: normal;
+  hyphens: auto;
+}
+
+.selected > span:first-child {
+  border-color: transparent;
+}
+
+.selected .label {
+  color: var(--color-text-primary);
+}
+
+/* ─── Inline variant (for summary / compact lists) ─── */
+
+.inline {
+  min-width: 0;
+  min-height: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0;
+  cursor: default;
+}
+
+.inline:active {
+  transform: none;
+}
+
+.inline .label {
+  max-width: none;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-body);
+}
+
+/* ─── Grid container ─── */
+
+/* As many cells as fit the grid's OWN width (never a viewport query: the same
+   grid sits in a page card, a filter sheet and a dialog). A cell is at least
+   110px, which holds the longest seeded name (102px) on one line at any
+   column count. A consumer narrower than three such cells lowers the public
+   knob `--color-swatch-cell` on its own class (the upload card does).
+   No column gap: a cell has no surface of its own, and the swatch brings its
+   own block padding, so the row gap stays small. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--color-swatch-cell, 110px), 1fr)
+  );
+  gap: var(--space-4) 0;
+  justify-items: stretch;
+}
+
+.swatch:focus-visible {
+  outline: var(--style-border-control) solid var(--color-text-primary);
+  outline-offset: var(--space-4);
+}
+
+/* Geometry is reserved in both states; the wave stays inside the disc. */
+.mark,
+.wave {
+  position: absolute;
+  inset-inline-start: 0;
+  top: var(--space-8);
+  width: var(--swatch-disc-size);
+  height: var(--swatch-disc-size);
+  border-radius: var(--style-radius-round);
+  pointer-events: none;
+  opacity: 0;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  color: var(--polish-mark);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+}
+.selected .mark {
+  opacity: 1;
+}
+.wave {
+  background: var(--polish-mark);
+}
+.swatch[data-size='sm'] {
+  --swatch-disc-size: 12px;
+}
+.swatch[data-size='md'] {
+  --swatch-disc-size: 16px;
+}
+.swatch[data-size='quick'] {
+  --swatch-disc-size: 24px;
+}
+.swatch[data-size='lg'] {
+  --swatch-disc-size: 40px;
+}
+.inline .mark,
+.inline .wave {
+  top: 0;
+}

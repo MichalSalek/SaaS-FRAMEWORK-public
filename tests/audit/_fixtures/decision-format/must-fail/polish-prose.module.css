@@ -1,0 +1,4 @@
+/* Karta stoi na bieli, bo tekst do czytania nie może stać na tincie. */
+.card {
+  background: white;
+}

@@ -1,0 +1,299 @@
+/* MessageThreadPage: 1:1 chat. Floor-compliant: flat, full hairline borders,
+   zero gradient/shadow/one-sided. Bubbles differ by fill + alignment, not shadow. */
+
+/* The shell provides the side margins (20px), as on every screen: own 12px in the
+ * header, stream and composer would give 32px and a different left edge than the
+ * rest of the app. On a wide screen the conversation keeps a readable measure
+ * from the LEFT edge, like the conversation list. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  max-width: 720px;
+  width: 100%;
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) 0 var(--space-12);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.headerIdentity,
+.headerIdentityLink {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  color: inherit;
+}
+
+.headerIdentityLink {
+  text-decoration: none;
+  border-radius: var(--style-radius-control);
+}
+
+.headerIdentityLink:hover .headerName {
+  text-decoration: underline;
+}
+
+.headerIdentityText {
+  min-width: 0;
+}
+
+.headerName {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  /* The name is not cut with an ellipsis: up to two lines, the header grows. */
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.headerStatus {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.headerAction {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--color-text-secondary);
+}
+
+.header .headerAction:hover:not(:disabled) {
+  background-color: var(--color-surface-hover);
+}
+
+/* Hidden-conversation banner: a white card with no tint or frame. Text and action
+ * sit side by side, and when space runs out the WHOLE button drops under the text. */
+.hiddenBanner {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin: var(--space-12) 0 0;
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background-color: var(--color-surface-card);
+}
+
+.hiddenBannerText {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* The character counter hangs in the top gap of the composer (absolute), so its
+ * appearance 200 characters before the limit moves nothing. The „liczba / limit”
+ * pair is one unbreakable piece. */
+.counter {
+  position: absolute;
+  top: var(--space-2);
+  right: calc(44px + var(--space-12));
+  font-size: var(--text-xs);
+  line-height: 1;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.stream {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-20) 0;
+  overflow-y: auto;
+  scroll-padding-block: var(--space-8);
+}
+
+.row {
+  display: flex;
+}
+
+.rowMine {
+  justify-content: flex-end;
+}
+
+.rowOther {
+  justify-content: flex-start;
+}
+
+.bubble {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  /* min-width: 0 + overflow-wrap below: a long word or link breaks inside the
+     bubble instead of pushing it past 78% of the row. */
+  min-width: 0;
+  max-width: min(78%, 520px);
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--style-radius-surface);
+  color: var(--color-text-primary);
+}
+
+.bubbleMine {
+  /* The sender is encoded by inversion, not tint. My message is full ink with
+     paper-coloured text (the pair comes from the text and background roles, so it
+     inverts in dark too); the other person's stands on white. */
+  /* All message types, including linked session cards, share this inverted pair. */
+  background-color: var(--color-text-primary);
+  color: var(--color-bg-main);
+  --color-focus-ring: var(--color-bg-main);
+}
+
+.bubbleMine .bubbleTime {
+  color: color-mix(in oklch, var(--color-bg-main) 72%, transparent);
+}
+
+.bubbleOther {
+  background-color: var(--color-surface-interactive);
+}
+
+.bubbleText {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+}
+
+.bubbleTime {
+  align-self: flex-end;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Empty thread: the <EmptyState> canon on paper, centred in the stream. */
+.emptyStream {
+  --empty-surface: transparent;
+  --empty-border: none;
+  margin: auto;
+}
+
+.composer {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-20) 0 var(--space-12);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* The field grows with its content up to max-height (where the browser supports it). */
+  field-sizing: content;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-elevated);
+  border: var(--style-border-control) solid var(--color-control-border);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-10) var(--space-16);
+  resize: none;
+  max-height: 140px;
+  min-height: 44px;
+}
+
+.input:focus-visible {
+  outline: none;
+  /* Zloto jako JEDYNY wskaznik fokusu daje 1,96:1 na bieli (60% mix: 2,30:1),
+     a SC 1.4.11 wymaga 3:1. Ta regula zdejmuje globalny `outline`, wiec zlota
+     ramka jest tu calym sygnalem, wiec musi go uniesc. */
+  border-color: var(--color-focus-ring);
+}
+
+/* The round send button is a SKIN over ButtonAtom variant='primary': fill (gold) +
+   ink (#1c1c20 from .primary: correct contrast on gold in BOTH modes; white on gold
+   would be ~1.6:1 in light), 44px size (.iconOnly.md), hover/active/disabled/focus
+   from ButtonAtom (consistent with the app). Only the circle geometry is overridden.
+   The specificity of .composer .sendButton (0,2,0) beats the base .button
+   --radius-sm (0,1,0), so the circle wins whatever the CSS Modules bundle order. */
+.composer .sendButton {
+  flex-shrink: 0;
+  border-radius: var(--style-radius-pill);
+}
+
+.closedBanner {
+  flex-shrink: 0;
+  padding: var(--space-16) var(--space-20);
+  margin: var(--space-12) 0;
+  border-radius: var(--style-radius-surface);
+  background-color: var(--color-surface-card);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* History pagination: the button above the oldest loaded message. */
+.loadOlderRow {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) 0 var(--space-12);
+}
+
+/* Focus target of the stream (tabIndex=-1): no visual ring on programmatic focus. */
+.stream:focus {
+  outline: none;
+}
+
+/* Conversation skeleton: bubbles on both sides, my own pushed to the right. */
+.skeletonStream {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+}
+
+.skeletonOwn {
+  align-self: flex-end;
+}
+.sessionCard {
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-decoration: underline;
+}
+
+.sessionThumbnails {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.sessionThumbnails img {
+  width: 3rem;
+  height: 3rem;
+  object-fit: cover;
+  border-radius: var(--style-radius-control);
+}

@@ -1,0 +1,69 @@
+/* ─── Card base ─── */
+.card {
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+/* ─── Variant: Outlined ─── */
+.outlined {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+/* ─── Variant: Elevated (hairline + tonal step, NOT a shadow; anti-slop §2) ───
+ * Single-cream theme (R2): the tonal step goes through the NEUTRAL --color-surface-input, not the
+ * system cream. Cream is reserved for ONE surface of an app screen (owner), the AppHero card, so
+ * every `elevated` card beside it added a second cream band (three creams on /app/favorites).
+ * --color-surface-input gives a real step in BOTH modes (#f8f8f8 over a white card, #1e1e1e over
+ * #141414), which --color-bg-elevated would not in light (it is white). */
+.elevated {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  /* White means „tappable”, so information stays on paper. */
+  background: var(--color-surface-card);
+}
+
+/* ─── Highlighted ─── */
+/* Single-cream theme (R3 + R8): a highlighted card = a CLOSED 4-sided frame in a token that
+ * inverts with the mode.
+ * NOT cream as a line: cream used as a LINE gives ~1.05:1 on a white card, so the canonical
+ * „highlight" did not exist visually. Cream is a surface (R1/R2), never an edge.
+ * NOT --color-ink: it is dark in BOTH modes, so in dark it would draw a dark line on a dark
+ * background and the highlight would vanish again (R8).
+ * BOUNDARY with the pricing negative: a „recommended plan IN A SET" gets a full ink negative, but a
+ * lone Card.highlighted means „important", not „recommended among", so there is nothing to stand
+ * out from and it stays on the closed 4-sided frame. Its only live use is
+ * StylistDashboard.parts.organism.tsx.
+ * The ink frame is gone (too heavy): a highlighted card stands on the white tappable surface and
+ * the paper around it does the rest. */
+.highlighted,
+.highlighted.outlined {
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  background: var(--color-surface-interactive);
+}
+.highlighted {
+  position: relative;
+}
+
+/* ─── CardHeader ─── */
+.header {
+  padding: var(--space-20) var(--space-20) var(--space-8);
+  font-family: var(--style-heading-font);
+  font-weight: var(--style-heading-weight);
+}
+
+/* ─── CardContent ─── */
+.content {
+  padding: var(--space-12) var(--space-20);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+/* ─── CardActions ─── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) var(--space-20) var(--space-20);
+}

@@ -1,0 +1,48 @@
+/* ─── MaintenanceBanner ───
+ * Single full-width strip above announcements. The public header wrapper owns
+ * sticky; this strip does not pin on its own.
+ * Operational notice — amber solid fill, NON-dismissable.
+ * Anti-AI-slop: flat solid background, NO gradient / shadow / glow / one-sided border.
+ */
+
+.banner {
+  display: flex;
+  /* The message may wrap: the icon sits on its FIRST line (.icon is one line
+     tall), never centred against the whole paragraph. */
+  align-items: flex-start;
+  gap: var(--space-12);
+  width: 100%;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  /* DECISION: see main/src/UI/features/announcements/AnnouncementBanner.module.css (horizontal
+     padding in percent, not @media or a container query). Same measured values here: 390px ->
+     ~23px, 768px -> ~46px, 1440px -> 48px (clamped). */
+  padding-block: var(--space-12);
+  padding-inline: clamp(var(--space-20), 6%, var(--space-48));
+  min-height: 44px;
+  /* One-line message: 44px strip, text centred in it by the padding. */
+  /* Pas ostrzegawczy — pełne wypełnienie z roli palety, bez gradientu. */
+  background: var(--color-banner-warning);
+  color: var(--color-on-banner-warning);
+}
+
+/* ─── Icon ─── */
+
+.icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+.icon > svg {
+  display: block;
+}
+
+/* ─── Message ─── */
+
+.message {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+}

@@ -1,0 +1,87 @@
+# Jak pokazać klientce portfolio, zanim usiądzie na fotelu
+
+> Konsultacja zaczyna się przed wizytą. Zobacz, jak pokazać klientce swoje realne prace zawczasu i uniknąć rozczarowań przy fotelu. Poradnik dla stylistek.
+
+Wersja HTML tej strony: https://nailfolio.app/blog/jak-pokazac-klientce-portfolio-przed-wizyta/ | Data publikacji: 2026-07-16 | Kategoria: Porady dla stylistek
+
+## Znasz tę scenę
+
+Klientka siada na fotelu, wyciąga telefon i pokazuje zdjęcie z Pinteresta. Długie migdałki, ręcznie malowane zdobienie, chrom. Ona ma krótką płytkę, 45 minut czasu i budżet na hybrydę. Zaczyna się negocjacja, która zjada kwadrans wizyty i zostawia niedosyt po obu stronach.
+
+Problem nie leży w klientce ani w Tobie. Problem leży w momencie, w którym ta rozmowa się odbywa. Konsultacja przy fotelu to najgorszy możliwy czas na ustalanie oczekiwań, bo zegar już tyka.
+
+Dobra wiadomość: tę rozmowę można przenieść na kilka dni przed wizytą. Poniżej trzy sposoby, jak to zrobić w praktyce.
+
+## Sposób 1: portfolio pod jednym linkiem, nie w feedzie
+
+Instagram jest świetny do pokazywania, że działasz. Ale jako portfolio ma dwie wady. Po pierwsze, klientka widzi posty w kolejności publikacji, a nie według tego, czego szuka. Po drugie, między Twoimi pracami przewijają się Stories, rolki i prywatne zdjęcia.
+
+Dedykowane portfolio działa inaczej. Twoje prace są w jednym miejscu, opisane tagami: kolor, styl, długość. Klientka, która szuka krótkiego frencha, filtruje galerię i widzi tylko Twoje krótkie frenche. Nie musi scrollować przez trzy lata postów.
+
+Efekt jest prosty: klientka ogląda wyłącznie to, co naprawdę robisz, na płytkach takich jak jej. Zanim usiądzie na fotelu, jej oczekiwania są skalibrowane do Twojej realnej oferty.
+
+### Jak to ustawić
+
+1. Wybierz 15 do 30 swoich najlepszych prac. Jakość bije ilość, słabsze zdjęcia zaniżają całość.
+2. Otaguj każde zdjęcie: kolor, styl, długość. To te filtry robią robotę podczas wyboru.
+3. Przypnij na górze prace, z których jesteś najbardziej dumna. To one budują pierwsze wrażenie.
+4. Wrzuć link do portfolio w bio na Instagramie. Od teraz każda osoba, która trafia na Twój profil, ma o jeden krok mniej do Twojej pełnej oferty.
+
+W [Nailfolio](/for-stylists) taki zestaw ustawisz w kilkanaście minut, a galeria z filtrami działa na każdym telefonie.
+
+## Sposób 2: kod QR w salonie
+
+Najlepszy moment na pokazanie portfolio obecnej klientce to koniec wizyty. Paznokcie są gotowe, klientka ma wolne ręce i myśli już o następnym razie. Wydrukowany kod QR na stanowisku plus jedno zdanie od Ciebie wystarczą, żeby zajrzała do Twojej galerii.
+
+Klientka skanuje kod aparatem telefonu i profil otwiera się w przeglądarce. Jeśli chce mieć Twoją galerię zawsze pod ręką, loguje się bez hasła przez link w e-mailu lub Google i wysyła prośbę o połączenie. Po Twojej akceptacji ma dostęp do pełnej galerii. Od tej chwili Twoje prace są w jej telefonie, a przed kolejną wizytą wybiera wzór z Twojej galerii zamiast z przypadkowych inspiracji z internetu.
+
+To jest cichy mechanizm budowania stałych klientek: następna wizyta zaczyna się od Twojego portfolio, nie od Pinteresta.
+
+## Sposób 3: sesje inspiracji przed wizytą
+
+Najmocniejszy wariant to sytuacja, w której klientka sama przygotowuje konsultację. W Nailfolio połączona klientka może zebrać wybrane wzory z Twojej galerii w sesję inspiracji i wysłać Ci ją przed wizytą.
+
+Ty otwierasz Schowek sesji i widzisz gotowy plan: konkretne prace, które jej się podobają, zanim usiądzie na fotelu. Wiesz, po co przychodzi. Możesz przygotować kolory, oszacować czas, a w razie potrzeby napisać krótko: "to zdobienie na Twojej długości zrobimy w tej wersji".
+
+Konsultacja przy fotelu skraca się do potwierdzenia ustaleń. Zero nieporozumień typu "miało być inaczej", bo obie patrzycie na te same zdjęcia z Twojej galerii.
+
+## Co zyskujesz, przenosząc konsultację przed wizytę
+
+- **Czas.** Kwadrans negocjacji przy fotelu wraca do Ciebie na pracę.
+- **Mniej rozczarowań.** Klientka wybiera z tego, co naprawdę robisz, więc dostaje dokładnie to, co widziała.
+- **Profesjonalny wizerunek.** Stylistka z uporządkowanym portfolio i historią ustaleń wygląda jak firma, nie jak hobby.
+- **Wyższą wartość wizyty.** Klientka, która obejrzała 30 Twoich prac, częściej decyduje się na zdobienie, które widziała, zamiast na minimum.
+
+## Od czego zacząć
+
+Zacznij od jednego kroku: zbierz swoje najlepsze prace w portfolio z filtrami i wrzuć link w bio. Resztę, kod QR i sesje inspiracji, dołożysz w kolejnym tygodniu.
+
+## Najczęstsze pytania
+
+### Jak wysłać klientce portfolio przed wizytą?
+
+Wyślij link do portfolio kanałem, w którym ustalacie wizytę, i poproś o wybór dwóch lub trzech Twoich realizacji. Dopisz, że chcesz wiedzieć, co podoba jej się w tych zdjęciach: kolor, długość czy zdobienie. Zamiast samego linku możesz napisać: „Przed wizytą obejrzyj proszę moje prace i wybierz dwa wzory, które najbardziej Ci odpowiadają. Ustalimy, jak dopasować je do Twojej długości”.
+
+### Kiedy poprosić klientkę o wybór wzoru paznokci?
+
+Poproś o wybór kilka dni przed wizytą, żebyście miały czas omówić długość, zdobienie i zakres usługi. Przy bardziej pracochłonnym pomyśle potwierdź, czy wystarczy zarezerwowanego czasu. W Nailfolio wysłana sesja inspiracji pozostaje w schowku stylistki przez 14 dni, dlatego warto poprosić o jej wysłanie w ciągu dwóch tygodni przed wizytą, a nie miesiąc wcześniej.
+
+### Co zrobić, gdy klientka wybiera kilka różnych wzorów?
+
+Zapytaj, który element każdego zdjęcia chce zachować. Możecie wybrać kolor z jednej realizacji i zdobienie z drugiej, ale najpierw ustalcie, jak całość będzie wyglądała na jej długości. Potwierdź jeden wspólny kierunek zamiast traktować wszystkie fotografie jako osobne zamówienia. Jeśli używacie sesji inspiracji w Nailfolio, klientka może opisać swój pomysł w jednej notatce do całej sesji.
+
+### Czy sesja inspiracji w Nailfolio rezerwuje wizytę?
+
+Nie. Sesja inspiracji służy do przesłania stylistce wybranych zdjęć z jej galerii i jednej opcjonalnej notatki do całej sesji. Termin ustalacie osobno, na przykład w używanej już aplikacji do zapisów. Nailfolio nie ma rezerwacji, kalendarza ani przypomnień SMS. Na profilu publicznym stylistka może umieścić link do swojego narzędzia rezerwacyjnego.
+
+Chcesz sprawdzić, jak to działa u Ciebie? [Załóż darmowe konto](/for-stylists): plan Free Demo ze startową galerią masz od razu, bez karty. Gdy galeria urośnie, [plan Pro](/pricing) sprawdzisz przez 30 dni za darmo, z kartą przy aktywacji.
+
+## Pokaż klientkom swoje prace
+
+Zbierz zdjęcia w galerii. Klientki mogą wybrać z niej stylizacje i wysłać Ci inspiracje przed wizytą.
+
+Free Demo
+
+[Wypróbuj Nailfolio](https://nailfolio.app/user/login/?intent=register&role=stylist)
+
+[Zobacz cennik](https://nailfolio.app/pricing/)

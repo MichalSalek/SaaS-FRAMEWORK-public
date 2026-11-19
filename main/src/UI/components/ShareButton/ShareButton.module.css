@@ -1,0 +1,62 @@
+/* ─── ShareButton ─── */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
+  border: var(--style-border-control) solid var(--color-primary);
+  /* A labelled button takes the control radius like every other button;
+     the pill stays with chips. */
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  /* Gold as TEXT takes --color-accent-fg (AA); --color-primary is 2.2:1 on
+     paper. The frame stays on primary: a line is not read content. */
+  color: var(--color-accent-fg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--duration-200) var(--spring-curve);
+}
+
+.trigger:active {
+  transform: scale(0.96);
+  /* Press feedback is a TRANSIENT state, so it takes its own step of the
+     surface ladder (input, hover, pressed), not gold. Gold on this button is
+     already carried by the frame and the label. */
+  background: var(--color-surface-pressed);
+}
+
+/* ─── Full-width variant ─── */
+.fullWidth {
+  width: 100%;
+  justify-content: center;
+  padding: var(--space-12) var(--space-20);
+  font-size: var(--text-base);
+}
+
+/* ─── Copied feedback ─── */
+.copied {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+/* Quiet link-style variant: for actions that must stay reachable but must not
+   compete with the photo's main action. 44px touch target, no frame. */
+.quiet {
+  min-height: var(--space-44);
+  padding: 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.quiet:active {
+  background: transparent;
+  transform: none;
+}

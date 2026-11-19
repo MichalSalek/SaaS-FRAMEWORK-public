@@ -1,0 +1,9 @@
+// A hook that toasts its own success while the response event toasts too.
+export function useSaveThing() {
+  return useMutation({
+    mutationFn: (req: unknown) => saveThing_IO(req),
+    onSuccess: () => {
+      pushNewSnackbar(t('saved'), 'success');
+    },
+  });
+}

@@ -1,0 +1,109 @@
+/* UI/features/admin/AdminUsersPage.module.css
+ * Page shell, the bulk actions bar, plan badges and the detail grid of the
+ * user dialog. The list, its filters and its pager are shared primitives
+ * (DataTable, FilterBar, Pagination).
+ */
+
+/* ─── Page shell ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+}
+
+/* Nothing selected: every action is `disabled` on its own and shows it, so the
+   bar does not dim as a whole. The whole-bar opacity also dimmed the one line
+   that says what to do („Zaznacz użytkowników”) to 3.89:1 (qa:contrast). */
+.bulkBarDisabled {
+  pointer-events: none;
+}
+
+.bulkSpacer {
+  flex: 1 1 auto;
+}
+
+.bulkConfirmIcon {
+  color: var(--color-warning);
+  flex-shrink: 0;
+}
+
+.bulkConfirmText {
+  flex: 1 1 auto;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+/* ─── Plan badges ─── */
+/* DECISION: a plan is DATA and may be encoded, but not as five background washes side by side in
+   one table column: colour handed to every row stops meaning anything and eats the contrast
+   headroom reserved for the CTA (it also pulled a violet foreign to the palette in). One neutral
+   badge (--color-surface-input + full hairline ring) carries all plans; the LABEL is the data
+   carrier and typography is the only visual difference (paid plans have weight, Free keeps text
+   weight). The status tints below stay: they encode state, not surface. (owner) */
+
+.planBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--space-10);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--ls-wide-20);
+  white-space: nowrap;
+  background: var(--color-surface-input);
+  color: var(--color-text-primary);
+  /* Inset hairline ring (not a border): leaves the pill metrics alone and closes the badge surface
+       on four sides; no shadow, no glow. */
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+/* Free = the only plan without a fee: text weight instead of heading weight. The colour stays
+   full (we do not grey out data). */
+.planFree {
+  font-weight: var(--font-weight-body);
+}
+
+.planPro,
+.planProPlus,
+.planStudio,
+.planScale {
+  font-weight: 700;
+}
+
+/* ─── Bulk actions bar ───
+   Stands inside the table's own box, above the header row (DataTable
+   `selection.bar`), so it brings no box of its own. */
+
+.bulkBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-12);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  transition: opacity var(--transition-fast);
+}
+
+.bulkCount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ─── Analysis columns of the users table ─── */
+
+.count {
+  /* tnum-allow: right-aligned columns of plain integers compared row to row */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The export stopped at the row cap: one quiet line above the list. */
+.exportNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,22 @@
+/* UI/features/notifications/NotificationsPage.module.css
+ * The notification centre: the hero and one group of rows on paper. The rows
+ * are the shared NavRow (one look); the page adds only its block rhythm. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* The device switch in its own white box above the rows; empty when the
+   control renders nothing, so it takes no space then. */
+.optIn:empty {
+  display: none;
+}
+
+.optIn {
+  padding: var(--space-16);
+  margin-bottom: var(--space-16);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+}

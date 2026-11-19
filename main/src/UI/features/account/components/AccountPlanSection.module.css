@@ -1,0 +1,35 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-20);
+  min-width: 0;
+  width: 100%;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.stack p {
+  margin: 0;
+}
+.heading {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.summaryHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+.portalButton {
+  margin-inline-start: auto;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+}

@@ -1,0 +1,463 @@
+/**
+ * Structural tokens -- shared across ALL themes.
+ * These do NOT change when switching themes.
+ * Theme-specific tokens (colors, fonts) are set via palettes.css on <html>.
+ */
+
+@layer tokens {
+  :root {
+    /* ===== Spacing Scale: SSOT for spacing =====
+     * DECISION: names are PX-BASED (`--space-24` = 24px), not ordinal. An
+     * ordinal scale cannot be extended: the most frequent spacing (6px) sat
+     * between two steps and adding it meant renumbering, i.e. changing the
+     * meaning of, every existing use. Granularity thins as spacing grows
+     * (2..16 by 2, 20..48 by 4, 56..96 by 8, 112/128 by 16). Deliberately absent:
+     * 3, 5, 7, 9, 11, 18, 22px; those are optical corrections, written raw with
+     * an `optical:` comment, which `css/spacing-tokens` requires. */
+    --space-2: 2px;
+    --space-4: 4px;
+    --space-6: 6px;
+    --space-8: 8px;
+    --space-10: 10px;
+    --space-12: 12px;
+    --space-14: 14px;
+    --space-16: 16px;
+    --space-20: 20px;
+    --space-24: 24px;
+    --space-28: 28px;
+    --space-32: 32px;
+    --space-36: 36px;
+    --space-40: 40px;
+    --space-44: 44px;
+    --space-48: 48px;
+    --space-56: 56px;
+    --space-64: 64px;
+    --space-72: 72px;
+    --space-80: 80px;
+    --space-88: 88px;
+    --space-96: 96px;
+    --space-112: 112px;
+    --space-128: 128px;
+
+    /* The old ordinal scale `--sp-0..9` is gone. Two parallel name sets for one thing are two
+     * sources of truth, and one of them always drifts. Guard `css/spacing-tokens` rejects any
+     * return of `--sp-*`. */
+
+    /* ===== Shape language: SSOT for shape =====
+     * DECISION: primitives and page modules never write a radius, line width or
+     * label typography directly; they read these tokens (guard
+     * `css/shape-tokens`). Colour is not part of this layer (palettes.css).
+     * Direction: soft radii (fields and buttons on the control radius, surfaces
+     * on the surface radius, chips as pills, avatars round); information lies
+     * on paper without card or frame, white goes to what is tapped, and a
+     * tappable row or card carries the arrow disc (`AffordanceDiscAtom`). One
+     * filled CTA per screen. (owner) */
+    --style-radius-control: 12px;
+    --style-radius-surface: 14px;
+    --style-radius-pill: 999px;
+    --style-radius-avatar: 50%;
+    --style-radius-medallion: 50%;
+    /* A geometric circle, not a „pill”: toggle thumb and track, colour dot, unread dot. 50% on a
+     * square = circle, on 44×24 = stadium. The only exception to the square in this direction. */
+    --style-radius-round: 50%;
+    /* DECISION: one line weight, 1px. Fields, chips and outlined buttons have no
+     * frame (`--color-control-border` is transparent; white and radius carry
+     * them); the width stays for controls whose edge is a function (empty
+     * checkbox, switch track, destructive button). Surfaces touching edge to
+     * edge never draw two frames side by side: a list of cards is one frame
+     * plus dividers, else 1px + 1px reads as 2px. (owner) */
+    --style-border-control: 1px;
+    --style-border-surface: 1px;
+    /* The divider line (row border-top/bottom, grid gap) stays hairline: the direction splits
+     * list rows with a 1px gap, not a frame. */
+    --style-border-divider: 1px;
+    /* Paper ring around overlapping marks (avatar stack, medallion on a photo): a geometric gap
+     * in the background colour, not a frame. */
+    --style-border-ring: 3px;
+    --style-border-style-empty: solid;
+    --style-control-weight: 600;
+    --style-control-case: none;
+    --style-control-tracking: var(--ls-tight-10);
+    /* DECISION: the face narrows its space as weight grows (0.267em at 400,
+     * 0.21em at 500 and 600), so a semibold 14px label reads glued at 1x.
+     * 0.06em restores normal word spacing for label and control roles; use
+     * `word-spacing: var(--style-*-word-spacing)` right under
+     * `letter-spacing: var(--style-*-tracking)`. Headings (20px+) do not need it. */
+    --style-control-word-spacing: 0.06em;
+    --style-control-font: var(--font-body);
+    /* Labels (StatusPill, table headers, micro labels): no small caps, no letter spacing. */
+    --style-label-case: none;
+    --style-label-weight: 600;
+    --style-label-tracking: var(--ls-tight-10);
+    --style-label-word-spacing: 0.06em;
+    --style-label-font: var(--font-body);
+    --style-label-size: var(--text-xs);
+    /* Kicker / Eyebrow: a sentence in the same sans as the content. A separate group so changing
+     * the kicker does not retune every label. */
+    --style-kicker-font: var(--font-body);
+    --style-kicker-size: var(--text-sm);
+    --style-kicker-weight: 500;
+    --style-kicker-case: none;
+    --style-kicker-tracking: 0;
+    --style-eyebrow-rule: 0;
+    --style-heading-font: var(--font-heading);
+    --style-heading-weight: var(--font-weight-heading);
+    --style-heading-tracking: var(--letter-spacing-heading);
+    --style-heading-case: none;
+    --style-control-pad-x: var(--space-16);
+    --style-control-min-h: 44px;
+    --style-input-pad: var(--space-12);
+    /* One inset and one gap for every segmented track. A control-shaped
+       child radius is the track radius minus this inset minus the track
+       border, so the corners stay concentric. The track never wraps. */
+    --style-segmented-inset: var(--space-6);
+    --style-segmented-gap: var(--space-2);
+
+    /* --- Shadows: neutralised to `none` (anti-slop floor) ---
+     * DECISION: the whole scale is `none`; depth comes from tonal surface steps
+     * and hairline borders. The tokens stay as a safety net, so any
+     * `box-shadow: var(--shadow-*)` renders no shadow instead of slop. */
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+
+    /* --- Transitions --- */
+    /* Motion has TWO layers on purpose, not two name sets for one thing.
+     *
+     * Below, `--duration-N` = plain numbers, the name carries the value in ms (same rule as
+     * `--space-24` and `--ls-wide-40`). Here `--transition-*` = roles: time COMPOSED with a
+     * curve, for the shorthand `transition: color var(--transition-fast)`. The numbers have one
+     * source and the roles refer to it, so they cannot drift apart.
+     *
+     * TRAP: `--transition-*` ALREADY carries a curve, so
+     * `transition: transform var(--transition-normal) var(--ease-entrance)` has TWO timing
+     * functions in one declaration; CSS drops it entirely and the transition does not run.
+     * Need your own curve? Use the bare `--duration-N`. */
+    --outcome-change-duration: var(--duration-200);
+    --outcome-scene-duration: var(--duration-350);
+    --outcome-first-duration: 700ms;
+    --outcome-emblem-size: var(--space-48);
+    --transition-fast: var(--duration-120) ease;
+    --transition-normal: var(--duration-200) ease;
+    --transition-slow: var(--duration-350) ease;
+
+    /* --- Animation Curves --- */
+    --spring-curve: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ios-sheet-curve: cubic-bezier(0.32, 0.72, 0, 1);
+    --ease-entrance: cubic-bezier(0, 0, 0.2, 1); /* ease-out — entrances */
+    --page-transition-duration: 250ms;
+    --enter-duration: 200ms;
+    --stagger-delay: 50ms;
+
+    /* --- Spring Physics (CSS linear() easing) --- */
+    --spring-bounce: linear(
+      0,
+      0.009,
+      0.035 2.1%,
+      0.141,
+      0.281 6.7%,
+      0.723 12.9%,
+      0.938 16.7%,
+      1.017,
+      1.077,
+      1.121,
+      1.149 24.3%,
+      1.159,
+      1.163,
+      1.161,
+      1.154 29.9%,
+      1.129 32.8%,
+      1.051 39.6%,
+      1.017 43.1%,
+      0.991,
+      0.977 51%,
+      0.974 53.8%,
+      0.975 57.1%,
+      0.997 69.8%,
+      1.003 76.9%,
+      1
+    );
+    --spring-snappy: linear(
+      0,
+      0.063 1.2%,
+      0.236 3.5%,
+      0.823 11.4%,
+      1.003 15.3%,
+      1.073 18.5%,
+      1.096 20.4%,
+      1.104 22.5%,
+      1.096 25%,
+      1.048 31.5%,
+      1.018 37.2%,
+      0.994 44.8%,
+      0.986 53.4%,
+      1
+    );
+    /* Motion durations: the name carries the value in ms. */
+    --duration-100: 100ms;
+    --duration-120: 120ms;
+    --duration-200: 200ms;
+    --duration-300: 300ms;
+    --duration-350: 350ms;
+    /* The entrance-cascade offset stays a ROLE name: it is not a duration but the gap between the
+     * starts of neighbours, i.e. a design decision. */
+    --stagger-offset: 60ms;
+
+    /* --- Z-Index Scale --- */
+    --z-fab: 50;
+    --z-app-bar: 100;
+    --z-bottom-nav: 100;
+    --z-navigation-drawer-backdrop: 150;
+    --z-navigation-drawer: 151;
+    --z-bottom-sheet-backdrop: 200;
+    --z-bottom-sheet: 201;
+    --z-theme-switcher: 200;
+    /* Toast/snackbar rendered by the app (the stylist profile's feedbackBanner). Sonner has its
+     * own stack outside this scale. Skip links use --z-skip-link below, never this layer: they
+     * would sit under the drawer, dialog and tooltip they must cover. */
+    --z-toast: 300;
+    --z-drawer-backdrop: 900;
+    --z-drawer: 901;
+    --z-dialog-backdrop: 1000;
+    --z-dialog: 1001;
+    --z-select: 1100;
+    --z-menu: 1100;
+    --z-tooltip: 1200;
+    /* Layers that used to be raw numbers in modules, named here so the scale tells the truth.
+     *
+     * Two known collisions, visible here and unresolved because neither has a reported bug:
+     *   --z-sticky-bar        == --z-app-bar == --z-bottom-nav (all 100)
+     *   --z-fullscreen-overlay == the same 100
+     * At equal z-index tree order wins, not intent. If the CTA bar or the impersonation banner
+     * ever hides under the app bar, this is the cause: separate these layers deliberately. */
+    --z-sticky-bar: 100;
+    --z-fullscreen-overlay: 100;
+    --z-fullscreen-overlay-above: 101;
+    /* The gallery FAB sits above the generic --z-fab (50). The reason is undocumented; if it
+     * goes away, drop to --z-fab. */
+    --z-gallery-fab: 90;
+    /* The skip link (WCAG 2.4.1) must cover EVERYTHING, tooltip included. */
+    --z-skip-link: 9999;
+
+    /* --- Tooltip (inverted surface) --- */
+    --color-tooltip-bg: #1f2937;
+    --color-tooltip-text: #f9fafb;
+
+    /* --- Layout --- */
+    --app-bar-height: 57px;
+    --bottom-nav-height: 56px;
+    --gallery-filter-fab-size: var(--space-48);
+    --gallery-filter-fab-gap: var(--space-20);
+    --max-content-width: 1727px;
+    /* LP/static pages: editorial container, deliberately narrower than the app
+     * --max-content-width. Unifies the left/right edge of EVERY public section (Style Policy §4);
+     * a mix of local widths (1200 / 1180 / 760) gave a visibly chaotic axis. */
+    --lp-content-width: 1200px;
+    /* Vertical rhythm of public pages: one unit.
+     * DECISION: this one unit is the band padding, the section header to content
+     * gap and the gap around illustrations, so everything on a band lines up.
+     * Pages read it through their own `--section-block`, never per-section
+     * values; the hero and CTA bands keep their own voted proportions.
+     * (owner) */
+    --lp-rhythm: clamp(32px, 4vw, 48px);
+
+    /* --- Account web shell (AccountWebLayout, desktop >=1280) ---
+     * Desktop chrome for the account routes (login/onboarding excluded):
+     * dark left nav-rail + centered content column. Analogous to AdminLayout
+     * (rail 240 + content max), but a narrower content since account = forms/cards, not the
+     * dense admin tables (1400). */
+    --account-rail-width: 248px;
+    --account-content-max: 940px;
+
+    /* --- Role tints ---
+     * DECISION: exactly three roles where a tint carries MEANING get a token
+     * here instead of scattered color-mix in modules: the mark (glyph or
+     * initial in a disc, medallion, avatar fallback, counter; plus a strong
+     * variant), the persistent selected state, and the transient hover. All
+     * are translucent neutral ink steps, so they read on paper and on white;
+     * no pale pink tints, red stays for the CTA, the affordance arrow and the
+     * mark glyph. Hover is deliberately neutral: an accent on every row means
+     * nothing. Changing a percentage HERE retunes the whole product. */
+    --color-mark-bg: color-mix(
+      in oklch,
+      var(--color-text-primary) 7%,
+      transparent
+    );
+    --color-mark-bg-strong: color-mix(
+      in oklch,
+      var(--color-text-primary) 12%,
+      transparent
+    );
+    --color-state-selected: color-mix(
+      in oklch,
+      var(--color-text-primary) 9%,
+      transparent
+    );
+    --color-state-hover: color-mix(
+      in oklch,
+      var(--color-text-primary) 6%,
+      transparent
+    );
+    /* Quiet control fill.
+     * DECISION: a translucent ink step, so a quiet non-button control (label
+     * chip, filter and upload choices) stays visible both on paper and inside a
+     * white section box without knowing where it stands. The quiet BUTTON and a
+     * tappable chip do not use it: they are white with a 1px ink outline
+     * (DESIGN.md §Style Policy 20 and 39). White stays for tappable rows and
+     * cards on paper (`--color-surface-interactive`). */
+    --color-control-fill: color-mix(
+      in oklch,
+      var(--color-text-primary) 7%,
+      transparent
+    );
+    /* MARK ON A NEGATIVE: --color-mark-bg is SEMI-TRANSPARENT, so over ink it gives a dark brown
+     * instead of a gold mark, and a glyph in --color-accent-fg (dark gold for light backgrounds)
+     * drops to ~2:1 on it. The „recommended" card is a full negative on three surfaces (pricing,
+     * for-studios, onboarding + pay), so the mark on ink gets its own role token instead of three
+     * local color-mixes. Mode-invariant because ink is mode-invariant. */
+    --color-mark-bg-on-ink: color-mix(
+      in oklch,
+      var(--color-primary) 24%,
+      var(--color-ink)
+    );
+
+    /* --- Desktop phone frame (structural, not themed) ---
+     * Used by AppLayout (>=1280px) to render the iPhone-style frame
+     * + sidebar slot around the app shell. The frame bg stays deep
+     * neutral both modes (it represents the "outside the phone" area —
+     * a stage, not a UI surface). Sidebar bg is theme-aware via
+     * `--color-frame-sidebar-bg`, blended toward the frame bg so it
+     * reads as integrated with the stage rather than a floating panel. */
+    --color-frame-bg: #1a1a1a;
+    --color-frame-bezel: #333333;
+    /* Light-mode default: warm beige with more saturation than iter 1.
+     * Dark mode overrides via `:root[data-mode='dark']` below — separate
+     * value to keep visual parity with the deep stage. */
+    --color-frame-sidebar-bg: oklch(0.94 0.012 70);
+    --color-frame-sidebar-border: color-mix(
+      in oklch,
+      var(--color-primary) 18%,
+      var(--color-border)
+    );
+    /* DECISION: a zero-blur inner hairline (an outline, not a shadow); any blur
+     * here breaks the anti-slop floor. */
+    --color-frame-sidebar-inset-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--color-primary) 14%, transparent);
+
+    /* --- Typography Scale (rem-based, root 16px) ---
+     * DECISION: a 14px floor on the WHOLE scale, no token below it: xs=14px,
+     * sm=15px. Do not "fix" them to 16px; below 16px is legal only as a
+     * `--text-*` token, never a raw value. Guard: css/min-font-size.
+     * (owner) */
+    --text-xs: 0.875rem;
+    --text-sm: 0.9375rem;
+    --text-base: 1rem;
+    --text-md: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 2rem;
+    --text-4xl: 2.5rem;
+
+    /* --- Typography Scale: FLUID (clamp) ---
+     * DECISION: the fixed scale above is for UI chrome; this fluid one governs
+     * content that grows with the screen (static page headings, ledes,
+     * numerals). It replaced a drift of near-identical clamp() variants. Values
+     * are cluster DOMINANTS, not averages, so migrating moves the fewest
+     * pixels; an element more than 12% off the nearest step keeps its own
+     * size, because there the size is a decision. Guard: css/fluid-type. */
+    --text-fluid-xs: clamp(14px, 1.05vw, 16px);
+    --text-fluid-sm: clamp(15px, 1.15vw, 17px);
+    --text-fluid-md: clamp(16px, 1.4vw, 20px);
+    --text-fluid-lg: clamp(20px, 2vw, 26px);
+    --text-fluid-xl: clamp(24px, 3vw, 36px);
+    --text-fluid-2xl: clamp(30px, 4.4vw, 48px);
+    --text-fluid-3xl: clamp(40px, 6vw, 72px);
+    --text-fluid-display: clamp(48px, 7vw, 96px);
+
+    /* Role aliases: levels that exist in this repo outside the scale.
+     * DECISION: two recurring clamp() clusters with identical ends and only a
+     * different vw factor get a name instead of a number: 22→30 (subhead,
+     * block title, card lede) and 18→22 (panel or card title). The ends are
+     * the cluster's, so extreme widths do not move; only the middle unifies. */
+    --text-fluid-subhead: clamp(22px, 2.5vw, 30px);
+    --text-fluid-panel-title: clamp(18px, 1.8vw, 22px);
+
+    /* --- Text measure that does not follow the face on screen ---
+     * DECISION: a measure such as `max-width: 56ch` is written
+     * `calc(56 * var(--ch-body))`. `ch` is the „0” of the face DRAWN NOW, so
+     * while Schibsted loads the box is measured in the narrower fallback, text
+     * takes an extra line and the hero jumps on swap (CLS). These values are
+     * Schibsted's own „0” advances (1263/2048 at 500, 1278/2048 at 600): pick
+     * by the element's weight (`--font-weight-body` / `--font-weight-heading`)
+     * and update both if a weight or the face changes. An unregistered custom
+     * property keeps `em` relative to the element's own size, like `ch`.
+     * Guard: css/ch-measure. */
+    --ch-body: 0.6167em;
+    --ch-heading: 0.624em;
+
+    /* --- Monospace (config keys, metrics, IDs) ---
+     * Defined centrally; per-file fallbacks in `var(--font-mono, fallback)` are unnecessary. */
+    --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+    /* --- Body line height ---
+     * Instrument Sans reads at 1.65; `global.css body` and modules read this role instead of a
+     * literal 1.6. Headings have their own tighter line heights and do not use this role. */
+    --leading-body: 1.65;
+
+    /* ===== Letter-spacing: SSOT for tracking =====
+     * DECISION: the name carries the VALUE in hundredths of an em
+     * (`--ls-tight-12` = -0.012em), like the spacing scale; semantic names turn
+     * arbitrary at fourteen steps. Large text is tightened (`tight`), small text
+     * opened (`wide`). The two tightest steps exist for display type up to
+     * 120px, where -0.02em is too loose. */
+    --ls-tight-40: -0.04em;
+    --ls-tight-25: -0.025em;
+    --ls-tight-20: -0.02em;
+    --ls-tight-15: -0.015em;
+    --ls-tight-12: -0.012em;
+    --ls-tight-10: -0.01em;
+    --ls-tight-5: -0.005em;
+    --ls-wide-5: 0.005em;
+    --ls-wide-10: 0.01em;
+    --ls-wide-20: 0.02em;
+    --ls-wide-40: 0.04em;
+    --ls-wide-60: 0.06em;
+    --ls-wide-80: 0.08em;
+    --ls-wide-100: 0.1em;
+    --ls-wide-120: 0.12em;
+    --ls-wide-140: 0.14em;
+
+    /* ROLE names: aliases of the above. They stay because they carry intent where tracking IS a
+     * design decision, not a number: eyebrow = tracked editorial label (chip + dot), shared by
+     * APP + LP + admin. Reference implementation: NotFoundPage / ServerErrorPage `.eyebrowChip`. */
+    --ls-eyebrow: var(--ls-wide-140);
+    --ls-micro-label: var(--ls-wide-60);
+  }
+
+  /* --- Dark mode overrides ---
+   * When color-scheme is dark, shadows need higher opacity to be visible
+   * against dark backgrounds. Tooltip inverts for contrast. */
+  :root[data-mode='dark'] {
+    --color-tooltip-bg: #e5e7eb;
+    --color-tooltip-text: #111827;
+    /* Shadows neutralized to `none` (see light block DECISION). */
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    /* Dark sidebar — deep charcoal blended toward the frame stage, so
+     * the panel reads as a recessed surface rather than a floating tile. */
+    --color-frame-sidebar-bg: color-mix(
+      in oklch,
+      var(--color-bg-elevated) 86%,
+      var(--color-frame-bg)
+    );
+    /* zero-blur inner hairline (de-slop floor; see the light block) */
+    --color-frame-sidebar-inset-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--color-primary) 16%, transparent);
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "/img/lp/app/de/appGalleryFeed.webp": {
+    "avif": [
+      {
+        "width": 240,
+        "src": "/img/lp/app/de/appGalleryFeed-240w.avif"
+      },
+      {
+        "width": 360,
+        "src": "/img/lp/app/de/appGalleryFeed-360w.avif"
+      },
+      {
+        "width": 420,
+        "src": "/img/lp/app/de/appGalleryFeed-420w.avif"
+      },
+      {
+        "width": 480,
+        "src": "/img/lp/app/de/appGalleryFeed-480w.avif"
+      },
+      {
+        "width": 600,
+        "src": "/img/lp/app/de/appGalleryFeed-600w.avif"
+      },
+      {
+        "width": 720,
+        "src": "/img/lp/app/de/appGalleryFeed-720w.avif"
+      }
+    ],
+    "webp": [
+      {
+        "width": 240,
+        "src": "/img/lp/app/de/appGalleryFeed-240w.webp"
+      },
+      {
+        "width": 360,
+        "src": "/img/lp/app/de/appGalleryFeed-360w.webp"
+      },
+      {
+        "width": 420,
+        "src": "/img/lp/app/de/appGalleryFeed-420w.webp"
+      },
+      {
+        "width": 480,
+        "src": "/img/lp/app/de/appGalleryFeed-480w.webp"
+      },
+      {
+        "width": 600,
+        "src": "/img/lp/app/de/appGalleryFeed-600w.webp"
+      },
+      {
+        "width": 720,
+        "src": "/img/lp/app/de/appGalleryFeed-720w.webp"
+      }
+    ]
+  },
+  "/img/lp/app/en/appGalleryFeed.webp": {
+    "avif": [
+      {
+        "width": 240,
+        "src": "/img/lp/app/en/appGalleryFeed-240w.avif"
+      },
+      {
+        "width": 360,
+        "src": "/img/lp/app/en/appGalleryFeed-360w.avif"
+      },
+      {
+        "width": 420,
+        "src": "/img/lp/app/en/appGalleryFeed-420w.avif"
+      },
+      {
+        "width": 480,
+        "src": "/img/lp/app/en/appGalleryFeed-480w.avif"
+      },
+      {
+        "width": 600,
+        "src": "/img/lp/app/en/appGalleryFeed-600w.avif"
+      },
+      {
+        "width": 720,
+        "src": "/img/lp/app/en/appGalleryFeed-720w.avif"
+      }
+    ],
+    "webp": [
+      {
+        "width": 240,
+        "src": "/img/lp/app/en/appGalleryFeed-240w.webp"
+      },
+      {
+        "width": 360,
+        "src": "/img/lp/app/en/appGalleryFeed-360w.webp"
+      },
+      {
+        "width": 420,
+        "src": "/img/lp/app/en/appGalleryFeed-420w.webp"
+      },
+      {
+        "width": 480,
+        "src": "/img/lp/app/en/appGalleryFeed-480w.webp"
+      },
+      {
+        "width": 600,
+        "src": "/img/lp/app/en/appGalleryFeed-600w.webp"
+      },
+      {
+        "width": 720,
+        "src": "/img/lp/app/en/appGalleryFeed-720w.webp"
+      }
+    ]
+  },
+  "/img/lp/app/pl/appGalleryFeed.webp": {
+    "avif": [
+      {
+        "width": 240,
+        "src": "/img/lp/app/pl/appGalleryFeed-240w.avif"
+      },
+      {
+        "width": 360,
+        "src": "/img/lp/app/pl/appGalleryFeed-360w.avif"
+      },
+      {
+        "width": 420,
+        "src": "/img/lp/app/pl/appGalleryFeed-420w.avif"
+      },
+      {
+        "width": 480,
+        "src": "/img/lp/app/pl/appGalleryFeed-480w.avif"
+      },
+      {
+        "width": 600,
+        "src": "/img/lp/app/pl/appGalleryFeed-600w.avif"
+      },
+      {
+        "width": 720,
+        "src": "/img/lp/app/pl/appGalleryFeed-720w.avif"
+      }
+    ],
+    "webp": [
+      {
+        "width": 240,
+        "src": "/img/lp/app/pl/appGalleryFeed-240w.webp"
+      },
+      {
+        "width": 360,
+        "src": "/img/lp/app/pl/appGalleryFeed-360w.webp"
+      },
+      {
+        "width": 420,
+        "src": "/img/lp/app/pl/appGalleryFeed-420w.webp"
+      },
+      {
+        "width": 480,
+        "src": "/img/lp/app/pl/appGalleryFeed-480w.webp"
+      },
+      {
+        "width": 600,
+        "src": "/img/lp/app/pl/appGalleryFeed-600w.webp"
+      },
+      {
+        "width": 720,
+        "src": "/img/lp/app/pl/appGalleryFeed-720w.webp"
+      }
+    ]
+  }
+}

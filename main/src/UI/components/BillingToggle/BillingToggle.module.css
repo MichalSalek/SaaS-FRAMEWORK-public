@@ -1,0 +1,160 @@
+/* ─── BillingToggle — segmented Monthly/Yearly switch ───
+ *
+ * Flat floor: the active option is a full pill (.thumb), a solid surface plus hairline that
+ * slides spring-snappy under the active option. No gradient, no shadow.
+ *
+ * Two variants:
+ *  .togglePricing — pricing canon (LP): options 11px/24px +600, hover rule,
+ *                   transition color 180ms ease-out.
+ *  .toggleAccount — pay page canon (in-app): options 8px/18px +500 (active +600),
+ *                   transition color 200ms ease-entrance, tap-highlight off;
+ *                   wrapped in .wrap (column + hint + stagger).
+ * The variants differ in TYPOGRAPHY and motion, not in surface: both use the same track and the
+ * same pill (owner), so one purchase path does not carry two looks of one switch.
+ */
+
+/* ─── Track (shared base: a grid of 2 equal columns, so the thumb sits pixel-for-pixel under an option) ─── */
+.toggle {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-pill);
+  padding: var(--style-segmented-inset);
+  isolation: isolate;
+  /* DECISION: the switch TRACK stays on `--color-surface-input`, NOT the `--color-track` role. The
+     two "track" roles differ: a progress track must stand out from its surface because its length
+     carries information (hence the darker `--color-track`), whereas the switch track sits UNDER a
+     raised pill and the pill must stand out from it (in dark mode raising goes UP in lightness).
+     On `--color-track` the pill frame fell to 2.66:1 in light and the pill turned darker than the
+     track in dark, reading as a recess. The signal is the hairline whose numbers are below. */
+  background: var(--color-surface-input);
+}
+
+/* ─── Spring thumb: a solid pill + hairline (no shadow), in motion ─── */
+/* The active option's pill is at card level. In dark mode „raising" goes UP in lightness, so the
+ * pill must be one step further from the background than the track, or the active segment reads as
+ * a recess instead of an overlay.
+ *
+ * The hairline is not decoration, it is the only carrier of the signal: the pill fill against the
+ * track is 1.06:1 in light and 1.13:1 in dark, so „which option is active" shows only by the
+ * outline. That is why the frame has its own token per mode. Measured in light: --color-border
+ * (#959595) on the --color-surface-input track is 2.82:1, below the 3:1 of SC 1.4.11 (that token
+ * was calibrated on WHITE); --color-text-tertiary gives 3.25:1 against the track and 3.45:1
+ * against the pill. In dark the direction is reversed: --color-border holds 3.88:1 and tertiary
+ * would drop to 3.08:1, hence the override. */
+.thumb {
+  position: absolute;
+  z-index: 0;
+  top: var(--style-segmented-inset);
+  bottom: var(--style-segmented-inset);
+  left: var(--style-segmented-inset);
+  width: calc((100% - (2 * var(--style-segmented-inset))) / 2);
+  border: var(--style-border-surface) solid var(--color-text-tertiary);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-surface-card);
+  transition: transform 420ms var(--spring-snappy);
+}
+
+.thumb[data-pos='yearly'] {
+  transform: translateX(100%);
+}
+
+:root[data-mode='dark'] .thumb {
+  border-color: var(--color-border);
+  background: var(--color-surface-hover);
+}
+
+/* ─── Option (button) ─── */
+.option {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  border: var(--style-border-surface) solid transparent;
+  border-radius: var(--style-radius-pill);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Pricing variant: padding 11px/24px, weight 600, color transition 180ms. */
+.togglePricing .option {
+  padding: 11px var(--space-24);
+  font-weight: 600;
+  transition: color var(--duration-200) ease-out;
+}
+
+@media (hover: hover) {
+  .togglePricing .option:not([data-active]):hover {
+    color: var(--color-text-primary);
+  }
+}
+
+/* Active option (pricing): colour only; the visible pill is carried by .thumb. */
+.togglePricing .option[data-active] {
+  color: var(--color-text-primary);
+}
+
+/* In-app variant: padding 8px/18px, weight 500, color transition 200ms. */
+.toggleAccount .option {
+  padding: var(--space-8) 18px;
+  font-weight: 500;
+  transition: color var(--duration-200) var(--ease-entrance);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Active option (in-app): colour + weight; the visible pill is carried by .thumb. */
+.toggleAccount .option[data-active] {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* ─── Save badge (-20%), shared: solid primary, no shadow ─── */
+.saveBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide-40);
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--style-radius-pill);
+}
+
+/* ─── Column wrapper + hint, ONLY the account variant ─── */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Stagger-in (matches AccountPayPage.module.css .staggerIn), payslideUp. */
+@keyframes billingToggleSlideUp {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.staggerIn {
+  animation: billingToggleSlideUp 320ms var(--ease-entrance) both;
+  animation-delay: calc(var(--stagger-index, 0) * 70ms);
+}

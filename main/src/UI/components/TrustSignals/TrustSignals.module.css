@@ -1,0 +1,101 @@
+/* ─── TrustSignals — canonical trust pills (no per-page .trustList) ───
+ * Items are STATIC (non-interactive): no hover, no transition
+ * (floor §4: hover only on interactive elements). */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--trust-fg, var(--color-text-secondary));
+  letter-spacing: var(--ls-wide-10);
+}
+
+/* Decorative icon, gold tint (canon `.trustList li svg`; a decorative fill,
+ * not text, so --color-primary is allowed here). */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  justify-content: center;
+  line-height: inherit;
+}
+
+.text {
+  min-width: 0;
+}
+
+/* ─── Variant: pills — inline chip row, members separated by a gap ─── */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-24);
+}
+
+.pills .item {
+  opacity: 0.85;
+}
+
+/* DECISION: the middle dot as a separator is banned product-wide (like dashes; guard
+ * audit:copy-dashes). Each member starts with its own icon, so the icon and the wider column gap
+ * mark the boundary, with no punctuation. (owner) */
+
+/* ─── Variant: chips — outlined pills (about/for-clients canon) ───
+ * Static <li>, so NO hover/transition (floor §4); radius-full is allowed:
+ * these are real pills (GLOBAL 23). */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-10) var(--space-12);
+}
+
+.chips .item {
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-14);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  letter-spacing: var(--ls-wide-5);
+}
+
+/* ─── Variant: grid — an even grid of static cards, full hairline ─── */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+}
+
+@media (min-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  }
+}
+
+/* Tonal surface step + FULL hairline border (elevation without a shadow). */
+.grid .item {
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-20);
+  background: var(--color-bg-elevated);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  line-height: var(--leading-body);
+}
+
+.grid .icon {
+  /* Optical alignment of the icon to the first text line. */
+  height: 1lh;
+  margin-top: 0;
+}

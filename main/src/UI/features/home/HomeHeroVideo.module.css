@@ -1,0 +1,24 @@
+/* The canonical LpHero supplies markup/type/spacing. These knobs change only this approved
+   video layout, including the 1024px split instead of the shared 768px photo breakpoint. */
+.heroWithVideo {
+  --lp-hero-columns: minmax(0, 1fr);
+  --lp-hero-headline-measure: calc(20 * var(--ch-heading));
+  --lp-hero-content-align: center;
+  --lp-hero-text-align: center;
+  --lp-hero-actions-align: center;
+  --lp-hero-min-height: 0px;
+  --lp-hero-pad-top: var(--space-40);
+  --lp-hero-pad-bottom: var(--space-40);
+}
+
+@media (min-width: 1024px) {
+  .heroWithVideo {
+    --lp-hero-columns: minmax(0, 7fr) minmax(0, 5fr);
+    --lp-hero-headline-measure: calc(16 * var(--ch-heading));
+    --lp-hero-content-align: flex-start;
+    --lp-hero-text-align: left;
+    --lp-hero-actions-align: flex-start;
+    --lp-hero-pad-top: var(--space-48);
+    --lp-hero-pad-bottom: var(--space-48);
+  }
+}

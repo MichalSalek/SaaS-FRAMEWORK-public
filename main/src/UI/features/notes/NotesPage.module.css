@@ -1,0 +1,156 @@
+/* UI/features/notes/NotesPage.module.css
+ * The notes screen: section titles on paper, rows and fields in white boxes
+ * (A3 „Biel na papierze”). Rows are the shared NavRow; this file adds only the
+ * page rhythm, the privacy line, the one-time offer and the plan lock. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  min-width: 0;
+}
+
+/* The promise of the screen, right under its title: icon on the first line. */
+.privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: calc(var(--space-8) * -1) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.privacyIcon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-text-primary);
+}
+
+.privacyIcon svg {
+  display: block;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+
+/* A section with nothing in it yet: one sentence saying where it fills from,
+   in the same white box its rows would stand in. */
+.sectionEmpty {
+  margin: 0;
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.quietLine {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.filter {
+  max-width: calc(32 * var(--ch-body));
+}
+
+/* --- One-time offer: the private note as the public profile text --- */
+
+.bridge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.bridgeTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+}
+
+.bridgeBody {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.bridgeActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-16);
+}
+
+/* --- Free plan: client-card and visit notes are a plan feature --- */
+
+.locked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-20) var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* The lock sits on the title's FIRST line: a holder one title line tall. */
+.lockedHead {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  font-size: var(--text-lg);
+  line-height: 1.25;
+}
+
+.lockedIcon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 1lh;
+  color: var(--color-accent-fg);
+}
+
+.lockedIcon svg {
+  display: block;
+}
+
+.lockedBody {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.lockedCta {
+  margin-top: var(--space-4);
+}

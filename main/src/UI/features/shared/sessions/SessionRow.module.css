@@ -1,0 +1,23 @@
+/* UI/features/shared/sessions/SessionRow.module.css
+ * The session row is a NavRowMolecule: its look lives in the primitive. One
+ * thing is local, INSIDE the row's `note` slot: the date that belongs to the
+ * status. The loading stand-in is the primitive's NavRowListSkeletonMolecule. */
+
+/* Client's list: who the session is for and how many photos it holds. It
+   takes a whole line of the note (the status pieces start under it) and wraps
+   when the name is long; a name is never cut. */
+.who {
+  flex-basis: 100%;
+}
+
+/* The date is one unbreakable piece: on a narrow row the whole date moves
+   under the pill (the note line wraps its pieces as wholes). */
+.when {
+  white-space: nowrap;
+}
+
+/* Less than a day left: full ink and weight, no colour, no icon. */
+.when[data-urgent] {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}

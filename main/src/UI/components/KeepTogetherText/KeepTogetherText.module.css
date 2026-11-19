@@ -1,0 +1,7 @@
+/* One unbreakable piece of a sentence. An inline block moves to the next
+   line as a whole; `max-width` lets it wrap inside only when the column is
+   narrower than the piece itself, so it can never push past its container. */
+.piece {
+  display: inline-block;
+  max-width: 100%;
+}

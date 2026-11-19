@@ -1,0 +1,53 @@
+/* --- GalleryFilterSection: FAB + Overlay wrapper --- */
+
+.filterFab {
+  position: fixed;
+  bottom: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) +
+      var(--gallery-filter-fab-gap)
+  );
+  /* DECISION: a fixed offset, NOT `calc(50% - 215px + 20px)`. That arithmetic assumed a 430px
+     column centered in the window and drifted wherever the column has another width (measured:
+     390px and 430px gave 20px, 900px gave 248px, and in the 390px desktop frame at 1280/1440 it
+     gave 0px, glued to the frame edge). The containing block for `position: fixed` already exists
+     at every width, so the offset is given directly. */
+  right: var(--space-20);
+  width: var(--gallery-filter-fab-size);
+  height: var(--gallery-filter-fab-size);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: var(--style-border-control) solid var(--color-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-gallery-fab);
+  /* Hairline border (line above) carries elevation — NIE cień (anti-slop §2). */
+  transition: transform var(--transition-fast);
+}
+
+.filterFab:active {
+  transform: scale(0.95);
+}
+
+.filterFabBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--space-4);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* On mobile, position relative to viewport */

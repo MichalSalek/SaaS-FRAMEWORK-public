@@ -1,0 +1,4 @@
+export const API_HTTP_METHODS = Object.freeze({
+  FIXTURE_OP: 'POST',
+  FIXTURE_OPERATION_WITH_A_LONG_NAME: 'POST',
+});

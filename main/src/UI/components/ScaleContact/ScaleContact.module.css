@@ -1,0 +1,42 @@
+.row {
+  max-width: var(--lp-content-width);
+  margin: clamp(28px, 3.4vw, 48px) auto 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(16px, 2vw, 28px);
+  padding: clamp(20px, 3vw, 32px);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+}
+
+.body {
+  flex: 1;
+  min-width: min(100%, 320px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-panel-title);
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.description {
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.row > a {
+  flex-shrink: 0;
+}

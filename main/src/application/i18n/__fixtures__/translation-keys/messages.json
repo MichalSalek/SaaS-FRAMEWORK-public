@@ -1,0 +1,27 @@
+{
+  "pl": {
+    "demo": {
+      "title": "Tytuł",
+      "group": { "a": "A", "b": "B" },
+      "list": ["x", "y"],
+      "onlyPl": "Tylko po polsku"
+    },
+    "other": { "label": "Etykieta" }
+  },
+  "en": {
+    "demo": {
+      "title": "Title",
+      "group": { "a": "A", "b": "B" },
+      "list": ["x", "y"]
+    },
+    "other": { "label": "Label" }
+  },
+  "de": {
+    "demo": {
+      "title": "Titel",
+      "group": { "a": "A", "b": "B" },
+      "list": ["x", "y"]
+    },
+    "other": { "label": "Etikett" }
+  }
+}

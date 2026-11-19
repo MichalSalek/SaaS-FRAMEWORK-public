@@ -1,0 +1,41 @@
+{
+  "unverifiableKey": {
+    "application/app-snackbar/sonner-adapter/AppSnackbars.controller.tsx": 1,
+    "UI/components/AppDrawer/AppDrawer.organism.tsx": 1,
+    "UI/features/account/AccountPayPage.composition.tsx": 1,
+    "UI/features/account/components/AccountPlanSection.organism.tsx": 1,
+    "UI/features/admin/AdminConfigPage.parts.molecule.tsx": 1,
+    "UI/features/admin/AdminEmailSchedulePage.lifecycle.organism.tsx": 1,
+    "UI/features/admin/AdminLogsPage.filters.molecule.tsx": 1,
+    "UI/features/admin/components/ReportActionConfirm.molecule.tsx": 3,
+    "UI/features/admin/ReportCard.organism.tsx": 2,
+    "UI/features/checkout/hooks/useCheckoutPlanHighlights.ts": 1,
+    "UI/features/client/ClientProfilePreferences.organism.tsx": 3,
+    "UI/features/gallery/PhotoDetailPage.composition.tsx": 1,
+    "UI/features/gallery/StyleDetailGallery.organism.tsx": 1,
+    "UI/features/home/HomePageBottom.organism.tsx": 2,
+    "UI/features/pairing/QrScannerDialog.organism.tsx": 1,
+    "UI/features/shared/pricing/hooks/usePricingPlans.ts": 1,
+    "UI/features/shared/reviews/ReviewsSection.organism.tsx": 5,
+    "UI/features/static/AboutPage.composition.tsx": 2,
+    "UI/features/static/AboutPageSections.organism.tsx": 3,
+    "UI/features/static/ComparePage.composition.tsx": 1,
+    "UI/features/static/CookiesPage.composition.tsx": 1,
+    "UI/features/static/CookiesPageSections.organism.tsx": 4,
+    "UI/features/static/ForClientsPageSections.organism.tsx": 1,
+    "UI/features/static/ForStudiosPageSections.b.organism.tsx": 2,
+    "UI/features/static/ForStylistsPage.composition.tsx": 2,
+    "UI/features/static/ForStylistsPageSections.b.organism.tsx": 1,
+    "UI/features/static/ForStylistsPageSections.organism.tsx": 1,
+    "UI/features/static/HelpCenterAccordion.molecule.tsx": 4,
+    "UI/features/static/HelpCenterPage.blocks.organism.tsx": 2,
+    "UI/features/static/PricingComparisonTable.organism.tsx": 6,
+    "UI/features/static/PricingTierCard.organism.tsx": 5,
+    "UI/features/static/PricingTierSection.organism.tsx": 1
+  },
+  "unverifiableTranslator": {},
+  "untypedSlot": {
+    "UI/features/checkout/components/CheckoutForm.molecule.tsx": 1,
+    "UI/layouts/AppLayout.composition.tsx": 1
+  }
+}

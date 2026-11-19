@@ -1,0 +1,109 @@
+/* ─── TrustStatsSection — home canon (owner vote), visually 1:1 ───
+ * Body on the band's light background, an ink card of numbers (StatsBand ink-card).
+ * The card is STATIC: no hover (floor §4). */
+
+.section {
+  /* Dense beat: compression signals "hard facts" (home canon). */
+  --section-pad-block: var(--lp-rhythm);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 40px);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.5vw, 18px);
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  letter-spacing: var(--ls-tight-5);
+  color: var(--color-text-primary);
+  max-width: calc(60 * var(--ch-body));
+  text-wrap: pretty;
+  margin: 0;
+}
+
+.benefitExamples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: var(--space-16);
+}
+.useCase {
+  padding: var(--space-24);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-text-primary) 24%, var(--color-bg-main));
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+}
+.useCase h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-heading);
+  margin: 0 0 var(--space-12);
+  color: var(--color-text-primary);
+}
+.useCase p {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+.examplesSection {
+  /* tint-allow: Owner requested a contrasting solid burgundy
+     negative between LP bands. This is an ink surface, not a cream wash. */
+  background: color-mix(in oklch, var(--color-ink) 80%, var(--color-primary));
+  color: var(--color-on-ink);
+}
+
+.headLayout {
+  display: grid;
+  align-items: center;
+  gap: var(--space-32);
+}
+
+.examplesSection .body {
+  color: var(--color-on-ink);
+}
+
+.exampleIllustration {
+  --illustration-frame: var(--color-on-ink);
+  margin-block: 0;
+}
+
+.examplesSection .useCase {
+  background: var(--color-bg-paper);
+  padding: var(--space-32);
+}
+
+.exampleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-48);
+  height: var(--space-48);
+  margin-bottom: var(--space-24);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  color: var(--color-accent-fg);
+}
+
+.exampleIcon svg {
+  width: var(--space-24);
+  height: var(--space-24);
+}
+
+@media (min-width: 1024px) {
+  .headLayout {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: var(--space-48);
+  }
+}

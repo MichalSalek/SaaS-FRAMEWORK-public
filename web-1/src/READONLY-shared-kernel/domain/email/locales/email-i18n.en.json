@@ -1,0 +1,380 @@
+{
+  "stats": {
+    "worksOne": "{{n}} photo",
+    "worksFew": "{{n}} photos",
+    "worksMany": "{{n}} photos",
+    "clientsOne": "{{n}} client",
+    "clientsFew": "{{n}} clients",
+    "clientsMany": "{{n}} clients",
+    "joiner": ", "
+  },
+  "bodies": {
+    "welcome": {
+      "preheader": "Your account is ready. Choose how you want to use Nailfolio.",
+      "heading": "Welcome to Nailfolio",
+      "headingWithName": "Welcome to Nailfolio, {{addressName}}",
+      "body": "Hi! Your account is ready. Choose Stylist to share your work and connect with clients, or Client to collect ideas for appointments.",
+      "cta": "Choose account type"
+    },
+    "onboarding-incomplete": {
+      "preheader": "For stylists: a portfolio of your work. For clients: ideas for your next appointment.",
+      "heading": "How will you use Nailfolio?",
+      "body": "Your account is almost ready. Choose how you want to use Nailfolio.\n\nChoose Stylist if you create nail designs, or Client if you collect ideas for appointments. If you have a question, reply to this email.",
+      "cta": "Choose your account type"
+    },
+    "trial-nudge-upload": {
+      "preheader": "Choose a photo from your phone and show clients your work.",
+      "heading": "Start with one nail design",
+      "body": "Choose a photo of a nail design you would like clients to see. In Nailfolio, you can crop it and add colour, length and design details to make it easier to find later.\n\nConnected clients can see your full gallery. You can also pin selected photos to your public profile, which is visible without an account.",
+      "cta": "Add a photo"
+    },
+    "trial-empty-portfolio": {
+      "preheader": "One photo is enough to start building your portfolio.",
+      "heading": "Show your first nail design",
+      "body": "Start with one photo. Add its colour, length and design details, then choose more work for your gallery. You can pin selected photos to your public profile.\n\nYour {{planName}} trial has {{trialDaysLeft#day|days}} left. If you need a hand getting started, reply to this email.",
+      "cta": "Add gallery photos"
+    },
+    "trial-celebration": {
+      "preheader": "Show a client your QR code. Once you accept the connection, they can see your full gallery.",
+      "heading": "Share your gallery with clients",
+      "headingWithName": "{{addressName}}, share your gallery with clients",
+      "body": "Your gallery now has photos to share. At your next appointment, show your client your permanent QR code. After scanning it and signing in, they can send a connection request. They will see your full gallery only once you accept.\n\nFind the code in the app. You can download and print it to keep it handy in your salon.",
+      "cta": "Show your QR code"
+    },
+    "trial-progress": {
+      "preheader": "Pin selected photos and add your profile link to your Instagram bio.",
+      "heading": "Your portfolio, one link to share",
+      "body": "Choose work that shows your style and pin it to your public profile. Clients can see it without creating an account, along with the information you add to your profile.\n\nThen share your link with clients or add it to your Instagram bio.",
+      "cta": "Pin photos to your profile"
+    },
+    "trial-social-proof": {
+      "preheader": "Add colour and length to photos so clients can find the designs they have in mind.",
+      "heading": "Help clients find their next nail design",
+      "body": "Looking for short red nails? Adding colour, length and design details to your photos helps clients find matching work in your gallery.\n\nYour {{planName}} trial has {{trialDaysLeft#day|days}} left. Add a few designs and try the filters.",
+      "cta": "Add gallery photos"
+    },
+    "trial-milestone": {
+      "preheader": "Complete your profile and share your QR code at your next appointment.",
+      "heading": "Get your profile ready for your next client",
+      "body": "Two weeks of your trial have passed. Your {{planName}} trial continues for {{trialDaysLeft#more day|more days}}.\n\nYour public profile shows your bio, phone number and pinned photos. Your permanent QR code lets a client send a connection request after signing in. Once you accept it, the client can see your full gallery.",
+      "cta": "Complete your public profile",
+      "secondaryCta": "Show your QR code"
+    },
+    "trial-fomo": {
+      "preheader": "Add photos and check your profile as a client would see it.",
+      "heading": "Get your portfolio ready to share",
+      "body": "Your {{planName}} trial has {{trialDaysLeft#day|days}} left. Add photos, pin selected work and open your public profile to see it as a client would.\n\nIf you need help with your first steps, just reply.",
+      "cta": "Add your first photos"
+    },
+    "trial-warning": {
+      "preheader": "Your first payment is on {{trialEndDate}}. You can change or cancel your plan beforehand.",
+      "heading": "Your trial ends in a week",
+      "body": "Your trial ends on {{trialEndDate}}. From that date, {{planName}} becomes paid and the first payment will be charged to the card saved when you started the trial.\n\nTo change or cancel your subscription before the first payment, open your account settings before that date.",
+      "bodyInactive": "Your trial ends on {{trialEndDate}}. From that date, {{planName}} becomes paid and the first payment will be charged to the card saved when you started the trial.\n\nTo change or cancel your subscription before the first payment, open your account settings before that date.",
+      "cta": "Review your plan",
+      "ctaInactive": "Review your plan",
+      "secondaryCta": "Open your public profile",
+      "ps": "A question about the payment or the plan? Reply to this email."
+    },
+    "trial-last-day": {
+      "preheader": "Your saved card will be charged tomorrow. You can still change your plan today.",
+      "heading": "Your paid plan starts tomorrow",
+      "body": "From tomorrow, {{planName}} becomes paid. You can continue adding unlimited photos and clients, and pin more photos to your public profile. Connected clients can access your full gallery.",
+      "bodyInactive": "From tomorrow, {{planName}} becomes paid. To avoid the first payment, change or cancel your subscription in account settings today.\n\nAfter switching to Free Demo, saved photos and connections remain in your account. Adding more photos and clients is subject to Free Demo plan limits.",
+      "offerApplied": "Your first paid month has a 20% discount. The discount is already applied to your account.",
+      "cta": "See your plan",
+      "secondaryCta": "Open your gallery",
+      "ps": "To switch to Free Demo before the first payment, change or cancel your subscription today. Saved photos and connections remain, and connected clients still see your full gallery. Free Demo allows you to add photos up to a limit of 5 and connect with up to 2 clients."
+    },
+    "trial-ended": {
+      "preheader": "Your photos and connections stay. You can keep using Free Demo.",
+      "heading": "Your portfolio stays with you",
+      "body": "Your {{planName}} trial ended without a paid subscription starting. Your account is now on Free Demo. Saved photos and connections remain in your account, and connected clients still see your full gallery.\n\nFree Demo allows you to add photos up to a limit of 5 and connect with up to 2 clients. Your public profile shows 3 pinned photos. You can reactivate {{planName}} in account settings.",
+      "bodyZero": "Your {{planName}} trial ended without a paid subscription starting. Your account is now on Free Demo.\n\nFree Demo allows you to add 5 photos and connect with 2 clients. If you need help with your account or gallery, reply to this email.",
+      "cta": "Compare plans",
+      "secondaryCta": "Open your gallery"
+    },
+    "trial-winback": {
+      "preheader": "20% off your first month. The code can be used once and is valid for 72 hours.",
+      "preheaderNoOffer": "Your account is on Free Demo. Saved photos and connections remain available.",
+      "heading": "Keep growing your portfolio",
+      "body": "Your trial has ended. Your photos and connections remain, and connected clients still see your full gallery. Free Demo lets you add up to 5 photos, connect with up to 2 clients and show 3 pinned photos on your public profile.\n\nReady to keep growing your portfolio? Return to {{planName}} with 20% off your first month. The code below is assigned to your account and can be used once.",
+      "bodyNoOffer": "Your trial has ended. Your photos and connections remain, and connected clients still see your full gallery. Free Demo lets you add up to 5 photos, connect with up to 2 clients and show 3 pinned photos on your public profile.\n\nWhen you need more room in your gallery, you can reactivate {{planName}} in account settings.",
+      "offerLabel": "Your code",
+      "offerHeadline": "20% off your first month",
+      "offerExpiry": "Valid until {{offerExpiresAt}}",
+      "offerFinePrint": "The discount applies to the first monthly plan payment and can be used once. Use the button below to apply it at checkout.",
+      "cta": "Return to {{planName}} with 20% off",
+      "ctaNoOffer": "Return to {{planName}}",
+      "ps": "Free Demo remains active without a card. When you need an unlimited gallery and visit history, you can switch to Pro."
+    },
+    "cancel-d1": {
+      "preheader": "Your photos and connections stay. If you would like, tell us what we could improve.",
+      "heading": "Your account continues on Free Demo",
+      "body": "Your subscription has ended and your account is now on Free Demo. Your photos and connections remain in your account.\n\nThank you for trying Nailfolio. If something was missing or got in your way, reply and let us know what we could improve.",
+      "cta": "See the plans"
+    },
+    "cancel-d7-winback": {
+      "preheader": "20% off your first month. The code can be used once and is valid for 72 hours.",
+      "preheaderNoOffer": "Your account is on Free Demo. Saved photos and connections remain available.",
+      "heading": "Come back when you need more room",
+      "body": "Your subscription ended a week ago. Your photos and connections remain, and connected clients still see your full gallery. Free Demo lets you add up to 5 photos, connect with up to 2 clients and show 3 pinned photos on your public profile.\n\nReady to keep growing your portfolio? Return to {{planName}} with 20% off your first month. The code below is assigned to your account and can be used once.",
+      "bodyNoOffer": "Your subscription ended a week ago. Your photos and connections remain, and connected clients still see your full gallery. Free Demo lets you add up to 5 photos, connect with up to 2 clients and show 3 pinned photos on your public profile.\n\nWhen you need more room in your gallery, you can reactivate {{planName}} in account settings.",
+      "offerLabel": "Your code",
+      "offerHeadline": "20% off your first month",
+      "offerExpiry": "Valid until {{offerExpiresAt}}",
+      "offerFinePrint": "The discount applies to the first monthly plan payment and can be used once. Use the button below to apply it at checkout.",
+      "cta": "Return to {{planName}} with 20% off",
+      "ctaNoOffer": "Return to {{planName}}",
+      "ps": "Free Demo remains active without a card. When you need an unlimited gallery and visit history, you can switch to Pro."
+    },
+    "cancel-d30-final": {
+      "preheader": "Check the 3 pinned photos shown on your public profile.",
+      "heading": "Keep your public profile up to date",
+      "body": "Your public profile still works on Free Demo and shows 3 pinned photos. Check that they are the ones you want clients to see. You can change your selection in the gallery.\n\nThis is the final reminder after your subscription ended. You can return to a paid plan in account settings.",
+      "cta": "Compare paid plans"
+    },
+    "upgrade-confirmation": {
+      "preheader": "Add work and clients without limits. Choose photos for your public profile, too.",
+      "heading": "{{planName}} is ready to use",
+      "body": "Your {{planName}} plan is active. You can add photos and clients without limits, and pin more work to your public profile.\n\nChoose the photos you want people to see without an account. If you have questions about your plan or gallery, reply to this email.",
+      "cta": "Pin work to your profile"
+    },
+    "downgrade-notification": {
+      "preheader": "Saved photos and connections stay in your account. See the Free Demo limits.",
+      "heading": "You're on the Free Demo plan",
+      "body": "Your account is now on Free Demo. Saved photos and connections remain. Free Demo allows you to add photos up to a limit of 5, connect with up to 2 clients and show 3 pinned photos on your public profile. You can reactivate a paid plan in account settings.",
+      "cta": "Compare plans"
+    },
+    "payment-failed": {
+      "preheader": "Update your card in settings. Payment will be retried automatically.",
+      "heading": "Payment failed",
+      "body": "Your payment for {{planName}} did not go through. Check your card expiry date, spending limit and whether online payments are enabled. You can update your card in account settings.\n\nPayment will be retried automatically. If you need help, reply to this email.",
+      "cta": "Check your payment card"
+    },
+    "dunning-info": {
+      "preheader": "Your plan is still active. Check your card so the next payment can go through.",
+      "heading": "Payment failed",
+      "body": "Your payment for {{planName}} did not go through, but your plan is still active. Check the saved card: its expiry date, spending limit and whether online payments are enabled. Update your card in account settings if needed.",
+      "cta": "Check your payment card"
+    },
+    "dunning-urgent": {
+      "preheader": "Check your card. An unpaid subscription will switch to Free Demo.",
+      "heading": "Payment retry failed",
+      "body": "A payment retry for {{planName}} failed. If your subscription remains unpaid, your account will move to Free Demo. Saved photos and connections remain in your account. Connected clients still see your full gallery. Free Demo allows you to add photos up to a limit of 5, connect with up to 2 clients and show 3 pinned photos on your public profile.\n\nCheck or update your card in account settings. If you need help, reply to this email.",
+      "bodyZero": "A payment retry for {{planName}} failed. If your subscription remains unpaid, your account will move to Free Demo. Check or update your card in account settings. If you need help, reply to this email.",
+      "cta": "Check your payment card"
+    },
+    "dunning-final": {
+      "preheader": "To keep your paid plan, check your card today. Your photos and connections stay.",
+      "heading": "Final payment attempt failed",
+      "body": "The final payment attempt for {{planName}} failed. If your subscription remains unpaid, your account will move to Free Demo. Saved photos and connections remain in your account. Connected clients still see your full gallery. Free Demo allows you to add photos up to a limit of 5, connect with up to 2 clients and show 3 pinned photos on your public profile.\n\nTo stay on a paid plan, check your card in account settings today. If you choose Free Demo, no action is needed.",
+      "bodyZero": "The final payment attempt for {{planName}} failed. If your subscription remains unpaid, your account will move to Free Demo. To stay on a paid plan, check your card in account settings today. If you choose Free Demo, no action is needed.",
+      "cta": "Check your payment card"
+    },
+    "pairing-notification": {
+      "preheader": "Your client can now see your full gallery and choose ideas before an appointment.",
+      "heading": "You have a new client",
+      "body": "The connection with {{clientName}} is established. The client now has access to your full gallery and appears on your connections list.",
+      "cta": "See connections"
+    },
+    "pair-request-notification": {
+      "preheader": "Choose in the app whether to give this client access to your full gallery.",
+      "heading": "A new connection request",
+      "body": "{{clientName}} sent a connection request. Accepting it gives the client access to your full gallery. You can also decline the request.",
+      "placeLine": "Place: {{place}}",
+      "noteLine": "Message: {{note}}",
+      "cta": "See the request"
+    },
+    "session-shared-notification": {
+      "preheader": "See the selected photos before the appointment. The session is available for __NF_SESSION_EXPIRY_DAYS__ days.",
+      "heading": "Shared Inspiration Session",
+      "body": "{{clientName}} shared an Inspiration Session with selected photos. You can view the session in the app for __NF_SESSION_EXPIRY_DAYS__ days after it was shared.",
+      "cta": "See the session"
+    },
+    "messaging-notification": {
+      "preheader": "Read and reply in the app. Email replies go to Nailfolio support.",
+      "heading": "You have a new message",
+      "body": "{{senderName}} sent you a message in Nailfolio. Open Messages to read it and reply in the conversation.\n\nReplies to this email go to Nailfolio support, not to the person who sent the message.",
+      "cta": "Open Messages"
+    },
+    "salon-staff-invitation": {
+      "preheader": "See what joining the team means and accept your invitation.",
+      "heading": "An invitation to a salon team",
+      "intro": "{{inviterName}} invites you to join the team at {{salonName}} as a stylist in Nailfolio.",
+      "introNoName": "A salon owner in Nailfolio invites you to join their team as a stylist.",
+      "body": "Your own account receives the salon plan capabilities while you remain a member and the salon has an active Studio or Scale plan.\n\nYour work will appear in the salon gallery with you credited as its author; you can turn this off in your profile. A client connected with any salon member can send you inspiration or a message. Your work stays yours, and only you can access your private notes and conversations.\n\nClicking the button accepts the invitation in the app. The link does not sign you in. After accepting, sign in or create a stylist account.",
+      "cta": "Join the team"
+    },
+    "renewal-reminder": {
+      "preheader": "Review your {{planName}} renewal scheduled for {{renewalDate}}.",
+      "heading": "Your plan renewal",
+      "body": "Your {{planName}} plan is scheduled to renew on {{renewalDate}}. Open your account to review the payment, change your card or cancel your plan.",
+      "cta": "See your plan",
+      "supportNote": "Have a question?",
+      "supportCta": "Ask about your plan",
+      "preheaderWithAmount": "{{renewalDate}}. Planned payment: {{renewalAmount}} including tax.",
+      "bodyWithAmount": "Your {{planName}} plan is scheduled to renew on {{renewalDate}}. Planned payment: {{renewalAmount}} including tax.\nYou can change your card or cancel your plan before the renewal date."
+    },
+    "magic-link": {
+      "preheader": "Sign in without a password. This link works once and expires in an hour.",
+      "heading": "Your login link",
+      "body": "Use the button to sign in to Nailfolio or finish creating your account. The link can be used once and is valid for one hour.",
+      "cta": "Sign in",
+      "copyLinkLabel": "The button doesn't work? Copy this link:",
+      "ignoreNote": "If you did not request a login link, ignore this email. Keep the link private."
+    },
+    "account-delete-confirm": {
+      "preheader": "Confirm only if you want to delete your account. The link expires in 24 hours.",
+      "heading": "Confirm account deletion",
+      "body": "There is a request to delete your Nailfolio account. To confirm it, use the button within 24 hours.\n\nAfter confirmation, you have 90 days to restore your account by signing in again with the same email address.",
+      "cta": "Confirm account deletion",
+      "ignoreNote": "Not your request? Do not confirm it, and reply to this email for help. Your account will not be deleted without confirmation."
+    },
+    "account-deleted-recovery": {
+      "preheader": "You can return within 90 days. Just sign in with the same email address.",
+      "heading": "Your account is closed. You can still return",
+      "body": "Your Nailfolio account has been closed as requested. You can restore it for 90 days by signing in with the same email address. After that period, the account will be permanently closed.",
+      "cta": "Restore the account",
+      "ignoreNote": "If this is what you wanted, there's nothing to do. If you want the data gone right away and for good, write to support@nailfolio.app."
+    },
+    "email-change-confirm": {
+      "preheader": "One step to update your login email. The link expires in 24 hours.",
+      "heading": "Confirm the email change",
+      "body": "This address has been requested as the new login email for a Nailfolio account. If you requested the change, confirm it using the button below within 24 hours.",
+      "cta": "Confirm the new address",
+      "ignoreNote": "If it wasn't you, ignore this email. Without confirmation nothing changes."
+    },
+    "email-change-notify": {
+      "preheader": "Did not request this? Reply to this email for help.",
+      "heading": "Email change",
+      "body": "There is a request to change your Nailfolio login email to {{newEmail}}.\n\nIf you requested this, you do not need to do anything with this email. Otherwise, reply here or write to support@nailfolio.app."
+    },
+    "newsletter-confirm": {
+      "preheader": "Confirm your address to receive the Nailfolio newsletter. The link is valid for 7 days.",
+      "heading": "Confirm your newsletter signup",
+      "body": "One more click to complete your Nailfolio newsletter signup. Confirm your email address using the button below. The link is valid for 7 days.",
+      "cta": "Confirm signup",
+      "ignoreNote": "Did not sign up? Ignore this email. You will not receive the newsletter without confirmation."
+    },
+    "winback-deletion-d60": {
+      "preheader": "About a month remains to restore your account. Your 20% discount code lasts 72 hours.",
+      "preheaderNoOffer": "You can still restore the account with the same email, for about a month.",
+      "heading": "Would you like to return to your account?",
+      "body": "Your Nailfolio account was closed two months ago. You can still restore it for about a month by signing in with the same email address. After that period, the account will be permanently closed.\n\nA 20% discount is available for your first month of {{planName}}. The code below is assigned to your account and can be used once.",
+      "bodyNoOffer": "Your Nailfolio account was closed two months ago. You can still restore it for about a month by signing in with the same email address. After that period, the account will be permanently closed. If you do not want to restore it, no action is needed.",
+      "offerLabel": "Your code",
+      "offerHeadline": "20% off your first month",
+      "offerExpiry": "Valid until {{offerExpiresAt}}",
+      "offerFinePrint": "The discount applies to the first monthly plan payment and can be used once. Use the button below to apply it at checkout.",
+      "cta": "Come back with 20% off",
+      "ctaNoOffer": "Restore the account",
+      "ps": "This is the only reminder about the account restoration deadline."
+    },
+    "support-reply-notification": {
+      "preheader": "Read the reply below. The full conversation is in the app.",
+      "heading": "A reply to your question",
+      "body": "Here is a reply about “{{threadSubject}}”. Read it below, or open the full conversation in the app.\n\n{{replyPreview}}",
+      "cta": "Open the conversation"
+    },
+    "moderation-owner-notification": {
+      "preheader": "Read the reason for the decision. You can reply if you wish to appeal.",
+      "preheaderBan": "Read the reason for the ban. You can appeal by replying to this email.",
+      "heading": "A decision about a photo",
+      "headingBan": "Your account has been banned",
+      "introHide": "One of your photos has been hidden after a report was reviewed. The photo has not been deleted, but is not visible to other users.",
+      "introDelete": "One of your photos has been removed following a report review because it violated the terms.",
+      "introWarn": "A report about one of your photos has been reviewed. The photo remains visible. This is a warning for a violation of the terms. A further violation will result in the photo being hidden or the account being banned.",
+      "introBan": "Your account has been banned following a report review. Your photos are hidden and account access is suspended.",
+      "adminNoteLabel": "Decision note:",
+      "cta": "Open the gallery",
+      "ctaPhoto": "See this photo",
+      "ps": "You can appeal the decision by replying to this email or writing to support@nailfolio.app."
+    },
+    "free-first-photo": {
+      "preheader": "Choose a photo from your phone. One design is enough to start.",
+      "heading": "Start with one photo",
+      "body": "Upload a photo of your own nail design from your phone. You can crop it and add details so clients can find it in your gallery.\n\nThen choose which designs to show on your public profile. Clients can view those without an account.",
+      "cta": "Add your first photo"
+    },
+    "free-public-profile": {
+      "preheader": "Share selected nail designs with one link.",
+      "heading": "Show clients your work",
+      "body": "You already have photos in your gallery. Pin selected designs to your public profile so clients can view them without an account.\n\nCheck your profile name and description too. You can add the finished link to your Instagram bio or send it to a client.",
+      "cta": "Choose profile photos"
+    },
+    "free-first-client": {
+      "preheader": "Show your QR code at the next appointment.",
+      "heading": "Show your client your QR code",
+      "body": "At your next appointment, open your QR code and show it to your client. After scanning it and signing in, they can send you a connection request.\n\nOnce you accept, your client can see your full gallery. You can also download and print the code.",
+      "cta": "Show QR code",
+      "preheaderInactive": "You have a connection request. Review it in Nailfolio.",
+      "bodyInactive": "A client has requested to connect. Open your requests and check who sent it.\n\nAccept if you recognise the client and want to share your full gallery with them.",
+      "ctaInactive": "Review connection request",
+      "headingInactive": "Review your connection request"
+    }
+  },
+  "subjects": {
+    "email.magicLink.subject": "Sign in to Nailfolio",
+    "email.welcome.subject": "Welcome to Nailfolio",
+    "email.trial.d1Nudge.subject": "Show your first nail design",
+    "email.trial.d3Inactive.subject": "Start your portfolio with one photo",
+    "email.trial.d3Active.subject": "{{galleryCount#photo|photos}} ready to share with clients",
+    "email.trial.d7Active.subject": "One week with {{planName}}, {{galleryCount#photo|photos}} to share",
+    "email.trial.d7Inactive.subject": "Help clients find their next nail design",
+    "email.trial.d14Active.subject": "Share your profile and QR code with clients",
+    "email.trial.d14Inactive.subject": "{{trialDaysLeft#day|days}} left to try Nailfolio",
+    "email.trial.d23Warning.subject": "Your first plan payment is in a week",
+    "email.trial.d29LastDay.subject": "First {{planName}} payment tomorrow, 20% off, {{addressName}}",
+    "email.trial.d29LastDay.subjectNoOffer": "First {{planName}} payment tomorrow, {{addressName}}",
+    "email.trial.d30Ended.subject": "Your trial has ended. Your portfolio stays",
+    "email.trial.d37Winback.subject": "20% off your first month, {{addressName}}",
+    "email.trial.d37Winback.subjectNoOffer": "{{addressName}}, return to {{planName}} when you need more",
+    "email.upgrade.subject": "Your {{planName}} plan is ready to use",
+    "email.downgrade.subject": "Your account is now on Free Demo",
+    "email.pairingNotification.subject": "{{clientName}} can now see your gallery",
+    "email.pairRequestNotification.subject": "Connection request from {{clientName}}",
+    "email.sessionSharedNotification.subject": "{{clientName}} shared an Inspiration Session",
+    "email.messagingNotification.subject": "{{senderName}} sent you a message in Nailfolio",
+    "email.messagingNotification.subjectFromStylist": "Your stylist sent you a message in Nailfolio",
+    "email.salonStaffInvitation.subject": "A salon team invitation from {{inviterName}}",
+    "email.salonStaffInvitation.subjectNoName": "You are invited to join a salon team",
+    "email.paymentFailed.subject": "Your {{planName}} payment did not go through",
+    "email.cancel.d1.subject": "Subscription ended. Your photos and connections stay",
+    "email.cancel.d7.subject": "{{addressName}}, come back with 20% off your first month",
+    "email.cancel.d7.subjectNoOffer": "{{addressName}}, your portfolio is still in your account",
+    "email.cancel.d30.subject": "Which 3 photos are on your public profile?",
+    "email.dunning.d1Info.subject": "Check your card for {{planName}}",
+    "email.dunning.d7Urgent.subject": "Your {{planName}} payment failed again",
+    "email.dunning.d14Final.subject": "{{planName}}: the final payment attempt failed",
+    "email.onboarding.incomplete24h.subject": "{{addressName}}, choose how you use Nailfolio",
+    "email.renewal.reminder7d.subject": "Your {{planName}} renewal: {{renewalDate}}",
+    "email.newsletter.confirm.subject": "Confirm your Nailfolio newsletter signup",
+    "email.accountDeleteConfirm.subject": "Confirm deletion of your Nailfolio account",
+    "email.accountDeletedRecovery.subject": "Account closed. You have 90 days to return",
+    "email.winback.deletionD60.subject": "{{addressName}}, restore your account with 20% off your first month",
+    "email.winback.deletionD60.subjectNoOffer": "{{addressName}}, about a month left to restore your account",
+    "email.changeEmail.confirm.subject": "Confirm your new Nailfolio login email",
+    "email.changeEmail.notify.subject": "Your Nailfolio email change request",
+    "email.support.reply.subject": "A reply to your question: {{threadSubject}}",
+    "email.moderation.owner.subject": "A decision about your photo",
+    "email.moderation.hide.subject": "Your photo is hidden. See the reason",
+    "email.moderation.delete.subject": "Your photo was removed. See the reason",
+    "email.moderation.warn.subject": "A warning about your photo",
+    "email.moderation.ban.subject": "Your account is banned. See the reason",
+    "email.free.firstPhoto.subject": "Add your first nail design to Nailfolio",
+    "email.free.publicProfile.subject": "Choose designs for your public profile",
+    "email.free.firstClient.subject": "Connect with your first client"
+  },
+  "footer": {
+    "unsubscribe": "Manage whether you receive these emails.",
+    "unsubscribeLink": "Unsubscribe",
+    "companyInfo": "Nailfolio | Kraków, Poland | support@nailfolio.app",
+    "replyHeading": "Need a hand?",
+    "replyBody": "Reply to this email. Your message will reach the Nailfolio team.",
+    "replyCta": "Write to us",
+    "appCta": "Open Nailfolio",
+    "helpCta": "Help and contact",
+    "participantReplyNote": "Replies to this email go to Nailfolio support. To message your stylist or client, use the app."
+  }
+}

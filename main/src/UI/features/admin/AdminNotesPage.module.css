@@ -1,0 +1,56 @@
+/* Admin Notes: page spacing and the few layout rules of the editor panel.
+ * Panels, the list, the field, pills and buttons are shared parts with their
+ * own look. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  min-width: 0;
+}
+
+/* Lands below the sticky top bar when a pick in the list scrolls to it.
+   Also the container the action row measures itself against. */
+.editorAnchor {
+  container-type: inline-size;
+  min-width: 0;
+  scroll-margin-top: var(--space-80);
+}
+
+/* One quiet line of counts; it keeps its height while a version loads. */
+.counts {
+  min-height: 1lh;
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+}
+
+/* A narrow editor (a phone): the buttons are a deliberate stack of equal
+   width, never two on a row and a third alone. Same rule on notes and
+   policies. */
+@container (max-width: 479px) {
+  .actions {
+    flex: 1 1 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.listEmpty {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}

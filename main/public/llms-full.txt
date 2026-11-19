@@ -1,0 +1,1278 @@
+# Nailfolio: full site content (EN)
+
+> Concatenated markdown mirrors of every public page. Index: https://nailfolio.app/llms.txt | Polish: https://nailfolio.app/llms-pl.txt | German: https://nailfolio.app/llms-de.txt
+
+# Nail Portfolio and Appointment Prep for Nail Artists
+
+> Nailfolio is an online nail portfolio for nail artists where you prepare for every appointment: a filterable gallery, an in-salon QR code, inspiration sessions from clients and a history of recent visits.
+
+HTML version of this page: https://nailfolio.app/en/ | Markdown mirrors: PL https://nailfolio.app/index.md, DE https://nailfolio.app/de/index.md | LLM index: https://nailfolio.app/llms.txt
+
+## A nail portfolio for your clients
+
+Agree on designs with your clients before their appointments and save time at the nail table. Your client picks photos from your gallery, can add a note and discusses the details with you in Messages.
+
+- Free Demo
+
+## How much time could you get back?
+
+Calculate the time you could save with Nailfolio.
+
+**Working day:** Time spent choosing a design: 10 minutes; Clients per day: 8. 80 minutes (1 hr 20 min).
+
+Nailfolio beta testers reported 10-15 minutes less spent discussing the design during an appointment.
+
+You could finish work earlier or fit in another appointment.
+
+### One extra appointment could cover your plan
+
+Compare the monthly plan cost with what you keep from an appointment after materials, other costs and taxes.
+
+[Compare with pricing](https://nailfolio.app/en/pricing/)
+
+## See how your client finds a design in your gallery
+
+Tap a filter to see matching work at the top of the gallery.
+
+## See how your client sends you her choices
+
+Your client picks a few photos from your gallery and sends them with a question. You reply in Messages before her visit.
+
+## Design selection, photos and client notes
+
+- Photos from the web may require discussing the design’s scope
+- A specific design can be hard to find among many posts
+- Review notes on preferences and allergies before a visit
+
+Before a visit, review the inspiration selected by your client and your previous notes. Your client uses filters in your gallery to narrow down her photo choices.
+
+In Nailfolio, review photos in your gallery, Inspiration Sessions shared by your client and notes in her card. Visit history is available on paid plans.
+
+## Add work and share your gallery with clients
+
+Add your photos and show your QR code. Your client signs in, sends a connection request and can open the full gallery after you approve it.
+
+### Add photos of your work
+
+Add photos of completed designs and tag nail color, style and length. Tags enable gallery filtering.
+
+### Show the QR code to your client
+
+Show your QR code on your phone or in print. Your client scans it, signs in and sends a connection request. Once you approve it, she can access your full gallery.
+
+### Your client filters and chooses
+
+Your client filters photos by color, style and length. She can like selected designs and share them with you in an Inspiration Session with a note.
+
+## Portfolio, client history and visit conversation, all in one place.
+
+Use the gallery, QR connections, Inspiration Sessions and Messages. Client history access and gallery limits depend on your plan.
+
+### Nail gallery with filters
+
+Your client can combine color, style and length filters to find photos that match her choices.
+
+### Your client’s notes and history
+
+Every plan lets you save an “Important before the appointment” note. Paid plans also let you keep private notes and view visit history.
+
+### Connect with a client using a QR code
+
+Your client scans your QR code and signs in without a password. Once you approve her connection request, she can access your full gallery.
+
+### Inspiration Session before a visit
+
+Your client chooses photos from your gallery and shares an Inspiration Session with you. She can add a note. Before the appointment, you can review her selection and prepare your materials.
+
+### Fixed subscription fee
+
+Nailfolio does not charge commission on clients. Paid plans have a fixed subscription fee.
+
+### Messages with clients
+
+In Messages, you can talk to clients even before connecting and discuss details before the appointment.
+
+Always free for clients
+
+### Choose before the visit
+
+Your client browses your gallery and sends selected designs in an Inspiration Session.
+
+### Details with your client
+
+Messages and notes help you prepare for the appointment.
+
+### Keep a visit record
+
+With a paid plan, save result photos and revisit your client’s visit history.
+
+Prepare for appointments with inspiration, messages and client notes.
+
+## Nailfolio, social media and booking apps
+
+Keep photos of your work and client notes, and receive inspiration before the appointment.
+
+## Questions people ask most
+
+### What is Nailfolio?
+
+Nailfolio helps you manage your work gallery, connect with clients by QR code, receive their Inspiration Sessions and talk in Messages. Paid plans also include client visit history. The app works in a phone browser.
+
+### How does Nailfolio differ from an Instagram gallery?
+
+In Nailfolio, your client browses your work with color, style and length filters. Once connected, she can select photos and share an Inspiration Session with a note. Paid plans also include visit history.
+
+### What does Free Demo include?
+
+With Free Demo, you can add up to 5 photos and connect with up to 2 clients. See the pricing page for paid-plan details.
+
+### What does the client get after scanning the QR code?
+
+After signing in, your client sends a connection request. You approve it with one tap, so you control access to your full gallery with color, style and length filters. Once connected, she can browse your work, like designs and send you an Inspiration Session before the visit.
+
+### What about my photos: who owns them?
+
+You retain the rights to your photos. Nailfolio does not sell them or use them in ads. After closing your account, you have 90 days to restore it along with your photos.
+
+### How do I set up a portfolio?
+
+Create an account, add photos and tag color, style and length. Then show your QR code to your client and approve her connection request.
+
+## Nailfolio for nail salon clients
+
+Learn about QR connections, your stylist’s gallery and Inspiration Sessions before a visit.
+
+## Create a nail portfolio and share it with clients
+
+Share your work with clients and receive their selected photos and a note before the appointment. Use their choices to prepare your materials.
+
+Try Nailfolio with Free Demo.
+
+---
+
+# Nail Portfolio App for Nail Artists: Client History
+
+> Show your work in a portfolio with filters and a QR code. Your client can choose styles from your gallery and send you an Inspiration Session before the appointment.
+
+HTML version of this page: https://nailfolio.app/en/for-stylists/ | Markdown mirrors: PL https://nailfolio.app/for-stylists.md, DE https://nailfolio.app/de/for-stylists.md | LLM index: https://nailfolio.app/llms.txt
+
+## Discuss the design before the appointment with your client
+
+Agree on designs with your clients before their appointments and save time at the nail table. Your client picks photos from your gallery, can add a note and discusses the details with you in Messages.
+
+- Free Demo
+
+## How much time could you get back?
+
+Calculate the time you could save with Nailfolio.
+
+**Working day:** Time spent choosing a design: 10 minutes; Clients per day: 8. 80 minutes (1 hr 20 min).
+
+Nailfolio beta testers reported 10-15 minutes less spent discussing the design during an appointment.
+
+You could finish work earlier or fit in another appointment.
+
+### One extra appointment could cover your plan
+
+Compare the monthly plan cost with what you keep from an appointment after materials, other costs and taxes.
+
+[Compare with pricing](https://nailfolio.app/en/pricing/)
+
+## Design selection and client notes before a visit
+
+Before your client takes a seat, she browses your portfolio and chooses a design for the visit.
+
+**Problem:** Your client shows you a design from the web that needs to fit the length of her nails.
+**Solution:** Show your client your own work and narrow the choices with length, color and style filters.
+
+**Problem:** On Instagram, finding one specific design in a flood of posts is hard.
+**Solution:** Tags help your client narrow the gallery by color, length and style instead of scrolling through post after post.
+
+**Problem:** Before the visit, photos from the web and earlier decisions are hard to find.
+**Solution:** Your client shares selected photos in an Inspiration Session and can add a note. You can review the session before the appointment.
+
+## Nail portfolio, Inspiration Sessions and client history
+
+Add your work to the gallery, receive clients’ choices before visits and keep notes in their client cards. History access depends on your plan.
+
+### Nail gallery with filters
+
+Tag photos by color, style, length and design details. Your client can use these tags to filter your gallery.
+
+### Your QR code at the station
+
+Show your client the QR code on your phone or in print. After signing in, she sends a connection request. Confirm it to give her access to your full gallery.
+
+### Inspiration Session before a visit
+
+Inspiration session
+
+### Fixed fee, zero commission
+
+Paid plans have a fixed subscription fee. Nailfolio does not charge commission on clients.
+
+### Shared gallery and salon profile
+
+### Gallery setup checklist
+
+In Gallery Strength, you see the next steps: add photos, complete your profile and connect with your first client. You know what to do before showing your profile to clients.
+
+### Messages with clients
+
+In Messages, you can talk to clients even before connecting. Adding a phone number to your public profile is optional.
+
+See the app from the inside
+
+## Create an account
+
+Try Nailfolio with Free Demo.
+
+## How to set up a nail portfolio in Nailfolio
+
+Add photos, tag them and share your QR code. Then review the choices your clients share with you.
+
+### Add your first work
+
+Choose photos that show range: nude, french, color, short, long and detailed designs.
+
+Step 1: photos of your work
+
+### Tag color, style and length
+
+Choose tags when adding a photo so your client can narrow down the gallery.
+
+Filters help your client decide
+
+### Show the QR code to your client
+
+Your client can open the gallery during a visit, like designs and return to them before her next appointment.
+
+Gallery access after connection approval
+
+### Return to your client’s history
+
+With a plan that includes visit history, you can revisit earlier choices, notes and shared inspiration.
+
+Choices and notes from previous visits
+
+## Inspiration Session before a visit
+
+Your client shares selected designs and can add a note. You can review the session before the appointment.
+
+## Start with Free Demo, compare paid plans
+
+Clients use Nailfolio for free. Choose a plan based on the number of photos and pinned designs you need, and your salon’s needs.
+
+0% commission on clients. Paid plans have a fixed subscription fee. Cancellation is available in account settings.
+
+### Choose before the visit
+
+Your client browses your gallery and sends selected designs in an Inspiration Session.
+
+### Details with your client
+
+Messages and notes help you prepare for the appointment.
+
+### Keep a visit record
+
+With a paid plan, save result photos and revisit your client’s visit history.
+
+Prepare for appointments with inspiration, messages and client notes.
+
+## Questions about Nailfolio in your work
+
+### How does Nailfolio differ from Instagram?
+
+In Nailfolio, your client browses your work with color, style and length filters. She can select photos, add a note and share an Inspiration Session with you. Paid plans also include visit history for your clients.
+
+### How does a client access the gallery?
+
+Your client scans your QR code, signs in with Google or an email link and sends a connection request. Once you accept it, she can access your full gallery. Your public profile with selected work is available without signing in.
+
+### How do Free Demo and Pro differ?
+
+Free Demo lets you add up to 5 photos and connect with up to 2 clients. Pro has no limit on photos or client connections. You also get access to visit history.
+
+### How does the paid-plan trial work?
+
+If you have not used a trial before, your first paid plan starts a 14-day trial. You need to add a card to start it. To prevent a paid subscription from starting after the trial, cancel it in the Stripe portal before it ends.
+
+### I already use Booksy/Fresha. Is Nailfolio an alternative?
+
+Nailfolio is for presenting your work and preparing for visits. Booksy and Fresha offer appointment booking, which Nailfolio does not provide. You can use these tools alongside each other. Compare Booksy, Fresha and Instagram.
+
+### What happens to my photos if I cancel my subscription?
+
+Photos remain in your account. When the paid plan ends, Free Demo limits apply: up to 3 pinned styles on the public profile, 5 photos and 2 connected clients. Above a limit, you cannot add new photos or connections. Connected clients retain gallery access.
+
+### Does a client have to install an app to see my entire gallery?
+
+The public profile with selected work is available without an account. The full gallery, QR connection and Inspiration Sessions require a free client account. Nailfolio works in a phone browser, with no installation needed.
+
+### I'm switching from another app. Will you help me import my gallery?
+
+Contact support before moving your gallery to discuss importing it. Available assistance depends on the format of your photos and data from the previous app.
+
+### Will my client see that I pay for an app?
+
+No. Your clients cannot access your subscription, invoices or payment settings.
+
+### Can I message my clients in the app?
+
+Yes. In Messages, you can talk to a client without connecting first or sharing your private phone number. Adding a phone number to your public profile is optional.
+
+### I don't have a fixed station, I work at my clients' homes, is this for me?
+
+Yes. You can show your QR code wherever you work. Once the connection is confirmed, your client can access your gallery.
+
+---
+
+# Nail Designs From Your Stylist's Portfolio, Set Before Your Visit
+
+> Scan your stylist's QR code, choose nail designs from her portfolio, set them in an inspiration session and message her before your visit. Nailfolio is free for clients.
+
+HTML version of this page: https://nailfolio.app/en/for-clients/ | Markdown mirrors: PL https://nailfolio.app/for-clients.md, DE https://nailfolio.app/de/for-clients.md | LLM index: https://nailfolio.app/llms.txt
+
+## Nail designs from your stylist
+
+Connect with your nail professional through their profile or QR code. Pick inspirations from their gallery and discuss the details before your appointment to save time at the salon.
+
+- Your account is free, no card required
+
+## How to prepare inspiration before a visit
+
+Choose photos from your stylist’s gallery and share an Inspiration Session. You can add a note. Your stylist can review the session before your appointment.
+
+### Connect with your stylist using a QR code
+
+Scan the stylist’s QR code and send a connection request. You can view the full gallery once they accept.
+
+### Choose photos from your stylist’s gallery
+
+Filters work together: pick color, style and length at the same time. You only see the designs that match your idea.
+
+### Sharing an Inspiration Session
+
+Your stylist sees the selected photos and any note you add, so she can prepare in advance.
+
+### Browse your stylist’s new work
+
+Check your stylist’s gallery for new photos.
+
+## Your stylist’s gallery, liked designs and Inspiration Sessions
+
+Once connected to your stylist, you can browse her full gallery, choose designs and share Inspiration Sessions. You can also message her from her profile before connecting. Your account is free.
+
+### A nail gallery with color, style and length filters
+
+Browse your stylist’s work and combine color, style and nail length filters.
+
+Results include designs that match all selected filters.
+
+### Your stylist’s full gallery on your phone
+
+Scan your stylist’s QR code and sign in without a password. Once she approves the connection, you can see her full gallery; if she contributes to an active Studio salon, you can also browse the whole contributing team’s work.
+
+### Your collection of favorite designs
+
+After signing in, like designs from your stylist’s gallery. You can add selected photos to an Inspiration Session and share it with your stylist.
+
+Your collection stays with you even when your stylist adds new work. Pick up where you left off on any phone.
+
+### Your stylists in one place
+
+Like the stylist profiles you want to revisit. Find them in your collection and check their public profiles for new work.
+
+### An Inspiration Session with photos
+
+In an Inspiration Session, choose photos and optionally add a note. Once you share it, your stylist can review your selection before the appointment.
+
+Your stylist opens the session and sees the selected photos and any note you add.
+
+### Messages to your stylist
+
+You can message your stylist from her public profile, even before connecting. You will find the conversation in Messages.
+
+Use Nailfolio free of charge.
+
+### Scan the QR code at the nail salon
+
+Scan the code, sign in and send a connection request. Once your stylist approves it, you can access her gallery.
+
+### Filter nail designs by color, style and length
+
+Filters for color, style and length narrow your choice. You can like the designs you pick and add a short note.
+
+### Share the inspiration session with your stylist
+
+Your stylist sees the selected photos and one note. A shared session stays active for 30 days.
+
+Inspiration sessions stay live for 30 days after sharing.
+
+## Nail designs from your stylist’s gallery
+
+Browse designs by your stylist and filter them by color, length and style. You can share selected photos with her before the visit.
+
+- Fuchsia aura with stars
+- Tortoiseshell with gold foil
+- Cobalt French with flowers
+- Blue and purple chrome
+
+## Your account and privacy
+
+Nailfolio stores the information needed to run your account and connections with your stylists. It does not sell data, show ads or track you across apps.
+
+- Nailfolio does not sell data to third parties
+- No ads, no cross-app tracking
+- After closing your account, you have 90 days to restore it.
+
+## Data and privacy at Nailfolio
+
+Your account is free and does not require a card. Nailfolio does not show ads.
+
+- No hidden fees
+- No credit card, no payments
+- Encrypted connection
+- Private messages with your stylist
+- Full gallery after connecting
+- No ads, no data selling
+
+## How to invite your stylist to Nailfolio
+
+Send your stylist a link to Nailfolio. They can try the Free Demo without a card, and you can return to their gallery before your next appointment.
+
+## Questions about Nailfolio
+
+---
+
+# Nail Salon Portfolio, Dashboard and Client History
+
+> A client connected with a stylist can choose from the salon’s shared gallery and send inspiration before the appointment.
+
+HTML version of this page: https://nailfolio.app/en/for-studios/ | Markdown mirrors: PL https://nailfolio.app/for-studios.md, DE https://nailfolio.app/de/for-studios.md | LLM index: https://nailfolio.app/llms.txt
+
+## Nail salon portfolio in one gallery
+
+A client connected with one stylist can browse the team’s shared work and send her chosen inspiration before the appointment. Her stylist can prepare the materials in advance.
+
+- Shared team gallery
+
+## Your whole team’s work in your salon gallery
+
+Stylists keep their own accounts and photo authorship. You choose the salon showcase, and clients have one place to find inspiration before their visit.
+
+### Shared salon gallery
+
+Each stylist adds photos to her own account. The salon gallery shows the team’s work with each author’s name; clients can choose a stylist and filter by colour, style and length.
+
+### Salon profile with your own address
+
+Choose a readable salon profile address and a showcase from the whole team’s gallery. Without an account, clients see your showcase and each stylist’s pinned work, always with its author.
+
+### One connection to the whole salon
+
+Once any stylist approves the QR connection, the client can browse the full salon gallery. She can send an Inspiration Session or message to any stylist contributing to it.
+
+### Own work and private conversations
+
+Photos belong to the stylist who uploaded them. Each stylist keeps her own clients, notes and conversations; neither you nor her colleagues can access them.
+
+## From a photo at the station to inspiration before the visit
+
+Your stylists work in their own accounts, while you present your work as one salon. Every photo tells the client who created the design.
+
+## Manage your salon account and team
+
+With an active Studio or Scale plan, members use its capabilities in their own accounts. You present work together, while every stylist’s clients, notes and conversations remain private.
+
+## Plans for solo stylists, salons and larger teams
+
+Pro and Pro Marka are for solo stylists. Studio covers a salon team of up to 10 accounts. Scale is agreed individually.
+
+### You are opening your first station
+
+Pro includes an unlimited gallery and client visit history from the last 90 days. It is designed for solo stylists.
+
+Start on the Pro plan
+
+### You are running a team under one brand
+
+The salon gallery shows shared team work with each stylist credited. After connecting with one stylist, a client can browse the full salon gallery and share inspirations with her chosen stylist.
+
+Studio plan for growing teams
+
+### You are scaling to more locations
+
+For larger teams, multiple locations or additional features, contact support to discuss Scale. Implementation and support are defined in an individual offer.
+
+Scale: individual offer
+
+## Pro Marka, Studio and Scale: plan comparison
+
+Pick a plan that fits your salon size. You can start smaller and move up as the team grows.
+
+### Pro Marka
+
+### Studio
+
+### Scale
+
+- 0% commission from clients
+
+## Questions about Studio plan
+
+### How many stylists can I add?
+
+With the Studio plan, you can invite up to 9 stylists, in addition to the owner's account. Each person accepts an invitation and uses their own account. While Studio or Scale is active, team members can use its features without an additional subscription.
+
+### Can clients see who did which design?
+
+Yes. Every work in the salon gallery shows the author’s name, avatar and profile link. Clients can also filter to one stylist’s work.
+
+### Can invited stylists access the salon gallery?
+
+Yes, members can browse the shared salon gallery. Each edits and deletes only her own photos. Only you choose the showcase at the top of the salon profile.
+
+### How much does the Studio plan cost?
+
+See the pricing page for the current price. Studio includes up to 10 accounts including yours, a salon dashboard and a shared salon profile. Contact us about Scale for a larger team.
+
+### Can I cancel the Studio plan?
+
+Yes, you can cancel on the Plan page. When the paid plan ends, the salon gallery and profile become unavailable and stylists return to their own plans. Photos and direct client connections stay in their accounts; salon-derived connections end.
+
+### What happens when a nail artist leaves the team?
+
+Her work leaves the salon gallery and showcase, but remains in her account with clients directly connected to her. Salon-derived connections end. She returns to her own plan without deleting photos. Clients keep salon access if they also have a direct connection with another team member.
+
+### Can I test Studio before purchasing?
+
+You can try Studio under the trial terms shown in pricing. Team members receive plan capabilities on their own accounts when the salon subscription is an active paid subscription.
+
+### What about a large team or several locations?
+
+Studio covers one location and up to 10 accounts with no per-seat fees. Contact support to discuss Scale and an individual offer for larger teams or multiple locations.
+
+### Can I read my stylists’ client conversations?
+
+No. Each stylist has her own conversations and client cards. The shared gallery gives neither you nor colleagues access to that information.
+
+### What can a client see before and after connecting?
+
+Without an account, she sees your salon showcase and all contributing stylists’ pinned work. After an approved QR connection with any of them or you, she can access the full salon gallery and send an Inspiration Session or message to any contributing stylist.
+
+### Who owns the photos in the salon gallery?
+
+They belong to the stylist who uploaded them. Joining enables contributions to the salon gallery; she can switch them off in her profile. Neither you nor colleagues can edit or delete her photos. When she leaves, her work stays in her own account.
+
+## Set up a salon portfolio with Studio
+
+The Studio plan for your salon
+
+---
+
+# Pricing, Free Demo, Pro, Pro Marka and Studio
+
+> Compare Nailfolio plans: Free Demo with no card, Pro with an unlimited gallery, visit history and client insights, Pro Marka with full history, and Studio with team accounts.
+
+HTML version of this page: https://nailfolio.app/en/pricing/ | Markdown mirrors: PL https://nailfolio.app/pricing.md, DE https://nailfolio.app/de/pricing.md | LLM index: https://nailfolio.app/llms.txt
+
+## Nailfolio pricing Compare plans
+
+Help clients choose before the appointment, so you can spend less of it finding a design. Try the workflow with Free Demo or choose a plan for you or your team.
+
+### Free Demo
+
+- 5 photos in gallery
+
+- 2 connected clients
+
+- 3 pinned designs
+
+- Your own public profile linked to your gallery
+
+- Inspiration Session
+
+### Pro
+
+- Unlimited gallery
+
+- Unlimited clients
+
+- Client card: notes (allergies, preferences) and visits from the last 90 days
+
+- Photos without watermark
+
+- Insights: the colours, styles and lengths your clients choose most
+
+- 10 pinned designs
+
+- Your own public profile linked to your gallery
+
+- Inspiration Session
+
+### Pro Marka
+
+- Unlimited gallery
+
+- Unlimited clients
+
+- Client card: notes (allergies, preferences) and full visit history
+
+- Your own colour theme for the public profile
+
+- Photos without watermark
+
+- Insights: the colours, styles and lengths your clients choose most
+
+- 15 pinned designs
+
+- Your own public profile linked to your gallery
+
+- Inspiration Session
+
+### Studio
+
+- Unlimited gallery
+
+- Unlimited clients
+
+- Whole team included, up to 10 accounts, no per-seat fees
+
+- Shared gallery of the whole team
+
+- Public salon profile with your own address
+
+- Studio capabilities on each stylist’s own account
+
+- Client card: notes (allergies, preferences) and full visit history
+
+- Your own colour theme for the public profile
+
+- Photos without watermark
+
+- Insights: the colours, styles and lengths your clients choose most
+
+- 30 pinned designs
+
+- Your own public profile linked to your gallery
+
+- Inspiration Session
+
+### Scale
+
+- Unlimited gallery
+
+- Unlimited clients
+
+- Unlimited team
+
+- Shared gallery of the whole team
+
+- Public salon profile with your own address
+
+- Studio capabilities on each stylist’s own account
+
+- Custom features
+
+- Multiple locations: chains and franchises
+
+- Guaranteed response time
+
+- Personal onboarding manager
+
+- Onboarding assistance
+
+- Client card: notes (allergies, preferences) and full visit history
+
+- Your own colour theme for the public profile
+
+- Photos without watermark
+
+- Insights: the colours, styles and lengths your clients choose most
+
+- 50 pinned designs
+
+- Your own public profile linked to your gallery
+
+- Inspiration Session
+
+[Plans & pricing](https://nailfolio.app/en/pricing/)
+
+## Features available during the Pro trial
+
+- Unlimited photo gallery
+- Unlimited client connections
+- In an Inspiration Session, your client chooses photos and adds a note, so you have everything before the visit.
+- A custom profile link, such as nailfolio.app/u/anna-nails, to share with your clients.
+
+Try the photo gallery, client connections and visit history for 14 days.
+
+## Frequently asked questions
+
+### Can I change my plan at any time?
+
+Changes between paid plans take effect once the prorated difference is paid. If you switch to Free, your current paid plan remains active until the end of the paid period.
+
+### How does the 14-day trial work?
+
+If your account is eligible for the one-time trial, it lasts 14 days and requires a card. After the trial, your selected plan becomes a paid subscription unless you cancel beforehand. Cancel during the trial to avoid a charge. Free Demo does not expire.
+
+### Which payment methods are available?
+
+Stripe handles payments. You'll see the available methods in the payment window.
+
+### Do clients pay anything?
+
+No. Your client scans the QR code and sends a connection request. After you approve it, she browses the full gallery and shares inspiration. You control access, and clients use the gallery and Inspiration Sessions free of charge.
+
+### What does Free Demo include, and what does Pro include?
+
+With Free Demo, you can try the gallery and client connections. Pro gives you an unlimited gallery and client connections, plus visit history. See the plan comparison above for other differences.
+
+### Are my photos and client data secure?
+
+The app connection is encrypted, and Stripe handles payments. See the Privacy Policy for information about external services and data processing.
+
+### What happens to my photos after I cancel?
+
+Photos remain in your account. When the paid plan ends, Free Demo limits apply: the public profile shows up to 3 pinned styles, and adding photos beyond 5 is blocked. Connected clients retain gallery access.
+
+### Will I receive an invoice?
+
+Yes. You can enter your business details at checkout. You can find invoices in the billing section of your account.
+
+### What does a stylist get by joining a Studio team?
+
+With an active Studio or Scale plan, each stylist uses the plan's features on their own account. The salon profile shows pinned work from stylists who have chosen to participate, with each author credited. A client connected to one of them can see the full salon gallery and send an Inspiration Session or message to any participating stylist. Client cards and private notes are not shared.
+
+### How is the payment currency selected?
+
+The currency is selected automatically for your country, independently of the app language. Poland uses PLN, euro area countries use EUR, and other countries, including Canada, use USD. You enter invoice details in the payment form. An existing subscription keeps its currency when you travel or change the language.
+
+---
+
+# Nailfolio, Booksy, Fresha and Instagram: comparison of uses
+
+> Compare Nailfolio with booking apps and social media. Nail gallery, Inspiration Sessions, Messages and client history.
+
+HTML version of this page: https://nailfolio.app/en/compare/ | Markdown mirrors: PL https://nailfolio.app/compare.md, DE https://nailfolio.app/de/compare.md | LLM index: https://nailfolio.app/llms.txt
+
+## How is Nailfolio different from Booksy, Fresha and Instagram?
+
+Compare booking apps, social media and Nailfolio to see what each can do for your work.
+
+## Comparison of features and purpose
+
+Bookings, photo publishing and visit preparation serve different purposes.
+
+| | Nailfolio | Booksy / Fresha | Instagram / Pinterest |
+| --- | --- | --- | --- |
+| What it's for | Visit prep and client history | Bookings and the appointment calendar | Reach and online presence |
+| What your client sees | Your gallery with color, style and length filters | Online bookings, an appointment calendar and service pricing | Posts, reels and photos |
+| Your client’s history | Notes, messages, inspiration sessions and visit history | Appointment history | No dedicated client card |
+| Cost for you | Try Free Demo or choose a paid plan, no client commission | A subscription, and with some tools a commission on every new client acquired through their platform | Free account, optional paid advertising |
+
+Use a booking app alongside Nailfolio. Add your booking link to your public profile. Your client chooses photos for an Inspiration Session in Nailfolio, while you keep visit history.
+
+## Nailfolio and appointment booking apps
+
+- Booksy is used for bookings and appointment calendars. Nailfolio is used to present work, choose inspiration and maintain client history. Bookings take place outside Nailfolio.
+- Your client can book through Booksy, then choose photos from your Nailfolio gallery. Once connected, she can share an Inspiration Session and discuss details in Messages.
+
+Nailfolio does not broker bookings or charge commission from clients.
+
+## Nailfolio and sharing work on Instagram
+
+- On Instagram, you publish photos, reels and stories and communicate with followers.
+- In Nailfolio, your client filters photos of your work by color, style and nail length. She adds selected photos to an Inspiration Session and can share it before the visit.
+
+You can add your Nailfolio public profile link to Instagram.
+
+## Pinterest photos and a gallery of your own work
+
+- On Pinterest, your clients browse inspiration from many creators. Before a visit, discuss whether a chosen design fits their nail length, shape and the materials available.
+- In Nailfolio, your client chooses from your previous work. She can send you selected photos and a note in an Inspiration Session to discuss details before the visit.
+
+## Gallery and preparation for a visit
+
+In Nailfolio, review photos selected by your client, talk in Messages and keep visit history in her card.
+
+## The most common questions about Nailfolio next to other tools
+
+### Does Nailfolio replace Booksy?
+
+No. Bookings take place outside Nailfolio. In Nailfolio, you maintain a gallery, receive Inspiration Sessions and record client history. You can add a booking link to your public profile.
+
+### Do I have to give up Instagram?
+
+No. Keep publishing work on Instagram and add your Nailfolio link there. Your clients browse the filtered gallery in Nailfolio and choose photos for an Inspiration Session.
+
+### How is Nailfolio different from Pinterest?
+
+Pinterest contains photos by many creators. In Nailfolio, your client browses your work, filters it and chooses photos for an Inspiration Session.
+
+### How much does it cost compared to Booksy or Fresha?
+
+With Free Demo, you can try Nailfolio without a card: add up to 5 photos and connect with up to 2 clients. Pro has a flat monthly fee with no client commission; see the pricing page for the current rate. Booking apps usually require a subscription, and some also charge a commission for each new client they bring in.
+
+### What can I use Nailfolio for alongside other apps?
+
+In Nailfolio, bring together your work gallery, photos selected by your client before a visit, Messages and visit history. Once connected, your client shares an Inspiration Session with you.
+
+### Can I import photos from Instagram or Booksy?
+
+Add photos to your Nailfolio gallery. If you need help preparing them or tagging colors and features, contact us through the form.
+
+---
+
+# About Nailfolio: nail portfolio and client history for stylists
+
+> The nail portfolio app for nail stylists: a gallery of your work, visit prep through inspiration sessions and a history of recent visits with clients, with no commission.
+
+HTML version of this page: https://nailfolio.app/en/about/ | Markdown mirrors: PL https://nailfolio.app/about.md, DE https://nailfolio.app/de/about.md | LLM index: https://nailfolio.app/llms.txt
+
+## About Nailfolio: an app for nail stylists and clients
+
+Nailfolio is built in Kraków. The app helps nail artists show their work and prepare for client visits.
+
+A nail portfolio and client history for independent stylists and salons.
+
+In Nailfolio, you maintain a public profile, work gallery and client cards. Clients choose photos for Inspiration Sessions and share them before a visit.
+
+## Why Nailfolio was created
+
+- Photos chosen before a visit help you discuss color, length and nail art. When a client chooses from their stylist’s work, the conversation can refer to designs the stylist has already created.
+- When preparing a nail design, you can filter the gallery by colour or nail length, save a note and check the client’s visit history.
+- Nailfolio combines these features in an app for nail stylists. Clients browse a gallery with color, style and length filters and share Inspiration Sessions after connecting with a stylist. The stylist can review the selected photos and record notes and visit history in the client card.
+
+Work gallery, inspiration and visit history.
+
+## Gallery, mobile access and data
+
+Features and terms of using Nailfolio.
+
+### Work gallery for nail stylists
+
+The gallery has nail color, style and length filters. A QR code connects a client with a stylist. Once the connection is confirmed, the client can choose photos for an Inspiration Session.
+
+### Photos and QR code on your phone
+
+Add a photo from your phone, select the design’s colors and features, then publish it in your gallery. Show the QR code on your screen or print it.
+
+### Photo ownership and data storage
+
+Nailfolio does not sell data or use marketing cookies. You retain ownership of your photos regardless of your plan.
+
+## Nailfolio development milestones
+
+How the photo gallery, stylist connections and client cards took shape.
+
+### 2024: First product sketches
+
+The first app sketches covered a gallery of the stylist’s work and choosing inspiration before a visit.
+
+### Early 2025: First prototype and tests
+
+The first version included gallery filters and a QR code. Three salons in Kraków tested how clients connect with stylists.
+
+### Summer 2025: Polish version, policies and hosting
+
+We prepared the Polish-language version, terms and privacy policy.
+
+### Q3 2026: Stylist account registration
+
+Stylists can start with the limited Free Demo, with a gallery and QR code. Visit history is available on paid plans.
+
+### Next stage: Further markets and the mobile app
+
+Development plans include Czech, German-speaking and English-speaking markets and a mobile app.
+
+## Photos, fees and languages
+
+- 100% ownership of your photos
+- 0% commission from your clients
+- 3 languages: Polish, English, German
+
+The first nail stylists from Krakow and Warsaw were testing Nailfolio before the launch.
+
+### Who is behind Nailfolio?
+
+Nailfolio is an independently developed product from Kraków. Feedback from nail stylists informs its development.
+
+### How is Nailfolio different from Booksy?
+
+Booksy is a platform for booking appointments. Nailfolio is a nail portfolio with client history: color, style and length filters, a QR code at the salon, and Inspiration Sessions from clients. They solve different problems, so the two work well side by side.
+
+### How is Nailfolio development funded?
+
+Nailfolio is developed without external investors. Paid plans fund further app development.
+
+### Where is the data stored?
+
+Cloudinary handles photos, and Stripe handles payments. Some providers also process data outside the EU; see the Privacy Policy for details. Nailfolio does not sell data or use marketing cookies.
+
+### Which languages is Nailfolio available in?
+
+Nailfolio is available in Polish, English and German.
+
+---
+
+# Contact Nailfolio: support and partnerships
+
+> Contact Nailfolio about accounts, app features, pricing and partnerships. Contact form, email and help center.
+
+HTML version of this page: https://nailfolio.app/en/contact/ | Markdown mirrors: PL https://nailfolio.app/contact.md, DE https://nailfolio.app/de/contact.md | LLM index: https://nailfolio.app/llms.txt
+
+## Contact us
+
+Use the form or send an email about your account, app features, pricing or partnerships.
+
+### What should I include in a bug report?
+
+Describe what is not working and when the error occurs. Include your phone model and browser. If possible, attach a screenshot to your email.
+
+### What language can I write in?
+
+Contact is available in Polish, English and German. The reply will use the language of your message.
+
+### I have a pricing question. Where should I write?
+
+Select “Plans and pricing” or email https://nailfolio.app/contact. You can also ask about Studio and Scale plans there.
+
+### How can I request an offer for a salon network?
+
+Select “Partnership or collaboration” or email https://nailfolio.app/contact to ask about a custom Scale offer.
+
+### Where is Nailfolio from?
+
+Nailfolio is an independently developed app from Kraków.
+
+---
+
+# Help Center and FAQ
+
+> Nailfolio Help Center: instructions for the gallery, QR code, Inspiration Sessions, Messages, accounts and subscriptions.
+
+HTML version of this page: https://nailfolio.app/en/help-center/ | Markdown mirrors: PL https://nailfolio.app/help-center.md, DE https://nailfolio.app/de/help-center.md | LLM index: https://nailfolio.app/llms.txt
+
+## Nailfolio Help Center
+
+Answers about galleries, QR codes, Inspiration Sessions, messages, client history and accounts.
+
+## How a client shares inspiration with her stylist
+
+### The client scans a QR code
+
+The client scans her stylist’s QR code, signs in and sends a connection request.
+
+### The stylist accepts the connection
+
+After the request is accepted, the client can browse the stylist’s full gallery, including private work.
+
+### The client chooses photos
+
+The client chooses photos, can like designs, adds one note and shares an Inspiration Session with her stylist before the visit.
+
+### The stylist receives the session
+
+After the session is shared, the stylist sees the chosen photos and note. The client can discuss the details in Messages.
+
+## General
+
+### What is Nailfolio?
+
+Nailfolio is an app for nail stylists and their clients. It includes a gallery with filters, QR connections, Inspiration Sessions, Messages and a client card with visit history.
+
+### Is Nailfolio free?
+
+Stylists can start with Free Demo without a card: up to 5 photos, up to 2 connected clients and 3 pinned styles. Free Demo does not expire. Pro includes an unlimited gallery and client list, plus 90 days of visit history; compare the other paid plans on the pricing page. The 14-day trial is available once per account and requires a card at activation. After 14 days, the subscription starts unless you cancel first. A client account is free.
+
+### How do I get started with Nailfolio?
+
+A stylist or client opens nailfolio.app in a phone browser on Android or iPhone and signs in with Google or an email link.
+
+### What devices does Nailfolio work on?
+
+Stylists and clients can use all Nailfolio features in a phone browser on Android and iPhone. There is no separate desktop app. The Android app is in preparation.
+
+### Is my data safe?
+
+Connections to the app are encrypted. Stripe handles payments. See the Privacy Policy for information about service providers and data processing.
+
+### How can I contact Nailfolio?
+
+A stylist or client can use the contact form, email https://nailfolio.app/contact or message @nailfolio on Instagram.
+
+### How do I sign in if there's no password?
+
+A stylist or client signs in with Google or an email link. To receive a link, enter an email address and open the link in the message. No password is needed.
+
+### The magic sign-in link isn't arriving, what should I do?
+
+A stylist or client should check Spam and Promotions. A sign-in link is valid for one hour; after that, request a new one or sign in with Google. If the problem continues, use the contact form and include the email address used to sign in.
+
+### Can I sign in on several devices at once?
+
+A stylist or client can use the same account across all their devices at once. Sign in the same way on each one: with a login link sent to the same email address or with Google. Active sessions can be checked and signed out in the Signed-in devices section of Account.
+
+### How do I switch between the nail artist and client roles?
+
+One person can use Nailfolio as both a stylist and a client. In Account, select Settings, then Switch role. Each role keeps its own data, galleries and settings.
+
+### The app isn't working or loads slowly, what should I do?
+
+A stylist or client should close and reopen Nailfolio, then check the internet connection. If the problem continues, send a report with the phone model, operating system and error description.
+
+### How do I report an inappropriate photo?
+
+A stylist or client opens the photo menu (three dots), selects “Report” and chooses a reason. The report goes to the moderation team. If a moderator takes action on the photo and the author's email address is available, the author receives the decision by email. The person who submitted the report does not receive an outcome notification.
+
+## For nail artists
+
+### How do I add nail photos to my Nailfolio gallery?
+
+Open the app, go to the Add tab, take a photo or choose from your gallery, tag colors and features, then publish.
+
+### What are pinned photos?
+
+Pinned photos are your best work, displayed at the top of your public profile. The number of pins depends on your plan.
+
+### How do I generate a QR code for clients?
+
+You have one permanent QR code on the Connection screen. Show it to your client on your phone or print it and display it at your station. Your client scans it, opens your profile and sends a connection request for you to accept.
+
+### How can a client send me inspiration before the visit?
+
+Your client creates an Inspiration Session, chooses photos from your gallery, adds one note and shares the collection with you in one tap. You will find it in the Session Inbox.
+
+### How do I change my pricing plan?
+
+Open Your account and plan, then Plan. Before changing a paid plan, you will see the amount and billing consequences. The change takes effect after the displayed difference is settled. If you switch to Free Demo, your current plan remains active until the end of the paid period.
+
+### Can I add nail artist accounts?
+
+Choose Studio and invite stylists by email. After accepting and signing in normally, they use the active salon plan’s capabilities in their own accounts. Their work joins the shared gallery with author credits; each can turn this off in her profile. A client connected with one member can browse the whole gallery and contact any contributing stylist. You can display your permanent QR code at reception as the salon’s code: once you accept the request, the client can see the work of all team members who share photos with the salon and message each of them.
+
+### What happens to my photos when I downgrade?
+
+Your photos and data stay in your account, and connected clients retain access to the full gallery. After a paid plan ends, the public profile shows up to 3 pinned styles, and Free Demo blocks adding photos beyond 5 or connecting more than 2 clients. Nothing is deleted.
+
+### How does subscription auto-renewal work?
+
+After the 14-day trial, your subscription renews automatically. Manage your plan in account settings.
+
+### How do I cancel my subscription?
+
+Open Your account and plan, then Plan and subscription management. You can cancel renewal in the Stripe portal. Your current plan remains active until the end of the paid period, then Free Demo limits apply. Your account, data and photos remain, and connected clients keep access to the gallery.
+
+### My payment didn't go through, what should I do?
+
+Check that your card is active and has sufficient funds. Go to Account → Subscription → Manage subscription and update your card details. Stripe will automatically retry the payment. If the problem persists, use the contact form.
+
+### I'd like a refund, how does that work?
+
+During the 14-day Pro trial, you can cancel your subscription at no charge. If you have already been charged, submit a request within 14 days. After it has been reviewed, you will receive a response about the refund.
+
+### A staff member has left, how do I revoke their access?
+
+The owner can remove a stylist, and a member can leave. The stylist returns to their own plan’s capabilities. Photos and client data stay on their account, but adding beyond their own plan’s limits is blocked.
+
+### How do I reply to a client in the app?
+
+Open the Messages tab, there you'll see conversations with clients you're connected with.
+
+### Do I have to add a phone number to my profile?
+
+No, the field is optional. If you fill it in, clients will see it on your public profile.
+
+## For clients
+
+### How do I find a nail artist?
+
+Scan your stylist’s QR code at the salon and sign in with Google or an email link to request a connection. Your stylist controls access: once she accepts your request, you can see her full gallery. Filter her work by color and features to find what you have in mind.
+
+### Can I like nail artists?
+
+Yes. Select “Like stylist” on the stylist’s profile. You can find her later in your collection.
+
+### How do I like a design?
+
+Select the heart on a photo in your stylist’s gallery. You’ll find liked designs in “Your collection”.
+
+### What is connecting with a nail artist?
+
+Connecting with a stylist lets you see her full gallery, send Inspiration Sessions and write Messages. In an active Studio salon, one connection also opens the work of all contributing stylists. You can send inspiration or a message to any of them without another connection request.
+
+### Do I have to pay for an account?
+
+No. Your client account is free. You can browse galleries and like any design or stylist at no cost.
+
+### How do I delete my account?
+
+Open Account, select Settings, then Delete account. Your account will be deactivated and your data stored securely. You have 90 days to change your mind: sign in again and restore the account with one click. You can request permanent data deletion at any time under Article 17 GDPR by writing to https://nailfolio.app/contact.
+
+### Does the artist’s code expire or work only once?
+
+No. Your stylist’s QR code is permanent: the same code is displayed at her station and on her screen. Scan it with your regular camera to open your stylist’s profile and send a connection request. Your stylist can accept it with one tap.
+
+### I see a message that I'm already connected with this nail artist. What does that mean?
+
+It means you already have an active connection with your stylist, so you do not need to scan her code again. Open Dashboard, then Connected stylists, to see her full gallery. You can connect with up to 3 stylists at a time.
+
+### My photo has disappeared from the gallery, why?
+
+A photo may be hidden if it violates the content rules, for example if it contains personal data, faces or content unrelated to nails. You'll receive the reason for the decision by email. To appeal, reply to that message.
+
+### Can I message my stylist?
+
+Yes. Use Messages once you are connected with your stylist.
+
+## Technical
+
+### What photo formats are supported?
+
+Nailfolio supports JPG, PNG and WEBP formats. Maximum file size is 10 MB. Photos are automatically optimised.
+
+### How does color tagging work?
+
+Photos can be assigned one or more colors from the available palette.
+
+### Is data encrypted?
+
+Connections to the app are encrypted.
+
+### What are style features?
+
+Features are tags describing techniques, effects and styles, e.g. French, Ombre, Chrome, Floral. The app has a set of predefined features in four categories.
+
+### How do gallery filters work?
+
+Photos in a stylist’s gallery can be filtered by color, style and nail length. Filters work together, and results update immediately.
+
+### Does Nailfolio have an API?
+
+Nailfolio does not offer a public API. Submit integration questions using the contact form.
+
+### Does Nailfolio work offline?
+
+The gallery and Inspiration Sessions require an internet connection. Nailfolio has no offline mode.
+
+## App support contact
+
+For further questions, use the contact form or send an email.
+
+---
+
+# Nailfolio on your phone: nail portfolio and client history
+
+> Use Nailfolio in your phone’s browser: nail gallery, Inspiration Sessions, Messages and client history. Available on Android and iPhone.
+
+HTML version of this page: https://nailfolio.app/en/get-app/ | Markdown mirrors: PL https://nailfolio.app/get-app.md, DE https://nailfolio.app/de/get-app.md | LLM index: https://nailfolio.app/llms.txt
+
+## Nailfolio on your phone: nail portfolio and client history
+
+Nailfolio helps nail professionals and clients agree on a design before the appointment. Photos, a note and Messages help save time at the salon. Use it in your phone’s browser.
+
+## Gallery, Inspiration Sessions and client history
+
+Add your work and keep client cards. Your client chooses photos before the visit.
+
+### Add and organize your photos
+
+Add photos of your work and tag them by color, style and nail length. Published photos appear in your gallery. Pin selected styles to your public profile, which anyone with the link can view.
+
+### Show your QR code to your client
+
+Show your client your permanent QR code. When she sends a connection request, accept it to give her access to your full gallery.
+
+### Filter photos by style
+
+Once connected, your client filters photos in your gallery by color, style and nail length.
+
+### Share an Inspiration Session before the visit
+
+Your client chooses photos and shares an Inspiration Session with you. She can add a note. You will find the session under “Sessions from clients”; it stays active for 30 days.
+
+### Scans your QR code and signs in
+
+Your client scans your QR code and sends a connection request. Once you accept, they can see your full gallery.
+
+### Message clients and keep their cards
+
+In Messages, you can talk to clients even before connecting. Paid plans let you keep private cards for connected clients, add notes and view visit history.
+
+## How Nailfolio works in the nail salon
+
+Create an account, add photos of your work and show your client the QR code. Your client chooses a design before the visit.
+
+### Create an account
+
+Click “Try Nailfolio” to go to registration.
+
+### Add photos of your work
+
+Add photos of your work and tag them by color, style and nail length.
+
+### Show your client the QR code
+
+Your client scans the QR code, connects with you and chooses photos from your gallery before the visit.
+
+- No ads in the app
+- Your work and clients in one place
+- You choose which work appears on your public profile.
+- Client cards are private to each stylist.
+
+### When will the app be on Google Play, and how do I start today?
+
+Nailfolio is available in your phone’s browser on Android and iPhone. The Android app is being prepared for publication on Google Play. A native iOS app is not currently available.
+
+### How much does Nailfolio cost?
+
+A client account is free. You can try Free Demo without a card; see the pricing page for paid-plan prices and details.
+
+### Does the app work without internet?
+
+Features such as the gallery and Inspiration Sessions require an internet connection. Nailfolio has no offline mode.
+
+### Does the app collect data for advertising?
+
+Nailfolio does not use marketing cookies or advertising pixels and does not share data with advertisers. You can turn off analytics in the cookie banner. See the Privacy Policy for information about service providers and data processing.
+
+### Which devices are supported?
+
+Nailfolio runs in your phone's browser; you do not need to install an app.
+
+### Does the client have to install the app?
+
+Clients can use Nailfolio in their phone’s browser. An account is needed for likes and Inspiration Sessions, and a confirmed connection with the stylist gives access to the full gallery. Sign-in uses Google or an email link. The stylist’s public profile is available without an account.
+
+### Can I use Nailfolio as a client, without a stylist account?
+
+Yes. You can use a free client account without creating a stylist account. You can also have both.
+
+### What happens when I change my phone?
+
+On a new device, sign in with the same email address. You can use Nailfolio on several devices, such as a phone and a tablet.
+
+---
+
+# Welcome to Nailfolio
+
+> Nailfolio for nail professionals and their clients. Choose inspirations and discuss the details before an appointment to save time at the salon.
+
+HTML version of this page: https://nailfolio.app/en/welcome/ | Markdown mirrors: PL https://nailfolio.app/welcome.md, DE https://nailfolio.app/de/welcome.md | LLM index: https://nailfolio.app/llms.txt
+
+## Welcome to Nailfolio
+
+Agree on your nail design before the appointment and save time at the salon.
+
+Beta testers reported 10-15 minutes less spent discussing a design during an appointment.
+
+[Create account](https://nailfolio.app/en/user/login/?intent=register)
+
+[Log in](https://nailfolio.app/en/user/login/)
+
+[Home](https://nailfolio.app/en/)
+
+[Plans and pricing](https://nailfolio.app/en/pricing/)

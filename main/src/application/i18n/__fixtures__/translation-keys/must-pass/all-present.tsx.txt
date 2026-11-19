@@ -1,0 +1,36 @@
+export {};
+type Translator = {
+  (key: string, values?: Record<string, unknown>): string;
+  has(key: string): boolean;
+  rich(key: string, values?: Record<string, unknown>): unknown;
+  markup(key: string, values?: Record<string, unknown>): string;
+  raw(key: string): unknown;
+};
+declare function useTranslations<N extends string = never>(namespace?: N): Translator;
+declare function getTranslations<N extends string = never>(
+  options: N | { locale: string; namespace?: N }
+): Promise<Translator>;
+
+type DemoT = ReturnType<typeof useTranslations<"demo">>;
+type Part = "a" | "b";
+const PARTS = ["a", "b"] as const;
+function label({ t }: { t: DemoT }): string {
+  return t("title");
+}
+export async function sample(locale: string, part: Part) {
+  const t = useTranslations("demo");
+  const root = useTranslations();
+  const server = await getTranslations({ locale, namespace: "other" });
+  return [
+    t("title"),
+    t(`group.${part}`),
+    PARTS.map(p => t(`group.${p}`)).join(""),
+    t.rich("title", { b: (chunks: unknown) => chunks }),
+    t.raw("list"),
+    root("other.label"),
+    server("label"),
+    label({ t }),
+    // A key that may be absent, read only behind its own has() guard.
+    t.has("maybeLater") ? t("maybeLater") : "",
+  ];
+}

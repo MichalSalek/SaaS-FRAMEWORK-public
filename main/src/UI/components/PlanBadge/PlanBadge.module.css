@@ -1,0 +1,41 @@
+/* ─── PlanBadge ─── */
+.badge {
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--style-radius-surface);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-primary-contrast);
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.free {
+  background: var(--color-text-secondary);
+}
+
+.pro {
+  background: var(--color-accent);
+}
+
+.proPlus {
+  background: var(--color-warning);
+}
+
+.studio {
+  background: var(--color-primary);
+}
+
+.scale {
+  background: var(--color-success);
+}
+
+/* Public profile: one ink-and-gold mark, identical for every paid tier so the
+   badge never competes with the brand colour of the page. */
+.premium {
+  --color-focus-ring: var(--color-accent-on-ink);
+  background: var(--color-ink);
+  color: var(--color-warning);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-warning) 55%, transparent);
+  letter-spacing: var(--ls-tight-10, 0.01em);
+}

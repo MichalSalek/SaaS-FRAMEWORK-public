@@ -1,0 +1,21 @@
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Solid tonal fill, not a gradient (anti-slop floor). */
+  background: var(--color-surface-input);
+  color: var(--color-text-secondary);
+  border-radius: var(--style-radius-surface);
+}
+.sm {
+  width: 40px;
+  height: 40px;
+}
+.md {
+  width: 80px;
+  height: 80px;
+}
+.lg {
+  width: 120px;
+  height: 120px;
+}

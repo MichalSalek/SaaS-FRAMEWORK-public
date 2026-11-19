@@ -1,0 +1,207 @@
+import { defineContracts } from '../../application/contracts/contract.types';
+import { QUERY_FIELD } from '../../application/contracts/query-fields';
+import {
+  sessionContainerAcceptSchema,
+  sessionContainerAddPhotoSchema,
+  sessionContainerCloseSchema,
+  sessionContainerCreateSchema,
+  sessionContainerRemovePhotoSchema,
+  sessionContainerSetNoteSchema,
+  sessionContainerShareSchema,
+  sessionDetailResponseSchema,
+  sessionInsightsResponseSchema,
+  sessionListResponseSchema,
+  sessionResponseSchema,
+} from './session-container.contract-schemas';
+
+/**
+ * Inspiration sessions. Create, add, remove and share are the client's.
+ * Close, the note, and both reads are granted to the stylist and the client.
+ * GET list filters stay lenient (bad take falls back to 50). A missing session id
+ * on get-by-id stays a handler 400 `{ session_id: 'Required' }`.
+ */
+
+const listQuery = {
+  cursor: QUERY_FIELD.string(),
+  take: QUERY_FIELD.int(50),
+};
+
+export const SESSION_CONTAINER_CONTRACTS = defineContracts({
+  SESSION_CONTAINER_ACCEPT: {
+    summary:
+      'Akceptuje udostępnione inspiracje bez potwierdzania wizyty lub ceny.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/accept',
+    method: 'POST',
+    body: sessionContainerAcceptSchema,
+    query: null,
+    response: sessionResponseSchema,
+    successEvents: ['SESSION_CONTAINER_ACCEPTED'],
+    auditEvents: ['SESSION_CONTAINER_ACCEPTED'],
+    access: 'STYLIST',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_CREATE: {
+    summary:
+      'Nowa sesja inspiracji klientki, opcjonalnie ze stylistką i nazwą. Zwraca sesję.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/create',
+    method: 'POST',
+    body: sessionContainerCreateSchema,
+    query: null,
+    response: sessionResponseSchema,
+    successEvents: ['SESSION_CONTAINER_CREATED'],
+    auditEvents: ['SESSION_CONTAINER_CREATED'],
+    access: 'CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_ADD_PHOTO: {
+    summary:
+      'Dopisuje zdjęcie z galerii do sesji. Powtórka tego samego zdjęcia niczego nie dodaje.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/add-photo',
+    method: 'POST',
+    body: sessionContainerAddPhotoSchema,
+    query: null,
+    response: sessionDetailResponseSchema,
+    successEvents: ['SESSION_CONTAINER_PHOTO_ADDED'],
+    auditEvents: ['SESSION_CONTAINER_PHOTO_ADDED'],
+    access: 'CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_REMOVE_PHOTO: {
+    summary:
+      'Zdejmuje zdjęcie z sesji. Brak tego zdjęcia w sesji też jest sukcesem.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/remove-photo',
+    method: 'POST',
+    body: sessionContainerRemovePhotoSchema,
+    query: null,
+    response: sessionDetailResponseSchema,
+    successEvents: ['SESSION_CONTAINER_PHOTO_REMOVED'],
+    auditEvents: ['SESSION_CONTAINER_PHOTO_REMOVED'],
+    access: 'CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_SHARE: {
+    summary:
+      'Udostępnia sesję przypisanej stylistce i zwraca zaktualizowaną sesję.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/share',
+    method: 'POST',
+    body: sessionContainerShareSchema,
+    query: null,
+    response: sessionResponseSchema,
+    successEvents: ['SESSION_CONTAINER_SHARED'],
+    auditEvents: ['SESSION_CONTAINER_SHARED'],
+    access: 'CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_CLOSE: {
+    summary:
+      'Zamyka sesję (klientka albo stylistka) i zwraca zaktualizowaną sesję.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/close',
+    method: 'POST',
+    body: sessionContainerCloseSchema,
+    query: null,
+    response: sessionResponseSchema,
+    successEvents: ['SESSION_CONTAINER_CLOSED'],
+    auditEvents: ['SESSION_CONTAINER_CLOSED'],
+    access: 'STYLIST_AND_CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_SET_NOTE: {
+    summary:
+      'Zapisuje notatkę sesji po stronie stylistki albo klientki. Pusta treść jest dozwolona.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/set-note',
+    method: 'POST',
+    body: sessionContainerSetNoteSchema,
+    query: null,
+    response: sessionResponseSchema,
+    successEvents: ['SESSION_CONTAINER_NOTE_UPDATED'],
+    auditEvents: ['SESSION_CONTAINER_NOTE_UPDATED'],
+    access: 'STYLIST_AND_CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_GET_MY: {
+    summary:
+      'Lista sesji zalogowanej osoby w aktywnej roli. Strona po stronie, domyślnie 50.',
+    group: 'SESSION_CONTAINER',
+    kind: 'QUERY',
+    path: 'session-container/get-my',
+    method: 'GET',
+    body: null,
+    query: listQuery,
+    response: sessionListResponseSchema,
+    successEvents: ['SESSION_CONTAINERS_FETCHED'],
+    auditEvents: ['SESSION_CONTAINERS_FETCHED'],
+    access: 'STYLIST_AND_CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_DUPLICATE: {
+    summary:
+      'Tworzy nową sesję roboczą z inspiracji zamkniętej lub wygasłej sesji. Zdjęcia i notatka klientki zostają skopiowane.',
+    group: 'SESSION_CONTAINER',
+    kind: 'COMMAND',
+    path: 'session-container/duplicate',
+    method: 'POST',
+    body: sessionContainerCloseSchema,
+    query: null,
+    response: sessionDetailResponseSchema,
+    successEvents: ['SESSION_CONTAINER_DUPLICATED'],
+    auditEvents: ['SESSION_CONTAINER_DUPLICATED'],
+    access: 'CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_INSIGHTS: {
+    summary:
+      'Agreguje kolory, cechy i długości z inspiracji klientek. Pełne dane w planach płatnych.',
+    group: 'SESSION_CONTAINER',
+    kind: 'QUERY',
+    path: 'session-container/insights',
+    method: 'GET',
+    body: null,
+    query: null,
+    response: sessionInsightsResponseSchema,
+    successEvents: ['SESSION_CONTAINER_INSIGHTS_FETCHED'],
+    auditEvents: [],
+    access: 'STYLIST',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+  SESSION_CONTAINER_GET_BY_ID: {
+    summary: 'Jedna sesja z listą zdjęć (query session_id).',
+    group: 'SESSION_CONTAINER',
+    kind: 'QUERY',
+    path: 'session-container/get-by-id',
+    method: 'GET',
+    body: null,
+    query: { session_id: QUERY_FIELD.requiredString() },
+    response: sessionDetailResponseSchema,
+    successEvents: ['SESSION_CONTAINER_FETCHED'],
+    auditEvents: ['SESSION_CONTAINER_FETCHED'],
+    access: 'STYLIST_AND_CLIENT',
+    authCheck: true,
+    limiterTier: 'default',
+  },
+});
+
+export type SessionContainerContracts = typeof SESSION_CONTAINER_CONTRACTS;

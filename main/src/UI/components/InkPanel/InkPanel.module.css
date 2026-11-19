@@ -1,0 +1,46 @@
+/* ─── InkPanel — a closed dark rectangle on a light background ───
+ * Canon (owner vote): a negative is a closed rounded rectangle inside the
+ * parent's container, NEVER a full-bleed band. Floor: zero gradients and
+ * shadows; the frame is a full four-sided hairline or none. */
+
+.panel {
+  width: 100%;
+  border-radius: var(--style-radius-surface);
+  padding: clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px);
+}
+
+/* A mode-invariant negative: the ink/on-ink pair does NOT flip between
+ * modes. Full hairline from a color-mix on on-ink. */
+.ink {
+  background: var(--color-ink);
+  /* Quiet buttons on the negative do not take the white surface. */
+  --btn-quiet-bg: transparent;
+  --btn-quiet-border: var(--color-on-ink);
+  --btn-quiet-fg: var(--color-on-ink);
+  /* Focus ring on ink: the base ring is exactly --color-ink in LIGHT, so it would be invisible here
+     (1.00:1). It takes --color-accent-on-ink: the red --color-primary is dark in LIGHT and gives
+     only 3.6:1 on ink, below AA, whereas this role is mode-invariant. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  color: var(--color-on-ink);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 16%, var(--color-ink));
+}
+
+/* Violet: the featured-card pattern from ForClientsPage. In LIGHT mode the pure --color-secondary
+ * (oklch 0.58) gives white text only ~4.38:1 (below AA 4.5:1), so it is deepened by 15%
+ * primary-contrast (~5.4:1, PASS). The shared token stays untouched, the tint is local. No frame
+ * (source: border transparent): the solid fill closes the rectangle by itself. */
+.violet {
+  background: color-mix(
+    in oklch,
+    var(--color-secondary) 85%,
+    var(--color-primary-contrast)
+  );
+  color: var(--color-text-inverse);
+}
+
+/* DARK mode: secondary 0.66 with near-black text-inverse already gives
+ * 6.3:1, so the pure token is used. */
+[data-mode='dark'] .violet {
+  background: var(--color-secondary);
+}

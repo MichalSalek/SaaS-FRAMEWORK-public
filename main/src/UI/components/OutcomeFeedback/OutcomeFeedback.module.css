@@ -1,0 +1,285 @@
+.line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  position: relative;
+  color: var(--color-text-secondary);
+}
+.reserve {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  pointer-events: none;
+  display: flow-root;
+}
+.status {
+  grid-area: 1 / 1;
+  display: flow-root;
+}
+.liveText {
+  display: block;
+}
+.lineContent {
+  display: block;
+  position: relative;
+}
+/* The check's slot exists only while the check is drawn: reserved in every
+   state it indented „Zmiany zapisują się same” under a flush-left heading.
+   The message text changes with the state anyway, so nothing shifts. */
+.line[data-state='complete'] .lineContent {
+  padding-inline-start: calc(1em + var(--space-8));
+}
+.lineContent > .checkSlot {
+  position: absolute;
+  inset-inline-start: 0;
+}
+.check {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  display: block;
+  color: var(--color-success);
+}
+.checkSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1em;
+  height: 1lh;
+}
+.retry {
+  float: inline-end;
+  margin-inline-start: var(--space-8);
+}
+.actionReserve {
+  float: inline-end;
+  margin-inline-start: var(--space-8);
+  visibility: hidden;
+  pointer-events: none;
+}
+.outcome {
+  min-width: 0;
+}
+.result {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+.changed {
+  animation: feedback-change var(--outcome-change-duration) ease;
+}
+.scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-16);
+  text-align: center;
+  animation: feedback-enter var(--outcome-scene-duration) ease both;
+}
+.emblem {
+  width: var(--outcome-emblem-size);
+  height: var(--outcome-emblem-size);
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--color-primary);
+}
+.emblem > svg {
+  width: 100%;
+  height: 100%;
+}
+.title {
+  margin: 0;
+  font: inherit;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-heading);
+}
+/* The heading takes programmatic focus so a screen reader starts at the result;
+   it is not a control (tabindex -1), so it draws no focus ring. */
+.title:focus {
+  outline: none;
+}
+.preview {
+  display: flex;
+  justify-content: center;
+}
+.body,
+.preview,
+.actions,
+.aside {
+  width: 100%;
+  min-width: 0;
+}
+/* A body may carry several blocks (sentence, second sentence, a list): they keep
+   one gap instead of touching. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+.particle {
+  position: absolute;
+  width: var(--space-4);
+  height: var(--space-4);
+  background: var(--color-primary);
+  pointer-events: none;
+  animation: feedback-particle var(--outcome-first-duration) ease both;
+}
+.particle[data-position='0'] {
+  top: 0;
+  left: 0;
+}
+.particle[data-position='1'] {
+  top: 0;
+  right: 0;
+}
+.particle[data-position='2'] {
+  bottom: 0;
+  left: 0;
+}
+.particle[data-position='3'] {
+  bottom: 0;
+  right: 0;
+}
+.particle[data-position='4'] {
+  top: 50%;
+  left: 0;
+}
+.particle[data-position='5'] {
+  top: 50%;
+  right: 0;
+}
+@keyframes feedback-change {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes feedback-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes feedback-particle {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+ * SUCCESS PRESENTATIONS — one family, two weights (owner)
+ *
+ * `glory` is a milestone: a compact raspberry band with the mark and the
+ * title, then the paper panel that carries the content. It borrows the
+ * brand-field/plinth language of the welcome and plan-decision surfaces, but
+ * stays inside the app shell and under the app bar. `plain` keeps the existing
+ * surface of quiet confirmations (magic link, invitation, repeated upload).
+ *
+ * The action dock is part of BOTH presentations: a full-screen success must
+ * keep its buttons at the bottom edge under the thumb, never floating in the
+ * middle when the copy is short. Long content scrolls behind the dock.
+ * ============================================================ */
+
+.sceneGlory {
+  width: calc(100% + var(--space-20) + var(--space-20));
+  margin-inline: calc(var(--space-20) * -1);
+  gap: 0;
+  align-items: stretch;
+  text-align: start;
+  flex: 1 0 auto;
+  min-height: 100%;
+  animation: feedback-enter var(--outcome-scene-duration) ease both;
+}
+
+.sceneDocked {
+  flex: 1 0 auto;
+  min-height: 100%;
+}
+
+.sceneGlory .emblem {
+  width: var(--space-64);
+  height: var(--space-64);
+  color: var(--color-on-brand-field);
+}
+
+.sceneGlory .title {
+  color: var(--color-on-brand-field);
+  font-size: var(--text-2xl);
+}
+
+.gloryBand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-24) var(--space-20);
+  background: var(--color-brand-field);
+  color: var(--color-on-brand-field);
+  text-align: center;
+}
+
+.gloryBand .particle {
+  background: var(--color-on-brand-field);
+}
+
+.gloryPanel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-16);
+  min-width: 0;
+  padding: var(--space-20) var(--space-20) 0;
+  background: var(--color-bg-paper);
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.gloryPanel .body {
+  text-align: center;
+}
+
+.gloryPanel .body :where(section, form) {
+  text-align: start;
+}
+
+.gloryPanel .preview {
+  justify-content: center;
+}
+
+.actionsDockSlot {
+  width: 100%;
+  min-width: 0;
+}
+
+.actionsDocked {
+  margin-top: auto;
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding-top: var(--space-16);
+  padding-bottom: max(var(--space-20), env(safe-area-inset-bottom, 0px));
+  /* The view owns the surface. Painting the dock here made a white rectangle
+     around the rounded buttons whenever the host background was gray (the
+     Playground preview exposed it); the buttons already carry their own fill. */
+  background: transparent;
+}

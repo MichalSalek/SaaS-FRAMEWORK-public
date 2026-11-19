@@ -1,0 +1,57 @@
+.button {
+  position: fixed;
+  bottom: calc(var(--space-32) + env(safe-area-inset-bottom, 0px));
+  right: var(--space-32);
+  z-index: var(--z-fab);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: var(--style-radius-pill);
+  /* Depth comes from a full hairline + solid fill, not from a shadow. */
+  border: var(--style-border-surface) solid var(--color-primary-dark);
+
+  text-decoration: none;
+  cursor: pointer;
+  /* bottom anim = płynne wysunięcie nad StickyCtaBar gdy bar wjeżdża (PublicLayout
+     koordynuje pozycję; ease-entrance zgrane z reveal bara 200ms). */
+  transition:
+    transform var(--transition-fast),
+    bottom var(--duration-200) var(--ease-entrance),
+    opacity var(--duration-200) var(--ease-entrance),
+    visibility var(--duration-200);
+}
+
+/* Telefon: jedna prawa krawędź dla wszystkiego, co pływa (owner:
+   dymek stał dalej od krawędzi ekranu niż przycisk „Zacznij za darmo” pod nim,
+   „dlatego jest nierówno”). 16 px to odstęp przycisku CTA (StickyCtaBar). */
+@media (max-width: 767.98px) {
+  .button {
+    right: var(--space-16);
+  }
+}
+
+@media (hover: hover) {
+  .button:hover {
+    transform: scale(1.08);
+  }
+}
+
+.button:active {
+  transform: scale(0.95);
+}
+
+/* Native video controls need the lower-right corner while the activated explainer is visible.
+   Scope this to the floating link; the contact page and its other entry points remain available.
+   Leaving the viewport or unmounting the player restores the link through the existing transition. */
+:global(body:has([data-marketing-video][data-active][data-in-view='true']))
+  .button {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

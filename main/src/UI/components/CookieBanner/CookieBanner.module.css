@@ -1,0 +1,462 @@
+/* ─── Shell: colours inverted to the theme ───
+ * The collapsed bar and the tab use inverted ink: background from the text colour, text from the
+ * paper colour, in both modes (light: dark bar, dark: light bar). The values are read HERE, from
+ * the surroundings, and the bar below swaps its content tokens with them; on a single element the
+ * swap would read itself. */
+.shell {
+  --_cookie-bg: var(--color-text-primary);
+  --_cookie-fg: var(--color-bg-main);
+}
+
+/* ─── Banner (fixed bottom, mobile-first) ─── */
+.banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-dialog);
+  padding: var(--space-8) var(--space-12);
+  /* Full fill, no blur or shadow: the inverted color of the whole bar separates it from content. */
+  background: var(--_cookie-bg);
+  color: var(--_cookie-fg);
+  animation: slide-up 250ms ease-out;
+  max-height: 40vh;
+  overflow-y: auto;
+  transition:
+    transform var(--duration-200) var(--ease-entrance),
+    opacity var(--duration-200) var(--ease-entrance),
+    visibility var(--duration-200) linear;
+  /* The content reads the same tokens as everywhere, only with inverted values: text, secondary
+     text, links, lines and the quiet button. */
+  --color-text-primary: var(--_cookie-fg);
+  --color-text-secondary: color-mix(
+    in oklch,
+    var(--_cookie-fg) 78%,
+    var(--_cookie-bg)
+  );
+  --color-accent-fg: var(--_cookie-fg);
+  --color-primary-dark: var(--_cookie-fg);
+  --color-divider: color-mix(
+    in oklch,
+    var(--_cookie-fg) 24%,
+    var(--_cookie-bg)
+  );
+  --color-surface-hover: color-mix(
+    in oklch,
+    var(--_cookie-fg) 12%,
+    var(--_cookie-bg)
+  );
+  --color-surface-pressed: color-mix(
+    in oklch,
+    var(--_cookie-fg) 20%,
+    var(--_cookie-bg)
+  );
+  --btn-quiet-fg: var(--_cookie-fg);
+  --btn-quiet-hover-bg: var(--color-surface-hover);
+  --btn-quiet-pressed-bg: var(--color-surface-pressed);
+  /* Focus ring in the bar's text colour: the highest contrast on the inverted background in both
+     modes. */
+  --color-focus-ring: var(--_cookie-fg);
+}
+
+/* The expanded settings panel returns to the normal surface: toggles and category descriptions
+   should look like in settings, not like on the bar. */
+.shell[data-expanded] {
+  --_cookie-bg: var(--color-bg-elevated);
+  --_cookie-fg: var(--color-text-primary);
+}
+
+.shell[data-expanded] .banner {
+  --color-text-primary: inherit;
+  --color-text-secondary: inherit;
+  --color-accent-fg: inherit;
+  --color-primary-dark: inherit;
+  --color-divider: inherit;
+  --color-surface-hover: inherit;
+  --color-surface-pressed: inherit;
+  --btn-quiet-fg: inherit;
+  --btn-quiet-hover-bg: inherit;
+  --btn-quiet-pressed-bg: inherit;
+  --color-focus-ring: inherit;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* Hidden: the bar slides below the screen, the tab stays. */
+.banner[data-tucked] {
+  transform: translateY(calc(100% + var(--space-16)));
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ─── Cookie tab (right edge, above the contact bubble) ─── */
+.tab {
+  position: fixed;
+  right: 0;
+  /* Above the contact bubble also when the bubble is raised above the CTA button (76 px + 48 px
+     high): everything that floats stands in the lower right corner, under the thumb, and nothing
+     overlaps. */
+  bottom: calc(
+    var(--space-96) + var(--space-48) + env(safe-area-inset-bottom, 0px)
+  );
+  z-index: var(--z-dialog);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  /* A full thin frame in the sign colour: over a dark page section a dark tab blended into the
+     background (measured on an ink band). */
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--_cookie-fg) 34%, transparent);
+  border-radius: var(--style-radius-control) 0 0 var(--style-radius-control);
+  background: var(--_cookie-bg);
+  color: var(--_cookie-fg);
+  cursor: pointer;
+  transform: translateX(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform var(--duration-200) var(--ease-entrance),
+    opacity var(--duration-200) var(--ease-entrance),
+    visibility var(--duration-200) linear;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab[data-visible] {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.tab:focus-visible {
+  /* focus-ring-allow: a ring in the tab's text colour, drawn inside it, on its own fill. */
+  outline: 2px solid var(--_cookie-fg);
+  outline-offset: -4px;
+}
+
+/* ─── „Akceptuję wszystkie” calls for a tap: two short nudges every few seconds. The wrapper
+ *     carries the motion, so it does not clash with the button's own press. ─── */
+.acceptNudge {
+  display: flex;
+  animation: cookie-nudge 3.6s ease-in-out 1.2s infinite;
+}
+
+@keyframes cookie-nudge {
+  0%,
+  72%,
+  100% {
+    transform: scale(1);
+  }
+
+  78% {
+    transform: scale(1.06);
+  }
+
+  84% {
+    transform: scale(1);
+  }
+
+  90% {
+    transform: scale(1.04);
+  }
+
+  96% {
+    transform: scale(1);
+  }
+}
+
+/* The expanded category panel does not fit in 40vh (455px of content in a 336px window at
+   390x844), so the save button landed below the edge and had to be scrolled to before consent
+   could be given. A collapsed banner should be small, an expanded one should be fully VISIBLE: the
+   user just deliberately asked for details. */
+.banner:has(.innerExpanded) {
+  max-height: 85vh;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ─── Inner wrapper (max-width on desktop) ─── */
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Content column (heading + description + categories). On desktop it is the left half of the
+   horizontal band, on mobile a plain stack. */
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* ─── Header ─── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.headingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.heading {
+  margin: 0;
+}
+
+/* ─── „Dostosuj" in the heading row (collapsed view) ───
+ * A secondary text action: it expands the category panel, it does not give consent, so it does
+ * not compete visually with the two CTAs below. It sits with the heading because that frees a
+ * whole button row in the actions. Height 32px > the WCAG 2.5.8 minimum of 24px (44px is reserved
+ * for the real consent/refusal CTAs). */
+.customizeBtn {
+  flex-shrink: 0;
+  /* A finger's target (44 px), like every other control of the banner. */
+  min-height: 44px;
+  padding: 0 var(--space-8);
+  border: none;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: var(--color-accent-fg);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.customizeBtn:active {
+  background: var(--color-surface-pressed);
+}
+
+@media (hover: hover) {
+  .customizeBtn:hover {
+    color: var(--color-primary-dark);
+    background: var(--color-surface-hover);
+  }
+}
+
+/* ─── Close button (expanded view) ─── */
+/* 44x44px meets the WCAG 2.5.8 / Apple HIG touch-target minimum. */
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.closeBtn:active {
+  background: var(--color-surface-pressed);
+}
+
+@media (hover: hover) {
+  .closeBtn:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+/* ─── Description ─── */
+.description {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Readable „cookies" link in the banner description: the gold-ink variant (WCAG 1.4.3).
+ * --color-primary (light gold #e0b341) is 1.96:1 on white and fails; --color-accent-fg = #8a6d18
+ * (4.91:1) is the canon for SMALL gold text/links on a light background (palettes.css). Light gold
+ * stays for FILLs/icons. */
+.link {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--color-primary-dark);
+}
+
+/* ─── Category toggles (expanded view) ─── */
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.alwaysOn {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* DECISION: the category description is NOT indented under the toggle label. A `margin-left: 56px`
+ * was dead: `.typography` from the Typography module has equal specificity and won by CSS Modules
+ * bundle order (computed marginLeft 0px). Full width is wanted anyway: at 390px a 56px indent
+ * costs an extra text line per category. If an indent returns it must go through a custom
+ * property, not a bare declaration of the same property. */
+.categoryDesc {
+  color: var(--color-text-secondary);
+}
+
+/* ─── Actions (button row) ─── */
+/* Mobile: two equal columns. A collapsed banner has exactly two CTAs (refusal + consent), because
+   „Dostosuj" moved to the heading row. */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+}
+
+.actionBtn {
+  width: 100%;
+}
+
+/* ─── Compact mobile card (<480) ─── */
+/* StickyCtaBar rule: a stuck element = a closed card with a buffer, taking the minimum of the
+   viewport. A full hairline border (4 sides) + radius-md instead of an edge bar; the banner drops
+   from ~45% to ~30% of a 390px screen. Touch targets: both consent/refusal CTAs keep 44px; only
+   the text „Dostosuj" is lower (36px, still above the WCAG 2.5.8 minimum of 24px). */
+@media (max-width: 479px) {
+  .banner {
+    left: var(--space-8);
+    right: var(--space-8);
+    bottom: var(--space-8);
+    padding: var(--space-8) var(--space-12);
+    border-radius: var(--style-radius-surface);
+  }
+
+  .shell[data-expanded] .banner {
+    border: var(--style-border-surface) solid var(--color-divider);
+  }
+
+  .inner {
+    gap: var(--space-8);
+  }
+
+  .headingRow .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .headingRow .heading {
+    font-size: var(--text-base);
+  }
+
+  .actions {
+    gap: var(--space-4);
+  }
+
+  .actions .actionBtn {
+    padding: var(--space-8) var(--space-12);
+    font-size: var(--text-sm);
+  }
+}
+
+/* ─── Desktop: ONE HORIZONTAL BAND ───
+ * A collapsed banner is not a card with three rows but a bar: content on the left, actions on the
+ * right, all on one baseline. An expanded one returns to a column, because the category panel
+ * needs the full width. */
+@media (min-width: 768px) {
+  .banner {
+    padding: var(--space-12) var(--space-20);
+    max-height: none;
+  }
+
+  .inner {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-20);
+  }
+
+  /* The horizontal band has spare width, so space-between would throw „Dostosuj" into the middle
+     of the emptiness, detached from both the title and the actions. It stays by the heading it
+     belongs to. The expanded panel goes back to spreading, because the close button sits on the
+     right there. */
+  .inner:not(.innerExpanded) .header {
+    justify-content: flex-start;
+  }
+
+  .innerExpanded {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-12);
+  }
+
+  /* Content column: heading + description one under the other, actions beside, not below. */
+  .textCol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+    flex: 1;
+  }
+
+  .innerExpanded .textCol {
+    gap: var(--space-12);
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+
+  .actionBtn {
+    width: auto;
+    min-width: 160px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    max-width: 1100px;
+  }
+}

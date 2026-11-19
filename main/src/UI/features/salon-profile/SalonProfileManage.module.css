@@ -1,0 +1,104 @@
+.form {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-20);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+.form fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.form legend {
+  margin-bottom: var(--space-12);
+}
+
+.galleryWorks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+
+.workAuthor {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.galleryContent {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-20);
+}
+
+.salonQr {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-16);
+  padding: var(--space-8) var(--space-16) var(--space-16);
+}
+
+.setup {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-20);
+}
+.contactFields {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-16);
+}
+.setup [id] {
+  scroll-margin-top: var(--space-64);
+}
+
+.slugStatus {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.slugPreview {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.slugField {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.slugHint {
+  color: var(--color-text-secondary);
+}
+
+/* The first configuration: one column of a form's width, the step indicator
+   on top, the step's boxes, then the step's actions. */
+.wizard {
+  display: grid;
+  min-width: 0;
+  max-inline-size: 40rem;
+  gap: var(--space-20);
+}
+
+.wizardLead {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.wizardActions {
+  display: grid;
+  gap: var(--space-12);
+}
+
+.wizardButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+
+.publishHint {
+  margin: 0;
+}

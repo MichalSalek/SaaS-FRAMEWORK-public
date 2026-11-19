@@ -1,0 +1,423 @@
+/* ─── GalleryPhotoCard ─── */
+.card {
+  /* A column, so that two cards of one grid row (stretched to one height)
+     can line up what stands at their bottom edge; without it the shorter
+     card ends with an empty band. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--style-radius-surface);
+  /* The photo card is tappable, so it stands on white. */
+  background: var(--color-surface-interactive);
+  position: relative;
+  isolation: isolate;
+  /* Depth = hairline border + tonal surface (no shadow). Border carries the
+   * card edge against the gallery grid; strengthened from 6% so the photo
+   * reads as a framed object, not a floating slab. */
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color var(--transition-normal);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+/* Hover: lift + border emphasis (transform + border-color carry the
+ * interactive affordance — no shadow). */
+@media (hover: hover) {
+  .card:has(.openPhotoButton:hover) {
+    transform: translateY(-3px) scale(1.012);
+    border-color: var(--color-border-surface);
+  }
+  .card:has(.openPhotoButton:hover) .image {
+    transform: scale(1.04);
+  }
+}
+
+.shareResult {
+  position: absolute;
+  z-index: 3;
+  right: var(--space-12);
+  bottom: calc(var(--space-44) + var(--space-16));
+  max-width: calc(100% - var(--space-24));
+  padding: var(--space-8) var(--space-12);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-card);
+  pointer-events: none;
+}
+
+/* (owner) The one-column view is a feed: the photo spans the full width
+   without rounding, and the caption under it gets its own minimal white box
+   so colors and styles do not lie on bare paper. */
+.cardFullWidth {
+  border-radius: 0;
+  background: transparent;
+  border-color: transparent;
+}
+
+/* DECISION: in the feed the caption is ATTACHED to the frame, not a separate bubble below it:
+   zero margin, photo width, top corners cut (frame and caption are one body), only the bottom
+   rounded. A detached box read as a second card and broke the rhythm of the Instagram-like
+   column. (owner) */
+.cardFullWidth .info {
+  margin: 0;
+  padding: var(--space-16) var(--space-20) var(--space-20);
+  background: var(--color-bg-paper);
+  border-radius: 0 0 var(--style-radius-surface) var(--style-radius-surface);
+}
+
+.cardFullWidth .imageWrapper {
+  border-radius: 0;
+  /* 3:4 = the creator's crop ratio (CropStep ASPECT), as in the grid; a square
+   * would crop the approved frame a second time. */
+  aspect-ratio: 3 / 4;
+}
+
+.cardCompact .imageWrapper {
+  border-radius: var(--style-radius-surface);
+}
+
+/* Press only the photo that actually opens. A share control, a heart or a
+   static card (public profile, salon showcase) must not scale the whole tile. */
+.card:has(.openPhotoButton:active) {
+  transform: scale(0.97);
+  transition: transform var(--duration-100) var(--spring-snappy);
+}
+
+.imageWrapper {
+  flex: none;
+  width: 100%;
+  aspect-ratio: 3 / 4; /* Portrait, nail-friendly */
+  /* The fixed-ratio frame keeps exact layout while off-screen media paint is skipped. */
+  content-visibility: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: var(--style-radius-surface) var(--style-radius-surface) 0 0;
+  overflow: hidden;
+  /* tint-allow: photo placeholder backdrop, visible only until the photo loads, so it does not
+   * compete with content surfaces (the tint rule targets SURFACES, not media backdrops).
+   * DECISION: solid tonal fill (NOT gradient): a functional image placeholder behind the
+   * lazy-loaded photo (object-fit:cover covers it once loaded), kept solid per the floor. */
+  background: var(--color-bg-paper);
+}
+
+/* Keyboard focus ring for the clickable image area (role=button, tabIndex=0).
+ * Mode-aware --color-focus-ring clears 3:1 in both themes (WCAG 2.4.11). */
+/* Stretched open-photo button over the whole frame, UNDER the actions (heart,
+   pin, share have z-index 2). It carries the control role and the focus ring;
+   it fills the frame to the pixel, so the ring outlines the frame. */
+.openPhotoButton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* DECISION: the card's focus indicator is drawn ON THE CARD, not on the photo. An outline inside
+   the frame is ~1:1 on a dark photo, and a scrim that would fix the contrast covers the work, so a
+   keyboard user cannot see WHICH photo they are about to open. `:has()` targets only the open
+   button; pin/heart/share have their own indicator inside their disc. */
+.card:has(.openPhotoButton:focus-visible) {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.openPhotoButton:focus-visible {
+  outline: none;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Image load-state resolve (former blur-up) ─── */
+/* De-slop (zero blur): the old filter:blur(8px) LQIP is replaced by an
+ * opacity resolve — the wrapper (already backed by a solid tonal
+ * placeholder, see .imageWrapper) sits slightly dimmed until the <img>
+ * mounts, then fades to full. Same transient load cue, no filter. */
+.imageResolve {
+  opacity: 0.85;
+  transition: opacity 400ms var(--ease-entrance);
+}
+
+.imageResolve:has(img) {
+  opacity: 1;
+}
+
+/* ─── Pinned Badge (top-right) ─── */
+/* (owner) The badge is vertically centred on the heart beside it (a 44px
+   disc from `--space-8`), not aligned with its top edge. */
+.pinnedBadge {
+  position: absolute;
+  top: calc(var(--space-8) + 22px);
+  transform: translateY(-50%);
+  right: var(--space-8);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  border-radius: var(--style-radius-pill);
+  z-index: 2;
+}
+
+/* When both pinned badge and heart are present, shift badge left */
+.pinnedBadgeWithHeart {
+  right: calc(var(--space-8) + 44px + var(--space-8));
+}
+
+/* ─── Pin Toggle Button (top-right, interactive) ─── */
+/* WCAG 2.1 AA / iOS HIG: minimum 44x44 tappable area */
+.pinToggle {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-pill);
+  /* Solid dark scrim (no backdrop-blur) — guarantees >=3:1 for the white
+   * icon over arbitrary photo content (WCAG 1.4.11 non-text). */
+  /* Focus ring on a photo overlay: the base --color-focus-ring is ink in light
+     mode, but this disc is dark and lies on a user bitmap, so the ring takes the
+     overlay role's white. The NEGATIVE offset is REQUIRED: the global +2px would
+     put the ring OUTSIDE the disc on the bare photo (white on white ~1:1). Inside
+     the disc, darkened to a computed veil while focused, white holds 3.18:1. */
+  --color-focus-ring: var(--color-on-photo-overlay);
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast);
+  z-index: 2;
+}
+
+.pinToggle:active {
+  transform: scale(0.9);
+}
+
+.pinToggleActive {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+/* ─── Selection mark (top-right, drawn only) ───
+   DECISION: in a pick mode the whole photo is the control and this disc only SHOWS the state, so
+   it takes no pointer events. Same two looks as the heart: a white sign on the dark scrim = not
+   chosen yet (a plus, "add"), the brand colour on a WHITE disc = chosen (a check). White under
+   the brand colour holds contrast on any photo. */
+.selectMark {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* focus-ring-allow: a drawn mark without focus; the card carries the ring */
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+  pointer-events: none;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.selectMark[data-selected='true'] {
+  background: var(--color-on-photo-overlay);
+  color: var(--color-primary);
+}
+
+.selectMark[data-pending='true'] {
+  opacity: 0.5;
+}
+
+.openPhotoButton:active + .selectMark {
+  transform: scale(0.9);
+}
+
+.openPhotoButton:disabled {
+  cursor: progress;
+}
+
+/* ─── Heart Button (top-right) ─── */
+.heartButton {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-pill);
+  /* Solid dark scrim (no backdrop-blur) — raised to 0.45 so the white heart
+   * clears >=3:1 over light photo regions (WCAG 1.4.11 non-text). */
+  /* Focus ring: white, drawn inside the disc (see .pinToggle). */
+  --color-focus-ring: var(--color-on-photo-overlay);
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
+  z-index: 2;
+}
+
+.heartButton:active {
+  transform: scale(0.95);
+}
+
+/* DECISION: a liked heart stands on a WHITE disc. The brand color is a dark raspberry, which
+   almost vanishes on the dark scrim over a dark photo; raspberry on white holds contrast on any
+   photo (on a white one the disc edge disappears, not the heart). The focus ring draws inside
+   the disc, so it takes the brand color. */
+.heartButton[data-liked='true'],
+.heartButton[data-liked='true']:focus-visible {
+  --color-focus-ring: var(--color-primary);
+  background: var(--color-on-photo-overlay);
+}
+
+/* Heart state not known yet (favorites in flight or failed): the heart does
+   not pretend a confirmed "not liked"; it is muted and inactive. */
+.heartButton:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.heartButton:disabled:active {
+  transform: none;
+}
+
+/* ─── Share Button (bottom-right) ─── */
+.shareButton {
+  position: absolute;
+  bottom: var(--space-8);
+  right: var(--space-8);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--style-radius-pill);
+  /* Solid dark scrim (no backdrop-blur) — raised to 0.45 so the white share
+   * icon clears >=3:1 over light photo regions (WCAG 1.4.11 non-text). */
+  /* Focus ring: white, drawn inside the disc (see .pinToggle). */
+  --color-focus-ring: var(--color-on-photo-overlay);
+  background: var(--color-photo-overlay);
+  color: var(--color-on-photo-overlay);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+  z-index: 2;
+}
+
+.shareButton:active {
+  transform: scale(0.95);
+}
+
+/* ─── Card Info ─── */
+.info {
+  display: flex;
+  flex-direction: column;
+  /* The card is a column (see `.card`), so the text part takes what the photo
+     leaves: a `footer` can then stand on the card's bottom edge. */
+  flex: 1 1 auto;
+  gap: var(--space-8);
+  padding: var(--space-12); /* Tight padding */
+}
+
+.colorDots {
+  display: flex;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+/* (owner) Colors and style names start on one vertical line. A chip carries
+   its own padding, so its TEXT would start ~14px right of the first color dot;
+   in the photo card chips become labels, no fill and no inset. */
+.traitChips {
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-8);
+  row-gap: var(--space-4);
+}
+
+.traitChips > * {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Social Proof: Like Count ─── */
+.likeCount {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Watermark overlay for FREE plan ─── */
+.watermark {
+  position: relative;
+}
+
+.watermark::after {
+  content: 'Nailfolio';
+  position: absolute;
+  bottom: var(--space-12);
+  right: var(--space-12);
+  font-size: var(--text-xs);
+  /* DECISION: the dot and color are computed for the WORST background, a white photo: the only
+   * surface in the app whose background is an arbitrary user bitmap, so contrast must hold without
+   * assumptions. White text at 14px needs 4.5:1 (WCAG 1.4.3; the logotype exception does not help,
+   * the mark must be legible), i.e. background luminance <= 0.183, i.e. a scrim >= 0.54 over a
+   * white bitmap. 0.62 gives 6.2:1 on white and 21:1 on black. Do NOT lower the scrim alpha or
+   * dim the text below full white. The overlay on a photo is mode-invariant, so it uses the
+   * photo-overlay roles, not theme tokens. */
+  color: var(--color-on-photo-overlay);
+  /* focus-ring-allow: a caption pseudo-element on the photo; not a control,
+     no descendants, never hosts focus, so a ring remap has nothing to fix. */
+  background: var(--color-photo-overlay-strong);
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--style-radius-control);
+  pointer-events: none;
+}
+
+/* The share disc sits bottom-right, so on a card that
+   has it the mark moves to the other corner instead of hiding under the disc. */
+.watermark:has(.shareButton)::after {
+  right: auto;
+  left: var(--space-12);
+}
+
+/* Focus on the photo controls: the disc darkens to a computed veil and the
+   white ring moves INSIDE the disc (see --color-photo-focus-veil). */
+.pinToggle:focus-visible,
+.heartButton:focus-visible,
+.shareButton:focus-visible {
+  background: var(--color-photo-focus-veil);
+  outline-offset: -2px;
+}

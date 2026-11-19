@@ -1,0 +1,272 @@
+/**
+ * ReviewsSection — one structure, two layouts (owner; the decision is described in
+ * the component).
+ *
+ * Phone: a row of equal white cards that scrolls sideways.
+ * From 768 px: the first review with one sentence in large type, and under it a
+ * button that expands the rest.
+ *
+ * Anti-AI-Slop (DESIGN.md §Anti-AI-Slop, HARD):
+ *   ZERO gradients · ZERO shadows/glow/box-shadow · ZERO single-sided borders ·
+ *   ZERO hover on static things · ZERO scroll-reveal · ZERO dashes in copy.
+ */
+
+/* ─── Shell — full-bleed, content at the LP width ─── */
+
+.section {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-bg-main);
+  /* The public pages' one vertical unit (tokens.css, --lp-rhythm). */
+  padding: var(--lp-rhythm) var(--section-gutter, 20px);
+}
+
+.inner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 40px);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.headline {
+  max-width: calc(36 * var(--ch-heading));
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.25;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+/* ─── Cards: the review text stands on white, not on paper ─── */
+
+.lead,
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  margin: 0;
+  padding: var(--space-20);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+.punch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0;
+}
+
+/* The one sentence that carries the review. */
+.punchLine {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.15;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.punchRest,
+.quote {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.quote {
+  color: var(--color-text-primary);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-top: auto;
+}
+
+.authorMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.authorName {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-style: normal;
+  color: var(--color-text-primary);
+}
+
+.authorPlace {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Phone: a row that scrolls sideways and stops on a card ─── */
+
+.reviews {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-12);
+  /* The row runs to both screen edges; the first card starts at the gutter. */
+  margin-inline: calc(-1 * var(--section-gutter, 20px));
+  padding: 0 var(--section-gutter, 20px) var(--space-8);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--section-gutter, 20px);
+  scrollbar-width: none;
+}
+
+.reviews > .lead,
+.reviews .card {
+  flex: 0 0 min(84%, 360px);
+  scroll-snap-align: start;
+}
+
+/* The list is only a wrapper on a phone: its cards join the row. */
+.rest {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.moreButton {
+  display: none;
+}
+
+/* ─── From 768 px: the first review and a button, the rest below it ─── */
+
+@media (min-width: 768px) {
+  .reviews {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-24);
+    margin-inline: 0;
+    padding: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .reviews > .lead,
+  .reviews .card {
+    flex: none;
+  }
+
+  .lead {
+    gap: var(--space-24);
+    padding: clamp(28px, 4vw, 56px);
+  }
+
+  .punchLine {
+    max-width: calc(16 * var(--ch-heading));
+    font-size: var(--text-fluid-3xl);
+    line-height: 1.1;
+    letter-spacing: var(--ls-tight-25);
+  }
+
+  .punchRest {
+    max-width: calc(62 * var(--ch-body));
+    font-size: var(--text-fluid-md);
+  }
+
+  .moreButton {
+    display: inline-flex;
+    align-self: flex-start;
+  }
+
+  .rest {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-16);
+  }
+}
+
+/* From 960 px the sentence stands on the left, the rest of the review and
+   its author on the right: the white box is used edge to edge. */
+@media (min-width: 960px) {
+  .lead {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    column-gap: clamp(32px, 5vw, 72px);
+    row-gap: var(--space-24);
+    align-items: start;
+  }
+
+  .punch {
+    display: contents;
+  }
+
+  .punchLine {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .punchRest,
+  .lead > .foot {
+    grid-column: 2;
+  }
+}
+
+/* ─── Rating — five nail plates (owner, 1:1 form) ─── */
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.nailOn,
+.nailOff {
+  display: block;
+  width: 8px;
+  height: 16px;
+}
+
+/* DECISION: filled with `--color-primary` (brand colour). The full rating is exposed by the
+   `aria-label` on `.rating` (marks are `aria-hidden`), so do not trade the brand colour for
+   contrast. */
+.nailOn {
+  fill: var(--color-primary);
+}
+
+.nailOff {
+  fill: none;
+  stroke: var(--color-icon-muted);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ─── Consent / authenticity note ─── */
+
+.consentNote {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,39 @@
+/* ─── Skeleton base ─── */
+/* Flat loading state (no shimmer gradient): solid tonal surface whose
+ * opacity breathes 0.55 → 1. Same "loading" affordance, zero gradients. */
+.skeleton {
+  display: block;
+  background-color: var(--color-surface-hover);
+  animation: skeletonPulse 1.4s ease-in-out infinite alternate;
+}
+
+/* ─── Pulse animation ─── */
+@keyframes skeletonPulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ─── Variant: Rect ─── */
+.rect {
+  width: 100%;
+  height: 20px;
+  border-radius: var(--style-radius-control);
+}
+
+/* ─── Variant: Text ─── */
+.text {
+  width: 80%;
+  height: 14px;
+  border-radius: var(--style-radius-control);
+}
+
+/* ─── Variant: Circle ─── */
+.circle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--style-radius-avatar);
+}

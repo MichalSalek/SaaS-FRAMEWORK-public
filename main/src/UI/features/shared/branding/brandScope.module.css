@@ -1,0 +1,29 @@
+/* DECISION: the brand colour of a stylist or salon (Pro Marka, Studio, Scale) TAKES OVER the
+ * public page accent: main button, arrow discs, icons (location, pins) and text accents. The logo
+ * and the support bubble keep the Nailfolio colour (the app's brand, not hers). The palette is
+ * curated dark tones (kernel branding.config.ts), so light text on them passes AA in light mode
+ * without runtime math; that is why the base rule is light-mode only. In dark mode the same hue is
+ * lifted to the dark main-button lightness with dark text on it, as on the default accent.
+ * (owner) */
+:global([data-mode='light']) .scope {
+  --color-primary: var(--brand-accent);
+  --color-cta: var(--brand-accent);
+  --color-accent: var(--brand-accent);
+  --color-accent-fg: var(--brand-accent);
+  --color-accent-fg-strong: var(--brand-accent);
+}
+
+/* An engine without relative colour syntax would turn every token below into
+   an invalid value and leave the dark main button transparent; there the page
+   keeps the app's own dark accent instead. */
+@supports (color: color(from currentColor srgb r g b)) {
+  :global([data-mode='dark']) .scope {
+    --color-primary: oklch(from var(--brand-accent) 0.76 min(c, 0.15) h);
+    --color-cta: oklch(from var(--brand-accent) 0.76 min(c, 0.15) h);
+    --color-accent: oklch(from var(--brand-accent) 0.76 min(c, 0.15) h);
+    --color-accent-fg: oklch(from var(--brand-accent) 0.8 min(c, 0.13) h);
+    --color-accent-fg-strong: oklch(
+      from var(--brand-accent) 0.78 min(c, 0.14) h
+    );
+  }
+}

@@ -1,0 +1,123 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * FaqSection — the canonical FAQ skin (one place for every landing page).
+ *
+ * DECISION: FaqSection is the only FAQ pattern on the landing pages; pages carry no class
+ * dictionaries of their own. Trigger hover is --color-accent-fg, not --color-primary (AA on
+ * light backgrounds). The answer reveal is keyed off [data-open], not a keyframe on the class:
+ * the panel is ALWAYS in the DOM, so a mount keyframe would play once at mount and never on open.
+ * Expand mechanics (grid-template-rows 0fr to 1fr, 250ms) live in Accordion.module.css; this file
+ * is skin plus section skeleton. The full-bleed band (100vw breakout, background, padding) stays
+ * with the page. Colors only through var(--color-*) / color-mix.
+ * ───────────────────────────────────────────────────────────────────── */
+
+.section {
+  width: 100%;
+}
+
+.header {
+  /* Canonical breathing room between header and list. */
+  margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+.list {
+  /* Narrow Q&A column, canonical 72ch measure, centred in the parent's wide
+     container (a width contrast against the rest of the page). */
+  max-width: calc(72 * var(--ch-body));
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* White box on paper (DESIGN.md §Style Policy 30): answers are reading
+     text and had too little contrast on paper (owner). Lines stay only
+     BETWEEN items: the box has its own edge, so top and bottom list lines
+     would double it. */
+  padding-inline: clamp(16px, 2.4vw, 28px);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* ─── Item — full-width horizontal hairlines (separators, not accents) ─── */
+.item {
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  transition: background var(--transition-fast);
+}
+
+.item:first-child {
+  border-top: 0;
+}
+
+/* An open item gets NO background of its own: a faint tint communicated
+   nothing and multiplied surfaces. Opening is signalled by the revealed
+   answer and the rotated chevron; full hairlines keep the list rhythm. */
+
+/* ─── Trigger ─── */
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  padding: clamp(18px, 2vw, 26px) clamp(4px, 1vw, 12px);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-md);
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  text-align: left;
+  transition: color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .trigger:hover {
+    /* Interactive trigger hover on a light background: AA-safe accent. */
+    color: var(--color-accent-fg);
+  }
+}
+
+.trigger:focus-visible {
+  outline: 2px solid
+    color-mix(in oklch, var(--color-focus-ring) 60%, transparent);
+  outline-offset: 4px;
+  border-radius: var(--style-radius-control);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  /* Spring 200ms, inside the 150-300ms motion window (tokens only). */
+  transition: transform var(--duration-200) var(--spring-curve);
+}
+
+.chevron[data-open] {
+  transform: rotate(180deg);
+}
+
+/* ─── Content / answer ─── */
+.content {
+  padding: 0 clamp(4px, 1vw, 12px) clamp(18px, 2vw, 26px);
+}
+
+.answer {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: calc(64 * var(--ch-body));
+  text-wrap: pretty;
+  /* Reveal on EVERY open, synchronized with the grid mechanics in
+     Accordion.module.css (250ms, --ease-entrance). */
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 250ms var(--ease-entrance),
+    transform 250ms var(--ease-entrance);
+}
+
+.item[data-open] .answer {
+  opacity: 1;
+  transform: translateY(0);
+}

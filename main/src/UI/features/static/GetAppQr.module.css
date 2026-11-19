@@ -1,0 +1,38 @@
+/* GetAppQr: a code that opens Nailfolio on the phone (computer only). */
+
+.qr {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .qr {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    padding: var(--space-12) var(--space-20) var(--space-12) var(--space-12);
+    border: var(--style-border-surface) solid var(--color-divider);
+    border-radius: var(--style-radius-surface);
+    background: var(--color-surface-card);
+    text-align: left;
+  }
+}
+
+/* The bitmap carries its own white field and quiet zone. */
+.code {
+  flex: none;
+  display: block;
+  width: 132px;
+  height: 132px;
+  border-radius: var(--style-radius-control);
+}
+
+.note {
+  margin: 0;
+  max-width: calc(22 * var(--ch-heading));
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}

@@ -1,0 +1,35 @@
+.section {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-16);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.head {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.description {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-12);
+}
+
+/* A counter never breaks inside („3 z 30”). */
+.meta {
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}

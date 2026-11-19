@@ -1,0 +1,5 @@
+/* The post-trial amount in the small note: weight, not size or colour. The note inherits
+   face, size and colour from the surface class (also the negative of cards on ink). */
+.amount {
+  font-weight: 700;
+}

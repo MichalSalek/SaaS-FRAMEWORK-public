@@ -1,0 +1,59 @@
+/* ─── Eyebrow base (plain) ───
+ * Both variants read the `--style-kicker-*` roles (tokens.css); owner vote
+ * „Zdanie bezszeryfowe”: sentence case, body face, --text-sm, 500, no
+ * tracking, no rule. Nothing typographic is hardcoded here. */
+/* --eyebrow-color: optional recolor hook inherited from a wrapper (e.g.
+ * SectionHeader, LpHero); unset = canon (plain text-secondary, chip
+ * accent-fg). The chip hairline follows currentColor automatically. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin: 0;
+  font-family: var(--style-kicker-font);
+  font-size: var(--style-kicker-size);
+  font-weight: var(--style-kicker-weight);
+  line-height: 1.4;
+  letter-spacing: var(--style-kicker-tracking);
+  text-transform: var(--style-kicker-case);
+  color: var(--eyebrow-color, var(--color-text-secondary));
+}
+
+/* ─── Label ─── */
+.text {
+  display: inline-block;
+}
+
+/* ─── Variant: chip — caps + underline hairline (rule UNDER the caps) ───
+ *
+ * DECISION: the chip is a magazine kicker: caps with a full-width hairline UNDER the text. The
+ * leading 28px rule was dropped because it read as an AI-style leading-dash ornament; an
+ * underline rule matches "lines mark boundaries" and is not a tell. The box stays excluded.
+ *   - flex-column + align-items:flex-start: caps on row 1, hairline on row 2.
+ *   - `background: currentColor` on the hairline follows any text-color override (.inkEyebrow,
+ *     .eyebrowInk, .accentEyebrow, status .eyebrowError), so nothing is hardcoded per scope.
+ *   - `width: fit-content` is the hard fix for flex-stretch (it stretched to 28ch); `::after`
+ *     `width:100%` makes the hairline as wide as the text, not the viewport.
+ *   - max-width 40ch + wrap: long SEO h1 phrases wrap, the hairline stays under them.
+ * Contrast headroom is kept: the kicker stays quieter than the CTA. `--style-eyebrow-rule` is 0
+ * today, so `::after` has zero height; the declaration stays because the token is the one place
+ * the decision lives. (owner)
+ */
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+  width: fit-content;
+  max-width: calc(40 * var(--ch-body));
+  font-weight: var(--style-kicker-weight);
+  letter-spacing: var(--style-kicker-tracking);
+  color: var(--eyebrow-color, var(--color-accent-fg));
+  line-height: 1.2;
+}
+.chip::after {
+  content: '';
+  width: 100%;
+  height: var(--style-eyebrow-rule);
+  background: currentColor;
+}

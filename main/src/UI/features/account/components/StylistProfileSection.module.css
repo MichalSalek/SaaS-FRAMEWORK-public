@@ -1,0 +1,41 @@
+/* ─── StylistProfileSection: the public-profile fields on /app/profile. ───
+   The boxes themselves are ProfileManageSection (shared with the salon
+   screen); this module only stacks them and lays out a field with its hint.
+   StylistWebsiteField borrows `.field` and `.hint`. */
+
+.stack {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-20);
+}
+
+.stack [id] {
+  scroll-margin-top: var(--space-64);
+}
+
+/* Pole z jednolinijkową podpowiedzią. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+}
+
+/* The full address a new link makes, while it differs from the saved one. */
+.preview {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.addressCta {
+  align-self: flex-start;
+  margin-top: var(--space-6);
+}

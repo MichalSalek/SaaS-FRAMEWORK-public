@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <path
+    d="M60 18 91 30v23c0 21-13 38-31 49-18-11-31-28-31-49V30l31-12Z"
+    stroke="#1d1512"
+    stroke-width="1.5"
+    stroke-linejoin="round" />
+  <path
+    d="M60 31v56"
+    stroke="#1d1512"
+    stroke-width="1.5"
+    stroke-linecap="round" />
+  <path
+    d="M44 51h32M44 64h32"
+    stroke="#1d1512"
+    stroke-width="1.5"
+    stroke-linecap="round" />
+  <rect x="48" y="43" width="24" height="30" rx="5" fill="oklch(0.55 0.21 352)" />
+  <path
+    d="M54 43v-5a6 6 0 0 1 12 0v5"
+    stroke="#1d1512"
+    stroke-width="1.5"
+    stroke-linecap="round" />
+  <circle cx="60" cy="58" r="3" fill="#1d1512" />
+  <path
+    d="M30 28c7-7 16-11 27-13"
+    stroke="#55504a"
+    stroke-width="1.5"
+    stroke-linecap="round" />
+</svg>

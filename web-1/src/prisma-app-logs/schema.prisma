@@ -1,0 +1,64 @@
+generator client {
+  output        = "./js-client"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AppLogRecord {
+  id                 Int      @id @default(autoincrement())
+  created_at         DateTime @default(now())
+  event_log_chain_id String
+  type               String
+  namespace          String
+  message            String
+  payload            String
+  user_metadata      String
+  client_url         String
+  application        String
+  environment        String
+  user_id            String?
+
+  @@index([environment, id(sort: Desc)])
+  @@index([type, created_at(sort: Desc)])
+  @@index([user_id, created_at(sort: Desc)])
+  // Parytet z AiCrawlerEvent (web-1/src/prisma/schema.prisma): ten sam wzorzec
+  // agregatow po created_at. admin-health groupBy filtruje application=backend
+  // AND created_at>=cutoff -> composite (application, created_at DESC); retention
+  // deleteMany filtruje gole created_at -> bare @@index([created_at]).
+  @@index([application, created_at(sort: Desc)])
+  @@index([created_at])
+  // „ten sam łańcuch żądania" in the admin log detail.
+  @@index([event_log_chain_id])
+}
+
+/// Triage status an admin sets by hand for one error class.
+///
+/// The key is the group fingerprint (md5 of application|type|namespace|normalized
+/// message), computed in SQL. See LOG_FINGERPRINT_SQL in admin-log-groups.operations.ts.
+/// A row exists only for a group someone marked. No row means status `new`
+/// (SSOT: LOG_ISSUE_STATUSES in the kernel). Clearing a mark deletes the row,
+/// so the table does not fill with rows that add nothing.
+///
+/// The table outlives the logs it describes. Retention deletes AppLogRecord after
+/// 90 days, and "fixed" stays true after the last occurrence has expired.
+model LogIssueStatus {
+  fingerprint String   @id
+  status      String
+  note        String?
+  /// Copies of the group fields at mark time, so the row stays readable
+  /// after its logs fall out of retention.
+  application String
+  type        String
+  namespace   String
+  message     String
+  /// When the status was set. Comparing it with the group's `last_seen` yields
+  /// the derived state `regressed` (the error returned after it was marked fixed).
+  updated_at  DateTime @default(now()) @updatedAt
+  updated_by  String?
+
+  @@index([status])
+}

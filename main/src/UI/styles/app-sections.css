@@ -1,0 +1,66 @@
+/* DECISION: app sections use the owner's selected accent titles and subtle full frames.
+ * Semantic markers identify surfaces; public pages, state borders and negative scenes retain
+ * their own contracts. Routed content owns the scope, never the entire page or a dialog. (owner) */
+[data-app-content]
+  [data-app-section-title]:not(
+    :where(
+      [data-app-section-exclude],
+      [data-app-section-exclude] *,
+      [role='dialog'],
+      [role='dialog'] *
+    )
+  ) {
+  color: var(--color-app-section-title);
+}
+
+[data-app-content]
+  [data-app-section='bordered']:not(
+    :where(
+      [data-app-section-exclude],
+      [data-app-section-exclude] *,
+      [role='dialog'],
+      [role='dialog'] *
+    )
+  ) {
+  border-color: var(--color-app-section-border);
+}
+
+[data-app-content]
+  [data-app-section='plain']:not(
+    :where(
+      [data-app-section-exclude],
+      [data-app-section-exclude] *,
+      [role='dialog'],
+      [role='dialog'] *
+    )
+  ) {
+  outline: var(--style-border-surface) solid var(--color-app-section-border);
+  outline-offset: calc(-1 * var(--style-border-surface));
+}
+
+/* A nested module shares the containing card's frame, including a boxed stat band or list. */
+[data-app-content]
+  [data-app-section]
+  [data-app-section='bordered']:not(
+    :where(
+      [data-app-section-exclude],
+      [data-app-section-exclude] *,
+      [role='dialog'],
+      [role='dialog'] *
+    )
+  ) {
+  border-color: transparent;
+}
+
+[data-app-content]
+  [data-app-section]
+  [data-app-section='plain']:not(
+    :where(
+      [data-app-section-exclude],
+      [data-app-section-exclude] *,
+      [role='dialog'],
+      [role='dialog'] *
+    )
+  ) {
+  outline: none;
+}

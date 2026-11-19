@@ -1,0 +1,16 @@
+// The endpoint itself declares the owner; the hook calls it plainly.
+const bulkThing_IO = defineEndpoint({
+  url: () => '/x',
+  mode: 'post',
+  successFeedback: 'screen',
+});
+
+export function useBulkThing() {
+  return useMutation({
+    mutationFn: (req: unknown) => bulkThing_IO(req),
+    onSuccess: (data: { n: number }) => {
+      pushNewSnackbar(t('done', { n: data.n }), 'success');
+      setSavedFlash(false);
+    },
+  });
+}

@@ -1,0 +1,145 @@
+/* ─── PhoneMockup — reusable phone frame placeholder ─── */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10);
+}
+
+/* ─── Size variants ─── */
+/* Definite width per size (NOT max-width): without a figcaption the figure has
+ * no other intrinsic width, and in a `minmax(0, auto)` grid or flex
+ * shrink-to-fit it collapses to zero. max-width:90% on .frame lets it shrink in
+ * narrow containers. */
+.sm .frame {
+  width: 160px;
+}
+.md .frame {
+  width: 200px;
+}
+.lg .frame {
+  width: 260px;
+}
+.xl .frame {
+  width: 320px;
+}
+/* xxl/hero: breakout-size screens (a larger triptych breaking the
+ * --lp-content-width column). Additive: existing call sites do not change. */
+.xxl .frame {
+  width: 420px;
+}
+.hero .frame {
+  width: 400px;
+}
+
+/* The figure fills its container (centring the frame), but the size comes from
+ * the frame's definite width above, independent of the parent's width. (The
+ * figcaption is gone for good (owner); the attribute stays for parity with
+ * existing page selectors.) */
+.wrapper[data-no-caption] {
+  width: 100%;
+}
+
+.frame {
+  max-width: 90%;
+  /* shape-allow: drawn phone bezel; a device corner, not a product role */
+  border-radius: 14px;
+  /* shape-allow: drawn phone bezel; 3px chrome, not a surface/control/ring role */
+  border: 3px solid var(--color-border);
+  aspect-ratio: 9 / 19.5;
+  overflow: hidden;
+  background: var(--color-surface-input);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+/* Top notch decoration */
+.frame::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 5px;
+  background: var(--color-border);
+}
+
+/* Pre-cut responsive variants: the <picture> takes the box next/image's
+ * `fill` gave its <img> (absolute, edge to edge of the frame). */
+.screenshotPicture {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* Real screenshot fills the frame (cover); replaces the schematic placeholder. */
+.screenshotImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-10);
+  padding: var(--space-24) var(--space-12) var(--space-16);
+  width: 100%;
+  height: 100%;
+}
+
+/* Grid of placeholder tiles to simulate screen content */
+.screenGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  width: 80%;
+  flex: 1;
+  margin-top: var(--space-8);
+}
+
+/* Tonal brand color-block instead of neutral grey (--color-surface-hover @0.5 read as a broken
+   image): a solid color-mix primary-tint + hairline is an intentional gallery placeholder. Solid
+   fill, not a gradient. */
+.screenTile {
+  /* tint-allow: gallery placeholder backing that signals „a shot goes here”,
+     not emptiness. The single-cream theme targets CONTENT SURFACE tints; this is
+     a media backing, and a white hole read as a broken image. */
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-paper);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  aspect-ratio: 1;
+}
+.screenTile:first-child {
+  /* tint-allow: as above, a stronger step of the same backing. */
+  grid-column: span 2;
+  aspect-ratio: 2 / 1;
+  background: var(--color-bg-paper);
+}
+
+/* Route pill at bottom of screen */
+.routePill {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+  padding: var(--space-2) var(--space-8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+/* Mobile: the definite width plus max-width:100% on the base .frame handle
+ * shrinking in narrow containers, so no separate breakpoint is needed. */

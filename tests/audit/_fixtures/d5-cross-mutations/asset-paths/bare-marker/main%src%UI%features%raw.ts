@@ -1,0 +1,2 @@
+// asset-paths-allow:
+export const raw = '/img/lp/hero/nope.webp';

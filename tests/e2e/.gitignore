@@ -1,0 +1,5 @@
+# Playwright outputs — ephemeral, recreated per run
+test-results/
+playwright-report/
+playwright/.cache/
+*.zip

@@ -1,0 +1,319 @@
+/* ─── AppBar base ───
+ * DECISION: the bar has its own plane (--color-bg-subtle) closed by a full line in the text color,
+ * because a paper bar with a hairline blended into the page. Links are cells of a grid, each with
+ * a one-sentence caption of who the page is for; on a phone the same cells become full-height
+ * menu tiles. (owner) */
+.appBar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-app-bar);
+  width: 100%;
+  /* tint-allow: the nav bar is its own chrome plane above the page paper (owner) */
+  background: var(--color-bg-subtle);
+  border-bottom: var(--style-border-surface) solid var(--color-text-primary);
+}
+
+/* ─── Inner layout ─── */
+.inner {
+  --nav-gutter: var(--space-24);
+  display: flex;
+  align-items: center;
+  height: var(--app-bar-height);
+  padding: 0 var(--space-20);
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  /* The host can change the bar height through a token (public pages on a phone shrink it on
+     scroll down); the change must be smooth. */
+  transition: height var(--duration-200) var(--ease-entrance);
+}
+
+@media (min-width: 1280px) {
+  /* The bar content sits on the page content line, not on the window edges. */
+  .inner {
+    height: auto;
+    min-height: var(--space-72);
+    align-items: stretch;
+    gap: 0;
+    max-width: calc(var(--lp-content-width) + 2 * var(--nav-gutter));
+    padding-inline: var(--nav-gutter);
+  }
+}
+
+/* ─── Logo ─── */
+.logo {
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  flex-shrink: 0;
+  margin-right: var(--space-20);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 1280px) {
+  /* Logo and navigation are adjoining cells; the actions keep their own auto margin. */
+  .logo {
+    margin-right: 0;
+  }
+}
+
+/* ─── Desktop navigation ─── */
+.desktopNav {
+  display: none;
+  flex: 1;
+}
+
+/* Desktop/mobile split at 1280px (XL of the grid). The captioned cells plus the logo, language
+ * switch and account CTA need ~1230px; with the old 900 threshold they pushed „Zaloguj się" off
+ * screen at 1024px. Below 1280 the menu is the hamburger tile menu. All split queries in this
+ * file share this breakpoint: they must agree or the nav double-renders or dead-zones between
+ * the values. */
+@media (min-width: 1280px) {
+  /* Grid cells without separators (owner).
+   * Flex, not a grid with `auto` columns: a cell can SHRINK to the width of its label and the
+   * caption then wraps to two lines. With a grid, German labels pushed „Anmelden" off screen even
+   * at 1440px, because an `auto` column never goes below its single-line content. */
+  .desktopNav {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-self: stretch;
+    gap: 0;
+    background: transparent;
+    border-inline: var(--style-border-divider) solid var(--color-divider);
+  }
+}
+
+.navLink {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-12);
+  /* DECISION: navigation items keep square edges so their surfaces join cleanly; the item
+     separators are gone, the header and navigation outer frames remain. (owner) */
+  border-radius: 0;
+  /* shape-allow: owner requested a 2px current-page underline, distinct from frame widths */
+  border-bottom: 2px solid transparent;
+  /* tint-allow: grid cell on the bar plane (owner) */
+  background: var(--color-bg-subtle);
+  font-family: var(--font-body);
+  text-decoration: none;
+  transition:
+    background var(--transition-fast),
+    transform var(--duration-100) var(--spring-snappy);
+}
+
+.linkLabel {
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color var(--transition-fast);
+}
+
+.linkHint {
+  font-size: var(--text-xs);
+  line-height: 1.3;
+  color: var(--color-text-secondary);
+}
+
+.navLink .linkHint {
+  max-width: 120px;
+}
+
+.navLink[aria-current='page'] .linkLabel {
+  color: var(--color-accent-fg);
+}
+
+/* DECISION: underline the current destination as well as coloring its label, so location
+   is visible without relying on color alone. (owner) */
+.navLink[aria-current='page'],
+.mobileNavLink[aria-current='page'] {
+  border-bottom-color: var(--color-accent-fg);
+}
+
+@media (hover: hover) {
+  .navLink:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+.navLink:active {
+  background: var(--color-surface-pressed);
+  transform: scale(0.97);
+}
+
+/* ─── Desktop actions ─── */
+.desktopActions {
+  display: none;
+  align-self: center;
+  align-items: center;
+  gap: var(--space-12);
+  margin-left: auto;
+  padding-inline-start: var(--space-12);
+  flex-shrink: 0;
+}
+
+@media (min-width: 1280px) {
+  .desktopActions {
+    display: flex;
+  }
+}
+
+/* ─── Hamburger button (mobile only) ─── */
+.hamburger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  border: none;
+  border-radius: var(--style-radius-control);
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--duration-100) var(--spring-snappy);
+}
+
+.hamburger:active {
+  transform: scale(0.95);
+}
+
+@media (min-width: 1280px) {
+  .hamburger {
+    display: none;
+  }
+}
+
+/* ─── Mobile top-bar action (account avatar, LEFT of hamburger) ─── */
+.mobileTopAction {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* The avatar owns the right-push, so the hamburger drops its own auto-margin
+   and sits snug to the avatar's right with a small gap. */
+.mobileTopAction + .hamburger {
+  margin-left: var(--space-12);
+}
+
+@media (min-width: 1280px) {
+  .mobileTopAction {
+    display: none;
+  }
+}
+
+/* ─── Mobile menu overlay ───
+ * The menu opens to the full height under the bar, instead of unfolding a short list cut off
+ * mid-screen (owner). */
+.mobileMenu {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+  background: inherit;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  transition:
+    height var(--transition-slow),
+    opacity var(--transition-normal);
+}
+
+.mobileMenuOpen {
+  /* --menu-top measures the AppBar on open (everything above the menu, not only the bar). */
+  height: calc(100dvh - var(--menu-top, var(--app-bar-height)));
+  overflow-y: auto;
+  opacity: 1;
+}
+
+@media (min-width: 1280px) {
+  .mobileMenu {
+    display: none;
+  }
+}
+
+/* ─── Mobile nav: tiles with captions ─── */
+.mobileNav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: var(--space-16) var(--space-20);
+  background: transparent;
+  border: var(--style-border-surface) solid var(--color-text-primary);
+}
+
+.mobileNavLink {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: var(--space-96);
+  padding: var(--space-14);
+  /* A menu tile follows the same rule as .navLink: a grid cell without rounding. */
+  border-radius: 0;
+  /* shape-allow: owner requested a 2px current-page underline, distinct from frame widths */
+  border-bottom: 2px solid transparent;
+  /* tint-allow: menu tile on the bar plane (owner) */
+  background: var(--color-bg-subtle);
+  font-family: var(--font-body);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background var(--transition-fast),
+    transform var(--duration-100) var(--spring-snappy);
+}
+
+/* An odd last tile takes the whole row instead of leaving a hole. */
+.mobileNavLink:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  min-height: 0;
+}
+
+.mobileNavLink .linkLabel {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+}
+
+.mobileNavLink .linkHint {
+  font-size: var(--text-sm);
+  line-height: 1.35;
+}
+
+.mobileNavLink[aria-current='page'] .linkLabel {
+  color: var(--color-accent-fg);
+}
+
+.mobileNavLink:active {
+  background: var(--color-surface-pressed);
+  transform: scale(0.97);
+}
+
+/* ─── Mobile actions ─── */
+.mobileActions {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-12);
+  padding: 0 var(--space-20) var(--space-20);
+}
+
+.mobileActions > :last-child {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+/* Mobile destinations retain aria-current and label emphasis without the desktop underline. */
+@media (max-width: 1279.98px) {
+  .mobileNavLink[aria-current='page'] {
+    border-bottom-color: transparent;
+  }
+}

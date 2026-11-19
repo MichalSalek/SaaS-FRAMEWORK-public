@@ -1,0 +1,234 @@
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+}
+
+.chosen {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Brand colour ─── */
+
+.branding {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.label {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-6);
+}
+
+/* A colour from the kernel's curated palette = content colour (like nail
+   polish colours), given inline: it is data, not a design token. 44px = tap
+   target. Selecting does NOT change the box: the frame has a fixed width and
+   the selection ring is an `outline` (outside the layout), so neighbours do not jitter. */
+.swatch {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-round);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Selected swatch: an ink ring with a paper gap (canon „selected = ink”; the
+   swatch keeps its own colour, because the colour IS the content). */
+.swatch[data-selected] {
+  /* shape-allow: selection ring of a colour swatch, not the frame of a surface */
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 2px;
+}
+
+.swatch:focus-visible,
+.swatchDefault:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 4px;
+}
+
+.swatchDefault {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 44px;
+  padding: 0 var(--space-20);
+  border: 0;
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* The product's own accent, which the public page uses when she picks no
+   colour; a white collar keeps it visible on the inverted (selected) fill. */
+.defaultDot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--style-radius-pill);
+  background: var(--color-primary);
+  /* shape-allow: a collar that keeps the dot visible on the inverted fill, not a frame of a surface */
+  border: 2px solid var(--color-surface-interactive);
+  box-sizing: content-box;
+}
+
+/* Selected = inverted ink. The font weight does NOT change (bolding
+   widened the pill and shifted the neighbouring swatches). */
+.swatchDefault[data-selected] {
+  background: var(--color-text-primary);
+  color: var(--color-bg-main);
+  /* The ring is drawn INSIDE this fill (offset -4px below). The fill is the
+     text colour and flips with the mode, so the ring takes the selection's
+     own foreground: it contrasts with the fill in light AND dark. */
+  --color-focus-ring: var(--color-bg-main);
+}
+
+/* The focus ring of the selected pill is drawn in ink, where the remapped
+   colour has contrast (on a white box it would not). */
+.swatchDefault[data-selected]:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Plan-locked state: one sentence and one action. */
+.locked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  margin-top: var(--space-6);
+}
+/* Preview of the public page accent (inert picture, see the molecule). It
+   stands on the page tint, the surface the public profile itself has, so it
+   reads as a piece of that page and not as a control of this form. */
+.preview {
+  display: grid;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-main);
+  cursor: default;
+  user-select: none;
+  pointer-events: none;
+}
+
+.previewCaption {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.previewCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  background: var(--color-surface-card);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-primary) 35%, var(--color-border-surface));
+  border-radius: var(--style-radius-surface);
+  --nav-row-icon-fg: var(--color-primary);
+}
+
+.previewIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.previewAvatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--style-radius-round);
+  background: var(--color-bg-paper);
+  border: var(--style-border-ring) solid var(--color-primary);
+  padding: var(--space-2);
+}
+
+.previewCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.previewName {
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.previewPlace {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.previewPlaceIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: 1lh;
+}
+
+.previewPlace svg {
+  color: var(--color-primary);
+}
+
+.previewContact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+.previewContact > svg {
+  color: var(--color-primary);
+}
+
+.previewButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-40);
+  padding: 0 var(--space-16);
+  border-radius: var(--style-radius-control);
+  background: var(--color-cta);
+  color: var(--color-accent-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}

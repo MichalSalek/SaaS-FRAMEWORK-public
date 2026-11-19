@@ -1,0 +1,16 @@
+// A saved flash and a toast whose colour is computed both count as success.
+export function Editor() {
+  const save = useMutation({
+    mutationFn: (req: unknown) => savePolicy_IO(req),
+  });
+  return () =>
+    save.mutate(
+      {},
+      {
+        onSuccess: (data: { warn: boolean }) => {
+          setSavedFlash(true);
+          pushNewSnackbar(t('x'), data.warn ? 'warning' : 'success');
+        },
+      }
+    );
+}

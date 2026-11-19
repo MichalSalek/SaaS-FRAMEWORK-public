@@ -1,0 +1,310 @@
+/* ============================================================
+ * PhotoDetailPage — one photo, one main action
+ *
+ * Phone: photo → the filled main action → one row of quiet actions →
+ * whose work it is and when → traits and colours → similar works.
+ * From 720px of the page's own width (PageColumns) the photo keeps the
+ * left column and everything else sits beside it.
+ *
+ * One white surface (owner), no inner boxes, no frames, nothing
+ * animates in on entry (owner). Zero gradient / shadow /
+ * glow / blur.
+ * ============================================================ */
+
+.page {
+  /* (owner) „strona konkretnego zdjęcia… to jest jedna wielka sekcja”. The white
+     bleeds past the content padding (AppLayout `.content` has --space-20), so the
+     whole screen surface is white, not a card on paper. */
+  margin: calc(var(--space-20) * -1);
+  padding: var(--space-20);
+  min-height: 100%;
+  background: var(--color-bg-paper);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding-bottom: var(
+    --space-32
+  ); /* Container for the width rules below: on desktop the product routes render in a fixed 390px
+     frame and `@media (min-width)` measures the VIEWPORT, not the frame. Thresholds in
+     `@container app-view` are 40px lower than the old viewport ones (they measure the page
+     content-box: viewport minus 2x --space-20 AppLayout.content padding), so a real phone behaves
+     1:1 as before. */
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* ============================================================
+ * PHOTO
+ * ============================================================ */
+
+.hero {
+  margin: 0;
+}
+
+.imageFrame {
+  position: relative;
+  width: 100%;
+  border-radius: var(--style-radius-surface);
+  overflow: hidden;
+  background: var(--color-surface-input);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  /* DECISION: aspect-ratio 3:4, EXACTLY the wizard's crop frame (CropStep ASPECT). A square
+     cropped the approved frame a second time, centred and without `object-position`, so the
+     stylist saw a different photo than the one she approved. */
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+/* Pinned state on the photo: an opaque paper pill (it lies on the image and
+ * carries text), icon and label on one line. */
+.pinnedBadge {
+  position: absolute;
+  top: var(--space-12);
+  right: var(--space-12);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-10) var(--space-4) var(--space-8);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-primary);
+  background: var(--color-bg-paper);
+}
+
+.pinnedBadge svg {
+  display: block;
+  flex: none;
+}
+
+/* ============================================================
+ * ACTIONS — one filled action, then one row of quiet ones
+ * ============================================================ */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.mainAction {
+  width: 100%;
+  justify-content: center;
+}
+
+/* The owner's delete: its own line after the photo's details, as wide as
+   its words, so it is never mistaken for one of the everyday actions. */
+.deleteAction {
+  align-self: flex-start;
+  margin-top: var(--space-8);
+}
+
+/* Two quiet buttons, half of the row each. The labels are whole („Edytuj
+   zdjęcie”, „Foto bearbeiten”): when half of the container cannot hold one,
+   the pair stacks instead of breaking a label in two. */
+.actions {
+  container-type: inline-size;
+}
+
+.actionRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+}
+
+@container (max-width: 335px) {
+  .actionRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A row with one action (a viewer who cannot report): it takes the row. */
+.actionRow > :only-child {
+  grid-column: 1 / -1;
+}
+
+.actionCell {
+  min-width: 0;
+  justify-content: center;
+}
+
+/* ============================================================
+ * CREDIT — whose work, when, how long
+ * ============================================================ */
+
+.credit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.creditPerson {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+.creditMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The name is never cut: up to two lines, the row grows. */
+.creditName {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-heading);
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.creditMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-16);
+  margin: 0;
+}
+
+/* Icon + fact = one unbreakable piece on one line; the line wraps between
+ * the pieces. */
+.creditMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.creditMetaItem svg {
+  display: block;
+  flex: none;
+}
+
+/* ============================================================
+ * DETAIL GROUPS — traits and colours
+ * ============================================================ */
+
+.detailGroups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.detailGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Section label: neutral ink. Small accent-coloured text read as a link
+ * (owner); the accent stays with the action. */
+.groupLabel {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* Trait chip becomes a deep-link to STYLE_DETAIL when EXPLORE_ENABLED is on.
+ * Reset the anchor so the wrapped Chip keeps its own styling (no underline). */
+.traitChipLink {
+  text-decoration: none;
+  display: inline-flex;
+  color: inherit;
+}
+
+/* Colours are read-only facts: a dot and a name on paper, no pill and no
+ * frame (a framed pill reads as a control). */
+.colorList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-16);
+}
+
+.colorItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+/* ============================================================
+ * SKELETON — the loaded page's geometry
+ * ============================================================ */
+
+.skeletonImage {
+  width: 100%;
+  /* The same proportion as `.image` (3:4 = the wizard crop): a square placeholder
+   * under a portrait photo made the layout jump on every visit to the detail. */
+  aspect-ratio: 3 / 4;
+  border-radius: var(--style-radius-surface);
+}
+
+.skeletonAction {
+  width: 100%;
+  height: var(--style-control-min-h);
+  border-radius: var(--style-radius-control);
+}
+
+/* ============================================================
+ * ERROR — the shared error state plus a way back
+ * ============================================================ */
+
+.stateColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+/* What the session button will do, or has done, with the way to the session.
+   Always present under that button, so adding a photo moves nothing below. */
+.sessionLine {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  /* two lines of the hint = one line and the link under it */
+  min-height: calc(2lh + var(--space-4));
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* Low-priority actions live in words under the main action: sharing a link and
+   reporting are reachable but do not compete with the photo, liking or the
+   inspiration-session action. */
+.quietRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-16);
+}
+
+.tertiaryAction {
+  align-self: flex-start;
+  min-width: 0;
+}

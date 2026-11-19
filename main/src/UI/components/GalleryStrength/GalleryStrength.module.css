@@ -1,0 +1,223 @@
+/* ─── GalleryStrength (N6: Gallery Strength Indicator) ─── */
+
+.card {
+  /* compact card-like appearance */
+}
+
+/* ─── Header: circle + text side by side ─── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+}
+
+.headerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.headerHint {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+}
+
+/* ─── Circular SVG Progress ─── */
+.circleWrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+}
+
+.circle {
+  transform: rotate(-90deg);
+  display: block;
+}
+
+.circleTrack {
+  stroke: var(--color-track);
+}
+
+/* The ring encodes a RESULT (gallery strength), not "in progress", so the
+   fill/track boundary must meet 3:1 (WCAG 1.4.11) in both modes. */
+:root[data-mode='light'] .circleBar {
+  stroke: var(--color-accent-fg);
+}
+
+.circleBar {
+  stroke: var(--color-primary);
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.circleLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.percentValue {
+  margin: 0;
+  line-height: 1;
+}
+
+/* The count inside the donut (global .data-count = sans) gets weight 600 so
+ * it does not look anaemic inside the ring. */
+.percentValue :global(.data-count) {
+  font-weight: 600;
+}
+
+/* ─── Missing Items Checklist ─── */
+.checklist {
+  list-style: none;
+  margin: var(--space-20) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.checklistItem {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The row only contains two siblings: the (stretching) nav button and the
+   hint button. Everything about TAPPING (cursor, padding, press background,
+   touch minimum) lives on `.checkNav`, the control; vertical rhythm stays
+   here because it belongs to the row. */
+.checklistRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  /* The row height (44 + 12 + 12) is stated explicitly rather than derived
+     from a `content-box` exception to the global border-box: such an exception
+     would hold the height only until someone touches the button's padding or
+     border. */
+  min-height: 68px;
+}
+
+.checkNav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  /* Stretched to the full row height because the press background paints ON
+     IT; otherwise the press highlight covers a 48px strip of a 68px row. */
+  align-self: stretch;
+  /* The control's touch minimum; `.checklistRow` holds the row rhythm. */
+  min-height: 44px;
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  padding: var(--space-12) 0;
+  border: none;
+  background: none;
+  border-radius: var(--style-radius-control);
+}
+
+.checkNav:active {
+  /* Press feedback is a FLEETING state: its own step of the surface ladder
+     (input, hover, pressed), not the accent. */
+  background: var(--color-surface-pressed);
+}
+
+.checkBox {
+  width: 16px;
+  height: 16px;
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  flex-shrink: 0;
+}
+
+.checkLabel {
+  flex: 1;
+}
+
+.checkPoints {
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+
+/* ─── Info button ─── */
+.infoBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  /* Tap target: 44x44 hit-area via box sizing; icon stays 16px, centered by
+   * flex. Negative inline margin keeps the visual gap tight so the enlarged
+   * hit-area doesn't push the row layout. */
+  width: 44px;
+  height: 44px;
+  margin: 0 calc(var(--space-8) * -1);
+  border-radius: var(--style-radius-control);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.infoBtn:active {
+  opacity: 0.6;
+}
+
+/* ─── Hint panel (expandable) ─── */
+.hintPanel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-normal);
+  padding-left: calc(16px + var(--space-12));
+}
+
+.hintPanelOpen {
+  max-height: 120px;
+}
+
+.hintText {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  padding: var(--space-8) 0 var(--space-12);
+}
+
+/* ─── Card close (only at 100%) ───
+   The X is quiet: a card with a full score is a congratulation, not an alert,
+   so closing must not compete with the count. Round 44px touch area per the
+   icon-button canon. */
+.dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: var(--space-44);
+  height: var(--space-44);
+  margin: calc(var(--space-12) * -1) calc(var(--space-12) * -1) 0 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--style-radius-round);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-200) var(--ease-entrance),
+    color var(--duration-200) var(--ease-entrance);
+}
+
+@media (hover: hover) {
+  .dismiss:hover {
+    background: var(--color-state-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+.dismiss:active {
+  background: var(--color-surface-pressed);
+}

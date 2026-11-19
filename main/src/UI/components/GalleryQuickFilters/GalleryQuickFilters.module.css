@@ -1,0 +1,126 @@
+/* ─── GalleryQuickFilters ─── */
+/* Vertical rhythm before section headers is one value: the section gap
+ * var(--space-20) plus symmetric 2px trailing paddings on the rows below. */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* WCAG 2.1 AA: fieldset+legend semantic group wrapper. Strip browser defaults. */
+.filterGroup {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.filterLegend {
+  margin-bottom: var(--space-6);
+}
+
+/* Scroll affordance = peek (last chip naturally cut off at the row edge) +
+ * proximity snap. No edge-fade mask (gradient-free floor). */
+.scrollableChips {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--space-2);
+  scroll-snap-type: x proximity;
+}
+
+.scrollableChips::-webkit-scrollbar {
+  display: none;
+}
+
+/* DECISION: the chip row SCROLLS horizontally. The shared chip group (`Chip.module.css .group`)
+ * wraps rows, so traits and lengths made four rows inside the sticky filter block (`GalleryPage
+ * .filterWrap`), which on a phone took over half the screen and left the photo grid a narrow
+ * strip. The descendant selector (0-1-1) beats `.group` (0-1-0) regardless of module bundle
+ * order. */
+.scrollableChips > * {
+  flex-wrap: nowrap;
+  width: max-content;
+}
+
+/* Refined pill chip — rounded full, brand-tinted, distinct active state. */
+/* min-height 44px per WCAG 2.5.8 / Apple HIG touch-target minimum, for both .chip and
+ * .chipSelected so the touch area stays consistent. */
+.chip {
+  cursor: pointer;
+  transition:
+    transform var(--duration-200) cubic-bezier(0.34, 1.56, 0.64, 1),
+    background var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-6) var(--space-14);
+  border-radius: var(--style-radius-pill);
+  background: var(--color-surface-interactive);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  color: var(--color-text-primary);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide-10);
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-divider);
+    background: var(--color-state-hover);
+  }
+}
+
+.chipSelected {
+  /* Selection is ink inverted from the text and background roles (works in
+     both modes), not red or a tint. Red stays with the one CTA. */
+  cursor: pointer;
+  /* focus-ring-allow: the global ring is drawn outside the chip (outline-offset 2px), on the
+     page behind the fill, where the default ring already contrasts. */
+  background: var(--color-text-primary) !important;
+  /* Label in the background role: the inverse of the ink fill, AA in both modes. */
+  color: var(--color-bg-main) !important;
+  border: var(--style-border-control) solid transparent !important;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-6) var(--space-14);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide-20);
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+
+/* Scroll affordance = peek (last swatch naturally cut off at the row edge) +
+ * proximity snap, matching the chip rows. No edge-fade mask. */
+.colorSwatchRow {
+  display: flex;
+  gap: var(--space-10);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Trailing 2px mirrors .scrollableChips: an even gap before the next
+   * section header. */
+  padding: var(--space-2) 0;
+  scroll-snap-type: x proximity;
+}
+
+.colorSwatchRow > * {
+  scroll-snap-align: start;
+}
+
+.colorSwatchRow::-webkit-scrollbar {
+  display: none;
+}

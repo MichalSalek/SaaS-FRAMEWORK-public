@@ -1,0 +1,31 @@
+/* Lockup = mark + wordmark in ONE row, like the navbar. The lockup's font-size drives the mark
+ * height (`height: 1.9em`). */
+
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  /* The wordmark keeps its identity independently of the reading font role.
+   * DECISION: Marcellus ships one weight (400, application/fonts.ts). Any heavier value is browser
+   * faux-bold, which smears the serifs, so the wordmark stays at its real weight with synthesis off. */
+  font-family: var(--font-marcellus), serif;
+  font-weight: 400;
+  font-synthesis: none;
+  /* font-size inherits from the parent (compact navbar, rail); the lockup does not hardcode a
+   * scale, so the compact bar can drop to --text-base. */
+  letter-spacing: var(--ls-tight-10);
+  line-height: 1;
+  color: inherit;
+}
+
+.mark {
+  height: 1.9em;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.wordmark {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}

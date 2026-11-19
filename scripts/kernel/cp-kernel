@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Synchronize the published contract into the two applications in this flat checkout.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/../.." && pwd)
+for app in main web-1; do
+  test -f "$root/$app/package.json"
+  test -f "$root/.shared-kernel/package.json"
+  target="$root/$app/src/READONLY-shared-kernel"
+  mkdir -p "$target"
+  rsync -a --delete --exclude=node_modules --exclude=.git "$root/.shared-kernel/" "$target/"
+done

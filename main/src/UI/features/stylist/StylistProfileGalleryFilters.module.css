@@ -1,0 +1,44 @@
+.headingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.headingRow > h2 {
+  min-width: 0;
+  margin: 0;
+}
+
+.filterButton {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .headingRow > h2 {
+    font-size: var(--text-2xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .filterButton,
+  .bar {
+    display: none;
+  }
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.count {
+  margin-left: var(--space-6);
+}
+
+.summary {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}

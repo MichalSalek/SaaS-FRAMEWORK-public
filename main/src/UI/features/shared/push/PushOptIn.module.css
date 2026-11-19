@@ -1,0 +1,21 @@
+/* UI/features/shared/push/PushOptIn.module.css
+ * One settings row: text on the left, the switch on the right, the outcome
+ * line under both. Same anatomy as the account's notification rows. */
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-8) var(--space-16);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.line {
+  grid-column: 1 / -1;
+}

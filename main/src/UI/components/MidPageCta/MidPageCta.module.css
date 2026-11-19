@@ -1,0 +1,52 @@
+/* MidPageCta: a centred CTA block between LP sections. The button itself
+ * carries the sanctioned shimmer effect through [data-cta-shimmer='on'].
+ *
+ * DECISION: the band cuts off from the page paper with WHITE and is 40% of the screen high with
+ * the content centered ("background: white; height: 40vh; display: flex; align-items: center"). A
+ * lower band on paper blended into its neighbours and, next to a white section, left a narrow
+ * white strip. `min-height`, not `height`: a longer headline (German) stretches the band instead
+ * of overflowing it. Every occurrence on public pages looks the same because the style lives here.
+ * (owner) */
+
+.midCta {
+  min-height: 40vh;
+  padding: clamp(var(--space-48), 6vw, 80px) var(--space-20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-card);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  text-align: center;
+  max-width: 560px;
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-subhead);
+  line-height: 1.25;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reassurance {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}

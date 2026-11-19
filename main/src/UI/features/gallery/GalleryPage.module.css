@@ -1,0 +1,287 @@
+/* UI/features/gallery/GalleryPage.module.css
+ * The stylist's own gallery: the photos are the content.
+ *
+ * Hierarchy: intro (canon <AppHero>: title + one sentence of live numbers) →
+ * ONE filter control row (GalleryFilterBar) → photo grid. Nothing animates in
+ * on entry (owner: no staggered entrances), so a return from a
+ * photo lands on a still page at the remembered position.
+ *
+ * Zero: gradient / shadow / glow / blur / one-sided-border / hover-on-static.
+ */
+
+/* --- Page shell --- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+  min-height: 100%;
+  /* Compensate AppLayout content padding for full-bleed hero. */
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  /* AppLayout reserves the bottom navigation, safe area and end gap. */
+  padding: var(--space-20) var(--space-20) 0;
+}
+
+/* Only the visible floating filter needs extra clearance above that shared
+ * reserve. The same dimensions position and size the actual control. */
+.pageWithFloatingFilter {
+  padding-bottom: calc(
+    var(--gallery-filter-fab-size) + var(--gallery-filter-fab-gap)
+  );
+}
+
+/* DECISION: container queries for this screen. On desktop the product routes render in a fixed
+   390px frame and `@media (min-width)` measures the VIEWPORT: at 1440 the grid went to four
+   columns (`min-width: 960px`) inside a 350px frame, tiles of ~78px. The width rules below ask
+   `@container app-view` with thresholds 40px lower than the old viewport ones (they measure the
+   page content-box), so a real phone behaves 1:1 as before. The container sits on `.pageTrack`,
+   NOT on `.page`: the filter FAB (GalleryFilterSection, `position: fixed`) is a sibling of
+   `.pageTrack` inside `.page`; with the container on `.page` layout containment would make it
+   the containing block and the FAB would scroll with the page instead of sticking to the window. */
+.pageTrack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  container-type: inline-size;
+  container-name: app-view;
+}
+
+/* The intro card lives in the <AppHero> canon (components/AppHero). */
+
+/* ============================================================
+ * FILTERS — one compact row in the content (GalleryFilterBar), not sticky
+ * ============================================================ */
+
+/* DECISION: the filter block is NOT sticky, and the three captioned chip rows no longer stand
+   above the photos at all (owner): stuck, they took ~40% of a phone screen. One
+   "Filtry N" row with the active filters remains (components/GalleryFilterBar), not sticky; the
+   floating button (`GalleryFilterSection .filterFab`) appears only when that row scrolls off
+   screen (see components/GalleryFloatingFilters.organism.tsx). */
+
+/* ============================================================
+ * MASONRY GRID — variable heights via CSS columns
+ *
+ * DECISION: see main/src/UI/features/explore/ExplorePage.module.css (CSS columns for masonry).
+ * Columns: 2 mobile, 3 tablet, 4 desktop, 5 wide desktop, counted on the content track (container
+ * query), so the grid uses the page's width.
+ * ============================================================ */
+
+.galleryGrid {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .galleryGrid {
+    column-count: 3;
+    column-gap: var(--space-12);
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGrid {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+@container app-view (min-width: 1360px) {
+  .galleryGrid {
+    column-count: 5;
+  }
+}
+
+.galleryGridItem {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGridItem {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* Full-width layout (single column, vertical rhythm) — for the
+ * editorial / single-column reading mode. */
+/* (owner) The single-column view reads like a feed: the photo at full frame
+   width, no section margin and no card around it, works one under another.
+   The two-column grid stays cards. */
+.galleryGridFullWidth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-24);
+  /* section-discipline-allow: the single-column view is a photo feed at full
+     frame width (owner), not a static-page section; the Section component
+     carries different semantics and its own spacing. */
+  /* The feed bleeds through the page gutter, including inside the DEV phone
+   * frame. Viewport units would size its photos against the desktop window. */
+  width: calc(100% + var(--space-20) * 2);
+  margin-inline: calc(var(--space-20) * -1);
+}
+
+/* (owner: „wykorzystaj szerokość”) On a wide track the „large photos” view is
+ * two, then three columns of large frames within the page margins, not one
+ * 400 px column in the middle of an empty screen. The view switch still chooses
+ * between large frames and the dense grid. */
+@container app-view (min-width: 560px) {
+  .galleryGridFullWidth {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: auto;
+    margin-inline: 0;
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .galleryGridFullWidth {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ============================================================
+ * EMPTY STATE — branded illustration + warm copy + tip pills
+ * Reads as Notion-style onboarding, not a sad icon + text.
+ * Depth comes from the closed dashed frame plus the illustration medallion;
+ * no fill, the block sits on paper.
+ * ============================================================ */
+
+/* Surface, frame and typography come from the <EmptyState size="page"> canon
+   (a white box with no frame, like every section); no local background or pink border. */
+.emptyState {
+  margin-top: var(--space-12);
+}
+
+/* Inline guidance list — plain text, tonal tint, NO pill/border/icon-circle.
+ * DECISION: static tips must NOT look tappable (fake affordance): they read as "to przeczytaj", not
+ * "to kliknij". Each line carries a flat tonal marker (color-mix bullet, zero gradient/shadow) for
+ * editorial rhythm. */
+.emptyTips {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.emptyTip {
+  position: relative;
+  padding-left: var(--space-20);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.emptyTip::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--style-radius-pill);
+  background: color-mix(in oklch, var(--color-primary) 55%, transparent);
+}
+/* No-results variant — slim, no illustration, focused on clear-filters action. */
+/* Surface is the <EmptyState> canon without a medallion (a short message, not
+   an invitation to a first action). Two buttons side by side instead of stacked. */
+.noResultsState {
+  --empty-title-size: var(--text-lg);
+  --empty-pad-block: var(--space-32);
+  --empty-pad-block-end: var(--space-32);
+}
+/* ============================================================
+ * PLAN LIMIT NOTICE — one place left or none
+ *
+ * At the limit: contextual text and a voluntary plan action. One place left:
+ * a quiet line on paper. No tint or frame: the lock and button carry meaning.
+ * ============================================================ */
+
+.limitNotice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-card);
+}
+
+/* The text may wrap: the icon's box is exactly one line of that text tall, so
+ * the glyph sits on the FIRST line, not against the middle of the paragraph. */
+.limitNoticeIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.limitNoticeIcon svg {
+  display: block;
+}
+
+.limitNoticeText {
+  flex: 1 1 calc(12 * var(--ch-body));
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.limitNoticeCta {
+  flex: none;
+  margin-left: auto;
+}
+
+/* ============================================================
+ * SKELETON — varied heights to hint at masonry
+ * ============================================================ */
+
+.skeletonGrid {
+  column-count: 2;
+  column-gap: var(--space-12);
+}
+
+@container app-view (min-width: 560px) {
+  .skeletonGrid {
+    column-count: 3;
+  }
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonGrid {
+    column-count: 4;
+    column-gap: var(--space-20);
+  }
+}
+
+.skeletonCard {
+  break-inside: avoid;
+  margin-bottom: var(--space-12);
+  border-radius: var(--style-radius-surface);
+}
+
+@container app-view (min-width: 920px) {
+  .skeletonCard {
+    margin-bottom: var(--space-20);
+  }
+}
+
+/* Varied skeleton heights via nth-child rotation — masonry feel from
+ * the loading state itself. */
+.skeletonCard:nth-child(3n + 1) {
+  aspect-ratio: 3 / 4;
+}
+.skeletonCard:nth-child(3n + 2) {
+  aspect-ratio: 1 / 1;
+}
+.skeletonCard:nth-child(3n + 3) {
+  aspect-ratio: 4 / 5;
+}

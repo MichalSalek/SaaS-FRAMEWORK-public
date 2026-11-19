@@ -1,0 +1,183 @@
+/* AppDialog — fullscreen on mobile, centered card on desktop */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog-backdrop);
+  min-height: 100dvh;
+  background: var(--color-scrim-soft);
+  transition: opacity var(--transition-fast);
+}
+
+.backdrop[data-starting-style],
+.backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+/* DECISION: the dialog scrim is stronger in dark mode as a LOCAL override, not
+ * a token change. Black 0.35 barely dims a dark page, so the content under the
+ * dialog competed with it. The `--color-scrim-*` tokens are mode-invariant by
+ * decision (palettes.css) and have other consumers, so only this surface moves
+ * from soft (0.35) to `--color-scrim-strong` (0.6). */
+:root[data-mode='dark'] .backdrop {
+  background: var(--color-scrim-strong);
+}
+
+/* ---- Popup ---- */
+
+.popup {
+  position: fixed;
+  z-index: var(--z-dialog);
+
+  /* Mobile-first: full-screen */
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-paper);
+  color: var(--color-text-primary);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  -webkit-overflow-scrolling: touch;
+  /* The container takes programmatic focus on open; no ring for that, the
+   * :focus-visible rule below restores a keyboard ring. */
+  outline: none;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+/* Restore visible focus ring for keyboard users (WCAG 2.4.7 / EAA).
+   `outline: none` above suppresses the default ring for mouse users on
+   the popup container; this counterpart re-adds it when the user is
+   navigating via keyboard. */
+.popup:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.popup[data-starting-style],
+.popup[data-ending-style] {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Desktop: centered card */
+@media (min-width: 640px) {
+  .popup {
+    padding-block: 0;
+    inset: unset;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(28rem, calc(100vw - 3rem));
+    max-height: calc(100dvh - 4rem);
+    border-radius: var(--style-radius-surface);
+    /* Hairline edge (NOT a shadow, anti-slop §2). The dialog reads over a 0.35 scrim. */
+    border: var(--style-border-surface) solid var(--color-border-surface);
+  }
+
+  .popup[data-starting-style],
+  .popup[data-ending-style] {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+/* ---- Actions footer ---- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  margin-top: auto;
+}
+
+.actions > :is(button, a) {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.body {
+  padding: var(--space-12) var(--space-20);
+}
+
+@media (min-width: 1280px) {
+  .popup {
+    /* Desktop: a narrower confirmation dialog */
+    --dialog-popup-width: min(24rem, calc(100vw - 3rem));
+    width: var(--dialog-popup-width);
+  }
+}
+
+/* ---- Header (title + description) — also the swipe-down handle on mobile ---- */
+
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Title / Description ---- */
+
+.title {
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-20) var(--space-20) 0;
+}
+
+.titleRow > button {
+  flex-shrink: 0;
+}
+
+.description {
+  margin: 0;
+  padding: var(--space-8) var(--space-20) 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ---- Tryb makiety telefonu (desktop, trasa produktowa) ---- */
+
+/* DECISION: inside the desktop phone frame the dialog is the PHONE's full-screen
+ * sheet. Media queries measure the window, so without this override the popup
+ * took desktop geometry and centred on the whole window, outside the frame.
+ * Attribute selector because the frame class is hashed in another module;
+ * AppLayout sets `[data-app-frame]` and the portal container makes the popup
+ * its descendant. Radius is zero: the frame's `overflow: hidden` clips corners. */
+[data-app-frame='true'] .popup {
+  padding-block: 0;
+  inset: 0;
+  width: auto;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  transform: none;
+}
+
+[data-app-frame='true'] .popup[data-starting-style],
+[data-app-frame='true'] .popup[data-ending-style] {
+  transform: translateY(8px);
+}
+
+[data-app-frame='true'] .actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+[data-app-frame='true'] .actions > * {
+  width: auto;
+}

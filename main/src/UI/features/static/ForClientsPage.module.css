@@ -1,0 +1,923 @@
+/* ForClients page: flat editorial (DESIGN.md anti-slop). Depth is solid
+ * color blocks and full hairlines. One cream band uses --color-bg-subtle.
+ * Ink-violet is the single second accent, on the featured visit card.
+ * Marcellus numerals mark the journey. No local cream ladder: several cream
+ * bands on one page made none of them stand out (owner rejected that). */
+
+.page {
+  --section-block: var(--lp-rhythm);
+  --section-gutter: clamp(20px, 5vw, 56px);
+
+  /* No local cream scale. The page is paper. One band takes --color-bg-subtle.
+     Rhythm comes from section hairlines, full-bleed ink, and the final CTA.
+     A private cream ladder spread the tint across four bands, so none of
+     them stood out. That is the case the owner rejected. (owner) */
+
+  padding: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow-x: clip;
+}
+
+.heroPhoneMockup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  position: relative;
+}
+
+@media (min-width: 860px) {
+  /* Flat tint block behind phone — solid cream surface step, no blur/glow. */
+  .heroPhoneMockup::before {
+    content: '';
+    position: absolute;
+    inset: -10% -12%;
+    background: var(--color-bg-main);
+    border: var(--style-border-surface) solid var(--color-divider);
+    border-radius: var(--style-radius-surface);
+    z-index: -1;
+    pointer-events: none;
+  }
+}
+
+.heroSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  padding: var(--space-6) 0 var(--space-4);
+  transition:
+    gap var(--transition-fast),
+    color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .heroSecondary:hover {
+    /* Link hover text on light hero → AA gold (--color-accent-fg). */
+    color: var(--color-accent-fg);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Shared section header
+ * ───────────────────────────────────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: calc(60 * var(--ch-body));
+  margin: 0 0 var(--lp-rhythm);
+}
+
+/* Per-page headline scale for <SectionHeader>, set through the canon's var hooks (never
+ * redefine .sectionHeadline). The lede is the canon's own and exposes no hooks. */
+.sectionHeaderScaled {
+  --section-headline-size: clamp(30px, 4.8vw, 52px);
+  --section-headline-leading: 1.06;
+  --section-headline-tracking: var(--letter-spacing-heading);
+  --section-headline-measure: calc(18 * var(--ch-heading));
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 1b. DISCOVERY — real manicure samples, not abstract placeholders.
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band przez <Section> (breakout+padding+kontener w komponencie); tu tylko
+   tło + rytm. Pojedynczy border-bottom zostaje lokalnie (zero-diff: band
+   historycznie bez border-top → bordered={false}). */
+.discoverySection {
+  --section-pad-block: var(--lp-rhythm);
+  background: var(--color-bg-main);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.discoveryInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .discoveryInner {
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  }
+}
+
+.discoveryHeader {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.4vw, 18px);
+  max-width: calc(58 * var(--ch-body));
+}
+
+.discoveryHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* fluid-allow: 2xl z podniesionym maksimum, parytet z HomePage */
+  font-size: clamp(30px, 4.6vw, 56px);
+  line-height: 1.05;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: 0;
+  max-width: calc(18 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+.discoveryLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: calc(54 * var(--ch-body));
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.discoveryGrid {
+  display: grid;
+  align-items: end;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.2vw, 16px);
+}
+
+@media (min-width: 640px) {
+  .discoveryGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.discoveryTile {
+  position: relative;
+  aspect-ratio: 1;
+  margin: 0;
+  overflow: hidden;
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+}
+
+.discoveryTile[data-featured='true'] {
+  aspect-ratio: 4 / 5;
+}
+
+.discoveryTileImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.discoveryTileLabel {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  display: inline-flex;
+  justify-content: center;
+  padding: var(--space-8) var(--space-10);
+  border-radius: var(--style-radius-control);
+  background: var(--color-ink);
+  /* focus-ring-allow: static figcaption on the photo tile — no focusable
+     descendants, the ring never paints here. */
+  --color-focus-ring: var(--color-accent-on-ink);
+  border: var(--style-border-surface) solid
+    color-mix(in oklch, var(--color-on-ink) 24%, transparent);
+  color: var(--color-accent-on-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  line-height: 1.2;
+  text-align: center;
+  text-transform: var(--style-label-case);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3. VISIT MOMENTS — 4-step timeline / cards w/ variable rhythm
+ *    Featured center card pops in primary solid fill
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band through <Section bordered> (hairline pair matches .bordered).
+   Here only the background and the rhythm. */
+.visitMomentsSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+}
+
+/* DECISION: the accepted 1024x1536 photograph stays portrait and visible on mobile, never
+ * a cropped panorama: its phone and manicure must stay visible at 2x pixel density or more.
+ * (owner) */
+.visitMomentsLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-32);
+}
+
+.visitMomentsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-24);
+}
+
+@media (min-width: 640px) {
+  .visitMomentsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .visitMomentsLayout {
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  }
+}
+
+/* Flat card — elevation via tonal surface + full hairline border, no shadow.
+ * Static (no hover) by design, see below. */
+.visitMoment {
+  position: relative;
+  min-width: 0;
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+  padding: var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  overflow: hidden;
+}
+
+.visitMomentContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* .visitMoment is a static <article>, not a link: no hover (anti-slop floor). */
+
+/* Featured card — solid INK-VIOLET fill (the per-page duoton color-block, brief
+   §1/§6). Gold lives elsewhere (numerals, finalCta); this single ink block gives
+   the gold→ink→gold rhythm that says 'for-clients'. solid gold-tint + hairline, no sparkle, no shadow.
+   DECISION: in light mode pure --color-secondary is below WCAG AA 4.5:1 for inverse body
+   text, so the card mixes in 15% --color-primary-contrast locally (the shared token in
+   palettes.css stays untouched). Dark mode already passes and returns to the pure token. */
+.visitMoment[data-featured='true'] {
+  background: color-mix(
+    in oklch,
+    var(--color-secondary) 85%,
+    var(--color-primary-contrast)
+  );
+  border-color: transparent;
+  color: var(--color-text-inverse);
+  /* Inverse at 90% on the secondary-mix card measures 4.21:1.
+     Solid inverse is 4.74:1 light / 6.10:1 dark. */
+}
+
+[data-mode='dark'] .visitMoment[data-featured='true'] {
+  background: var(--color-secondary);
+}
+
+/* Native portrait proportions preserve the phone, fingers and café setting. */
+.visitMomentPhoto {
+  width: 100%;
+  max-width: 32rem;
+  min-width: 0;
+  margin: 0 auto;
+  overflow: hidden;
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-surface-input);
+}
+
+.visitMomentPhotoImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Small ordered markers leave the explanation as the focal point. */
+.visitMomentNumeral {
+  flex-shrink: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  line-height: 1;
+  color: var(--color-primary);
+  user-select: none;
+}
+
+.visitMomentNumeral::before {
+  content: attr(data-num);
+}
+
+/* Featured card keeps the SAME numeral size as the others (Task 3: one size
+   in the section, numerals must not dominate copy) — only the colour flips. */
+.visitMoment[data-featured='true'] .visitMomentNumeral {
+  color: var(--color-text-inverse);
+  opacity: 0.7;
+}
+
+.visitMomentTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.15;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.visitMoment[data-featured='true'] .visitMomentTitle {
+  color: var(--color-text-inverse);
+}
+
+.visitMomentBody {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.visitMoment[data-featured='true'] .visitMomentBody {
+  color: var(--color-text-inverse);
+  font-size: var(--text-fluid-sm);
+}
+
+/* Footnote: the 7-day session fact from the removed steps section
+   (`how.footnote`). Quiet text, no chevron in ::before. A '›' on
+   non-clickable text looked like navigation (owner). Same as
+   .benefitsFootnote. */
+.visitMomentsFootnote {
+  margin: clamp(32px, 4vw, 56px) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Benefits: parallel features, not a sequence, so no numerals. One hairline
+ * container. The only cream band on the page. Neighbours are paper, so a
+ * cream section needs full hairlines top and bottom: a tint without a frame
+ * bleeds (DECISION in Section.composition.tsx). The frame is the section's
+ * `bordered` prop and does not double the strip below (DECISION in
+ * Section.module.css). Desktop split: 7/12 list, 5/12 sticky phone. */
+.benefitsSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-subtle);
+}
+
+.benefitsSection .sectionHeader {
+  max-width: var(--lp-content-width);
+  margin-inline: auto;
+  margin-bottom: var(--lp-rhythm);
+}
+
+/* Split 7/12 and 5/12. One column below 1024px. */
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .benefitsGrid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+/* Kolumna telefonu (1:1 z .v1aPhoneCol) — sticky na desktopie: duży screen
+   galerii towarzyszy liście podczas scrollu (dowód obok obietnicy). */
+.benefitsPhoneCol {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .benefitsPhoneCol {
+    position: sticky;
+    top: calc(
+      var(--public-header-height, var(--app-bar-height)) + var(--space-96)
+    );
+    align-self: start;
+    padding-top: clamp(8px, 1vw, 16px);
+  }
+}
+
+/* Bordered container — full hairline on all four sides + radius; rows are
+   divided by internal separators (border-top per row). */
+.benefitsList {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+  background: var(--color-bg-main);
+  overflow: hidden;
+}
+
+/* Clean single-column rows — full-width separators (the container border +
+   per-row border-top). No numerals, no per-row offsets: a calm document. */
+.benefit {
+  display: block;
+  padding: clamp(28px, 3.4vw, 52px) clamp(24px, 3.4vw, 56px);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  position: relative;
+}
+
+/* First row: container border already provides the top edge. */
+.benefit:first-child {
+  border-top: none;
+}
+
+/* Title and body share a comfortable measure but title can run a touch wider
+   for editorial rhythm. */
+.benefit .benefitTitle {
+  max-width: calc(40 * var(--ch-heading));
+}
+
+/* Highlight row (O5) — solid primary color-block break, kept WITHIN the
+   bordered list. Content fills the row; solid gold-tint + hairline, no sparkle anchors the right so
+   there's no empty band. */
+.benefit[data-highlight] {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-top-color: color-mix(
+    in oklch,
+    var(--color-primary) 64%,
+    var(--color-bg-main)
+  );
+  padding-block: clamp(40px, 5vw, 80px);
+  overflow: hidden;
+}
+.benefit[data-highlight] .benefitContent {
+  max-width: calc(68 * var(--ch-body));
+  position: relative;
+  z-index: 1;
+}
+
+.benefit[data-highlight] .benefitTitle {
+  font-size: var(--text-fluid-xl);
+  line-height: 1.12;
+  max-width: calc(26 * var(--ch-heading));
+  color: var(--color-primary-contrast);
+}
+
+.benefit[data-highlight] .benefitText {
+  color: var(--color-primary-contrast);
+}
+
+.benefit[data-highlight] .benefitDetail {
+  color: var(--color-primary-contrast);
+  border-color: color-mix(
+    in oklch,
+    var(--color-primary-contrast) 40%,
+    transparent
+  );
+  background: transparent;
+}
+
+.benefitContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1vw, 16px);
+  max-width: calc(64 * var(--ch-body));
+  min-width: 0;
+}
+
+.benefitTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.22;
+  letter-spacing: var(--ls-tight-12);
+  color: var(--color-text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.benefitText {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.benefitDetail {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: var(--space-12) 0 0;
+  padding: var(--space-12) var(--space-14);
+  /* Motyw „Jeden krem" (R3): box na papierze, granicę niesie pełny hairline
+     (4 boki, nigdy jednostronny pasek). */
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-control);
+  background: var(--color-bg-paper);
+  font-style: italic;
+}
+
+/* Quiet text footnote. No chevron in ::before: a '›' on non-clickable text
+   looked like a link (owner). */
+.benefitsFootnote {
+  margin: clamp(40px, 5vw, 72px) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  letter-spacing: var(--ls-tight-5);
+}
+
+/* Portfolio strip: a visual divider between benefits and reviews.
+ * Section hairline, bare photos (no frames, radii or captions), equal height.
+ * Mobile scrolls with snap. Desktop shows six equal frames. */
+.stripSection {
+  padding: clamp(24px, 4vw, 40px) 0;
+  border-block: var(--style-border-divider) solid var(--color-divider);
+  background: var(--color-bg-main);
+}
+
+.stripHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-8) var(--space-20);
+  padding-inline: clamp(16px, 4vw, 40px);
+  margin-bottom: var(--space-20);
+}
+
+.stripTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.strip {
+  display: flex;
+  gap: var(--space-6);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-inline: clamp(16px, 4vw, 40px);
+  padding-bottom: var(--space-8);
+}
+
+.stripItem {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0;
+  height: clamp(220px, 56vw, 320px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  scroll-snap-align: start;
+  /* Film-strip frame fill, not a page band. Neutral so the benefits cream
+     stays the only cream band on the page. */
+  background: var(--color-surface-input);
+}
+
+@media (min-width: 1024px) {
+  .strip {
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+
+  .stripItem {
+    flex: 1 1 0;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 4 / 5;
+  }
+}
+
+.coverImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 5. MID-FUNNEL CTA — zamknięty ink-prostokąt (<InkPanel tone='ink'>,
+ *    kanon taste-14: negatyw = zamknięta karta z radiusem na jasnym tle).
+ *    Wnętrze: ten sam content co dawny split — pull-quote left + CTA right.
+ *    Panel (tło/rama/padding/kolor bazowy) żyje w InkPanel.module.css.
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band przez <Section bordered> (para hairline = .bordered 1:1); InkPanel
+   siedzi bezpośrednio w kontenerze Section (wzór AboutPage timeline). */
+.midCta {
+  --section-pad-block: var(--lp-rhythm);
+  background: var(--color-bg-main);
+}
+
+.midCtaGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .midCtaGrid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+}
+
+.midCtaLeft {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.8vw, 22px);
+  min-width: 0;
+}
+
+/* Pull-quote — Marcellus editorial voice, on-ink */
+.midCtaQuote {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  /* fluid-allow: j.w. — poziom posredni miedzy xl a 2xl */
+  font-size: clamp(26px, 3.6vw, 44px);
+  line-height: 1.18;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-on-ink);
+  margin: 0;
+  max-width: calc(20 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+.midCtaQuote em {
+  color: inherit;
+  font-style: inherit;
+}
+
+.midCtaSubtext {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: color-mix(in oklch, var(--color-on-ink) 90%, transparent);
+  margin: 0;
+  max-width: calc(44 * var(--ch-body));
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* Right column — CTA cluster */
+.midCtaRight {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(20px, 2.4vw, 32px);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 6. TRUST — extended trust section with headline, lede, chips
+ * ───────────────────────────────────────────────────────────────────── */
+/* section-discipline-allow: padding-block is asymmetric (top 64-112,
+   bottom 56-96). Section only carries a symmetric --section-pad-block,
+   and matching it would change the measured band, so this band stays manual. */
+.trustSection {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--color-bg-main);
+  padding: var(--lp-rhythm) var(--section-gutter);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.trustInner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
+}
+
+@media (min-width: 860px) {
+  .trustInner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(28px, 4vw, 64px);
+  }
+}
+
+/* Lewa kolumna trustu (1:1 z .v2cLeft playgroundu) — patrz komentarz w TSX. */
+.trustLeft {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.trustHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.12;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  margin: clamp(8px, 1.2vw, 16px) 0 0;
+  max-width: calc(22 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+.trustLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: clamp(8px, 1.2vw, 16px) 0 0;
+  max-width: calc(60 * var(--ch-body));
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 7. PRIVACY mini-section — calm reassurance pre-CTA
+ *    Anti-AI-Slop: ZERO radial blob / filter:blur. Flat tint surface.
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band through <Section bordered> (hairline pair matches .bordered).
+   Here only the background and the rhythm. */
+.privacy {
+  --section-pad-block: var(--lp-rhythm);
+  background: var(--color-bg-main);
+}
+
+/* The heading and lede in column 1 align with the list box in column 2.
+ * Keep align-items:start so both columns begin on the same line at desktop
+ * widths; the row gap carries the vertical rhythm. */
+.privacyInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  --privacy-grid-gap: clamp(16px, 2vw, 28px);
+  gap: var(--privacy-grid-gap);
+}
+
+@media (min-width: 860px) {
+  .privacyInner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    column-gap: clamp(28px, 4vw, 56px);
+    row-gap: var(--privacy-grid-gap);
+    align-items: start;
+  }
+
+  .privacyHead {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .privacyList {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+.privacyHead {
+  --privacy-head-gap: clamp(var(--space-8), 1vw, var(--space-14));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--privacy-head-gap);
+  min-width: 0;
+}
+
+.privacyHeadline {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight-20);
+  color: var(--color-text-primary);
+  /* margin-top 0: the heading is the first line of grid row 2, so the box
+     on the right starts level with it (owner). */
+  margin: 0;
+  max-width: calc(22 * var(--ch-heading));
+  text-wrap: balance;
+}
+
+.privacyLede {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: clamp(8px, 1.2vw, 16px) 0 0;
+  max-width: calc(56 * var(--ch-body));
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+/* Flat card. With the cream ladder gone, parent and card share paper, so
+   only a full hairline frame plus padding sets the card apart. */
+.privacyList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  list-style: none;
+  padding: clamp(20px, 2.5vw, 32px);
+  margin: 0;
+  background: var(--color-bg-main);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-surface);
+}
+
+.privacyList li {
+  font-family: var(--font-body);
+  font-size: var(--text-fluid-xs);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  padding-left: var(--space-28);
+  position: relative;
+  font-weight: 500;
+}
+
+.privacyList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc((1lh - 18px) / 2);
+  width: 18px;
+  height: 18px;
+  border-radius: var(--style-radius-pill);
+  /* ZNAK: marker-bullet listy (18px kółko) — token roli, zostaje złoty. */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+}
+
+.privacyList li::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: calc((1lh - 18px) / 2 + 5px);
+  width: 8px;
+  height: 4px;
+  /* Ptaszek NIESIE znaczenie → accent-fg (blade primary na kremie to 2.2:1). */
+  border-left: var(--style-border-control) solid var(--color-accent-fg);
+  border-bottom: var(--style-border-control) solid var(--color-accent-fg);
+  transform: rotate(-45deg);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 8. FAQ — kanoniczny <FaqSection> (skórka accordion + nagłówek żyją
+ * w components/FaqSection); strona trzyma TYLKO full-bleed band + width.
+ * ───────────────────────────────────────────────────────────────────── */
+/* Band przez <Section as='div'> (FaqSection sam renderuje <section>);
+   bez borderów (zero-diff) → bordered={false} (default plain). */
+.faqSection {
+  --section-pad-block: var(--section-block);
+  background: var(--color-bg-main);
+}
+
+.midCtaWebLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-on-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: var(--space-4) 0 var(--space-2);
+  transition:
+    gap var(--transition-fast),
+    color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .midCtaWebLink:hover {
+    /* Keep interactive text legible on ink in both palette modes. */
+    color: var(--color-accent-on-ink);
+  }
+}
+
+.processIllustration {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.contextualIllustration {
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  height: auto;
+}
+
+/* A full section row gives the privacy scene room without stretching the
+ * accepted 1536px original beyond its honest 2x Retina limit. */
+.privacyIllustration {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: var(--illustration-native-width, 48rem);
+  margin-top: max(0px, calc(var(--illustration-gap) - var(--privacy-grid-gap)));
+}

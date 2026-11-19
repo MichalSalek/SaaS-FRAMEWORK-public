@@ -1,0 +1,59 @@
+/* StylistPhoneContact — publiczny telefon stylistki + CTA „Zadzwoń".
+   Floor-compliant: flat, pełne hairline bordery, zero gradient/shadow/one-sided. */
+
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12) var(--space-20);
+  padding: var(--space-20) var(--space-32);
+  background-color: var(--color-surface-card);
+  border: var(--style-border-surface) solid var(--color-border-surface);
+  border-radius: var(--style-radius-surface);
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+  text-transform: var(--style-label-case);
+  color: var(--color-text-muted);
+}
+
+.number {
+  flex: 1 1 auto;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide-20);
+  color: var(--color-text-primary);
+}
+
+.callButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-accent-text);
+  background-color: var(--color-primary);
+  border: var(--style-border-surface) solid var(--color-primary);
+  border-radius: var(--style-radius-control);
+  padding: var(--space-12) var(--space-32);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-200) var(--ease-entrance),
+    transform var(--duration-200) var(--ease-entrance);
+}
+
+.callButton:hover {
+  background-color: color-mix(in oklch, var(--color-primary) 88%, black);
+}
+
+.callButton:active {
+  transform: translateY(1px);
+}

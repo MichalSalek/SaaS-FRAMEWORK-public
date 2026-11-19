@@ -1,0 +1,61 @@
+.loginCta {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+/* Avatar trigger — interactive (hover/open affordance allowed). No shadow/glow
+   (anti-AI-slop floor): tonal surface tint + full hairline only. */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8);
+  border: var(--style-border-surface) solid transparent;
+  background: transparent;
+  border-radius: var(--style-radius-avatar);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.trigger:hover {
+  background: color-mix(in oklch, var(--color-text-primary) 7%, transparent);
+  border-color: var(--color-border);
+}
+
+.trigger[data-popup-open] {
+  background: color-mix(in oklch, var(--color-text-primary) 9%, transparent);
+}
+
+.caret {
+  transition: transform var(--transition-normal);
+}
+
+.trigger[data-popup-open] .caret {
+  transform: rotate(180deg);
+}
+
+.menu {
+  min-width: 13rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.item svg {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.danger {
+  color: var(--color-error);
+}
+
+.danger svg {
+  color: var(--color-error);
+}

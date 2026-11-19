@@ -1,0 +1,39 @@
+/* The public „O mnie” text: its field and the editor with an explicit save. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+}
+
+/* The save button and the profile link share one line and wrap as a pair. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12) var(--space-20);
+}
+
+/* DECISION: the field grows with the text and has NO max height. A bio is read whole before it is
+   saved, and with the old `max-height: 60vh` a long bio (up to 1000 characters, about 25 lines at
+   360px) scrolled inside the box and was cut mid-line. Browsers without `field-sizing` get the same
+   growth from the molecule (height set from scrollHeight); the rows prop stays the minimum. */
+.field textarea {
+  field-sizing: content;
+  overflow-y: hidden;
+}

@@ -1,0 +1,38 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  line-height: 1.6;
+}
+.stack p {
+  margin: 0;
+}
+.figures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border: var(--style-border-surface) solid var(--color-divider);
+  border-radius: var(--style-radius-control);
+  margin: 0;
+  background: var(--color-bg-paper);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+.row dd {
+  margin: 0;
+  white-space: nowrap;
+}
+.amount {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-heading);
+}
+.validity {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}

@@ -1,0 +1,162 @@
+/* ─── Wrapper ─── */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+}
+
+/* ─── Label ─── */
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.wrapper:focus-within .label {
+  color: var(--color-primary);
+}
+
+.hasError .label {
+  color: var(--color-error);
+}
+
+/* ─── Input container (for search icon positioning) ─── */
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.suffixContainer {
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  background: var(--color-surface-input);
+  transition: border-color var(--transition-fast);
+}
+
+.suffixContainer .input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+}
+
+.suffix {
+  flex: none;
+  padding-inline-end: var(--style-input-pad);
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.suffixContainer:focus-within {
+  border-color: var(--color-primary);
+}
+
+.suffixContainer:has(:focus-visible) {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.suffixContainer .input:focus-visible {
+  outline: none;
+}
+
+.hasError .suffixContainer {
+  border-color: var(--color-error);
+}
+
+/* ─── Shared input / textarea styles ─── */
+.input,
+.textarea {
+  width: 100%;
+  padding: var(--style-input-pad);
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface-input);
+  /* DECISION: the text field keeps a quiet 1px line in `--color-border` even though other controls
+     in the "A3" direction have no frame. A white field on paper is 1.09:1 and WCAG 1.4.11 requires
+     3:1 for a control boundary: without the line the field does not exist for the eye in bad
+     light. Chips, buttons and cards are carried by the surface alone. */
+  border: var(--style-border-control) solid var(--color-border);
+  border-radius: var(--style-radius-control);
+  /* outline:none on the base selector; :focus-visible below re-adds a 2px primary ring (WCAG
+   * 2.4.7) and :focus changes the border color for mouse/stylus users. */
+  outline: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  /* muted, not disabled: an active field's placeholder needs AA contrast (disabled
+   * #aaa = 2.19:1 on #f8f8f8 fails; muted #6e6e6e ~4.8:1, dark #909090 ~5.4:1).
+   * The disabled token is WCAG-exempt only for disabled UI, not placeholders. */
+  color: var(--color-text-muted);
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--color-primary);
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── Search icon ─── */
+.searchIcon {
+  position: absolute;
+  left: var(--style-input-pad);
+  display: flex;
+  align-items: center;
+  color: var(--color-icon-muted);
+  pointer-events: none;
+}
+
+.withSearchIcon {
+  padding-left: calc(var(--style-input-pad) + 20px + var(--space-8));
+}
+
+/* ─── Textarea ─── */
+.textarea {
+  resize: none;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* ─── Error state ─── */
+.hasError .input,
+.hasError .textarea {
+  border-color: var(--color-error);
+}
+
+.hasError .input:focus,
+.hasError .textarea:focus {
+  border-color: var(--color-error);
+}
+
+.error {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  line-height: 1.3;
+}
+
+/* ─── Disabled ─── */
+.isDisabled .input,
+.isDisabled .textarea {
+  opacity: 0.5;
+  cursor: not-allowed;
+  /* surface-hover (neutral), not bg-subtle: the warm tint made the read-only
+   * field the most inviting one in the form, an inverted affordance. */
+  background: var(--color-surface-hover);
+}
+
+.isDisabled .label {
+  opacity: 0.5;
+}

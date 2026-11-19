@@ -1,0 +1,84 @@
+/* ─── StickyCtaBar — Shared sticky CTA bar ─── */
+
+/* DECISION: on a phone there is no bar any more: only the button at the right edge, with no
+   background and no top line, right under the contact bubble ("the bar takes too much of the
+   view"). The empty strip beside the button lets touches through to the content below. When the
+   button is visible is decided by `useShowOnScroll` (phone: only while scrolling up). From 768px
+   the card is unchanged. (owner) */
+.stickyCtaBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky-bar);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-16);
+  padding-bottom: calc(var(--space-16) + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+  transform: translateY(100%);
+  opacity: 0;
+  transition:
+    transform var(--duration-200) var(--ease-entrance),
+    opacity var(--duration-200) var(--ease-entrance);
+}
+
+.stickyCtaBar > * {
+  pointer-events: auto;
+}
+
+.stickyCtaBar[data-visible] {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.stickyCtaText {
+  color: var(--color-text-secondary);
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .stickyCtaText {
+    display: block;
+    /* min-width max-content keeps the text at its full one-line width, so
+     * flex-shrink cannot squeeze it by a sub-pixel and break the last word.
+     * The bar (fit-content) grows to the content; max-width 660 caps it for
+     * very long copy. */
+    min-width: max-content;
+  }
+
+  .stickyCtaBar {
+    justify-content: center;
+    padding: var(--space-12) var(--space-32);
+    pointer-events: auto;
+    /* Solid fill, not backdrop blur (anti-slop floor). */
+    background: var(--color-bg-elevated);
+    /* fit-content + max-width 660 (owner vote): the width hugs the content
+     * (no spare side spacing), and 660 fits longer headlines on one line, e.g.
+     * „Gotowa pokazać klientce, co naprawdę robisz?". translateX(-50%) centres
+     * from the real width. */
+    width: fit-content;
+    max-width: 660px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    bottom: var(--space-20);
+    /* Owner vote: a closed card with the surface radius instead of a
+     * full-radius pill (the "sausage"), consistent with the closed-rectangle
+     * system; the full radius stays for real pills (chip/avatar). A docked
+     * edge-to-edge bar was rejected: it covers the viewport with an empty band. */
+    border-radius: var(--style-radius-surface);
+    border: var(--style-border-surface) solid var(--color-divider);
+  }
+
+  .stickyCtaBar[data-visible] {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Primary CTA wrapper for data-cta-shimmer: display:contents keeps the bar's
+ * flex layout; the sheen effect itself lives in global.css [data-cta-shimmer]. */
+.shimmerWrap {
+  display: contents;
+}

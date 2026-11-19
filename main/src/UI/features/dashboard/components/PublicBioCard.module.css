@@ -1,0 +1,7 @@
+/* „O mnie” card: the title and the line saying who reads the text. */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}

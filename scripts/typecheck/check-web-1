@@ -1,0 +1,15 @@
+#!/bin/bash
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+
+FAILED=0
+
+echo "  TypeScript check: web-1"
+(cd "$PROJECT_ROOT/web-1" && ./node_modules/.bin/tsc --noEmit)
+if [ $? -ne 0 ]; then FAILED=$((FAILED + 1)); fi
+
+echo "  ESLint check: web-1"
+(cd "$PROJECT_ROOT/web-1" && ./node_modules/.bin/eslint --max-warnings 0 .)
+if [ $? -ne 0 ]; then FAILED=$((FAILED + 1)); fi
+
+exit $FAILED

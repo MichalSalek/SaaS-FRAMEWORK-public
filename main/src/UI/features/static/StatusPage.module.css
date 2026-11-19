@@ -1,0 +1,285 @@
+/* ─── StatusPage — flat editorial, Anti-AI-Slop pattern ─── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 60dvh;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * OVERALL BANNER: the only cream band on the page + a hairline underneath.
+ * Single-cream theme: the gold surface tint gave way to cream,
+ * because the banner is a section band, not a mark. Deviations from the norm still
+ * colour semantically (warning/error), because there the background CARRIES data.
+ * ───────────────────────────────────────────────────────────────────── */
+.overallBanner {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(40px, 6vw, 72px) clamp(20px, 5vw, 56px) clamp(36px, 5vw, 60px);
+  /* White belongs to what is clickable, so the form card
+     returns to paper; otherwise a white field and a white button vanish on a white card. */
+  background: var(--color-surface-card);
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  animation: banner-rise var(--duration-300) var(--ease-entrance) both;
+}
+
+/* Single-cream theme (floor §3): the top accent bar (base + degraded/down
+ * variants) is removed: a thin fill at one edge is a banned one-sided
+ * border. The status is carried by the icon, the heading and the variant background. */
+
+/* Tint variants for non-operational states — semantic, not decorative */
+.overallBanner[data-status='degraded'] {
+  background: color-mix(
+    in oklch,
+    var(--color-bg-paper) 93%,
+    var(--color-warning) 7%
+  );
+}
+
+.overallBanner[data-status='down'] {
+  background: color-mix(
+    in oklch,
+    var(--color-bg-paper) 93%,
+    var(--color-error) 7%
+  );
+}
+
+/* `checking` deliberately has NO rule of its own: it inherits the base cream (the former
+ * declaration was a byte-for-byte copy of the base). */
+
+/* Translate only, never a fade: the banner is the first screen's largest
+ * block (DECISION in components/LpHero/LpHero.module.css). */
+@keyframes banner-rise {
+  from {
+    transform: translateY(12px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.overallInner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(16px, 2vw, 24px);
+}
+
+/* ─── Status line — icon + heading row ─── */
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 20px);
+}
+
+.overallHeading {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-xl);
+  line-height: 1.13;
+  letter-spacing: var(--ls-tight-15);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.overallSub {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ─── Services section ─── */
+.servicesSection {
+  padding: clamp(40px, 5vw, 72px) clamp(20px, 5vw, 56px);
+}
+
+.servicesInner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+}
+
+.sectionHeading {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-fluid-lg);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  margin: 0 0 clamp(20px, 3vw, 32px);
+}
+
+.servicesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+.serviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(16px, 2vw, 20px) 0;
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+  gap: clamp(16px, 2.5vw, 32px);
+}
+
+.serviceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.serviceName {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.serviceDescription {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.serviceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
+  padding: 5px var(--space-12);
+  border-radius: var(--style-radius-pill);
+  /* Single-cream theme: the base badge (unknown state) is a MARK, not a band:
+     a neutral tonal step; the only cream of the page is held by .overallBanner.
+     The operational/degraded/down variants still carry a semantic tint. */
+  background: var(--color-surface-input);
+}
+
+.serviceBadge[data-status='operational'] {
+  background: color-mix(in srgb, var(--color-success) 12%, transparent);
+}
+
+.serviceBadge[data-status='degraded'] {
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+}
+
+.serviceBadge[data-status='down'] {
+  background: color-mix(in srgb, var(--color-error) 12%, transparent);
+}
+
+.statusLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+/* Status icon colors — semantic status tokens (mode-aware) */
+.iconOperational {
+  color: var(--color-success);
+}
+
+.iconDegraded {
+  color: var(--color-warning);
+}
+
+.iconDown {
+  color: var(--color-error);
+}
+
+/* openstatus.dev external link */
+.openstatusLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: clamp(12px, 2vw, 20px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  /* Gold as TEXT carries meaning → --color-accent-fg (AA in both modes);
+     --color-primary on paper is 2.2:1 and with the tints removed it really vanishes. */
+  color: var(--color-accent-fg);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: var(--style-border-divider) solid
+    color-mix(in srgb, var(--color-accent-fg) 40%, transparent);
+  transition: border-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .openstatusLink:hover {
+    border-bottom-color: var(--color-accent-fg);
+  }
+}
+
+/* ─── History section ─── */
+.historySection {
+  padding: 0 clamp(20px, 5vw, 56px) clamp(40px, 5vw, 72px);
+}
+
+.historyInner {
+  max-width: var(--lp-content-width);
+  margin: 0 auto;
+}
+
+.historyHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  margin-bottom: clamp(16px, 2vw, 24px);
+  color: var(--color-text-secondary);
+}
+
+/* The heading shares this line with the glyph, so it carries NO margin of its own:
+   `align-items: center` centres the h2 BOX together with its 32px
+   bottom margin, so the text rode up while the clock stayed ~16px
+   lower and looked stuck underneath. The spacing under the whole row is
+   carried by .historyHeader. Measured, not estimated. */
+.historyHeader .sectionHeading {
+  margin: 0;
+}
+
+.historyEmpty {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding: clamp(24px, 3vw, 40px) 0;
+  border-top: var(--style-border-divider) solid var(--color-divider);
+}
+
+/* ─── Help CTA ─── */
+.helpSection {
+  padding: clamp(24px, 3vw, 40px) clamp(20px, 5vw, 56px);
+  border-top: var(--style-border-divider) solid var(--color-divider);
+  text-align: center;
+}
+
+.helpText {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.helpLink {
+  /* Gold-as-text = accent-fg (patrz .openstatusLink). */
+  color: var(--color-accent-fg);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: var(--style-border-divider) solid
+    color-mix(in srgb, var(--color-accent-fg) 40%, transparent);
+  transition: border-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .helpLink:hover {
+    border-bottom-color: var(--color-accent-fg);
+  }
+}

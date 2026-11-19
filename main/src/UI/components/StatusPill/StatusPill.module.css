@@ -1,0 +1,97 @@
+/* ============================================================
+ * STATUS PILL — status chip (universal), ONE visual recipe.
+ *
+ * Caller injects the status color via `--statusColor` (set by <StatusPill color>).
+ * Domain status→token maps stay at call-sites (getLifecycleColor / support status map).
+ * Floor 7×ZERO: flat fill, no gradient, no shadow/glow, no one-sided border.
+ * ============================================================ */
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-10);
+  border-radius: var(--style-radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--style-label-tracking);
+  /* Word spacing of the label role (see `--style-control-word-spacing` in tokens.css): here a
+     reader without context read "Nowa sesja" as "Nowasesja" (a 2.88px space at 14px, weight 600). */
+  word-spacing: var(--style-label-word-spacing);
+  /* A status is one piece: it never breaks inside, whatever its cell allows
+     (a table cell with `overflow-wrap: anywhere` split „ostrzeżeni|e”). */
+  white-space: nowrap;
+  /* A status-colour tint gave pale pink pills for brick statuses. The status is
+     carried by the text and a dot in its colour; the background is the neutral
+     mark, without a frame (owner vote). */
+  background: var(--color-mark-bg);
+  border: var(--style-border-surface) solid transparent;
+  /* DECISION: the text is 30% status colour mixed into ink. On the neutral mark
+     the raw status colour is too light (warning 1.71:1) and 55% stayed under AA;
+     30% holds AA for every status, and the dot carries the hue as well. */
+  color: color-mix(
+    in oklch,
+    var(--statusColor, var(--color-accent-fg)) 30%,
+    var(--color-text-primary)
+  );
+}
+
+/* A leading glyph (the `icon` prop) keeps its size. In a narrow table column
+ * the pill's text does not wrap, so the flex row would take the missing width
+ * from the icon and render it 0px wide. */
+.statusPill > svg {
+  flex: none;
+}
+
+/* Solid fill — the one step above the tint, for a status that must not blend
+ * into the row (critical severity). Text goes to --color-on-ink, which is the
+ * token already used for copy sitting on a filled role colour. */
+.solid {
+  background: var(--statusColor, var(--color-primary));
+  border-color: var(--statusColor, var(--color-primary));
+  color: var(--color-on-ink);
+}
+
+/* Badge presentation — uppercase + wider tracking for terse status words.
+ * Used by support threads ("OTWARTA" / "GESCHLOSSEN") so they read as badges
+ * and never break mid-word on the narrowest column. */
+.uppercase {
+  text-transform: var(--style-label-case);
+  letter-spacing: var(--style-label-tracking);
+  word-spacing: var(--style-label-word-spacing);
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--style-radius-round);
+  background: var(--statusColor, var(--color-primary));
+  flex-shrink: 0;
+}
+
+/* Spread-only ring pulse on the dot for live states (signal: "live").
+ * Spread-ring (0 0 0 Xpx) is OK per Anti-AI-Slop — it's not a visual shadow.
+ * Status-aware: the ring tints from --statusColor. */
+.statusDotPulse {
+  animation: statusDotPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes statusDotPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0
+      color-mix(
+        in oklch,
+        var(--statusColor, var(--color-primary)) 30%,
+        transparent
+      );
+  }
+  50% {
+    box-shadow: 0 0 0 4px
+      color-mix(
+        in oklch,
+        var(--statusColor, var(--color-primary)) 10%,
+        transparent
+      );
+  }
+}

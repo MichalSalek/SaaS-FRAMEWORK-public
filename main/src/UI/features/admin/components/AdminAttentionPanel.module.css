@@ -1,0 +1,120 @@
+/* admin/components/AdminAttentionPanel — „Wymaga reakcji” on the dashboard.
+   White box on paper; rows are links (white interactive surface comes from the
+   box itself, the tappable mark is the affordance disc). */
+
+.panel {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-20);
+  background: var(--color-surface-card);
+  border-radius: var(--style-radius-surface);
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-12);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.total {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.item:not(:last-child) {
+  border-bottom: var(--style-border-divider) solid var(--color-divider);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label disc'
+    'count disc';
+  align-items: center;
+  column-gap: var(--space-12);
+  row-gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-10) 0;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  border-radius: var(--style-radius-control);
+  transition: opacity var(--transition-fast);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.row:active {
+  opacity: 0.7;
+}
+
+.label {
+  grid-area: label;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.count {
+  grid-area: count;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.row > :last-child {
+  grid-area: disc;
+}
+
+/* Wide box: queue name and sentence on one line, names in a fixed column so
+   the sentences start on one edge. */
+@container (min-width: 560px) {
+  .row {
+    grid-template-columns: 176px minmax(0, 1fr) auto;
+    grid-template-areas: 'label count disc';
+  }
+}
+
+.allClear,
+.quiet {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.quiet {
+  padding-top: var(--space-4);
+}
+
+@media (hover: hover) {
+  .row:hover {
+    opacity: 0.8;
+  }
+}

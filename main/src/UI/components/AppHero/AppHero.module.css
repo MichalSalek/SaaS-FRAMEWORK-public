@@ -1,0 +1,125 @@
+/* AppHero: the canonical intro of an app screen, a bare title on paper (no card, no frame).
+ * No sparkles or stars (owner). */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  margin: 0;
+  /* DECISION: only a small optical vertical padding stays. The old 32px came from the filled-card
+   * era and added up with the page margin to ~52px of emptiness above and below the title; spacing
+   * now comes from the page margin and its `gap`. (owner) */
+  padding: var(--space-4) var(--space-20);
+  border-radius: var(--style-radius-surface);
+  /* DECISION: a screen header is information, so it stands directly on paper with no card or
+     frame; white belongs to what is tapped. The side padding goes with the card so the title
+     holds the content line. (owner) */
+  background: transparent;
+  border: var(--style-border-surface) solid transparent;
+  padding-inline: 0;
+  overflow: hidden;
+  /* Body plus the optional aside (identity avatar) in one row. */
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+}
+
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.aside {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+}
+
+.eyebrowRow {
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--space-12);
+}
+
+.title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--style-heading-font);
+  /* Deliberate fluid clamp: the only H1 of the screen. */
+  font-size: var(--text-fluid-xl);
+  font-weight: var(--style-heading-weight);
+  line-height: 1.15;
+  letter-spacing: var(--style-heading-tracking);
+  text-transform: var(--style-heading-case);
+  color: var(--color-text-primary);
+  text-wrap: pretty;
+  margin: 0;
+}
+
+.subtitle {
+  position: relative;
+  z-index: 1;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+  margin: var(--space-8) 0 0;
+  max-width: calc(42 * var(--ch-body));
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+/* Meta row of live data: sans; tabular digits ONLY on the numbers themselves.
+ *
+ * DECISION: `font-variant-numeric: tabular-nums` on the whole row spreads punctuation: in
+ * Schibsted Grotesk the `tnum` feature also covers the period and comma ("example.com" rendered
+ * as "example . com"). Counters sit in `<strong>` and only they get the feature. */
+.meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  /* Members are divided by a comma added in CSS (see ::after below) and one space of gap; the
+   * vertical gap only shows once a member wraps to a second line. A space of this text (15px,
+   * 400) measures 4.0px; with 6px the gap after the comma read as double („13 stylizacji,  3
+   * stylistki”). */
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Each meta member is an unbreakable unit (number + label, icon + status): wrapping happens
+ * BETWEEN members (flex-wrap), never inside (a pairing status icon used to land on its own line
+ * above the text). */
+.meta > span {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  white-space: nowrap;
+}
+
+/* Explicit exception: a member longer than the whole line (an e-mail) was cut by overflow:hidden.
+ * `data-breakable` lets it break anywhere, but only when it does not fit the line by itself:
+ * flex-wrap still moves it whole, because the line-breaking decision uses its full width. */
+.meta > span[data-breakable] {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Comma between meta members, added in CSS so no call site pastes punctuation by hand.
+ *
+ * DECISION: the middle dot as punctuation is banned product-wide (like dashes), so the separator
+ * is a comma. It sits AFTER a member (not before the next) so a wrapped line never starts with the
+ * mark; the negative margin eats the flex gap between the text and its comma. (owner) */
+.meta > span:not(:last-child)::after {
+  content: ',';
+  margin-left: calc(-1 * var(--space-4));
+}
+
+.meta strong {
+  font-weight: 700;
+  color: var(--color-accent-fg);
+}

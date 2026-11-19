@@ -1,0 +1,101 @@
+/* DECISION: owner chose the raspberry welcome field and theme-aware lower panel
+ * on 2026-10-30, and extended the motif to plan decisions on 2026-11-06. */
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-brand-field);
+  color: var(--color-on-brand-field);
+  --color-text-primary: var(--color-on-brand-field);
+  --color-text-secondary: var(--color-on-brand-field);
+  --color-focus-ring: var(--color-on-brand-field);
+}
+.field {
+  --btn-quiet-fg: var(--color-on-brand-field);
+  --btn-quiet-hover-bg: color-mix(
+    in oklch,
+    var(--color-on-brand-field) 12%,
+    var(--color-brand-field)
+  );
+  --btn-quiet-pressed-bg: color-mix(
+    in oklch,
+    var(--color-on-brand-field) 20%,
+    var(--color-brand-field)
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  gap: var(--space-20);
+  text-align: center;
+  padding: max(var(--space-40), env(safe-area-inset-top))
+    max(var(--space-24), env(safe-area-inset-right)) var(--space-32)
+    max(var(--space-24), env(safe-area-inset-left));
+}
+.welcome .field {
+  flex: 1 1 auto;
+  min-height: 14rem;
+}
+.decision .field {
+  padding-top: max(var(--space-24), env(safe-area-inset-top));
+  padding-bottom: var(--space-24);
+}
+.plinth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-16);
+  text-align: center;
+  background: var(--color-on-ink);
+  color: var(--color-ink);
+  --color-text-primary: var(--color-ink);
+  --color-text-secondary: var(--color-ink);
+  --color-bg-main: var(--color-on-ink);
+  --color-surface-interactive: var(--color-on-ink);
+  --color-surface-hover: var(--color-on-ink);
+  --color-surface-pressed: var(--color-on-ink);
+  --color-focus-ring: var(--color-ink);
+  --btn-quiet-fg: var(--color-ink);
+  --btn-quiet-border: var(--color-ink);
+  --btn-quiet-bg: var(--color-on-ink);
+  --btn-quiet-hover-bg: var(--color-on-ink);
+  --btn-quiet-pressed-bg: var(--color-on-ink);
+  padding: var(--space-24) max(var(--space-24), env(safe-area-inset-right))
+    max(var(--space-24), env(safe-area-inset-bottom))
+    max(var(--space-24), env(safe-area-inset-left));
+}
+.decision .plinth {
+  flex: 1 0 auto;
+}
+:root[data-mode='dark'] .plinth {
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+  --color-text-primary: var(--color-on-ink);
+  --color-text-secondary: var(--color-on-ink);
+  --color-bg-main: var(--color-ink);
+  --color-surface-interactive: var(--color-ink);
+  --color-surface-hover: var(--color-ink);
+  --color-surface-pressed: var(--color-ink);
+  --color-focus-ring: var(--color-on-ink);
+  --color-cta: var(--color-accent-on-ink);
+  --color-accent-text: var(--color-ink);
+  --btn-quiet-fg: var(--color-on-ink);
+  --btn-quiet-border: var(--color-on-ink);
+  --btn-quiet-bg: var(--color-ink);
+  --btn-quiet-hover-bg: var(--color-ink);
+  --btn-quiet-pressed-bg: var(--color-ink);
+}
+@media (max-height: 740px) {
+  .welcome .field {
+    min-height: 10rem;
+    padding-top: max(var(--space-24), env(safe-area-inset-top));
+  }
+}
+/* breakpoint-allow: retain the approved welcome spacing on 320px phones. */
+@media (max-width: 360px) {
+  .field,
+  .plinth {
+    padding-inline: max(var(--space-16), env(safe-area-inset-left))
+      max(var(--space-16), env(safe-area-inset-right));
+  }
+}

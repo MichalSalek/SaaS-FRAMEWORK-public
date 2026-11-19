@@ -1,0 +1,28 @@
+/* The tappability sign: a disc in the CTA colour, the arrow in the CTA text colour. The attribute
+ * selector (0-2-0) is deliberate: the sign inherits classes from the old chevrons (muted colour,
+ * rotation, margin), and its colour and fill must beat them whatever the module order in the
+ * bundle. Margin and position from those classes stay, because the sign sits in the same grid
+ * place. */
+.disc {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  transition: transform var(--duration-100) var(--brand-spring);
+}
+
+.disc[data-size] {
+  width: var(--disc-size, 32px);
+  height: var(--disc-size, 32px);
+  border-radius: var(--style-radius-round);
+  background: var(--color-cta);
+  color: var(--color-accent-text);
+  opacity: 1;
+}
+
+.disc[data-size='sm'] {
+  width: var(--disc-size, 28px);
+  height: var(--disc-size, 28px);
+}
+
+/* DECISION: the arrow disc stays raspberry on interactive rows. The rejected alternative (white
+ * disc with a text-colored outline) competed with the primary button for attention. (owner) */

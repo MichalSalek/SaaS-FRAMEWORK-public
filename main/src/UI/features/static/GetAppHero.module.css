@@ -1,0 +1,59 @@
+/* ─── GetAppHero: the „weź to na telefon" media hero (owner vote, B+C fusion).
+ * Shared by /get-app and /app/home (see the DECISION in GetAppHero.organism.tsx).
+ * Hero typography and skeleton live in components/LpHero; only the collage and
+ * store column here.
+ * ─── */
+
+/* C: phone(s) + stores underneath, a vertical proof column.
+ * text-align centres the "coming soon" note under the buttons. */
+.mediaWithStores {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  text-align: center;
+}
+
+/* B: collage of two phones, editorial offset.
+ * Vertical plus a slight overlap, no frame boxes around them (bare phones).
+ * The width MUST come from the wrappers: a PhoneMockup figure without a figcaption
+ * collapses to zero without a container dimension. */
+.collage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.collagePrimary {
+  width: clamp(180px, 58%, 260px);
+  z-index: 1;
+}
+
+/* The second screen (conversation) drops down and slightly overlaps the first;
+ * z-index lifts it ABOVE the gallery in the overlap strip. The phone frame takes 90%
+ * of the wrapper, so -24px at 390 gave frames TOUCHING instead of overlapping and two
+ * device outlines merged into a thick line (qa:borders probe). */
+.collageSecondary {
+  width: clamp(140px, 46%, 200px);
+  margin-top: clamp(48px, 9vw, 88px);
+  margin-left: clamp(-48px, -10vw, -40px);
+  z-index: 2;
+}
+
+/* Wrapper of GetAppStoreButtons inside .mediaWithStores: a transparent column
+   with the parent's gap, so the fragment (buttons row + "coming soon" note)
+   keeps the exact rhythm of the voted form. The scroll anchor of the funnel
+   CTAs is the hero's action block (GET_APP_STORES_ANCHOR_ID). */
+.storesAnchor {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+  /* Store CTA stack left-aligns (owner): favoured Android button on
+   * top, "coming soon" + iOS note read as left-aligned captions beneath it.
+   * text-align:left overrides the centered .mediaWithStores column for this
+   * block only (the phone collage above stays centered). */
+  text-align: left;
+}

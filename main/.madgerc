@@ -1,0 +1,9 @@
+{
+  "fileExtensions": ["ts", "tsx"],
+  "tsConfig": "tsconfig.json",
+  "detectiveOptions": {
+    "ts": { "skipTypeImports": true },
+    "tsx": { "skipTypeImports": true }
+  },
+  "excludeRegExp": ["READONLY-shared-kernel"]
+}
